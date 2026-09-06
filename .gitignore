@@ -1,0 +1,19 @@
+node_modules/
+数据/
+dist/
+runtime/
+.local/
+*.log
+*.lnk
+# Private local state and historical acceptance reports
+.local/
+docs/
+.env
+.env.*
+!.env.example
+config.local.json
+**/auth.json
+**/oauth_creds.json
+**/credentials.json
+*.db
+*.sqlite*

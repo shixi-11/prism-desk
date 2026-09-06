@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="stone" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#413528"/><stop offset="1" stop-color="#1b1712"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#f1dfb7"/><stop offset=".56" stop-color="#c7a574"/><stop offset="1" stop-color="#94734d"/>
+    </linearGradient>
+    <linearGradient id="shade" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#a98a5f"/><stop offset="1" stop-color="#59442d"/>
+    </linearGradient>
+    <clipPath id="tile"><rect x="20" y="20" width="472" height="472" rx="98"/></clipPath>
+  </defs>
+  <rect x="20" y="20" width="472" height="472" rx="98" fill="url(#stone)"/>
+  <g clip-path="url(#tile)">
+    <path d="M-10 390C79 380 139 317 216 336C298 357 349 400 526 299V524H-10Z" fill="#705839" opacity=".58"/>
+    <path d="M-10 455C102 438 164 391 246 395C340 401 397 436 526 369V524H-10Z" fill="#a18152" opacity=".35"/>
+    <path d="M-10 390C79 380 139 317 216 336C298 357 349 400 526 299" fill="none" stroke="#b18c57" stroke-width="5" opacity=".66"/>
+  </g>
+  <path d="M254 93L127 321L278 357Z" fill="url(#gold)"/>
+  <path d="M254 93L278 357L385 313Z" fill="url(#shade)"/>
+  <path d="M127 321L278 357L385 313L243 286Z" fill="#d4b681"/>
+  <path d="M254 93L127 321L278 357L385 313L254 93Z" fill="none" stroke="#ead4a8" stroke-width="7" stroke-linejoin="round"/>
+  <path d="M254 93L278 357M127 321L243 286L385 313" fill="none" stroke="#f0dab0" stroke-width="5" stroke-linejoin="round"/>
+  <rect x="22" y="22" width="468" height="468" rx="96" fill="none" stroke="#b49a6c" stroke-opacity=".35" stroke-width="3"/>
+</svg>
