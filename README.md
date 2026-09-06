@@ -1,20 +1,47 @@
 # Prism Desk · 棱镜
 
+<img src="src/assets/prism-icon.svg" width="80" height="80" alt="Prism Desk">
+
 [English](#english) · [简体中文](#简体中文)
 
 ## English
 
-Switch accounts. Keep working on the same task.
+Your project keeps moving, even when you change accounts.
 
-Prism Desk brings subscription CLIs into one Windows desktop workspace. A task keeps its conversation, project folder and handoff notes as you move between execution accounts. Model and reasoning settings stay with the task.
+Prism Desk is a Windows workspace for subscription CLIs. When one account runs out of allowance, you can move the task to another without rebuilding its conversation and progress notes by hand. The project folder stays the same.
 
-### Working in Prism
+### What you can do
 
-Create a task, choose its project folder and select an account. Start in read-only mode, or allow changes when the task requires editing files.
+| Feature | In practice |
+| --- | --- |
+| Continue the same task | Keep the original request, conversation, progress notes and recorded tool results together when handing work to another account. |
+| Choose an execution account | Select a configured Codex, Claude, Grok or Gemini CLI profile. Each uses its own login directory. |
+| Change model and reasoning | Adjust either setting during a task. Changes apply to the next execution and are saved per account within that task. |
+| Check allowance | View available provider-reported percentages, allowance windows and reset times. Codex reset credits include their individual expiry dates when returned. |
+| Hand off after exhaustion | Enable automatic handoff, or select the next account yourself. Prism waits for the previous execution to finish before continuing. |
+| Use local skills and tools | Point Prism to assistant instructions, a skills folder and installed applications. Check discovered entry points and supported application operations. |
+| Keep your work locally | Choose a permanent task-storage folder, add progress notes and export a Markdown conversation record. |
+| Work in your language | Choose one of nine interface languages, including right-to-left Arabic, and switch between light and dark desert themes. |
 
-When switching accounts, Prism waits for the current execution to stop, then passes the task's instructions, progress notes and recorded results to the next account. You can change the model and reasoning effort during a task; the new settings take effect on the next execution.
+### A typical task
 
-The interface has two desert themes: warm sand by day, dark earth by night. It supports Simplified Chinese, Traditional Chinese, English, Japanese, Korean, Spanish, French, German and Arabic. Language selection is saved, and Arabic uses a right-to-left layout. Conversation text stays in its original language.
+1. Click **New task**, give it a name and choose the project folder.
+2. Select an execution account, model and reasoning effort. Use **Read only** for review, or **Allow project changes** for editing.
+3. Enter your request and send it with **Ctrl + Enter**. Follow the conversation and execution log as work progresses.
+4. Add important decisions or remaining work to the progress notes. To change accounts, select the next account and use the handoff control; stop the current execution first when required.
+5. Continue in the same task. Export its record when you need a Markdown copy, or open the task-storage folder to find the local files.
+
+For example, start a game project with one account, record what is finished and what remains, then let another account continue in the same project folder. A handoff carries recorded context; it does not transfer a provider's internal model state.
+
+### Day and night
+
+Warm sand in daylight. Dark earth after dusk. The same workspace, with a quieter palette for each.
+
+| Day | Night |
+| --- | --- |
+| ![Day theme artwork](src/assets/desert-day.jpg) | ![Night theme artwork](src/assets/desert-night.jpg) |
+
+*Theme artwork used by the app.*
 
 ### Install
 
@@ -39,6 +66,24 @@ Copy-Item config.example.json .local/config.json
 ```
 
 Edit `.local/config.json` for your computer. You can also set `PRISM_CONFIG` to an absolute configuration-file path.
+
+A single-account configuration looks like this. Replace the sample login directory with your own, and choose a model available to your account. Adding more entries to `profiles` adds more execution accounts.
+
+```json
+{
+  "profiles": [
+    {
+      "id": "codex-personal-1",
+      "provider": "Codex",
+      "name": "Personal 1",
+      "home": "C:/PrismAccounts/codex-personal-1",
+      "executable": "codex.exe",
+      "model": "gpt-5.6-sol",
+      "write": true
+    }
+  ]
+}
+```
 
 | Field | Purpose |
 | --- | --- |
@@ -81,17 +126,42 @@ For an issue report, include the app and CLI versions, reproduction steps and a 
 
 ## 简体中文
 
-换一个执行账号，接着完成同一个任务。
+账号可以换，手上的项目接着做。
 
-棱镜把订阅 CLI 放进同一个 Windows 桌面工作台。切换账号时，对话、项目目录和交接记录仍留在原来的任务里，模型与思考等级也随任务保存。
+棱镜是一款面向订阅 CLI 的 Windows 桌面工作台。一个账号额度用完，可以把任务交给另一个账号，不必手动重建对话、重新整理进度。继续用原来的项目目录，把工作做下去。
 
-### 在棱镜中工作
+### 可以做什么
 
-新建任务，选择项目目录和执行账号。默认以只读模式开始，需要修改文件时再开启项目写入权限。
+| 功能 | 具体用途 |
+| --- | --- |
+| 同一任务接续 | 切换账号时保留原始要求、对话、进度备注和已记录的工具结果，供下一次执行读取。 |
+| 选择执行账号 | 在已配置的 Codex、Claude、Grok、Gemini CLI 入口之间选择，各账号使用独立登录目录。 |
+| 切换模型与思考等级 | 任务过程中即可调整，从下一次执行生效；设置按任务内的不同账号分别保存。 |
+| 查看额度 | 展示提供方可返回的剩余百分比、限制周期和恢复时间；Codex 重置卡按返回结果逐张列出到期日。 |
+| 额度耗尽后换号 | 可开启自动接续，也可手动选择下一个账号。前一次执行结束后，才开始下一次执行。 |
+| 使用技能与本机工具 | 配置助手指令、技能目录和应用路径，查看已发现的入口，并验证受支持的应用操作。 |
+| 在本机保存工作 | 指定固定会话目录、补充进度备注，并将对话导出为 Markdown。 |
+| 选择语言与主题 | 支持九种界面语言、阿拉伯语从右到左布局，以及日间和夜间的大漠主题。 |
 
-切换账号时，棱镜会等待当前执行停止，再把任务要求、进度备注和已记录的执行结果交给下一个账号。任务过程中可以调整模型与思考等级，新设置从下一次执行生效。
+### 怎么使用
 
-界面沿用大漠的色调：白天是温暖的沙色，夜晚是沉静的深褐。支持简体中文、繁体中文、英语、日语、韩语、西班牙语、法语、德语和阿拉伯语，自动保存语言选择，并为阿拉伯语提供从右到左的布局。对话内容保留原文。
+1. 点击**新建任务**，填写名称，选择实际要工作的项目文件夹。
+2. 选择**执行账号、模型和思考等级**。查看或分析资料时使用只读模式，需要改文件时选择**允许修改项目**。
+3. 输入要求，点击发送或按 **Ctrl + Enter**。在对话和执行记录中查看进展。
+4. 把重要决定和待办写入**进度备注**。需要换号时，选择下一个账号并使用接续按钮；当前仍在执行时，先按提示停止。
+5. 在原任务中继续。需要留档时使用**导出记录**生成 Markdown，也可打开会话保存位置查看本机文件。
+
+例如，做一个游戏时，先让一个账号完成部分开发，把完成项和待办记下来，再换另一个账号接着处理同一个项目。交接传递的是已经记录的上下文，不是提供方内部的模型状态。
+
+### 白天与黑夜
+
+白天是沙色，夜晚是深褐。保留大漠的空旷与沉静，让对话和工作留在画面中央。
+
+| 日间 | 夜间 |
+| --- | --- |
+| ![棱镜日间主题背景](src/assets/desert-day.jpg) | ![棱镜夜间主题背景](src/assets/desert-night.jpg) |
+
+*以上为应用使用的主题背景。*
 
 ### 安装
 
@@ -116,6 +186,24 @@ Copy-Item config.example.json .local/config.json
 ```
 
 按自己的电脑环境编辑 `.local/config.json`，也可通过环境变量 `PRISM_CONFIG` 指定配置文件的绝对路径。
+
+下面是一个账号的配置示例。将示例登录目录换成自己的目录，并填写账号可用的模型；在 `profiles` 数组中继续添加条目，即可增加执行账号。
+
+```json
+{
+  "profiles": [
+    {
+      "id": "codex-personal-1",
+      "provider": "Codex",
+      "name": "个人-1",
+      "home": "C:/PrismAccounts/codex-personal-1",
+      "executable": "codex.exe",
+      "model": "gpt-5.6-sol",
+      "write": true
+    }
+  ]
+}
+```
 
 | 字段 | 用途 |
 | --- | --- |
