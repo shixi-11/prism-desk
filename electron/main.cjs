@@ -128,6 +128,7 @@ app.whenReady().then(() => {
   handle("stop", () => runner.stop());
   handle("approve", (id, decision) => runner.approve(id, decision));
   handle("update", (id, update) => {
+    if(update && Object.keys(update).length===1 && ('title' in update || 'mode' in update))return require('./task-settings.cjs').updateTaskSetting(store,runner,id,update);
     const task = store.get(id);
     runner.assertIdle(task);
     if (

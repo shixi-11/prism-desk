@@ -29,7 +29,8 @@ Prism Desk is a Windows workspace for subscription CLIs. When one account runs o
 2. Select an execution account, model and reasoning effort. Use **Read only** for review, or **Allow project changes** for editing.
 3. Enter your request and send it with **Ctrl + Enter**. Follow the conversation and execution log as work progresses.
 4. Add important decisions or remaining work to the progress notes. To change accounts, select the next account and use the handoff control; stop the current execution first when required.
-5. Continue in the same task. Export its record when you need a Markdown copy, or open the task-storage folder to find the local files.
+5. Rename a task with its pencil button, a double-click or **F2**. Press **Enter** to save or **Esc** to cancel.
+6. Continue in the same task. Export its record when you need a Markdown copy, or open the task-storage folder to find the local files.
 
 For example, start a game project with one account, record what is finished and what remains, then let another account continue in the same project folder. A handoff carries recorded context; it does not transfer a provider's internal model state.
 
@@ -99,6 +100,10 @@ Use absolute paths for local resources and a separate login directory for each a
 
 Tasks are stored in the application's user-data directory unless `storageRoot` is set. Login credentials stay in the provider's own directory. Local configuration, task records and logs are excluded from Git.
 
+### File and command permissions
+
+Choose **Read only**, **Allow project changes**, or **Full access** in the composer. Full access is available for Codex and Claude: it permits files outside the project and automatically approves tool execution, within operating-system permissions. Changes made during execution are queued for the next run. Account billing settings remain separate.
+
 ### Accounts and local tools
 
 Codex and Claude adapters support file-editing tasks. Grok and Gemini adapters use read-only execution. Available models depend on the installed CLI and the selected account.
@@ -149,7 +154,8 @@ For an issue report, include the app and CLI versions, reproduction steps and a 
 2. 选择**执行账号、模型和思考等级**。查看或分析资料时使用只读模式，需要改文件时选择**允许修改项目**。
 3. 输入要求，点击发送或按 **Ctrl + Enter**。在对话和执行记录中查看进展。
 4. 把重要决定和待办写入**进度备注**。需要换号时，选择下一个账号并使用接续按钮；当前仍在执行时，先按提示停止。
-5. 在原任务中继续。需要留档时使用**导出记录**生成 Markdown，也可打开会话保存位置查看本机文件。
+5. 点击任务旁的铅笔、双击任务名或按 **F2** 即可重命名，按 **Enter** 保存，按 **Esc** 取消。
+6. 在原任务中继续。需要留档时使用**导出记录**生成 Markdown，也可打开会话保存位置查看本机文件。
 
 例如，做一个游戏时，先让一个账号完成部分开发，把完成项和待办记下来，再换另一个账号接着处理同一个项目。交接传递的是已经记录的上下文，不是提供方内部的模型状态。
 
@@ -218,6 +224,10 @@ Copy-Item config.example.json .local/config.json
 本机资源使用绝对路径，每个账号使用独立的登录目录。已有任务通过账号 ID 识别执行入口，配置后应保持 ID 稳定。默认账号结构见 [electron/config.cjs](electron/config.cjs)。
 
 未设置 `storageRoot` 时，会话保存在应用用户数据目录。登录凭据留在各提供方自己的目录中，本地配置、任务记录和日志不进入 Git。
+
+### 文件与命令权限
+
+在输入框下方选择**只读**、**允许修改项目**或**完全访问**。Codex 和 Claude 支持完全访问，可在操作系统权限范围内访问项目外文件，并自动允许工具执行。执行中修改权限会排到下一轮生效；账号的计费设置单独处理。
 
 ### 账号与本机工具
 

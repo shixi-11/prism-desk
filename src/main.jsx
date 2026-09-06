@@ -21,12 +21,30 @@ import {
   Download,
   Check,
   CircleDot,
+  Pencil,
 } from "lucide-react";
 import "./style.css";
 import "./desert.css";
 import {tr,setLanguage,locale,languages} from './i18n.js';
 
 const api = window.prism;
+function TaskEntry({item,selected,onSelect,onRename}){
+  const [editing,setEditing]=useState(false),[name,setName]=useState(item.title),[saving,setSaving]=useState(false);
+  const begin=()=>{setName(item.title);setEditing(true);};
+  async function save(e){e.preventDefault();if(!name.trim()||saving)return;setSaving(true);try{await onRename(item.id,name.trim());setEditing(false);}catch{}finally{setSaving(false);}}
+  return <div className="task-entry">
+    {editing?<form className="task-rename" onSubmit={save}>
+      <input autoFocus dir="auto" aria-label={tr("任务名称")} maxLength={100} value={name} disabled={saving} onFocus={e=>e.target.select()} onChange={e=>setName(e.target.value)} onKeyDown={e=>{if(e.key==='Escape'&&!saving)setEditing(false);}}/>
+      <button type="submit" aria-label={tr("保存名称")} disabled={saving||!name.trim()}><Check size={15}/></button>
+      <button type="button" aria-label={tr("取消")} disabled={saving} onClick={()=>setEditing(false)}><X size={15}/></button>
+    </form>:<>
+      <button className={`task-select ${selected?'selected':''}`} onClick={onSelect} onDoubleClick={begin} onKeyDown={e=>{if(e.key==='F2'){e.preventDefault();begin();}}} title={item.title}>
+        <CircleDot size={11}/><span dir="auto">{item.title}</span>{item.state==='running'&&<span className="status-dot"/>}
+      </button>
+      <button className="task-rename-button" title={tr("重命名")} aria-label={`${tr("重命名")} ${item.title}`} onClick={begin}><Pencil size={14}/></button>
+    </>}
+  </div>;
+}
 const labels = {
   idle: tr("就绪"),
   running: tr("正在执行"),
@@ -727,17 +745,7 @@ function App() {
           </span>
         </div>
         <nav aria-label={tr("任务列表")}>
-          {init.tasks.map((t) => (
-            <button
-              key={t.id}
-              className={task?.id === t.id ? "selected" : ""}
-              onClick={() => changeTask(t.id)}
-            >
-              <CircleDot size={11} />
-              <span>{t.title}</span>
-              {t.state === "running" && <span className="status-dot" />}
-            </button>
-          ))}
+          {init.tasks.map(t=><TaskEntry key={t.id} item={t} selected={task?.id===t.id} onSelect={()=>changeTask(t.id)} onRename={async(id,title)=>{try{const updated=await api.update(id,{title});setInit(old=>({...old,tasks:old.tasks.map(t=>t.id===id?updated:t)}));setTask(old=>old?.id===id?updated:old);}catch(error){fail(error);throw error;}}}/>)}
           {!init.tasks.length && (
             <p className="no-tasks">{tr("你的任务会留在这里。")}</p>
           )}
@@ -811,14 +819,17 @@ function App() {
               {task && (
                 <select
                   aria-label={tr("文件修改权限")}
-                  disabled={anyBusy || task.state === "unknown"}
-                  value={task.mode}
+                  disabled={task.state === "unknown"}
+                  value={task.pendingMode||task.mode}
+                  title={tr("完全访问可操作项目外文件并自动允许工具执行；权限修改在下一轮生效。")}
                   onChange={(e) => changeMode(e.target.value)}
                 >
                   <option value="read-only">{tr("只读")}</option>
-                  <option value="workspace-write">{tr("允许修改项目")}</option>
+                  <option value="workspace-write" disabled={!init.profiles.find(p=>p.id===task.profile)?.write}>{tr("允许修改项目")}</option>
+                  <option value="full-access" disabled={!init.profiles.find(p=>p.id===task.profile)?.write}>{tr("完全访问")}</option>
                 </select>
               )}
+              {task?.pendingMode&&<small className="permission-pending">{tr("下次执行生效")}</small>}
               <span className="compose-spacer" />
               {busy ? (
                 <button

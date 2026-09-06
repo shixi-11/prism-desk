@@ -315,9 +315,9 @@ class TaskStore {
       !fs.statSync(cwd).isDirectory()
     )
       throw Error("请选择已有的工作目录。");
-    profileFor(profile);
-    if(mode==='workspace-write' && !profileFor(profile).write)throw Error('这个入口只支持只读研究。');
-    if (!["read-only", "workspace-write"].includes(mode))
+    require('./task-settings.cjs').validateMode(mode,profileFor(profile));
+    if(mode!=='read-only' && !profileFor(profile).write)throw Error('这个入口只支持只读研究。');
+    if (!["read-only", "workspace-write", "full-access"].includes(mode))
       throw Error("工作模式无效。");
     return this.save({
       id: crypto.randomUUID(),
@@ -393,7 +393,7 @@ class TaskStore {
   }
 }
 function environmentPrompt(task, cap, record) {
-  return `你在棱镜中继续同一项任务。使用用户选择的语言回复。当前账号已由棱镜指定；不要自行调用其他 CLI、当前 Codex 桌面或 API 计费入口。只在本次任务范围内工作。\n工作目录：${task.cwd}\n模式：${task.mode}。${task.mode === "read-only" ? "禁止修改文件。" : "只修改工作目录内与本任务相关的文件。"}\n不得启动脱离当前执行的后台任务；所有应用调用等待退出并记录真实结果。不发送、不发布、不付费。不要读取账号认证文件、浏览器资料或无关私密目录。\n${CONFIG.assistant.instructions ? CONFIG.assistant.instructions + "\n" : ""}${TAICHU ? `按需读取用户配置的助手入口 ${path.join(TAICHU, "SKILL.md")}，仅加载任务相关参考。\n` : ""}${SKILLS ? `技能目录：${SKILLS}。按任务选用相关 SKILL.md，不把技能全集读取进上下文。` : "未配置共享技能目录。"}技能描述不代表工具已可用；以本次 CLI 工具与本机实际应用为准。\n本机已发现应用：${cap.apps
+  return `你在棱镜中继续同一项任务。使用用户选择的语言回复。当前账号已由棱镜指定；不要自行调用其他 CLI、当前 Codex 桌面或 API 计费入口。只在本次任务范围内工作。\n工作目录：${task.cwd}\n模式：${task.mode}。${task.mode === "read-only" ? "禁止修改文件。" : task.mode === "full-access" ? "用户已选择完全访问，可按本次任务需要操作项目外文件和本机命令，无需逐次请求工具执行确认。" : "只修改工作目录内与本任务相关的文件。"}\n不得启动脱离当前执行的后台任务；所有应用调用等待退出并记录真实结果。不发送、不发布、不付费。不要读取账号认证文件、浏览器资料或无关私密目录。\n${CONFIG.assistant.instructions ? CONFIG.assistant.instructions + "\n" : ""}${TAICHU ? `按需读取用户配置的助手入口 ${path.join(TAICHU, "SKILL.md")}，仅加载任务相关参考。\n` : ""}${SKILLS ? `技能目录：${SKILLS}。按任务选用相关 SKILL.md，不把技能全集读取进上下文。` : "未配置共享技能目录。"}技能描述不代表工具已可用；以本次 CLI 工具与本机实际应用为准。\n本机已发现应用：${cap.apps
     .filter((a) => a.installed)
     .map((a) => `${a.name}: ${a.path}`)
     .join(

@@ -204,5 +204,9 @@
   "{n} 张": "{n} crédits",
   "{n} 条记录": "{n} entrées",
   "{n} 小时": "{n} heures",
-  "插件与 MCP 需在各执行入口单独授权。": "Les extensions et serveurs MCP nécessitent une autorisation distincte pour chaque fournisseur d’exécution."
+  "插件与 MCP 需在各执行入口单独授权。": "Les extensions et serveurs MCP nécessitent une autorisation distincte pour chaque fournisseur d’exécution.",
+  "重命名": "Renommer",
+  "保存名称": "Enregistrer le nom",
+  "完全访问": "Accès complet",
+  "完全访问可操作项目外文件并自动允许工具执行；权限修改在下一轮生效。": "Autorise les fichiers hors du projet et approuve automatiquement les outils. Les changements prennent effet à la prochaine exécution."
 }

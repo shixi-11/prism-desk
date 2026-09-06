@@ -204,5 +204,9 @@
   "{n} 张": "{n} credits",
   "{n} 条记录": "{n} entries",
   "{n} 小时": "{n} hours",
-  "插件与 MCP 需在各执行入口单独授权。": "Plugins and MCP servers require separate authorization for each execution provider."
+  "插件与 MCP 需在各执行入口单独授权。": "Plugins and MCP servers require separate authorization for each execution provider.",
+  "重命名": "Rename",
+  "保存名称": "Save name",
+  "完全访问": "Full access",
+  "完全访问可操作项目外文件并自动允许工具执行；权限修改在下一轮生效。": "Full access allows files outside the project and automatically approves tool execution. Permission changes apply to the next run."
 }

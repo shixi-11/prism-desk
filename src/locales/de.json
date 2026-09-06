@@ -204,5 +204,9 @@
   "{n} 张": "{n} Guthaben",
   "{n} 条记录": "{n} Einträge",
   "{n} 小时": "{n} Stunden",
-  "插件与 MCP 需在各执行入口单独授权。": "Plugins und MCP-Server benötigen für jeden Ausführungsanbieter eine gesonderte Autorisierung."
+  "插件与 MCP 需在各执行入口单独授权。": "Plugins und MCP-Server benötigen für jeden Ausführungsanbieter eine gesonderte Autorisierung.",
+  "重命名": "Umbenennen",
+  "保存名称": "Namen speichern",
+  "完全访问": "Vollzugriff",
+  "完全访问可操作项目外文件并自动允许工具执行；权限修改在下一轮生效。": "Erlaubt Dateien außerhalb des Projekts und genehmigt Werkzeugaufrufe automatisch. Änderungen gelten ab der nächsten Ausführung."
 }

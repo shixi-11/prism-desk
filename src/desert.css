@@ -505,3 +505,11 @@ html:not([lang^="zh"]) .empty h1 { font-size:clamp(26px,3vw,44px); }
  html:not([lang^="zh"]) .inspector .quota { font-size:16px; flex-wrap:wrap; }
  html:not([lang^="zh"]) .inspector .quota strong { font-size:16px; }
 }
+.task-entry { position:relative; }
+.task-entry .task-select { padding-inline-end:38px; }
+.task-entry .task-rename-button { position:absolute; inset-inline-end:3px; top:50%; transform:translateY(-50%); width:28px; height:30px; padding:6px; margin:0; background:transparent; opacity:.55; }
+.task-entry:hover .task-rename-button, .task-entry .task-rename-button:focus-visible { opacity:1; }
+.task-rename { display:flex; align-items:center; gap:4px; padding:8px 0; }
+.task-rename input { min-width:0; width:100%; padding:8px; color:var(--text); background:var(--writing-bg); border:1px solid var(--line); }
+.task-entry .task-rename button { width:28px; flex-shrink:0; padding:5px; margin:0; background:transparent; }
+.permission-pending { color:var(--muted); font-size:11px; }

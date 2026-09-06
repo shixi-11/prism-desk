@@ -124,6 +124,6 @@ test("record path traversal and invalid work modes are rejected", (t) => {
   const { store, dir } = setup(t);
   assert.throws(() => store.get("../other"));
   assert.throws(() =>
-    store.create({ title: "x", cwd: dir, mode: "full-access" }),
+    store.create({ title: "x", cwd: dir, mode: "invalid-mode" }),
   );
 });

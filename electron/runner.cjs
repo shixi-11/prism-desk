@@ -37,9 +37,10 @@ class Runner extends EventEmitter {
   switch(id, profile) {
     const task = this.store.get(id);
     this.assertIdle(task);
+    require('./task-settings.cjs').applyPendingMode(task);
     const nextProfile=profileFor(profile);
-    if(task.mode==='workspace-write' && !nextProfile.write) throw Error('这个入口仅支持只读研究，请先将任务改为只读。');
-    if (task.profile === profile) return task;
+    require('./task-settings.cjs').validateMode(task.mode,nextProfile);
+    if (task.profile === profile) return this.store.save(task);
     const previous = task.profile;
     const progress = require('./handoff.cjs').snapshot(task, this.store.events(id));
     task.profile = profile;
@@ -58,8 +59,9 @@ class Runner extends EventEmitter {
       throw Error("请输入 1–60000 字的指令。");
     const task = this.store.get(id);
     this.assertIdle(task);
+    require('./task-settings.cjs').applyPendingMode(task);
     let profile = require('./models.cjs').selection(task,profileFor(task.profile));
-    if(task.mode==='workspace-write' && !profile.write) throw Error('这个入口仅支持只读研究。');
+    require('./task-settings.cjs').validateMode(task.mode,profile);
     this.event(id, "user", { text: text.trim(), profile: profile.id });
     this.active = { task, profile, phase: "starting", pending: new Map(), cancelRequested:false };
     this.state(task, "running");
@@ -69,7 +71,7 @@ class Runner extends EventEmitter {
         if(task.pendingModelRefresh?.[profile.id]){delete task.sessions[profile.id];delete task.pendingModelRefresh[profile.id];this.store.save(task);}
         attempted.add(profile.id);
         Object.assign(this.active,{profile,started:false,quotaExhausted:false,quotaByWindow:{},rpc:null,proc:null,turnId:null,grok:false,sessionId:null});
-        task.execution = {profile:profile.id, model:profile.model, effort:profile.effort};
+        task.execution = {profile:profile.id, model:profile.model, effort:profile.effort, mode:task.mode};
         const record=this.store.context(task);
         const instructions=environmentPrompt(task,capabilities(),record);
         this.state(task,'running');
@@ -84,7 +86,8 @@ class Runner extends EventEmitter {
         }
         if(this.active.quotaExhausted)this.event(id,'notice',{text:`${profile.provider} / ${profile.name} 订阅额度已耗尽。${task.autoSwitch===false?'自动接续已关闭，请选择其他账号继续。':'正在检查可接续的账号。'}`});
         if(task.autoSwitch===false || this.active.cancelRequested || !this.active.quotaExhausted || task.state!=='failed')break;
-        const next=PROFILES.find(p=>!attempted.has(p.id) && (task.mode==='read-only'||p.write));
+        require('./task-settings.cjs').applyPendingMode(task);
+        const next=PROFILES.find(p=>!attempted.has(p.id) && (task.mode==='read-only'||p.write&&['Codex','Claude'].includes(p.provider)));
         if(!next){this.event(id,'notice',{text:'已尝试所有符合当前权限的入口；没有自动重复调用。'});break;}
         this.active.pending.clear();
         this.emit('approval-reset',{taskId:task.id});
@@ -201,8 +204,8 @@ class Runner extends EventEmitter {
         cwd: task.cwd,
         model: profile.model,
         modelProvider: "openai",
-        approvalPolicy: "on-request",
-        sandbox: task.mode === "read-only" ? "read-only" : "workspace-write",
+        approvalPolicy: require('./task-settings.cjs').codexPermissions(task.mode).approvalPolicy,
+        sandbox: require('./task-settings.cjs').codexPermissions(task.mode).sandbox,
         developerInstructions: instructions,
       };
       const session = task.sessions[profile.id];
@@ -223,7 +226,7 @@ class Runner extends EventEmitter {
         model: profile.model,
         effort: profile.effort || "xhigh",
         sandboxPolicy:
-          task.mode === "read-only"
+          task.mode === "full-access" ? { type: "dangerFullAccess" } : task.mode === "read-only"
             ? { type: "readOnly" }
             : {
                 type: "workspaceWrite",
@@ -291,7 +294,7 @@ class Runner extends EventEmitter {
       "--append-system-prompt",
       instructions,
       "--permission-mode",
-      "dontAsk",
+      task.mode === "full-access" ? "bypassPermissions" : "dontAsk",
       "--allowedTools",
       task.mode === "read-only"
         ? "Read,Glob,Grep"
@@ -301,6 +304,7 @@ class Runner extends EventEmitter {
         ? "Read,Glob,Grep"
         : "Read,Glob,Grep,Edit,Write,Bash",
     ];
+    if(task.mode === "full-access")args.push("--dangerously-skip-permissions");
     if (task.sessions[profile.id])
       args.push("--resume", task.sessions[profile.id]);
     const proc = spawnCLI(profile, args, task.cwd);
@@ -419,7 +423,7 @@ class Runner extends EventEmitter {
     if(!run || run.task.id!==id)throw Error('当前任务没有正在执行的请求');
     if(run.requestedHandoff)throw Error('正在等待旧执行停止');
     const next = profileFor(profile);
-    if(run.task.mode==='workspace-write'&&!next.write)throw Error('目标账号仅支持只读研究');
+    require('./task-settings.cjs').validateMode(run.task.pendingMode||run.task.mode,next);
     if(run.started && !run.proc?.requestStop && !(run.grok && run.sessionId) && !(run.rpc && run.turnId))throw Error('此入口暂不支持可靠中断，请等待本轮结束');
     run.requestedHandoff=profile;
     try { await this.stop(); } catch(e){delete run.requestedHandoff;throw e;}
