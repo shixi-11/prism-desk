@@ -298,7 +298,7 @@ app.whenReady().then(() => {
     height: 940,
     minWidth: 1000,
     minHeight: 640,
-    title: "棱镜 · PRISM",
+    title: `棱镜 · Prism v${app.getVersion()}`,
     icon: path.join(__dirname, "..", "src", "assets", "prism.ico"),
     backgroundColor: "#272119",
     show: !process.env.PRISM_TEST_HIDE,
@@ -311,6 +311,7 @@ app.whenReady().then(() => {
     },
   });
   windows.add(window);
+  window.on('page-title-updated',event=>event.preventDefault());
   window.on('closed',()=>windows.delete(window));
   window.webContents.setWindowOpenHandler(() => ({ action: "deny" }));
   window.setMenu(null);
