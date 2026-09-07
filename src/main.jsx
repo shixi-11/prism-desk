@@ -832,7 +832,7 @@ function App() {
             <UsersRound size={18} />{tr("账号")}</button>
           <button onClick={() => setModal("capabilities")}>
             <BookOpen size={18} />{tr("共享能力")}</button>
-          <button onClick={()=>setTaskDialog({action:'history'})}><Archive size={18}/>{tr('归档与已删除')}</button>
+          <button onClick={()=>setTaskDialog({action:'history'})}><Archive size={18}/>{tr('归档')}</button>
           <button onClick={()=>setModal("settings")}><Settings2 size={18}/>{tr("设置")}</button>
         </footer>
       </aside>
