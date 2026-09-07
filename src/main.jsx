@@ -2,12 +2,14 @@ import React, { useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import Markdown from "react-markdown";
 import PreviewPanel,{LinkedMarkdown} from "./PreviewPanel.jsx";
-import {ImageAttachments,QueuedMessages,ActivityPanel,GeneralSettings} from "./TaskControls.jsx";
+import {ImageAttachments,QueuedMessages,ActivityPanel,GeneralSettings,AccountQuota} from "./TaskControls.jsx";
 import {
   Sun,
   Languages,
   ImagePlus,
   PanelRightOpen,
+  PanelRight,
+  PanelBottom,
   Moon,
   Monitor,
   Plus,
@@ -415,12 +417,12 @@ function Inspector({
           </span>
           <button
             className="quiet"
-            disabled={checking === target}
+            disabled={checking.includes(target)}
             onClick={() => onRefresh(target)}
           >
             <RefreshCw
               size={12}
-              className={checking === target ? "spinning" : ""}
+              className={checking.includes(target) ? "spinning" : ""}
             />{tr("刷新")}</button>
         </div>
         {quota?.status && <p className="account-status">{tr(quota.status)}</p>}
@@ -527,7 +529,7 @@ function Conversation({ task, events, streaming, onNew, onPreview }) {
   );
 }
 function ExecutionLog({ events }) {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(true);
   const records = events.filter((e) =>
     ["tool", "notice", "diff", "plan"].includes(e.type),
   );
@@ -578,6 +580,8 @@ function App() {
   const [events, setEvents] = useState([]);
   const [modal, setModal] = useState("");
   const [preview,setPreview]=useState(null);
+  const [view,setView]=useState(()=>{try{return {...{log:false,inspector:true},...JSON.parse(localStorage.getItem('prism-view')||'{}')};}catch{return {log:false,inspector:true};}});
+  const changeView=update=>setView(old=>{const next={...old,...update};localStorage.setItem('prism-view',JSON.stringify(next));return next;});
   const [theme, setTheme] = useState("system");
   const [language,changeLanguage]=useState('zh');
   const [draftSettings,setDraftSettings]=useState({}),[draftAccount,setDraftAccount]=useState('');
@@ -587,7 +591,8 @@ function App() {
   const [streaming, setStreaming] = useState("");
   const [toast, setToast] = useState("");
   const [quotas, setQuotas] = useState({});
-  const [checking, setChecking] = useState("");
+  const [checking, setChecking] = useState([]);
+  const [bulk,setBulk]=useState(null);
   const [approvals, setApprovals] = useState([]);
   const approval = approvals[0];
   const finishApproval = () => setApprovals((old) => old.slice(1));
@@ -729,7 +734,7 @@ function App() {
   const savePreferences=async update=>{try{const settings=await api.preferences(update);setInit(old=>({...old,settings}));}catch(e){fail(e);}};
   const addImages=async files=>{if(!task){if(files){const list=Array.from(files).filter(file=>file.type.startsWith("image/"));if(list.length>5){fail(Error(tr("每条消息最多添加 5 张图片")));return;}if(list.some(file=>file.size>10*1024*1024)){fail(Error(tr("图片不能超过 10 MB")));return;}pendingImageFiles.current=list;}setModal("new");return;}const taskId=task.id;setUploading(true);try{let inputs=null;if(files){const list=Array.from(files).filter(file=>file.type.startsWith("image/"));if(!list.length)return;if(images.length+list.length>5)throw Error(tr("每条消息最多添加 5 张图片"));inputs=await Promise.all(list.map(async file=>{if(file.size>10*1024*1024)throw Error(tr("图片不能超过 10 MB"));const bytes=new Uint8Array(await file.arrayBuffer());let binary="";for(let i=0;i<bytes.length;i+=32768)binary+=String.fromCharCode(...bytes.subarray(i,i+32768));return{name:file.name,data:btoa(binary)};}));}const added=await api.addImages(taskId,inputs);if(images.length+added.length>5)throw Error(tr("每条消息最多添加 5 张图片"));if(current.current===taskId)setImages(old=>[...old,...added].slice(0,5));else drafts.current[taskId]={...drafts.current[taskId],images:[...(drafts.current[taskId]?.images||[]),...added].slice(0,5)};}catch(e){fail(e);}finally{setUploading(false);}};
   const refresh = async (id,model) => {
-    setChecking(id);
+    setChecking(old=>[...old,id]);
     try {
       const result = await api.quota(id,model||task?.modelSettings?.[id]?.model||draftSettings[id]?.model);
       setQuotas((old) => ({ ...old, [id]: result }));
@@ -743,9 +748,10 @@ function App() {
         },
       }));
     } finally {
-      setChecking("");
+      setChecking(old=>old.filter(value=>value!==id));
     }
   };
+  const refreshAll=async()=>{if(bulk||checking.length)return;const profiles=[...init.profiles];let cursor=0,done=0;setBulk({done:0,total:profiles.length});try{await Promise.all(Array.from({length:Math.min(2,profiles.length)},async()=>{while(cursor<profiles.length){const profile=profiles[cursor++];await refresh(profile.id);setBulk({done:++done,total:profiles.length});}}));}finally{setBulk(null);}};
   const changeMode = async (mode) => {
     try {
       const t = await api.update(task.id, { mode });
@@ -771,7 +777,7 @@ function App() {
       </div>
     );
   return (
-    <div className={`workbench ${events.length?"has-conversation":""}`}>
+    <div className={`workbench ${events.length?"has-conversation":""} ${view.inspector?'':'inspector-hidden'}`}>
       <aside className="sidebar">
         <div className="brand">
           <PrismMark />
@@ -805,7 +811,7 @@ function App() {
             <h2>{task?.title || tr("新任务")}</h2>
             <p>{tr("一个任务，持续向前。")}</p>
           </div>
-          <div className="appearance-controls"><button title={tr("画布与预览")} disabled={!task} onClick={()=>setPreview({id:Date.now(),target:null,task})}><PanelRightOpen size={18}/></button><label className="language-control"><Languages size={18} aria-hidden="true"/><select className="language-toggle" aria-label="Switch language" title={tr("界面语言")} value={language} onChange={async e=>{const next=e.target.value;try{await api.language(next);setLanguage(next);changeLanguage(next);}catch(e){fail(e);}}}>{languages.map(l=><option key={l.id} value={l.id} lang={l.id}>{l.name}</option>)}</select></label><ThemeSwitch value={theme} onChange={setAppearance} /></div>
+          <div className="appearance-controls"><div className="view-controls"><button aria-label={tr("视图设置")} title={tr("视图设置")} onClick={()=>setModal("view")}><Settings2 size={19}/></button><button aria-label={tr("底部执行记录")} title={tr("底部执行记录")} aria-pressed={view.log} onClick={()=>changeView({log:!view.log})}><PanelBottom size={19}/></button><button aria-label={tr("右侧账号栏")} title={tr("右侧账号栏")} aria-pressed={view.inspector} onClick={()=>changeView({inspector:!view.inspector})}><PanelRight size={19}/></button></div><button title={tr("画布与预览")} disabled={!task} onClick={()=>setPreview({id:Date.now(),target:null,task})}><PanelRightOpen size={18}/></button><label className="language-control"><Languages size={18} aria-hidden="true"/><select className="language-toggle" aria-label="Switch language" title={tr("界面语言")} value={language} onChange={async e=>{const next=e.target.value;try{await api.language(next);setLanguage(next);changeLanguage(next);}catch(e){fail(e);}}}>{languages.map(l=><option key={l.id} value={l.id} lang={l.id}>{l.name}</option>)}</select></label><ThemeSwitch value={theme} onChange={setAppearance} /></div>
         </header>
         <Conversation
           task={task}
@@ -906,10 +912,10 @@ function App() {
               </>
             )}
           </div>
-          <ExecutionLog events={events} />
+          {view.log&&<ExecutionLog events={events} />}
         </div>
       </main>
-      <Inspector
+      {view.inspector&&<Inspector
         task={task}
         profiles={init.profiles}
         cap={init.capabilities}
@@ -925,8 +931,9 @@ function App() {
         onDraftAccount={setDraftAccount}
         onNew={()=>setModal('new')}
         disabled={anyBusy || task?.state === "unknown"}
-      />
+      />}
       {preview&&<PreviewPanel task={preview.task} request={preview} onClose={()=>setPreview(null)}/>}
+      {modal==='view'&&<Modal title={tr('视图设置')} onClose={()=>setModal('')}><div className="view-options"><label><input type="checkbox" checked={view.log} onChange={e=>changeView({log:e.target.checked})}/>{tr('底部执行记录')}</label><label><input type="checkbox" checked={view.inspector} onChange={e=>changeView({inspector:e.target.checked})}/>{tr('右侧账号栏')}</label></div></Modal>}
       {toast && (
         <div className="toast" role="alert">
           <p>{toast}</p>
@@ -956,18 +963,18 @@ function App() {
       {modal === "accounts" && (
         <Modal title={tr("订阅账号")} wide onClose={() => setModal("")}>
           <p className="muted">{tr("使用本机已有的独立订阅登录。切换在当前任务右侧完成；此处查询连接状态与额度。")}</p>
-          <div className="account-list">
+          <div className="account-query-toolbar"><button className="primary" disabled={!!bulk||checking.length>0} onClick={refreshAll}><RefreshCw size={16} className={bulk?"spinning":""}/>{tr("一键查询全部")}</button><span role="status">{bulk?`${tr("查询中…")} ${bulk.done} / ${bulk.total}`:""}</span></div><div className="account-list">
             {init.profiles.map((p) => (
               <div key={p.id}>
                 <strong>{p.provider}</strong>
                 <span>{tr(p.name)}</span>
-                <small>{quotas[p.id]?.status || tr("尚未查询")}</small>
+                <AccountQuota profile={p} quota={quotas[p.id]}/>
                 <button
                   className="outline"
-                  disabled={checking === p.id}
+                  disabled={!!bulk||checking.includes(p.id)}
                   onClick={() => refresh(p.id)}
                 >
-                  {checking === p.id ? tr("查询中…") : tr("查询")}
+                  {checking.includes(p.id) ? tr("查询中…") : tr("查询")}
                 </button>
               </div>
             ))}

@@ -23,6 +23,8 @@ Prism Desk is a Windows workspace for subscription CLIs. When one account runs o
 
 ### Messages, settings and previews
 
+The top bar has view settings and toggles for the bottom execution log and account sidebar. Their state is saved locally. In Accounts, **Check all accounts** queries every configured profile and displays available allowance, reset times, Codex reset credits and credit expiry dates. A failed query does not stop the remaining accounts.
+
 Paste screenshots, drop images into the composer or use the image button (up to five images, 10 MB each). Codex receives local images; Claude receives native image content when its subscription checks pass. Claude image execution has not yet been verified against a signed-in account.
 
 Send more messages while work runs: they wait in order and can be cancelled. Settings lets you choose Enter or Ctrl/⌘+Enter and queueing or live guidance. Live guidance uses Codex's active turn; other providers fall back to the queue. Failed or interrupted sends hold subsequent messages for review. Drafts are retained while switching tasks in the open app.
@@ -281,6 +283,8 @@ npm run build:desktop
 采用 [MIT 许可证](LICENSE)。棱镜是独立项目，各提供方名称与商标归其所有者所有。
 
 ### 消息、设置与预览
+
+顶部提供视图设置、底部执行记录和右侧账号栏开关，并记住开关状态。账号页的**一键查询全部**会查询所有已配置账号，展示剩余额度、恢复时间、Codex 重置卡数量与到期时间。单个账号查询失败不影响其他账号。
 
 支持粘贴截图、拖入图片或点击图片按钮，每条最多 5 张、每张不超过 10 MB。Codex 使用原生图片输入；Claude 在订阅检查通过后使用原生图片消息，目前尚未完成已登录账号的图片实测。
 
