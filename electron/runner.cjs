@@ -25,6 +25,8 @@ class Runner extends EventEmitter {
     return e;
   }
   state(task, state) {
+    require('./goal-lifecycle.cjs').execution(task,state);
+    if(state==='paused')require('./goal-lifecycle.cjs').pause(task);
     task.state = state;
     if (!["running", "stopping", "unknown"].includes(state)) delete task.activePid;
     this.store.save(task);
@@ -33,6 +35,7 @@ class Runner extends EventEmitter {
   confirmExecution(task,profile,reportedModel){
     if(!this.active||this.active.task.id!==task.id||!task.execution||this.active.confirmed)return;
     this.active.confirmed=true;
+    delete task.relaySource;
     task.execution.confirmed=true;
     if(reportedModel)task.execution.reportedModel=reportedModel;
     const previous=task.lastExecution;
@@ -79,15 +82,18 @@ class Runner extends EventEmitter {
       throw Error("请输入 1–60000 字的指令。");
     const task = this.store.get(id);
     this.assertIdle(task);
+    if(task.goalLifecycle?.status==='paused')throw Error('目标已暂停，请先继续目标。');
     if(task.planReviewRequired&&!options.planning)throw Error('请核对计划并确认后执行');
     require('./task-settings.cjs').applyPendingMode(task);
     let profile = require('./models.cjs').selection(task,profileFor(task.profile));
     if(profile.disabled)throw Error('账号尚未启用，请先登录或选择其他账号。');
-    require('./task-settings.cjs').validateMode(task.mode,profile);
+    require('./task-settings.cjs').validateMode(options.planning?'read-only':task.mode,profile);
     if(images.length&&!['Codex','Claude'].includes(profile.provider))throw Error('当前入口暂不支持图片，请选择 Codex 或 Claude');
     this.event(id, "user", { text: text.trim(), images, profile: profile.id });
     this.active = { task, profile, images, planning:!!options.planning, phase: "starting", pending: new Map(), cancelRequested:false };
+    delete task.stopReason;delete task.relaySource;
     const planRevision=task.workPlan?.revision;
+    this.active.planRevision=planRevision;
     if(options.planning){task.planReviewRequired=true;delete task.sessions[profile.id];this.store.save(task);}
     this.state(task, "running");
     try {
@@ -101,10 +107,11 @@ class Runner extends EventEmitter {
         const instructions=environmentPrompt({...task,mode:task.execution.mode},capabilities(),record)+(options.planning?'\n本轮只制订计划，禁止实施。读取必要材料后给出可核对的步骤与验收条件，等待用户确认。最后用 JSON 代码块返回 {"steps":[{"text":"步骤及验收条件"}]}，供界面展示待确认步骤。':'');
         this.state(task,'running');
         try {
-          if(profile.provider==='Codex')await this.codex(task,profile,instruction,instructions);
-          else if(profile.provider==='Claude')await this.claude(task,profile,instruction,instructions);
-          else if(profile.provider==='Gemini')await this.gemini(task,profile,instruction,instructions);
-          else await this.grok(task,profile,instruction,instructions);
+          const withGoals=instructions+'\n'+require('./task-plan.cjs').goalInstructions;
+          if(profile.provider==='Codex')await this.codex(task,profile,instruction,withGoals);
+          else if(profile.provider==='Claude')await this.claude(task,profile,instruction,withGoals);
+          else if(profile.provider==='Gemini')await this.gemini(task,profile,instruction,withGoals);
+          else await this.grok(task,profile,instruction,withGoals);
         } catch(e) {
           this.event(id,'notice',{text:e.message});
           if(['running','stopping'].includes(task.state))this.state(task,this.active.started?'unknown':'failed');
@@ -119,10 +126,14 @@ class Runner extends EventEmitter {
         this.emit('approval-reset',{taskId:task.id});
         this.event(id,'handoff',{progress:require('./handoff.cjs').snapshot(task,this.store.events(id)),text:`${profile.provider} / ${profile.name} 已由官方确认额度耗尽；旧执行已结束，自动切换到 ${next.provider} / ${next.name}，继续同一任务。`});
         profile=require('./models.cjs').selection(task,next);task.profile=next.id;delete task.sessions[next.id];this.store.save(task);
+        task.relaySource='quota_exhausted';
         instruction='继续这条任务尚未完成的工作。先读取持久工作记录和当前项目文件，核对前序账号实际完成的部分；已有成功操作不得重复执行，部分写入先核实再续做。不要要求用户重新描述任务。';
       }
     } finally {
-      if(options.planning){delete task.sessions[profile.id];if(task.state==='idle')require('./task-plan.cjs').capture(task,this.store.events(id),planRevision);}
+      if(this.active?.quotaExhausted)task.stopReason='quota_exhausted';
+      delete task.relaySource;
+      require('./task-plan.cjs').suggest(task,this.store.events(id),planRevision);
+      if(options.planning){delete task.sessions[profile.id];if(task.state==='idle')require('./task-plan.cjs').capture(task,this.store.events(id),this.active?.planRevision);}
       task.requestedHandoff = this.active?.requestedHandoff || null;
       delete task.execution;
       delete task.activeQuestionIds;
@@ -157,6 +168,7 @@ class Runner extends EventEmitter {
     rpc.on("message", (message) => {
       const p = message.params || {};
       if (message.id !== undefined) {
+        if(require('./goal-tools.cjs').request(this,task,message))return;
         if(message.method==="item/tool/requestUserInput"&&require("./questions.cjs").request(this,task,message))return;
         if (message.method?.endsWith("requestApproval")) {
           this.active?.pending.set(String(message.id), message);
@@ -243,12 +255,15 @@ class Runner extends EventEmitter {
         sandbox: require('./task-settings.cjs').codexPermissions((task.execution?.mode||task.mode)).sandbox,
         developerInstructions: instructions,
       };
-      const session = task.sessions[profile.id];
+      // Older native sessions did not register Prism's goal tools. Their full
+      // task history remains in the persistent handoff record.
+      const session = task.goalToolSessions?.[profile.id]===task.sessions[profile.id] ? task.sessions[profile.id] : null;
       const result = await rpc.call(
         session ? "thread/resume" : "thread/start",
-        session ? { ...options, threadId: session } : options,
+        session ? { ...options, threadId: session } : {...options,dynamicTools:require('./goal-tools.cjs').tools},
       );
       task.sessions[profile.id] = result.thread.id;
+      task.goalToolSessions={...task.goalToolSessions,[profile.id]:result.thread.id};
       this.store.save(task);
       if(this.active.cancelRequested){this.state(task,'paused');return;}
       this.event(task.id, "notice", {

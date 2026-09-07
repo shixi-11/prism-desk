@@ -2,10 +2,12 @@ import React, { useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import Markdown from "react-markdown";
 import QuestionChoices,{proseQuestion} from "./QuestionChoices.jsx";
-import TaskPlan from "./TaskPlan.jsx";
+import RelayPreferences from "./RelayPreferences.jsx";
+import GoalBar from "./GoalBar.jsx";
+import {goalProse} from './goal-message.js';
 import AccountManager from "./AccountManager.jsx";
 import PreviewPanel,{LinkedMarkdown} from "./PreviewPanel.jsx";
-import {ImageAttachments,QueuedMessages,ActivityPanel,GeneralSettings,AccountQuota} from "./TaskControls.jsx";
+import {ImageAttachments,QueuedMessages,GeneralSettings,AccountQuota} from "./TaskControls.jsx";
 import {
   Sun,
   Languages,
@@ -320,8 +322,6 @@ function Inspector({
   draftSettings,
   onDraftAccount,
   onHandoff,
-  onSavePlan,
-  onPlanAction,
   onRelayPreferences,
   storage,
   disabled,
@@ -339,7 +339,7 @@ function Inspector({
   const selectedConfig=task?.modelSettings?.[target];
   const activeConfig=task?.execution||task?.lastExecution;
   const changedModel=!!selectedConfig&&(!activeConfig||activeConfig.model!==selectedConfig?.model||activeConfig.effort!==selectedConfig?.effort);
-  const relayOrder=[...(task?.relayOrder||[]).filter(id=>profiles.some(p=>p.id===id)),...profiles.filter(p=>!(task?.relayOrder||[]).includes(p.id)).map(p=>p.id)];
+
   const running = task?.state === "running";
   const canStop = running && ["Codex","Claude","Grok"].includes(profiles.find(p=>p.id===task.profile)?.provider);
   const [clock,setClock]=useState(Date.now());
@@ -391,8 +391,6 @@ function Inspector({
         {canStop&&<button className="outline stop-handoff" onClick={()=>onHandoff(target)}>{tr("停止并交接")}</button>}
       </section>
       <div className="inspector-scroll">
-      {task&&<TaskPlan key={task.id} task={task} busy={disabled} onSave={onSavePlan} onAction={onPlanAction}/>}
-      {task&&<section className="relay-preferences"><h2>{tr('自动接续偏好')}</h2><p>{tr('按顺序寻找账号，使用各账号已保存的模型与思考等级。')}</p><ol>{relayOrder.map((id,i)=>{const p=profiles.find(p=>p.id===id),c=task.modelSettings?.[id];return <li key={id}><button title={tr('设置模型与思考等级')} onClick={()=>setTarget(id)}>{p.provider} / {tr(p.name)}<small>{c?.model||p.model} · {c?.effort||(p.provider==='Codex'?'xhigh':p.provider==='Gemini'?'auto':'high')}</small></button><button aria-label={tr('优先使用')+' '+p.name} disabled={i===0} onClick={()=>onRelayPreferences([id,...relayOrder.filter(v=>v!==id)])}>↑</button></li>;})}</ol></section>}
 
       <section>
         <div className="quota">
@@ -456,6 +454,7 @@ function Inspector({
         {selected?.provider==='Gemini'&&<><p className="account-status">{tr("Gemini 当前提供只读接续；登录后仍需执行验证。")}</p><button className="outline" disabled={loginBusy||disabled} onClick={async()=>{setLoginBusy(true);setLoginMessage(tr("请在当前浏览器完成 Google 授权"));try{const result=await api.loginGemini();setLoginMessage(tr(result.ok?"Google 授权已完成；尚未验证模型执行":"登录未完成，请核对浏览器提示后重试"));await onRefresh(target);}catch(e){setLoginMessage(e.message);}finally{setLoginBusy(false);}}}>{tr(loginBusy?"等待浏览器授权…":"登录 Google")}</button><p className="account-status" role="status">{loginMessage}</p></>}
         {quota?.remaining===0&&!stale&&<p className="quota-notice" role="status">{tr("额度已用完，可换账号继续或等待恢复；重置卡需手动使用。")}</p>}
       </section>
+      {task&&<RelayPreferences key={task.id} task={task} profiles={profiles} onSaveOrder={onRelayPreferences} onModelSettings={onModelSettings} Modal={Modal} ModelControls={ModelControls}/>}
       <section className="shared">
         <div className="section-title">
           <h2>{tr("共享能力")}</h2>
@@ -535,7 +534,7 @@ function Conversation({ task, events, streaming, onNew, onPreview, onChoice }) {
               {e.type === "assistant" && <small>{e.profile}</small>}
             </header>
             <div className="prose">
-              <LinkedMarkdown onPreview={onPreview}>{e.type==='assistant'&&proseQuestion(e.text)?proseQuestion(e.text).prefix:e.text||""}</LinkedMarkdown>
+              <LinkedMarkdown onPreview={onPreview}>{e.type==='assistant'?(proseQuestion(e.text)?proseQuestion(e.text).prefix:goalProse(e.text)||tr('已提出目标建议')):e.text||""}</LinkedMarkdown>
               {e.type==='question'&&<QuestionChoices questions={e.questions} disabled={task.state!=='running'||!task.activeQuestionIds?.includes(e.requestId)} answer={events.find(v=>v.questionRequestId===e.requestId)?.text} onAnswer={answers=>api.answerQuestion(task.id,e.requestId,answers)}/>}
               {e.type==='assistant'&&proseQuestion(e.text)&&<QuestionChoices questions={[proseQuestion(e.text)]} disabled={task.state==='unknown'||task.state==='stopping'} answer={events.find(v=>v.choiceEventId===e.id)?.text} onAnswer={answers=>onChoice(e.id,answers.choice.answers[0])}/>}
               <ImageAttachments taskId={task.id} images={e.images} onPreview={image=>onPreview(image.path)}/>
@@ -884,9 +883,10 @@ function App() {
               >{tr("已核对，继续任务")}</button>
             </div>
           )}
-          <ActivityPanel task={task} events={events} thinking={thinking} activity={activity}/>
+          {task&&<GoalBar key={task.id} task={task} events={events} thinking={thinking} activity={activity} Modal={Modal} onSave={async input=>{const updated=await api.savePlan(task.id,input);if(current.current===updated.id)setTask(updated);return updated;}} onPlanAction={async(action,revision)=>{const id=task.id;await api.planAction(id,action,revision??task.workPlan?.revision);if(current.current===id)await load(id);}} onGoalAction={async(action,revision)=>{const updated=await api.goalAction(task.id,action,revision);if(current.current===updated.id)setTask(updated);return updated;}}/>}
           <QueuedMessages items={queue.filter(item=>item.taskId===task?.id&&item.status!=="sending")} onCancel={id=>api.cancelQueued(id).catch(fail)} onRetry={id=>api.retryQueued(id).catch(fail)}/>
           <div className="composer" onDragOver={e=>{if(e.dataTransfer.types.includes("Files"))e.preventDefault();}} onDrop={e=>{e.preventDefault();addImages(e.dataTransfer.files);}}>
+            {task?.goalLifecycle?.status==='paused'?<p className="plan-mode-note">{tr('目标已暂停，请先继续目标。')}</p>:task?.planReviewRequired&&<p className="plan-mode-note">{tr('计划待确认，当前消息仅用于讨论计划。')}<button disabled={anyBusy||!task.workPlan?.steps?.length} onClick={async()=>{try{await api.planAction(task.id,'execute',task.workPlan?.revision);}catch(e){fail(e);}}}>{tr('确认计划并执行')}</button></p>}
             <ImageAttachments taskId={task?.id} images={images} onRemove={id=>setImages(old=>old.filter(image=>image.id!==id))} onPreview={image=>image.path&&setPreview({id:Date.now(),target:image.path,task})}/>
             <textarea dir="auto"
               aria-label={tr("任务指令")}
@@ -898,7 +898,7 @@ function App() {
                 if(e.nativeEvent.isComposing||e.keyCode===229)return;
                 if (e.key === "Enter" && (init.settings.sendShortcut==='enter'?!e.shiftKey:((e.ctrlKey||e.metaKey)&&!e.shiftKey))) {
                   e.preventDefault();
-                  if ((text.trim()||images.length)&&!sending&&!uploading) send();
+                  if ((text.trim()||images.length)&&!sending&&!uploading&&task?.goalLifecycle?.status!=='paused') send();
                 }
               }}
             />
@@ -938,7 +938,7 @@ function App() {
                   className="primary send"
                   onClick={send}
                   disabled={
-                    (!text.trim()&&!images.length) || sending || uploading || task?.state === "unknown" || !!task&&init.profiles.find(p=>p.id===task.profile)?.disabled || Object.values(accountLogins).some(s=>['starting','waiting','verifying'].includes(s.phase))
+                    (!text.trim()&&!images.length) || sending || uploading || task?.goalLifecycle?.status==='paused' || task?.state === "unknown" || !!task&&init.profiles.find(p=>p.id===task.profile)?.disabled || Object.values(accountLogins).some(s=>['starting','waiting','verifying'].includes(s.phase))
                   }
                 >{tr(anyBusy?(init.settings.busySend==='steer'?'引导':'排队'):'发送')}<Send size={17} />
                 </button>
@@ -970,9 +970,7 @@ function App() {
         quotas={quotas}
         checking={checking}
         onRefresh={refresh}
-        onSavePlan={async input=>{const updated=await api.savePlan(task.id,input);if(current.current===updated.id)setTask(updated);}}
-        onPlanAction={async action=>{const id=task.id;await api.planAction(id,action,task.workPlan?.revision);if(current.current===id)await load(id);}}
-        onRelayPreferences={async order=>{try{const updated=await api.relayPreferences(task.id,order);if(current.current===updated.id)setTask(updated);}catch(e){fail(e);}}}
+        onRelayPreferences={async order=>{const updated=await api.relayPreferences(task.id,order);if(current.current===updated.id)setTask(updated);return updated;}}
         onSwitch={changeProfile}
         onCapabilities={() => setModal("capabilities")}
         onModelSettings={async(settings,id)=>{if(task){const updated=await api.modelSettings(task.id,settings,id);if(current.current===updated.id)setTask(updated);}else setDraftSettings(old=>({...old,[id]:settings}));if(init.profiles.find(p=>p.id===id)?.provider==='Claude')await refresh(id,settings.model);}}

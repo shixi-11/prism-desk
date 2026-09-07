@@ -51,7 +51,7 @@ async function closeGemini(rpc) {
   } finally {clearTimeout(timer);}
 }
 async function runGemini(runner,task,profile,text,instructions) {
-  if (task.mode !== 'read-only') throw Error('Gemini 当前仅支持只读任务。');
+  if ((task.execution?.mode||task.mode) !== 'read-only') throw Error('Gemini 当前仅支持只读任务。');
   if (geminiStatus(profile).loginRequired) throw Error('Gemini 尚未完成 Google 登录，请先运行登录入口。');
   const {Rpc} = require('./core.cjs');
   const {policy} = prepareGemini(profile);

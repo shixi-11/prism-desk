@@ -585,5 +585,24 @@ html:not([lang^="zh"]) .empty h1 { font-size:clamp(26px,3vw,44px); }
 .sidebar > footer button.author-homepage{padding:10px 7px;border-bottom:0;font-size:14px}.author-homepage span{display:flex;flex-direction:column;gap:3px}.author-homepage small{font:11px var(--font-body);opacity:.75}
 .task-plan h2,.relay-preferences h2{font:400 20px var(--font-title);margin:0 0 16px}
 .plan-heading h2{margin:0}.plan-heading{margin-bottom:16px}.task-plan,.relay-preferences{padding-block:18px;border-bottom:1px solid var(--line)}
+.plan-details>summary{cursor:pointer;font-size:12px;color:var(--muted);padding:4px 0}.plan-details>summary::marker{color:var(--muted)}
 .relay-preferences li{margin:8px 0}.relay-preferences li>button:first-child{display:flex;flex:1;flex-direction:column;align-items:flex-start;gap:4px;padding-inline:0}
 .question-choices fieldset>button{justify-content:flex-start;text-align:start;flex-direction:column;align-items:flex-start}
+.relay-preferences .relay-summary{display:block;list-style:decimal;padding-inline-start:22px;margin:12px 0}
+.relay-preferences .relay-summary li{display:list-item;margin:6px 0;font-size:13px;overflow-wrap:anywhere}
+.relay-order{padding:0;margin:18px 0;list-style:none;display:grid;gap:8px}
+.relay-preferences .relay-order-row{display:grid;grid-template-columns:28px minmax(0,1fr) auto;gap:12px;align-items:center;border:1px solid var(--line);border-radius:8px;padding:14px 12px;background:var(--surface);cursor:grab}
+.relay-order-row:active{cursor:grabbing}.relay-order-row.dragging{opacity:.45}.relay-order-row.drag-over{outline:2px solid var(--accent);outline-offset:2px}
+.relay-grip{display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--muted)}.relay-grip small{font-size:11px}
+.relay-account{display:flex;flex-direction:column;gap:6px;min-width:0;overflow-wrap:anywhere}.relay-account strong{font-weight:500}.relay-account small{font-size:12px;color:var(--muted);text-align:start}
+.relay-row-actions{display:flex;gap:4px}.relay-row-actions button{padding:6px}.relay-model-editor{grid-column:2/-1;cursor:auto;padding-top:12px;border-top:1px solid var(--line)}.relay-save-status{min-height:1.5em;font-size:13px;color:var(--muted)}
+.relay-model-editor .model-controls>label{margin:0}
+@media(max-width:600px){.relay-preferences .relay-order-row{grid-template-columns:20px minmax(0,1fr);gap:8px}.relay-row-actions{grid-column:2}.relay-model-editor{grid-column:1/-1}}
+.goal-suggestion{border-top:1px solid var(--line);margin-block:8px;padding-top:8px}.goal-suggestion p{font-size:13px;margin:4px 0}.goal-suggestion button{font-size:12px;padding:5px 0}
+@media(max-width:1100px){.topbar>div:first-child>p{display:none}}
+.goal-control{margin-bottom:9px;min-width:0}.goal-bar{display:flex;align-items:center;gap:10px;min-width:0;padding:10px 13px;background:var(--writing-bg);border:1px solid var(--line);border-radius:18px;font-size:13px;min-height:48px}
+.goal-bar>svg{flex-shrink:0;color:var(--muted)}.goal-bar>.goal-label{display:flex;flex:1;min-width:0;justify-content:flex-start;text-align:start;gap:8px;padding:0;overflow:hidden}.goal-label strong{font-weight:500;flex-shrink:0}.goal-label span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--muted)}
+.goal-bar>button:not(.goal-label){flex:0 0 auto;padding:4px;color:var(--muted)}.goal-bar>time{flex-shrink:0;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap;font-size:12px}.goal-add{font-size:12px;padding:4px 0;color:var(--muted)}.goal-error{font-size:12px;line-height:1.6;margin:6px 0;color:var(--text)}
+.goal-control .task-plan{border:0;padding-top:0}.goal-control .task-plan .plan-editor>label{display:grid;gap:8px}.goal-control .plan-goal{line-height:1.7}.goal-control .plan-editor>button{margin-top:8px}.goal-control .plan-edit-step{margin-top:8px}.plan-mode-note{font-size:12px;line-height:1.6;margin:0 0 8px;color:var(--muted)}.plan-mode-note button{padding:3px 7px;text-decoration:underline}
+@media(max-width:1100px){.goal-bar{gap:6px;padding:9px 10px;font-size:12px}.goal-bar>.goal-label{gap:6px}.goal-bar>button:not(.goal-label){padding:3px}.goal-bar>svg{width:15px}.goal-bar>time{font-size:11px}}
+@media(max-width:1100px){.composer .folder-control{padding:6px;min-width:0}.composer .folder-control span{display:none}}

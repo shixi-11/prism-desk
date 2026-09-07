@@ -87,6 +87,9 @@ app.whenReady().then(() => {
   messageQueue=new (require('./message-queue.cjs').MessageQueue)(store,runner,path.join(dataPath(),'message-queue.json'));
   messageQueue.on('change',items=>emit('queue',items));
   messageQueue.on('failure',error=>emit('error',error.message));
+  // A plan may run directly outside the queue. Wake queued tasks afterwards;
+  // defer until the runner has had a chance to begin a requested handoff.
+  runner.on('idle',()=>queueMicrotask(()=>messageQueue.pump()));
   for (const type of ["event", "delta", "state", "idle", "approval", "quota", "approval-reset", "reasoning", "activity"])
     runner.on(type, (value) => emit(type, value));
   handle("init", () => ({
@@ -118,9 +121,14 @@ app.whenReady().then(() => {
   handle('answerQuestion',(id,requestId,answers)=>require('./questions.cjs').answer(runner,id,requestId,answers));
   handle('renameAccount',(id,name)=>{const result=require('./accounts.cjs').renameAccount(id,name);broadcastAccounts();return result;});
   handle('savePlan',(id,input)=>require('./task-plan.cjs').save(store,runner,id,input));
+  handle('goalAction',(id,action,revision)=>{
+    if(action==='resume'&&(accountOperation||validatingApps||resetInProgress))throw Error('请等待账号或应用操作结束。');
+    return require('./goal-actions.cjs').act(store,runner,messageQueue,id,action,revision);
+  });
   handle('relayPreferences',(id,order)=>{if(!Array.isArray(order)||new Set(order).size!==order.length||order.some(id=>!PROFILES.some(p=>p.id===id)))throw Error('接续顺序无效');const task=runner.active?.task.id===id?runner.active.task:store.get(id);task.relayOrder=order;store.save(task);emit('state',task);return task;});
   handle('planAction',(id,action,revision)=>{
     const task=store.get(id);runner.assertIdle(task);
+    if(task.goalLifecycle?.status==='paused')throw Error('目标已暂停，请先继续目标。');
     if(accountOperation||validatingApps||resetInProgress||messageQueue.running||messageQueue.items.some(i=>i.taskId===id&&i.status==='waiting'))throw Error('请等待当前执行结束。');
     if(revision!==task.workPlan?.revision)throw Error('计划已更新，请重新打开后编辑');
     if(action==='draft'){
@@ -254,6 +262,7 @@ app.whenReady().then(() => {
     if(choiceEventId){const source=store.events(id).find(e=>e.id===choiceEventId&&e.type==='assistant');if(!source)throw Error('这项选择已失效，请继续当前任务');if(store.events(id).some(e=>e.choiceEventId===choiceEventId))throw Error('已提交选择');}
     const images=require('./attachments.cjs').attachmentFiles(store.dir(id),imageIds);
     if(typeof text!=='string')throw Error('请填写指令。');
+    if(task.goalLifecycle?.status==='paused')throw Error('目标已暂停，请先继续目标。');
     text=text.trim()||(images.length?'请查看这些图片。':'');if(!text||text.length>60000)throw Error('请输入 1–60000 字的指令。');
     if(images.length&&!['Codex','Claude'].includes(PROFILES.find(p=>p.id===task.profile)?.provider))throw Error('当前入口暂不支持图片，请选择 Codex 或 Claude');
     if(settings().busySend==='steer'&&await runner.steer(id,text,images)){if(choiceEventId)runner.event(id,'notice',{choiceEventId,text:'已提交选择 · '+text});return {steered:true};}

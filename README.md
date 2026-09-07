@@ -25,9 +25,11 @@ Prism Desk is a Windows workspace for subscription CLIs. When one account runs o
 
 ### Messages, settings and previews
 
-**Goal and plan** keeps a task goal and editable steps, with progress saved across sessions. **Plan first** runs with read-only permissions and returns a draft for review. **Confirm plan and execute** explicitly starts implementation with the task’s configured permissions. Later planning messages remain read-only until confirmation. Long plans stay in the local handoff record.
+The compact **goal bar** above the composer shows the saved goal, execution state and accumulated execution time. Edit, pause, resume or delete the goal from the bar; expand it to see the full goal, editable plan and execution details. Pausing stops the current execution and holds queued messages. Deleting waits for execution to stop, removes the goal and holds pending messages for review; conversation records and workspace files remain available. The timer excludes pauses, idle time and time when the app is closed. Official quota exhaustion is shown separately from network or login failures.
 
-Model changes can be applied within the same account using **Switch and continue**. A confirmed execution records its account, model and reasoning level; a saved selection alone is not shown as a completed switch. **Automatic handoff preferences** sets account priority and uses each account’s saved model and reasoning level, while still respecting image and write-access requirements.
+Codex can save goals through Prism’s native tools when you ask it to set or change one. Other entries can propose a goal for you to adopt in the interface. Chat text claiming a goal is saved never changes the actual goal by itself. **Plan first** runs with read-only permissions and returns a draft for review. The composer explicitly indicates when messages only discuss a pending plan; **Confirm plan and execute** starts implementation with the task’s configured permissions. Goals and plans persist across sessions and remain in the handoff record.
+
+Model changes can be applied within the same account using **Switch and continue**. A confirmed execution records its account, model and reasoning level; a saved selection alone is not shown as a completed switch. **Automatic handoff preferences** opens an account list you can drag to reorder, with settings for each account’s model and reasoning level. Changes save automatically for the current task. The list marks accounts that cannot meet the task’s write-access requirements; handoff also respects image support.
 
 Each account card has an editable **Nickname** with a pencil button. This changes its display name, not its login identity. Native Codex questions and supported question-and-list messages offer clickable choices and a custom answer. Closing the Windows title-bar **×** hides Prism in the notification area; use the tray menu’s **Quit Prism** to stop active work and exit.
 
@@ -300,9 +302,11 @@ npm run build:desktop
 
 ### 消息、设置与预览
 
-「目标与计划」保存当前任务的目标、步骤和完成进度，重开后仍可继续。「先制订计划」以只读权限运行，生成待核对步骤；点击「确认计划并执行」后，才按任务已设置的权限开始实施。确认前继续讨论计划也保持只读，完整计划进入本地交接记录。
+输入框上方的紧凑目标条显示目标、执行状态和累计执行用时，可直接修改、暂停、继续或删除目标；展开后查看完整目标、计划和执行详情。暂停会停止当前执行并拦住排队消息；删除会等待执行停止，再移除目标并将排队消息留待核对，保留聊天和工作区文件。计时不包含暂停、空闲和应用关闭的时间。官方返回额度耗尽时显示「额度已用完」，自动换账号期间显示「额度已用完，正在接续」；网络或登录失败显示对应原因。
 
-同账号更换模型或思考等级后，可点击「切换并继续」。实际执行开始后会显示生效配置，并在切换时留下提示。「自动接续偏好」可调整账号优先顺序，各账号使用在此任务中保存的模型与思考等级；接续仍按图片支持和写入权限筛选，不静默降低所选模型。
+在 Codex 中要求设置或修改目标时，模型可通过棱镜的真实工具保存；其他入口可提出目标建议，由用户在界面采用。聊天里自称「已设置」不会改动真实目标。「先制订计划」以只读权限生成待核对步骤，输入框会明确提示当前消息仅讨论计划；点击「确认计划并执行」后才按已设置权限开始实施。目标和计划持久保存，并进入本地交接记录。
+
+同账号更换模型或思考等级后，可点击「切换并继续」。实际执行开始后会显示生效配置，并在切换时留下提示。「自动接续偏好」在独立窗口中拖动账号排序，点击每行设置按钮修改模型和思考等级，改动自动保存并用于当前任务。列表标明无法满足当前写入权限的账号，实际接续也会核对图片支持情况。
 
 账号卡片显示「备注名」和铅笔按钮，回车保存、Esc 取消；修改备注名不改变登录身份。原生 Codex 提问及符合格式的文字选项提供可点击按钮和自行填写入口。窗口右上角 × 将棱镜收进通知区，后台任务继续运行；右键托盘图标选择「退出棱镜」，才会停止执行并退出。
 

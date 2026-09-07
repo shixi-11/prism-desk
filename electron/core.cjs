@@ -167,6 +167,7 @@ class Rpc extends EventEmitter {
     }
     await this.call("initialize", {
       clientInfo: { name: "prism_workbench", title: "棱镜", version: "0.1.0" },
+      capabilities: { experimentalApi: true },
     });
     this.write({ method: "initialized", params: {} });
   }
@@ -372,6 +373,7 @@ class TaskStore {
   recover() {
     for (const task of this.list())
       if (["running", "stopping"].includes(task.state)) {
+        require('./goal-lifecycle.cjs').recover(task);
         task.state = "unknown";
         this.save(task);
         this.append(task.id, "notice", {
