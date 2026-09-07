@@ -37,7 +37,7 @@ function childEnv(profile) {
       ? profile.home
       : path.join(process.env.LOCALAPPDATA, "Prism", "unavailable-codex-home");
   if (profile.provider === "Claude") {env.CLAUDE_CONFIG_DIR = profile.home;env.CLAUDE_CODE_DISABLE_FAST_MODE='1';}
-  if (profile.provider === "Grok") env.GROK_AUTH_PATH = path.join(profile.home, "auth.json");
+  if (profile.provider === "Grok") {env.GROK_AUTH_PATH = path.join(profile.home, "auth.json");if(profile.isolatedHome)env.GROK_HOME=profile.home;}
   if (profile.provider === 'Gemini') {
     env.GEMINI_CLI_HOME=profile.home;
     env.NO_BROWSER='true';
@@ -206,7 +206,8 @@ async function accountStatus(id, cwd, model) {
     await rpc.init();
     const auth = await rpc.call("account/read");
     if (auth.account?.type !== "chatgpt")
-      throw Error("未检测到 ChatGPT 订阅登录，已阻止调用。");
+      throw Object.assign(Error("未检测到 ChatGPT 订阅登录，已阻止调用。"),{code:'AUTH_REQUIRED'});
+    if(profile.email&&auth.account.email?.toLowerCase()!==profile.email.toLowerCase())throw Object.assign(Error('登录账号与已有账号身份不一致，请使用原账号登录。'),{code:'AUTH_REQUIRED'});
     const usage = await rpc.call("account/rateLimits/read");
     return {
       id,
@@ -229,10 +230,12 @@ async function claudeAuth(profile, cwd) {
   });
   proc.stderr.on("data", () => {});
   proc.stdin.end();
+  let timedOut=false;const authTimer=setTimeout(()=>{timedOut=true;proc.kill();},20000);
   const code = await new Promise((resolve, reject) => {
     proc.on("close", resolve);
     proc.on("error", reject);
-  });
+  }).finally(()=>clearTimeout(authTimer));
+  if(timedOut)throw Error('账号检查超时，请重试。');
   let status;
   try {
     status = JSON.parse(output);
@@ -316,12 +319,13 @@ class TaskStore {
     atomic(path.join(this.dir(task.id), "task.json"), task);
     return task;
   }
-  create({ title, cwd, profile = PROFILES[0].id, mode = "read-only" }) {
+  create({ title, cwd, profile = PROFILES.find(p=>!p.disabled)?.id, mode = "read-only" }) {
     if (typeof title !== "string" || !title.trim() || title.length > 100)
       throw Error("请填写 1–100 字的任务名。");
     const managed=cwd==null||(typeof cwd==='string'&&!cwd.trim());
     if(!managed&&(typeof cwd!=='string'||!path.isAbsolute(cwd)||!fs.existsSync(cwd)||!fs.statSync(cwd).isDirectory()))
       throw Error("请选择已有的工作目录。");
+    if(profileFor(profile).disabled)throw Error('账号尚未启用，请先登录或选择其他账号。');
     require('./task-settings.cjs').validateMode(mode,profileFor(profile));
     if(mode!=='read-only' && !profileFor(profile).write)throw Error('这个入口只支持只读研究。');
     if (!["read-only", "workspace-write", "full-access"].includes(mode))

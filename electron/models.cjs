@@ -19,4 +19,4 @@ async function saveSelection(store,task,input,beforeSave=()=>{},profileId=task.p
  task.modelSettings={...task.modelSettings,[profileId]:{model:input.model,effort:input.effort}};task.pendingModelRefresh={...task.pendingModelRefresh,[profileId]:true};return store.save(task);
 }
 async function updateSelectionForRunner(store,runner,id,input,profileId){const updated=await saveSelection(store,store.get(id),input,()=>{},profileId);if(runner.active?.task.id===id){runner.active.task.modelSettings=updated.modelSettings;runner.active.task.pendingModelRefresh=updated.pendingModelRefresh;}return updated;}
-module.exports={modelOptions,selection,saveSelection,updateSelectionForRunner};
+module.exports={modelOptions,selection,saveSelection,updateSelectionForRunner,invalidate:id=>cache.delete(id)};

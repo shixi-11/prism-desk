@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import Markdown from "react-markdown";
+import AccountManager from "./AccountManager.jsx";
 import PreviewPanel,{LinkedMarkdown} from "./PreviewPanel.jsx";
 import {ImageAttachments,QueuedMessages,ActivityPanel,GeneralSettings,AccountQuota} from "./TaskControls.jsx";
 import {
@@ -318,14 +319,15 @@ function Inspector({
   storage,
   disabled,
 }) {
-  const [target, setTarget] = useState(task?.profile || profiles[0]?.id);
+  const [target, setTarget] = useState(task?.profile || profiles.find(p=>!p.disabled)?.id);
   const [resetBusy,setResetBusy]=useState(false),[resetMessage,setResetMessage]=useState('');
   const [loginBusy,setLoginBusy]=useState(false),[loginMessage,setLoginMessage]=useState('');
   useEffect(()=>setResetMessage(''),[target]);
   useEffect(() => {
-    setTarget(task?.profile || profiles[0]?.id);
+    setTarget(task?.profile || profiles.find(p=>!p.disabled)?.id);
   }, [task?.id, task?.profile]);
   const selected = profiles.find((p) => p.id === target);
+  useEffect(()=>{if(!task&&(!profiles.some(p=>p.id===target&&!p.disabled))){const next=profiles.find(p=>!p.disabled)?.id;setTarget(next);onDraftAccount?.(next||'');}},[profiles,task?.id]);
   const quota = quotas[target];
   const running = task?.state === "running";
   const canStop = running && ["Codex","Claude","Grok"].includes(profiles.find(p=>p.id===task.profile)?.provider);
@@ -349,7 +351,7 @@ function Inspector({
             disabled={disabled && !canStop}
           >
             {profiles.map((p) => (
-              <option value={p.id} key={p.id}>
+              <option value={p.id} key={p.id} disabled={p.disabled}>
                 {p.provider} / {tr(p.name)}
               </option>
             ))}
@@ -361,7 +363,7 @@ function Inspector({
         {task?.execution&&<p className="active-config">{tr("本轮执行")} · {task.execution.model} · {task.execution.effort}</p>}
                 <button
           className="relay outline"
-          disabled={disabled || !!task && target === task.profile}
+          disabled={disabled || selected?.disabled || !selected || !!task && target === task.profile}
           onClick={() => task ? onSwitch(target) : onNew()}
         >
           <ArrowRightLeft size={16} />
@@ -603,7 +605,8 @@ function App() {
   const [quotas, setQuotas] = useState({});
   const [checking, setChecking] = useState([]);
   const [bulk,setBulk]=useState(null);
-  const [loggingIn,setLoggingIn]=useState([]);
+
+  const [accountLogins,setAccountLogins]=useState({});
   const [approvals, setApprovals] = useState([]);
   const approval = approvals[0];
   const finishApproval = () => setApprovals((old) => old.slice(1));
@@ -630,8 +633,8 @@ function App() {
     api
       .init()
       .then((data) => {
-        setInit(data);setQueue(data.queue||[]);
-        setDraftAccount(data.profiles[0]?.id||'');
+        setInit(data);setQueue(data.queue||[]);setAccountLogins(data.accountLogins||{});
+        setDraftAccount(data.profiles.find(p=>!p.disabled)?.id||'');
         setTheme(data.settings.theme==='system'?(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'):data.settings.theme);
         setLanguage(data.settings.language||'zh');changeLanguage(data.settings.language||'zh');
         setApprovals(data.approvals || []);
@@ -640,6 +643,8 @@ function App() {
       })
       .catch(fail);
     return api.subscribe(({ type, value }) => {
+      if(type==='accounts'){setInit(old=>old?{...old,profiles:value}:old);if(!current.current)setDraftAccount(old=>value.some(p=>p.id===old&&!p.disabled)?old:value.find(p=>!p.disabled)?.id||'');return;}
+      if(type==='account-login'){setAccountLogins(old=>({...old,[value.id]:value}));return;}
       if(type==='task-list'){setInit(old=>old?{...old,...value}:old);const selected=value.tasks.find(t=>t.id===current.current);if(selected)setTask(selected);else if(current.current){++loadSequence.current;current.current=null;setTask(null);setEvents([]);setText('');setImages([]);setStreaming('');setThinking('');setActivity('');}return;}
       if(type==='approval-reset'){setApprovals(old=>old.filter(a=>a.taskId!==value.taskId));return;}
       if(type==='queue'){setQueue(value);return;}
@@ -773,7 +778,7 @@ function App() {
     }
   };
   const refreshAll=async()=>{if(bulk||checking.length)return;const profiles=[...init.profiles];let cursor=0,done=0;setBulk({done:0,total:profiles.length});try{await Promise.all(Array.from({length:Math.min(2,profiles.length)},async()=>{while(cursor<profiles.length){const profile=profiles[cursor++];await refresh(profile.id);setBulk({done:++done,total:profiles.length});}}));}finally{setBulk(null);}};
-  const loginClaude=async id=>{setLoggingIn(old=>[...old,id]);try{await api.loginClaude(id);await refresh(id);}catch(e){fail(Error((e.message||String(e)).replace(/^Error invoking remote method '[^']+': Error: /,"")));}finally{setLoggingIn(old=>old.filter(value=>value!==id));}};
+
   const changeMode = async (mode) => {
     try {
       const t = await api.update(task.id, { mode });
@@ -913,7 +918,7 @@ function App() {
                   className="primary send"
                   onClick={send}
                   disabled={
-                    (!text.trim()&&!images.length) || sending || uploading || task?.state === "unknown"
+                    (!text.trim()&&!images.length) || sending || uploading || task?.state === "unknown" || !!task&&init.profiles.find(p=>p.id===task.profile)?.disabled || Object.values(accountLogins).some(s=>['starting','waiting','verifying'].includes(s.phase))
                   }
                 >{tr(anyBusy?(init.settings.busySend==='steer'?'引导':'排队'):'发送')}<Send size={17} />
                 </button>
@@ -988,24 +993,7 @@ function App() {
       )}
       {modal === "accounts" && (
         <Modal title={tr("订阅账号")} wide onClose={() => setModal("")}>
-          <p className="muted">{tr("使用本机已有的独立订阅登录。切换在当前任务右侧完成；此处查询连接状态与额度。")}</p>
-          <div className="account-query-toolbar"><button className="primary" disabled={!!bulk||checking.length>0} onClick={refreshAll}><RefreshCw size={16} className={bulk?"spinning":""}/>{tr("一键查询全部")}</button><span role="status">{bulk?`${tr("查询中…")} ${bulk.done} / ${bulk.total}`:""}</span></div><div className="account-list">
-            {init.profiles.map((p) => (
-              <div key={p.id}>
-                <strong>{p.provider}</strong>
-                <span>{tr(p.name)}{(quotas[p.id]?.email||p.email)&&<small className="account-email">{quotas[p.id]?.email||p.email}{p.subscriptionType?` · ${p.subscriptionType}`:""}</small>}</span>
-                <AccountQuota profile={p} quota={quotas[p.id]}/>
-                <button
-                  className="outline"
-                  disabled={!!bulk||checking.includes(p.id)||loggingIn.includes(p.id)}
-                  onClick={() => p.provider==="Claude"&&quotas[p.id]?.authRequired?loginClaude(p.id):refresh(p.id)}
-                >
-                  {loggingIn.includes(p.id)?tr("等待浏览器登录"):checking.includes(p.id)?tr("查询中…"):p.provider==="Claude"&&quotas[p.id]?.authRequired?tr("重新登录"):tr("查询")}
-                </button>
-              </div>
-            ))}
-          </div>
-          <p className="muted">{tr("插件与 MCP 需在各执行入口单独授权。")}</p>
+          <AccountManager profiles={init.profiles} quotas={quotas} checking={checking} bulk={bulk} onRefresh={refresh} onRefreshAll={refreshAll} loginStates={accountLogins} busy={anyBusy}/>
         </Modal>
       )}
       {modal === "checkpoint" && (

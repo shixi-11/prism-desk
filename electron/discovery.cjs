@@ -5,6 +5,9 @@ function resolveExecutable(profile,env=process.env){
   if(path.isAbsolute(profile.executable)){if(isFile(profile.executable))return profile.executable;throw Error('程序未安装或路径已失效：'+profile.executable);}
   // Explorer does not inherit the Codex terminal's injected PATH. Find the
   // official per-device installation without touching any account directory.
+  const home=env.USERPROFILE||require('node:os').homedir();
+  const native=profile.provider==='Claude'?path.join(home,'.local','bin','claude.exe'):profile.provider==='Grok'?path.join(home,'.grok','bin','grok.exe'):null;
+  if(native&&isFile(native))return native;
   if(profile.provider==='Codex' && env.LOCALAPPDATA && path.isAbsolute(env.LOCALAPPDATA)){
     const root=path.join(env.LOCALAPPDATA||'', 'OpenAI','Codex','bin');
     const candidates=[path.join(root,'codex.exe'),...dirs(root).map(dir=>path.join(dir,'codex.exe'))].filter(isFile);

@@ -5,6 +5,12 @@ const path = require('node:path');
 const { languages, isSupportedLanguage, translate, directoryDialog, resetCreditDialog } = require('../electron/localization.cjs');
 const source = require('../src/locales/en.json');
 const placeholders = value => [...value.matchAll(/\{(\w+)\}/g)].map(match => match[1]).sort();
+test('account onboarding labels and validation messages have all translated keys',()=>{
+  for(const relative of ['src/AccountManager.jsx','electron/accounts.cjs','electron/account-login.cjs','electron/account-providers.cjs']){
+    const text=fs.readFileSync(path.join(__dirname,'..',relative),'utf8');
+    for(const match of text.matchAll(/'([^'\r\n]*[\u4e00-\u9fff][^'\r\n]*)'/g))assert.ok(source[match[1]],`${relative}: ${match[1]}`);
+  }
+});
 
 test('all eight translated catalogs cover the source keys and preserve interpolation tokens', () => {
   assert.equal(languages.length, 9);

@@ -57,5 +57,17 @@ function loadConfig(file = process.env.PRISM_CONFIG || path.join(__dirname, '../
   return validate({...defaults, ...local, assistant: {...defaults.assistant, ...local.assistant}});
 }
 
+const CONFIG_PATH=process.env.PRISM_CONFIG||path.join(__dirname,'../.local/config.json');
 const CONFIG = loadConfig();
-module.exports = {CONFIG, loadConfig, defaultConfig};
+function saveProfiles(profiles){
+  const latest=loadConfig(CONFIG_PATH);
+  if(!require('node:util').isDeepStrictEqual(latest.profiles,CONFIG.profiles))throw Error('账号配置已在外部改变，请重启后重试。');
+  const next=validate({...latest,profiles});
+  fs.mkdirSync(path.dirname(CONFIG_PATH),{recursive:true});
+  const backup=CONFIG_PATH+'.bak';if(fs.existsSync(CONFIG_PATH)&&!fs.existsSync(backup))fs.copyFileSync(CONFIG_PATH,backup);
+  const temp=CONFIG_PATH+'.'+require('node:crypto').randomUUID()+'.tmp';
+  try{fs.writeFileSync(temp,JSON.stringify(next,null,2));fs.renameSync(temp,CONFIG_PATH);}finally{if(fs.existsSync(temp))fs.unlinkSync(temp);}
+  CONFIG.profiles.splice(0,CONFIG.profiles.length,...profiles);
+  return CONFIG.profiles;
+}
+module.exports = {CONFIG, CONFIG_PATH, loadConfig, defaultConfig, saveProfiles};

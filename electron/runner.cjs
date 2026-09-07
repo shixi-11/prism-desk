@@ -39,6 +39,7 @@ class Runner extends EventEmitter {
     this.assertIdle(task);
     require('./task-settings.cjs').applyPendingMode(task);
     const nextProfile=profileFor(profile);
+    if(nextProfile.disabled)throw Error('账号尚未启用，请先登录或选择其他账号。');
     require('./task-settings.cjs').validateMode(task.mode,nextProfile);
     if (task.profile === profile) return this.store.save(task);
     const previous = task.profile;
@@ -69,6 +70,7 @@ class Runner extends EventEmitter {
     this.assertIdle(task);
     require('./task-settings.cjs').applyPendingMode(task);
     let profile = require('./models.cjs').selection(task,profileFor(task.profile));
+    if(profile.disabled)throw Error('账号尚未启用，请先登录或选择其他账号。');
     require('./task-settings.cjs').validateMode(task.mode,profile);
     if(images.length&&!['Codex','Claude'].includes(profile.provider))throw Error('当前入口暂不支持图片，请选择 Codex 或 Claude');
     this.event(id, "user", { text: text.trim(), images, profile: profile.id });
@@ -96,7 +98,7 @@ class Runner extends EventEmitter {
         if(this.active.quotaExhausted)this.event(id,'notice',{text:`${profile.provider} / ${profile.name} 订阅额度已耗尽。${task.autoSwitch===false?'自动接续已关闭，请选择其他账号继续。':'正在检查可接续的账号。'}`});
         if(task.autoSwitch===false || this.active.cancelRequested || !this.active.quotaExhausted || task.state!=='failed')break;
         require('./task-settings.cjs').applyPendingMode(task);
-        const next=PROFILES.find(p=>!attempted.has(p.id) && (!this.active.images.length||['Codex','Claude'].includes(p.provider)) && (task.mode==='read-only'||p.write&&['Codex','Claude'].includes(p.provider)));
+        const next=PROFILES.find(p=>!p.disabled&&!attempted.has(p.id) && (!this.active.images.length||['Codex','Claude'].includes(p.provider)) && (task.mode==='read-only'||p.write&&['Codex','Claude'].includes(p.provider)));
         if(!next){this.event(id,'notice',{text:'已尝试所有符合当前权限的入口；没有自动重复调用。'});break;}
         this.active.pending.clear();
         this.emit('approval-reset',{taskId:task.id});
@@ -209,6 +211,7 @@ class Runner extends EventEmitter {
       const auth = await rpc.call("account/read");
       if (auth.account?.type !== "chatgpt")
         throw Error("该入口没有使用 ChatGPT 订阅登录，调用已阻止。");
+      if(profile.email&&auth.account.email?.toLowerCase()!==profile.email.toLowerCase())throw Error('登录账号与已有账号身份不一致，请使用原账号登录。');
       if(this.active.cancelRequested){this.state(task,'paused');return;}
       const usage=await rpc.call('account/rateLimits/read');
       const quota=quotaView(usage);this.emit('quota',{id:profile.id,...quota,status:'官方额度查询',checkedAt:new Date().toISOString()});

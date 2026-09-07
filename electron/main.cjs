@@ -37,7 +37,9 @@ app.on('second-instance',showWindow);
 app.on('activate',showWindow);
 let resetInProgress=false;
 let geminiLogin=null;
-const claudeLogins=new Map();
+const accountLogins=new Map(),accountLoginStates=new Map();
+let accountOperation=false;
+let accountQueries=0;
 let validatingApps=false;
 const dataPath = () => app.getPath("userData");
 const emit = (type, value) => {
@@ -75,6 +77,7 @@ app.whenReady().then(() => {
   handle("init", () => ({
     tasks: store.list(),
     archivedTasks:store.list('archived'),deletedTasks:store.list('deleted'),
+    accountLogins:Object.fromEntries(accountLoginStates),
     profiles: PROFILES.map(({ home, executable, ...p }) => p),
     settings: settings(),
     queue:messageQueue.items,
@@ -90,6 +93,34 @@ app.whenReady().then(() => {
       : [],
   }));
   const broadcastTasks=()=>emit('task-list',{tasks:store.list(),archivedTasks:store.list('archived'),deletedTasks:store.list('deleted')});
+  const publicProfiles=()=>PROFILES.map(({home,executable,...p})=>p);
+  const broadcastAccounts=()=>emit('accounts',publicProfiles());
+  const assertAccountIdle=()=>{if(runner.active||accountOperation||accountQueries||resetInProgress||store.list().some(t=>['running','stopping','unknown'].includes(t.state)))throw Error('请等待当前执行或账号操作结束。');};
+  const loginState=(id,state)=>{const value={id,...state};accountLoginStates.set(id,value);emit('account-login',value);};
+  const verifyAccount=async id=>{const status=await require('./core.cjs').accountStatus(id,app.getAppPath());require('./accounts.cjs').recordVerified(id,status);broadcastAccounts();emit('quota',{id,...status});return status;};
+  handle('accounts',()=>require('./accounts.cjs').accountList());
+  handle('saveAccount',input=>{assertAccountIdle();const result=require('./accounts.cjs').saveAccount(input,path.join(dataPath(),'accounts'));broadcastAccounts();return result;});
+  handle('enableAccount',(id,enabled)=>{assertAccountIdle();if(typeof enabled!=='boolean')throw Error('账号设置无效。');const result=require('./accounts.cjs').setEnabled(id,enabled);broadcastAccounts();return result;});
+  handle('verifyAccount',async id=>{assertAccountIdle();accountOperation=true;messageQueue.paused=true;try{return await verifyAccount(id);}finally{accountOperation=false;messageQueue.paused=false;messageQueue.pump();}});
+  handle('accountInstall',provider=>shell.openExternal(require('./account-providers.cjs').providerFor(provider).installUrl));
+  handle('pickAccountFile',async kind=>{if(!['directory','executable'].includes(kind))throw Error('Invalid selection');const selected=await dialog.showOpenDialog(owner(),kind==='directory'?{properties:['openDirectory']}:{properties:['openFile'],filters:[{name:'CLI',extensions:['exe']}]});return selected.canceled?null:selected.filePaths[0];});
+  handle('startAccountLogin',id=>{
+    assertAccountIdle();const profile=PROFILES.find(p=>p.id===id);if(!profile)throw Error('账号不存在。');
+    require('./account-providers.cjs').providerFor(profile.provider);
+    accountOperation=true;messageQueue.paused=true;
+    try{
+      require('./accounts.cjs').clearAccountSessions(store,id);
+      require('./accounts.cjs').prepareLogin(id);broadcastAccounts();
+      loginState(id,{phase:'starting',hasUrl:false});
+      const login=require('./account-login.cjs').startAccountLogin(profile,app.getAppPath(),()=>loginState(id,{phase:'waiting',hasUrl:true}));
+      accountLogins.set(id,login);
+      loginState(id,{phase:'waiting',hasUrl:!!login.url});
+      login.completed.then(async result=>{if(result.cancelled){loginState(id,{phase:'cancelled',hasUrl:false});return;}loginState(id,{phase:'verifying',hasUrl:false});await verifyAccount(id);loginState(id,{phase:'connected',hasUrl:false});}).catch(error=>loginState(id,{phase:'error',hasUrl:false,message:error.message})).finally(()=>{accountLogins.delete(id);accountOperation=false;messageQueue.paused=false;messageQueue.pump();});
+      return {id};
+    }catch(error){accountOperation=false;messageQueue.paused=false;loginState(id,{phase:'error',hasUrl:false,message:error.message});messageQueue.pump();throw error;}
+  });
+  handle('openAccountLogin',id=>{const login=accountLogins.get(id);const profile=PROFILES.find(p=>p.id===id);const url=profile&&login?.url&&require('./account-providers.cjs').officialLoginUrl(profile.provider,login.url);if(!url)throw Error('登录链接尚未准备好，请稍候。');return shell.openExternal(url);});
+  handle('cancelAccountLogin',async id=>{await accountLogins.get(id)?.cancel();});
   handle("task", (id) => {const task=runner.active?.task.id===id?runner.active.task:store.get(id);if(task.unread){task.unread=false;store.save(task);broadcastTasks();}return {task,events:store.events(id)};});
   handle('taskMenu',id=>new Promise(resolve=>{const task=store.get(id);let chosen=null;Menu.buildFromTemplate(require('./task-menu.cjs').taskMenuTemplate(task,store.list(),key=>translate(settings().language,key),action=>{chosen=action;},runner.active?.task.id===id||['running','stopping','unknown'].includes(task.state))).popup({window:owner(),callback:()=>resolve(chosen)});}));
   handle('taskAction',async(id,action,value)=>{
@@ -129,7 +160,7 @@ app.whenReady().then(() => {
   });
   handle('savePreview',async(file,text,version)=>{if(!previewFiles.has(file))throw Error('请先打开文件');return require('./preview.cjs').savePreview(file,text,version);});
   handle("create", async input => {
-    input={...input,mode:input.mode??require('./task-settings.cjs').newTaskMode(settings(),PROFILES.find(p=>p.id===(input.profile||PROFILES[0].id)))};
+    input={...input,mode:input.mode??require('./task-settings.cjs').newTaskMode(settings(),PROFILES.find(p=>p.id===(input.profile||PROFILES.find(p=>!p.disabled)?.id)))};
     if(input.executionOptions){const list=await require('./models.cjs').modelOptions(input.profile,app.getAppPath());const m=list.models.find(m=>m.id===input.executionOptions.model);if(!m?.efforts.includes(input.executionOptions.effort))throw Error('模型或思考等级无效');}
     const task=store.create(input);if(input.executionOptions){task.modelSettings={[task.profile]:{model:input.executionOptions.model,effort:input.executionOptions.effort}};store.save(task);}broadcastTasks();return task;
   });
@@ -150,16 +181,10 @@ app.whenReady().then(() => {
     try{await require('./app-validation.cjs').validateApps();return capabilities();}finally{validatingApps=false;}
   });
   handle("quota", async(id,model) => {
-    try{return await accountStatus(id,app.getAppPath(),model);}catch(error){if(error.code!=='AUTH_REQUIRED')throw error;return {id,authRequired:true,status:error.message,remaining:null,windows:[],checkedAt:new Date().toISOString()};}
+    if(accountOperation)throw Error('请等待账号操作结束。');
+    accountQueries++;
+    try{return await accountStatus(id,app.getAppPath(),model);}catch(error){if(error.code!=='AUTH_REQUIRED')throw error;return {id,authRequired:true,status:error.message,remaining:null,windows:[],checkedAt:new Date().toISOString()};}finally{accountQueries--;}
   });
-  handle('loginClaude',async id=>{
-    const profile=PROFILES.find(p=>p.id===id&&p.provider==='Claude');if(!profile)throw Error('请选择 Claude 账号');
-    if(runner.active?.profile.id===id)throw Error('请等待此账号当前执行结束');
-    if(claudeLogins.has(id))throw Error('登录正在进行，请完成浏览器授权');
-    const login=require('./claude-login.cjs').startClaudeLogin(profile,app.getAppPath(),url=>shell.openExternal(url));claudeLogins.set(id,login);
-    try{return await login.completed;}finally{claudeLogins.delete(id);}
-  });
-  handle('cancelClaudeLogin',async id=>{await claudeLogins.get(id)?.cancel();});
   handle('loginGemini',async()=>{
     if(geminiLogin)throw Error('Google 登录窗口已打开，请完成当前授权');
     const profile=PROFILES.find(p=>p.provider==='Gemini');
@@ -171,6 +196,7 @@ app.whenReady().then(() => {
     finally {geminiLogin=null;}
   });
   handle('resetCredit',async id=>{
+    if(accountOperation)throw Error('请等待账号操作结束。');
     const profile=PROFILES.find(p=>p.id===id&&p.provider==='Codex');if(!profile)throw Error('请选择 Codex 订阅账号');
     if(runner.active||resetInProgress)throw Error('请等待当前执行或重置操作结束');
     resetInProgress=true;
@@ -182,9 +208,11 @@ app.whenReady().then(() => {
   handle('models',id=>require('./models.cjs').modelOptions(id,app.getAppPath()));
   handle('modelSettings',(id,input,profileId)=>require('./models.cjs').updateSelectionForRunner(store,runner,id,input,profileId));
   handle("run", async (id, text, imageIds=[]) => {
+    if(accountOperation)throw Error('请先完成或取消账号登录。');
     if(validatingApps)throw Error('请等待本机应用验证结束');
     if(resetInProgress)throw Error('请等待重置卡操作结束');
     const task = store.get(id);
+    if(PROFILES.find(p=>p.id===task.profile)?.disabled)throw Error('账号尚未启用，请先登录或选择其他账号。');
     const images=require('./attachments.cjs').attachmentFiles(store.dir(id),imageIds);
     if(typeof text!=='string')throw Error('请填写指令。');
     text=text.trim()||(images.length?'请查看这些图片。':'');if(!text||text.length>60000)throw Error('请输入 1–60000 字的指令。');
@@ -295,4 +323,4 @@ app.whenReady().then(() => {
   window=makeWindow();
 });
 app.on("window-all-closed", () => app.quit());
-app.on('before-quit',()=>{for(const login of claudeLogins.values())login.cancel().catch(()=>{});});
+app.on('before-quit',()=>{for(const login of accountLogins.values())login.cancel().catch(()=>{});});
