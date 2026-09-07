@@ -72,6 +72,7 @@ app.whenReady().then(() => {
   }));
   handle("task", (id) => ({ task: store.get(id), events: store.events(id) }));
   handle("create", async input => {
+    input={...input,mode:input.mode??require('./task-settings.cjs').newTaskMode(settings(),PROFILES.find(p=>p.id===(input.profile||PROFILES[0].id)))};
     if(input.executionOptions){const list=await require('./models.cjs').modelOptions(input.profile,app.getAppPath());const m=list.models.find(m=>m.id===input.executionOptions.model);if(!m?.efforts.includes(input.executionOptions.effort))throw Error('模型或思考等级无效');}
     const task=store.create(input);if(input.executionOptions){task.modelSettings={[task.profile]:{model:input.executionOptions.model,effort:input.executionOptions.effort}};store.save(task);}return task;
   });
@@ -84,6 +85,7 @@ app.whenReady().then(() => {
     atomic(path.join(dataPath(), "settings.json"), { ...settings(), theme });
   });
   handle('language',language=>{if(!isSupportedLanguage(language))throw Error('Unsupported language');atomic(path.join(dataPath(),'settings.json'),{...settings(),language});});
+  handle('defaultMode',mode=>{if(!require('./task-settings.cjs').MODES.includes(mode))throw Error('Invalid permission mode');atomic(path.join(dataPath(),'settings.json'),{...settings(),defaultMode:mode});return mode;});
   handle("scan", () => require('./diagnostics.cjs').verifyCapabilities());
   handle('validateApps',async()=>{
     if(runner.active||validatingApps)throw Error('请等待当前执行或应用验证结束');

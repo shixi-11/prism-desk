@@ -128,6 +128,20 @@ function Modal({ title, onClose, children, wide = false, dismissible = true }) {
     </dialog>
   );
 }
+const permissionModes=[['read-only','只读','查看文件、分析项目'],['workspace-write','项目内编辑','允许修改当前项目，额外权限按需确认'],['full-access','完全访问','允许访问项目外文件、执行命令，无需逐步确认']];
+function PermissionControl({task,profile,defaultMode,onChange,onDefault}){
+ const root=useRef(null),[saving,setSaving]=useState(false);
+ const mode=task.pendingMode||task.mode;
+ useEffect(()=>{const close=e=>{if(root.current&&!root.current.contains(e.target))root.current.open=false;};document.addEventListener('pointerdown',close);return()=>document.removeEventListener('pointerdown',close);},[]);
+ return <details className="permission-control" ref={root} onKeyDown={e=>{if(e.key==='Escape'){root.current.open=false;root.current.querySelector('summary').focus();}}}>
+  <summary>{tr(permissionModes.find(p=>p[0]===mode)?.[1]||'只读')}<ChevronDown size={14}/></summary>
+  <div className="permission-panel">
+   <div role="radiogroup" aria-label={tr('文件修改权限')}>{permissionModes.map(([id,label,description])=><label className="permission-option" key={id}><input type="radio" name="task-permission" value={id} checked={mode===id} disabled={task.state==='unknown'||(id!=='read-only'&&(!profile?.write||!['Codex','Claude'].includes(profile.provider)))} onChange={()=>onChange(id)}/><span><strong>{tr(label)}</strong><small>{tr(description)}</small></span></label>)}</div>
+   {task.pendingMode&&<p>{tr('下次执行生效')}</p>}
+   <button type="button" disabled={saving||defaultMode===mode} onClick={async()=>{setSaving(true);try{await onDefault(mode);}finally{setSaving(false);}}}>{tr(defaultMode===mode?'已设为新任务默认权限':'设为新任务默认权限')}</button>
+  </div>
+ </details>;
+}
 function NewTask({ onClose, onCreate }) {
   const [title, setTitle] = useState(tr("新任务"));
   const [cwd, setCwd] = useState("");
@@ -816,19 +830,7 @@ function App() {
                 </span>
               </button>
               <span className="separator" />
-              {task && (
-                <select
-                  aria-label={tr("文件修改权限")}
-                  disabled={task.state === "unknown"}
-                  value={task.pendingMode||task.mode}
-                  title={tr("完全访问可操作项目外文件并自动允许工具执行；权限修改在下一轮生效。")}
-                  onChange={(e) => changeMode(e.target.value)}
-                >
-                  <option value="read-only">{tr("只读")}</option>
-                  <option value="workspace-write" disabled={!init.profiles.find(p=>p.id===task.profile)?.write}>{tr("允许修改项目")}</option>
-                  <option value="full-access" disabled={!init.profiles.find(p=>p.id===task.profile)?.write}>{tr("完全访问")}</option>
-                </select>
-              )}
+              {task && <PermissionControl task={task} profile={init.profiles.find(p=>p.id===task.profile)} defaultMode={init.settings.defaultMode||'workspace-write'} onChange={changeMode} onDefault={async mode=>{try{await api.defaultMode(mode);setInit(old=>({...old,settings:{...old.settings,defaultMode:mode}}));}catch(e){fail(e);}}}/>}
               {task?.pendingMode&&<small className="permission-pending">{tr("下次执行生效")}</small>}
               <span className="compose-spacer" />
               {busy ? (

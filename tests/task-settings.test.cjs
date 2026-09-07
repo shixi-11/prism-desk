@@ -2,6 +2,15 @@ require('./helpers/config-fixture.cjs');
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),os=require('node:os'),path=require('node:path');
 const {TaskStore}=require('../electron/core.cjs'),{Runner}=require('../electron/runner.cjs');
 const {updateTaskSetting,codexPermissions}=require('../electron/task-settings.cjs');
+test('new-task defaults respect provider capabilities without changing existing tasks',()=>{
+ const {newTaskMode}=require('../electron/task-settings.cjs');
+ const writable={provider:'Codex',write:true};
+ assert.equal(newTaskMode({},writable),'workspace-write');
+ assert.equal(newTaskMode({defaultMode:'full-access'},writable),'full-access');
+ assert.equal(newTaskMode({defaultMode:'read-only'},writable),'read-only');
+ assert.equal(newTaskMode({defaultMode:'invalid'},writable),'workspace-write');
+ assert.equal(newTaskMode({defaultMode:'full-access'},{provider:'Grok',write:false}),'read-only');
+});
 function fixture(t){const dir=fs.mkdtempSync(path.join(os.tmpdir(),'prism-permissions-'));t.after(()=>fs.rmSync(dir,{recursive:true,force:true}));const store=new TaskStore(path.join(dir,'tasks'));return {dir,store,runner:new Runner(store)};}
 test('rename and queued permissions preserve a live task and apply on its next run',async t=>{
  const {dir,store,runner}=fixture(t),task=store.create({title:'Before',cwd:dir});let release;let turns=0;

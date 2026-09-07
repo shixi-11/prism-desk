@@ -208,5 +208,11 @@
   "重命名": "Cambiar nombre",
   "保存名称": "Guardar nombre",
   "完全访问": "Acceso completo",
-  "完全访问可操作项目外文件并自动允许工具执行；权限修改在下一轮生效。": "Permite acceder a archivos fuera del proyecto y aprueba automáticamente las herramientas. Los cambios se aplican en la próxima ejecución."
+  "完全访问可操作项目外文件并自动允许工具执行；权限修改在下一轮生效。": "Permite acceder a archivos fuera del proyecto y aprueba automáticamente las herramientas. Los cambios se aplican en la próxima ejecución.",
+  "项目内编辑": "Editar el proyecto",
+  "查看文件、分析项目": "Leer archivos y analizar el proyecto",
+  "允许修改当前项目，额外权限按需确认": "Editar el proyecto actual; solicitar aprobación para permisos adicionales",
+  "允许访问项目外文件、执行命令，无需逐步确认": "Acceder a archivos fuera del proyecto y ejecutar comandos sin aprobar cada paso",
+  "设为新任务默认权限": "Usar como permiso predeterminado para nuevas tareas",
+  "已设为新任务默认权限": "Permiso predeterminado para nuevas tareas"
 }

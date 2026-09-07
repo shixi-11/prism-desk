@@ -1,5 +1,9 @@
 const {CONFIG}=require('./config.cjs');
 const MODES=['read-only','workspace-write','full-access'];
+function newTaskMode(settings,profile){
+  if(!profile?.write||!['Codex','Claude'].includes(profile.provider))return 'read-only';
+  return MODES.includes(settings.defaultMode)?settings.defaultMode:'workspace-write';
+}
 function validateMode(mode,profile){
   if(!MODES.includes(mode))throw Error('Invalid permission mode');
   if(mode!=='read-only'&&(!profile?.write||!['Codex','Claude'].includes(profile.provider)))throw Error('这个入口仅支持只读研究。');
@@ -25,4 +29,4 @@ function updateTaskSetting(store,runner,id,update){
   return store.save(task);
 }
 function codexPermissions(mode){return mode==='full-access'?{approvalPolicy:'never',sandbox:'danger-full-access',sandboxPolicy:{type:'dangerFullAccess'}}:mode==='read-only'?{approvalPolicy:'on-request',sandbox:'read-only',sandboxPolicy:{type:'readOnly'}}:{approvalPolicy:'on-request',sandbox:'workspace-write',sandboxPolicy:{type:'workspaceWrite',networkAccess:true}};}
-module.exports={validateMode,applyPendingMode,updateTaskSetting,codexPermissions};
+module.exports={MODES,newTaskMode,validateMode,applyPendingMode,updateTaskSetting,codexPermissions};
