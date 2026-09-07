@@ -35,18 +35,28 @@ import "./desert.css";
 import {tr,setLanguage,locale,languages} from './i18n.js';
 
 const api = window.prism;
-function TaskEntry({item,selected,onSelect,onRename}){
+function taskGroups(tasks){
+  const groups=new Map();
+  for(const task of tasks){const key=task.pinned?'pinned':task.section?'section:'+task.section:task.projectGroup?'project:'+task.cwd:'tasks';
+    if(!groups.has(key))groups.set(key,{key,label:task.pinned?tr('置顶'):task.section||(task.projectGroup?task.cwd.split(/[\\/]/).filter(Boolean).pop():tr('任务')),path:task.projectGroup?task.cwd:undefined,tasks:[]});
+    groups.get(key).tasks.push(task);
+  }
+  return [...groups.values()];
+}
+function TaskEntry({item,selected,onSelect,onRename,onAction}){
   const [editing,setEditing]=useState(false),[name,setName]=useState(item.title),[saving,setSaving]=useState(false);
   const begin=()=>{setName(item.title);setEditing(true);};
   async function save(e){e.preventDefault();if(!name.trim()||saving)return;setSaving(true);try{await onRename(item.id,name.trim());setEditing(false);}catch{}finally{setSaving(false);}}
-  return <div className="task-entry">
+  const act=choice=>{if(choice?.action==='rename')begin();else if(choice)onAction(item.id,choice.action,choice.value);};
+  useEffect(()=>{if(!selected||editing)return;const handler=e=>{const k=e.key.toLowerCase();const action=e.ctrlKey&&e.altKey&&k==='r'?'rename':e.ctrlKey&&e.altKey&&k==='p'?'pin':e.ctrlKey&&e.shiftKey&&k==='u'?'unread':e.ctrlKey&&e.shiftKey&&k==='a'?'archive':null;if(action&&!e.defaultPrevented){e.preventDefault();act({action});}};window.addEventListener('keydown',handler);return()=>window.removeEventListener('keydown',handler);},[selected,editing,item.id,onAction]);
+  return <div className="task-entry" onContextMenu={async e=>{e.preventDefault();try{act(await api.taskMenu(item.id));}catch(error){onAction(item.id,'error',error);}}}>
     {editing?<form className="task-rename" onSubmit={save}>
       <input autoFocus dir="auto" aria-label={tr("任务名称")} maxLength={100} value={name} disabled={saving} onFocus={e=>e.target.select()} onChange={e=>setName(e.target.value)} onKeyDown={e=>{if(e.key==='Escape'&&!saving)setEditing(false);}}/>
       <button type="submit" aria-label={tr("保存名称")} disabled={saving||!name.trim()}><Check size={15}/></button>
       <button type="button" aria-label={tr("取消")} disabled={saving} onClick={()=>setEditing(false)}><X size={15}/></button>
     </form>:<>
-      <button className={`task-select ${selected?'selected':''}`} onClick={onSelect} onDoubleClick={begin} onKeyDown={e=>{if(e.key==='F2'){e.preventDefault();begin();}}} title={item.title}>
-        <CircleDot size={11}/><span dir="auto">{item.title}</span>{item.state==='running'&&<span className="status-dot"/>}
+      <button className={`task-select ${selected?'selected':''} ${item.unread?'unread':''}`} onClick={onSelect} onDoubleClick={begin} onKeyDown={e=>{const k=e.key.toLowerCase();const action=e.key==='F2'||(e.ctrlKey&&e.altKey&&k==='r')?'rename':e.ctrlKey&&e.altKey&&k==='p'?'pin':e.ctrlKey&&e.shiftKey&&k==='u'?'unread':e.ctrlKey&&e.shiftKey&&k==='a'?'archive':e.key==='Delete'?'delete':null;if(action){e.preventDefault();act({action});}}} title={item.title}>
+        <CircleDot size={11}/><span dir="auto">{item.pinned?'⌖ ':''}{item.title}</span>{(item.state==='running'||item.unread)&&<span className="status-dot"/>}
       </button>
       <button className="task-rename-button" title={tr("重命名")} aria-label={`${tr("重命名")} ${item.title}`} onClick={begin}><Pencil size={14}/></button>
     </>}
@@ -579,6 +589,7 @@ function App() {
   const [events, setEvents] = useState([]);
   const [modal, setModal] = useState("");
   const [preview,setPreview]=useState(null);
+  const [taskDialog,setTaskDialog]=useState(null),[sectionName,setSectionName]=useState('');
   const [view,setView]=useState(()=>{try{return {...{log:false,inspector:true},...JSON.parse(localStorage.getItem('prism-view')||'{}')};}catch{return {log:false,inspector:true};}});
   const changeView=update=>setView(old=>{const next={...old,...update};localStorage.setItem('prism-view',JSON.stringify(next));return next;});
   const [theme, setTheme] = useState("system");
@@ -624,10 +635,12 @@ function App() {
         setTheme(data.settings.theme==='system'?(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'):data.settings.theme);
         setLanguage(data.settings.language||'zh');changeLanguage(data.settings.language||'zh');
         setApprovals(data.approvals || []);
-        if (data.tasks.length) load(data.tasks[0].id);
+        const requested=new URLSearchParams(location.search).get('task');
+        if (data.tasks.length) load(data.tasks.find(t=>t.id===requested)?.id||data.tasks[0].id);
       })
       .catch(fail);
     return api.subscribe(({ type, value }) => {
+      if(type==='task-list'){setInit(old=>old?{...old,...value}:old);const selected=value.tasks.find(t=>t.id===current.current);if(selected)setTask(selected);else if(current.current){++loadSequence.current;current.current=null;setTask(null);setEvents([]);setText('');setImages([]);setStreaming('');setThinking('');setActivity('');}return;}
       if(type==='approval-reset'){setApprovals(old=>old.filter(a=>a.taskId!==value.taskId));return;}
       if(type==='queue'){setQueue(value);return;}
       if(type==='quota'){setQuotas(old=>({...old,[value.id]:value}));return;}
@@ -707,10 +720,18 @@ function App() {
       fail(e);
     }
   };
+  const taskAction=async(id,action,value)=>{try{
+    if(action==='error')throw value;
+    if(action==='section-new'){setSectionName('');setTaskDialog({id,action});return;}
+    const result=await api.taskAction(id,action,value);
+    if(result.selectId)await load(result.selectId);
+    if(result.text!==undefined)setTaskDialog({id,action,...result});
+    if(action.startsWith('copy-'))setToast(tr('已复制'));
+  }catch(error){fail(error);}};
   const create = async (values) => {
     const made = await api.create({...values,profile:draftAccount,executionOptions:draftSettings[draftAccount]});
     if(!task)drafts.current[made.id]={text,images:[]};
-    setInit((old) => ({ ...old, tasks: [made, ...old.tasks] }));
+    setInit((old) => ({ ...old, tasks: [made, ...old.tasks.filter(t=>t.id!==made.id)] }));
     setModal("");
     await load(made.id);
     if(pendingImageFiles.current.length){const files=pendingImageFiles.current;pendingImageFiles.current=[];const inputs=await Promise.all(files.map(async file=>{const bytes=new Uint8Array(await file.arrayBuffer());let binary="";for(let i=0;i<bytes.length;i+=32768)binary+=String.fromCharCode(...bytes.subarray(i,i+32768));return{name:file.name,data:btoa(binary)};}));setImages(await api.addImages(made.id,inputs));}
@@ -793,12 +814,13 @@ function App() {
           </span>
         </div>
         <nav aria-label={tr("任务列表")}>
-          {init.tasks.map(t=><TaskEntry key={t.id} item={t} selected={task?.id===t.id} onSelect={()=>changeTask(t.id)} onRename={async(id,title)=>{try{const updated=await api.update(id,{title});setInit(old=>({...old,tasks:old.tasks.map(t=>t.id===id?updated:t)}));setTask(old=>old?.id===id?updated:old);}catch(error){fail(error);throw error;}}}/>)}
+          {taskGroups(init.tasks).map(group=><React.Fragment key={group.key}><div className="task-group" title={group.path}>{group.label}</div>{group.tasks.map(t=><TaskEntry key={t.id} item={t} selected={task?.id===t.id} onSelect={()=>changeTask(t.id)} onAction={taskAction} onRename={async(id,title)=>{try{const updated=await api.update(id,{title});setInit(old=>({...old,tasks:old.tasks.map(t=>t.id===id?updated:t)}));setTask(old=>old?.id===id?updated:old);}catch(error){fail(error);throw error;}}}/>)}</React.Fragment>)}
           {!init.tasks.length && (
             <p className="no-tasks">{tr("你的任务会留在这里。")}</p>
           )}
         </nav>
         <footer>
+          <button onClick={()=>setTaskDialog({action:'history'})}><BookOpen size={18}/>{tr('归档与已删除')}</button>
           <button onClick={()=>setModal("settings")}><Settings2 size={18}/>{tr("设置")}</button>
           <button onClick={() => setModal("accounts")}>
             <Settings2 size={16} />{tr("账号")}</button>
@@ -943,6 +965,9 @@ function App() {
           </button>
         </div>
       )}
+      {taskDialog&&<Modal title={taskDialog.title||tr(taskDialog.action==='history'?'归档与已删除':taskDialog.action==='section-new'?'新建分区':'分享对话')} wide={!!taskDialog.text} onClose={()=>setTaskDialog(null)}>
+        {taskDialog.action==='history'?<div className="task-history">{['archivedTasks','deletedTasks'].map(key=><section key={key}><h3>{tr(key==='archivedTasks'?'已归档':'已删除')}</h3>{!init[key]?.length&&<p>{tr('暂无任务')}</p>}{init[key]?.map(t=><div className="history-row" key={t.id}><span>{t.title}</span><button onClick={()=>taskAction(t.id,'restore')}>{tr('恢复任务')}</button></div>)}</section>)}</div>:taskDialog.action==='section-new'?<form onSubmit={async e=>{e.preventDefault();if(!sectionName.trim())return;await taskAction(taskDialog.id,'section',sectionName);setTaskDialog(null);}}><label>{tr('分区名称')}<input autoFocus maxLength={60} value={sectionName} onChange={e=>setSectionName(e.target.value)}/></label><button type="submit" disabled={!sectionName.trim()}>{tr('保存')}</button></form>:<><p>{tr('复制或保存对话文档后即可分享。')}</p><div className="share-conversation"><Markdown>{taskDialog.text}</Markdown></div><div className="dialog-actions"><button onClick={()=>taskAction(taskDialog.id,'copy-conversation')}>{tr('复制对话')}</button><button onClick={()=>taskAction(taskDialog.id,'save-conversation')}>{tr('保存 Markdown')}</button></div></>}
+      </Modal>}
       {modal === "settings" && <Modal title={tr("设置")} onClose={()=>setModal("")}><GeneralSettings settings={{...init.settings,theme}} onSave={savePreferences} storage={init.taskStorage} onAccounts={()=>setModal("accounts")} onDefault={async mode=>{try{await api.defaultMode(mode);setInit(old=>({...old,settings:{...old.settings,defaultMode:mode}}));}catch(e){fail(e);}}} onAppearance={setAppearance} languageControl={<label>{tr("界面语言")}<select value={language} onChange={async e=>{try{await api.language(e.target.value);setLanguage(e.target.value);changeLanguage(e.target.value);}catch(error){fail(error);}}}>{languages.map(l=><option key={l.id} value={l.id}>{l.name}</option>)}</select></label>}/></Modal>}
       {modal === "new" && (
         <NewTask onClose={() => setModal("")} onCreate={create} />

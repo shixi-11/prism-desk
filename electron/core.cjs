@@ -289,22 +289,27 @@ class TaskStore {
     if (!/^[a-f0-9-]{36}$/.test(id)) throw Error("任务编号无效。");
     return path.join(this.root, id);
   }
-  list() {
+  list(view='active') {
     return fs
       .readdirSync(this.root)
       .flatMap((id) => {
         try {
-          return [this.get(id)];
+          const task=this.get(id,true);
+          if(view==='deleted'?!task.deletedAt:view==='archived'?(!task.archivedAt||task.deletedAt):(task.archivedAt||task.deletedAt))return [];
+          return [task];
         } catch {
           return [];
         }
       })
-      .sort((a, b) => b.updated.localeCompare(a.updated));
+      .sort((a, b) => Number(!!b.pinned)-Number(!!a.pinned)||b.updated.localeCompare(a.updated));
   }
-  get(id) {
-    return JSON.parse(
+  get(id,includeHidden=false) {
+    const task=JSON.parse(
       fs.readFileSync(path.join(this.dir(id), "task.json"), "utf8"),
     );
+    if(task.deletedAt&&!includeHidden)throw Error('任务已删除，请先恢复。');
+    if(task.archivedAt&&!includeHidden)throw Error('任务已归档，请先恢复。');
+    return task;
   }
   save(task) {
     task.updated = new Date().toISOString();

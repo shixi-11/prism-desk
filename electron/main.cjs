@@ -1,4 +1,7 @@
-const { app, BrowserWindow, ipcMain, dialog, shell } = require("electron");
+const { app, BrowserWindow, ipcMain, dialog, shell, Menu, clipboard } = require("electron");
+const callers=new (require('node:async_hooks').AsyncLocalStorage)();
+const windows=new Set();
+const owner=()=>callers.getStore()||[...windows][0];
 const path = require("node:path");
 const fs = require("node:fs");
 const {
@@ -24,6 +27,7 @@ const primaryInstance=app.requestSingleInstanceLock();
 if (!primaryInstance) app.quit();
 let window, store, runner, messageQueue;
 function showWindow(){
+  window=owner();
   if(!window||window.isDestroyed())return;
   if(window.isMinimized())window.restore();
   window.show();
@@ -37,8 +41,7 @@ const claudeLogins=new Map();
 let validatingApps=false;
 const dataPath = () => app.getPath("userData");
 const emit = (type, value) => {
-  if (window && !window.isDestroyed())
-    window.webContents.send("prism:event", { type, value });
+  for(const win of windows)if(!win.isDestroyed())win.webContents.send("prism:event", { type, value });
 };
 function settings() {
   try {
@@ -52,11 +55,11 @@ function settings() {
 function handle(method, fn) {
   ipcMain.handle("prism:" + method, async (event, ...args) => {
     if (
-      event.sender !== window.webContents ||
-      event.senderFrame !== window.webContents.mainFrame
+      ![...windows].some(win=>win.webContents===event.sender) ||
+      event.senderFrame !== event.sender.mainFrame
     )
       throw Error("非法调用来源");
-    return fn(...args);
+    return callers.run(BrowserWindow.fromWebContents(event.sender),()=>fn(...args));
   });
 }
 app.whenReady().then(() => {
@@ -71,6 +74,7 @@ app.whenReady().then(() => {
     runner.on(type, (value) => emit(type, value));
   handle("init", () => ({
     tasks: store.list(),
+    archivedTasks:store.list('archived'),deletedTasks:store.list('deleted'),
     profiles: PROFILES.map(({ home, executable, ...p }) => p),
     settings: settings(),
     queue:messageQueue.items,
@@ -85,7 +89,23 @@ app.whenReady().then(() => {
         }))
       : [],
   }));
-  handle("task", (id) => ({ task: store.get(id), events: store.events(id) }));
+  const broadcastTasks=()=>emit('task-list',{tasks:store.list(),archivedTasks:store.list('archived'),deletedTasks:store.list('deleted')});
+  handle("task", (id) => {const task=runner.active?.task.id===id?runner.active.task:store.get(id);if(task.unread){task.unread=false;store.save(task);broadcastTasks();}return {task,events:store.events(id)};});
+  handle('taskMenu',id=>new Promise(resolve=>{const task=store.get(id);let chosen=null;Menu.buildFromTemplate(require('./task-menu.cjs').taskMenuTemplate(task,store.list(),key=>translate(settings().language,key),action=>{chosen=action;},runner.active?.task.id===id||['running','stopping','unknown'].includes(task.state))).popup({window:owner(),callback:()=>resolve(chosen)});}));
+  handle('taskAction',async(id,action,value)=>{
+    const {manageTask,forkTask,conversationText}=require('./task-actions.cjs');
+    if(['pin','unread','archive','delete','restore','project','section'].includes(action)){const task=manageTask(store,runner,messageQueue,id,action,value);broadcastTasks();return {task};}
+    const task=store.get(id);
+    if(action==='project-pick'){const selected=await dialog.showOpenDialog(owner(),{properties:['openDirectory']});if(selected.canceled)return {};const next=manageTask(store,runner,messageQueue,id,'project',selected.filePaths[0]);broadcastTasks();return {task:next};}
+    if(action==='fork'){const fork=await forkTask(store,runner,id,!!value);broadcastTasks();return {selectId:fork.id};}
+    if(action==='share'||action==='preview-conversation')return {text:conversationText(store,id),title:task.title};
+    if(action==='save-conversation'){const result=await dialog.showSaveDialog(owner(),{defaultPath:task.title.replace(/[<>:"/\\|?*]/g,'_')+'.md',filters:[{name:'Markdown',extensions:['md']}]});if(!result.canceled)fs.writeFileSync(result.filePath,conversationText(store,id));return {};}
+    if(action.startsWith('copy-')){const values={'copy-conversation':()=>conversationText(store,id),'copy-title':()=>task.title,'copy-id':()=>id,'copy-path':()=>task.cwd};if(!values[action])throw Error('Unsupported copy action');clipboard.writeText(values[action]());return {};}
+    if(action==='open-folder'){await shell.openPath(task.cwd);return {};}
+    if(action==='open-document'){const file=path.join(store.dir(id),'conversation.md');fs.writeFileSync(file,conversationText(store,id));await shell.openPath(file);return {};}
+    if(action==='new-window'){makeWindow(id);return {};}
+    throw Error('Unsupported task action');
+  });
   handle('cancelQueued',id=>messageQueue.cancel(id));
   handle('retryQueued',id=>messageQueue.retry(id));
   handle('preferences',update=>{
@@ -95,7 +115,7 @@ app.whenReady().then(() => {
   });
   handle('addImages',async(id,inputs)=>{
     store.get(id);const {nativeImage}=require('electron');
-    if(!inputs){const result=await dialog.showOpenDialog(window,{properties:['openFile','multiSelections'],filters:[{name:'Images',extensions:['png','jpg','jpeg','webp','gif']}]});if(result.canceled)return [];inputs=result.filePaths.map(file=>{if(fs.statSync(file).size>10*1024*1024)throw Error('图片不能超过 10 MB');return {name:path.basename(file),data:fs.readFileSync(file).toString('base64')};});}
+    if(!inputs){const result=await dialog.showOpenDialog(owner(),{properties:['openFile','multiSelections'],filters:[{name:'Images',extensions:['png','jpg','jpeg','webp','gif']}]});if(result.canceled)return [];inputs=result.filePaths.map(file=>{if(fs.statSync(file).size>10*1024*1024)throw Error('图片不能超过 10 MB');return {name:path.basename(file),data:fs.readFileSync(file).toString('base64')};});}
     if(!Array.isArray(inputs)||inputs.length>5)throw Error('每条消息最多添加 5 张图片');
     return inputs.map(input=>require('./attachments.cjs').addAttachment(store.dir(id),input,nativeImage));
   });
@@ -103,7 +123,7 @@ app.whenReady().then(() => {
   const previewFiles=new Set();
   handle('preview',async(id,target,relativeTo)=>{
     const task=store.get(id);
-    if(!target){const picked=await dialog.showOpenDialog(window,{properties:['openFile'],defaultPath:task.cwd});if(picked.canceled)return null;target=picked.filePaths[0];}
+    if(!target){const picked=await dialog.showOpenDialog(owner(),{properties:['openFile'],defaultPath:task.cwd});if(picked.canceled)return null;target=picked.filePaths[0];}
     const base=relativeTo&&previewFiles.has(relativeTo)?path.dirname(relativeTo):task.cwd;
     const result=await require('./preview.cjs').readPreview(target,base);if(result.path)previewFiles.add(result.path);return result;
   });
@@ -111,10 +131,10 @@ app.whenReady().then(() => {
   handle("create", async input => {
     input={...input,mode:input.mode??require('./task-settings.cjs').newTaskMode(settings(),PROFILES.find(p=>p.id===(input.profile||PROFILES[0].id)))};
     if(input.executionOptions){const list=await require('./models.cjs').modelOptions(input.profile,app.getAppPath());const m=list.models.find(m=>m.id===input.executionOptions.model);if(!m?.efforts.includes(input.executionOptions.effort))throw Error('模型或思考等级无效');}
-    const task=store.create(input);if(input.executionOptions){task.modelSettings={[task.profile]:{model:input.executionOptions.model,effort:input.executionOptions.effort}};store.save(task);}return task;
+    const task=store.create(input);if(input.executionOptions){task.modelSettings={[task.profile]:{model:input.executionOptions.model,effort:input.executionOptions.effort}};store.save(task);}broadcastTasks();return task;
   });
   handle("pickDirectory", async () => {
-    const result = await dialog.showOpenDialog(window, directoryDialog(settings().language));
+    const result = await dialog.showOpenDialog(owner(), directoryDialog(settings().language));
     return result.canceled ? null : result.filePaths[0];
   });
   handle("theme", (theme) => {
@@ -154,7 +174,7 @@ app.whenReady().then(() => {
     const profile=PROFILES.find(p=>p.id===id&&p.provider==='Codex');if(!profile)throw Error('请选择 Codex 订阅账号');
     if(runner.active||resetInProgress)throw Error('请等待当前执行或重置操作结束');
     resetInProgress=true;
-    try{const answer=await dialog.showMessageBox(window,resetCreditDialog(settings().language,profile));if(answer.response!==1)return {outcome:'cancelled'};
+    try{const answer=await dialog.showMessageBox(owner(),resetCreditDialog(settings().language,profile));if(answer.response!==1)return {outcome:'cancelled'};
       if(runner.active)throw Error('任务已经开始，请等本轮结束再使用重置卡');
       return await require('./reset-credits.cjs').consumeReset(id,app.getAppPath(),dataPath());
     }finally{resetInProgress=false;}
@@ -180,7 +200,7 @@ app.whenReady().then(() => {
   handle("stop", () => runner.stop());
   handle("approve", (id, decision) => runner.approve(id, decision));
   handle("update", (id, update) => {
-    if(update && Object.keys(update).length===1 && ('title' in update || 'mode' in update))return require('./task-settings.cjs').updateTaskSetting(store,runner,id,update);
+    if(update && Object.keys(update).length===1 && ('title' in update || 'mode' in update)){const result=require('./task-settings.cjs').updateTaskSetting(store,runner,id,update);broadcastTasks();return result;}
     const task = store.get(id);
     runner.assertIdle(task);
     if (
@@ -228,7 +248,7 @@ app.whenReady().then(() => {
   handle("export", async (id) => {
     const task = store.get(id);
     const record = store.context(task);
-    const result = await dialog.showSaveDialog(window, {
+    const result = await dialog.showSaveDialog(owner(), {
       title: translate(settings().language, '导出工作记录'),
       defaultPath: task.title + ".md",
       filters: [{ name: "Markdown", extensions: ["md"] }],
@@ -237,7 +257,8 @@ app.whenReady().then(() => {
       fs.copyFileSync(record.path, result.filePath);
     return !result.canceled;
   });
-  window = new BrowserWindow({
+  function makeWindow(taskId){
+  const window = new BrowserWindow({
     width: 1460,
     height: 940,
     minWidth: 1000,
@@ -254,19 +275,24 @@ app.whenReady().then(() => {
       backgroundThrottling: false,
     },
   });
+  windows.add(window);
+  window.on('closed',()=>windows.delete(window));
   window.webContents.setWindowOpenHandler(() => ({ action: "deny" }));
   window.setMenu(null);
   window.once('ready-to-show',()=>{if(!process.env.PRISM_TEST_HIDE)window.showInactive();});
   if(process.platform==='win32')window.setAppDetails({appId:'org.prismdesk.app',appIconPath:path.join(__dirname,'..','src','assets','prism.ico'),relaunchDisplayName:'棱镜',relaunchCommand:`"${process.execPath}" "${path.resolve(__dirname,'..')}" --user-data-dir="${app.getPath('userData')}"`});
   window.webContents.on("will-navigate", (event) => event.preventDefault());
-  window.loadFile(path.join(__dirname, "..", "dist", "index.html"));
+  window.loadFile(path.join(__dirname, "..", "dist", "index.html"),{query:taskId?{task:taskId}:{}});
   window.webContents.once('did-finish-load',()=>messageQueue.pump());
   window.on("close", (event) => {
-    if (runner.active) {
+    if (runner.active && windows.size===1) {
       event.preventDefault();
       emit("error", "任务仍在执行，请先停止或等待结束后关闭棱镜。");
     }
   });
+  return window;
+  }
+  window=makeWindow();
 });
 app.on("window-all-closed", () => app.quit());
 app.on('before-quit',()=>{for(const login of claudeLogins.values())login.cancel().catch(()=>{});});

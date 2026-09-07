@@ -1198,3 +1198,5 @@ nav button.selected:before {
     scroll-behavior: auto !important;
   }
 }
+
+.task-group{padding:16px 12px 6px;font-size:11px;opacity:.65}.task-select.unread{font-weight:700}.history-row{display:flex;gap:16px;align-items:center;justify-content:space-between;padding:10px 0}.share-conversation{max-height:55vh;overflow:auto;padding:16px;border:1px solid var(--border);border-radius:12px;overflow-wrap:anywhere}.task-history section+section{margin-top:24px}

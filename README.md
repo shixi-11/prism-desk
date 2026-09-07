@@ -23,6 +23,8 @@ Prism Desk is a Windows workspace for subscription CLIs. When one account runs o
 
 ### Messages, settings and previews
 
+Right-click a task to rename, pin, mark unread, archive, group by project or section, share, copy, fork, open its folder or conversation, open another window, or delete it. **Archived and deleted** in the sidebar restores hidden tasks. Deleting a task preserves its workspace and conversation files. Project selection changes where future work runs; existing files stay in their original folder. Forking starts fresh CLI sessions and copies conversation attachments; the separate-workspace option starts with an empty folder. Share previews a local Markdown document for copying or saving; it does not create a hosted public link. Task changes are synchronized across open windows.
+
 The top bar has view settings and toggles for the bottom execution log and account sidebar. Their state is saved locally. In Accounts, **Check all accounts** queries every configured profile and displays available allowance, reset times, Codex reset credits and credit expiry dates. A failed query does not stop the remaining accounts.
 
 Paste screenshots, drop images into the composer or use the image button (up to five images, 10 MB each). Codex receives local images; Claude receives native image content when its subscription checks pass. Claude image execution has not yet been verified against a signed-in account.
@@ -283,6 +285,8 @@ npm run build:desktop
 采用 [MIT 许可证](LICENSE)。棱镜是独立项目，各提供方名称与商标归其所有者所有。
 
 ### 消息、设置与预览
+
+右键任务可重命名、置顶、标记未读、归档、按项目或分区整理、分享、复制、分叉、打开工作目录或对话文档、在新窗口中打开，以及删除任务。侧栏“归档与已删除”可恢复任务；删除保留工作目录和对话文件。选择项目会改变后续执行的工作目录，已有文件留在原处。分叉复制对话和附件，并建立新的 CLI 会话；独立工作区选项使用新的空白文件夹。“分享”先预览本地 Markdown 文档，支持复制或保存，不生成托管的公开链接。多个窗口会同步任务变更。
 
 顶部提供视图设置、底部执行记录和右侧账号栏开关，并记住开关状态。账号页的**一键查询全部**会查询所有已配置账号，展示剩余额度、恢复时间、Codex 重置卡数量与到期时间。单个账号查询失败不影响其他账号。
 
