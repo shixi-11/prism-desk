@@ -112,18 +112,15 @@ app.whenReady().then(() => {
       require('./accounts.cjs').clearAccountSessions(store,id);
       require('./accounts.cjs').prepareLogin(id);broadcastAccounts();
       loginState(id,{phase:'starting',hasUrl:false});
-      const login=require('./account-login.cjs').startAccountLogin(profile,app.getAppPath(),url=>{
+      const login=require('./account-login.cjs').startAccountLogin(profile,app.getAppPath(),()=>{
         loginState(id,{phase:'waiting',hasUrl:true});
-        shell.openExternal(url).catch(()=>{
-          if(accountLogins.get(id)?.url===url)loginState(id,{phase:'waiting',hasUrl:true,message:'浏览器未能自动打开，请点击“重新打开登录页”。'});
-        });
       });
       accountLogins.set(id,login);
       login.completed.then(async result=>{if(result.cancelled){loginState(id,{phase:'cancelled',hasUrl:false});return;}loginState(id,{phase:'verifying',hasUrl:false});await verifyAccount(id);loginState(id,{phase:'connected',hasUrl:false});}).catch(error=>loginState(id,{phase:'error',hasUrl:false,message:error.message})).finally(()=>{accountLogins.delete(id);accountOperation=false;messageQueue.paused=false;messageQueue.pump();});
       return {id};
     }catch(error){accountOperation=false;messageQueue.paused=false;loginState(id,{phase:'error',hasUrl:false,message:error.message});messageQueue.pump();throw error;}
   });
-  handle('openAccountLogin',id=>{const login=accountLogins.get(id);const profile=PROFILES.find(p=>p.id===id);const url=profile&&login?.url&&require('./account-providers.cjs').officialLoginUrl(profile.provider,login.url);if(!url)throw Error('登录链接尚未准备好，请稍候。');return shell.openExternal(url);});
+  handle('copyAccountLogin',id=>{const login=accountLogins.get(id);const profile=PROFILES.find(p=>p.id===id);const url=profile&&login?.url&&require('./account-providers.cjs').officialLoginUrl(profile.provider,login.url);if(!url)throw Error('登录链接尚未准备好，请稍候。');clipboard.writeText(url);return {copied:true};});
   handle('cancelAccountLogin',async id=>{await accountLogins.get(id)?.cancel();});
   handle("task", (id) => {const task=runner.active?.task.id===id?runner.active.task:store.get(id);if(task.unread){task.unread=false;store.save(task);broadcastTasks();}return {task,events:store.events(id)};});
   handle('taskMenu',id=>new Promise(resolve=>{const task=store.get(id);let chosen=null;Menu.buildFromTemplate(require('./task-menu.cjs').taskMenuTemplate(task,store.list(),key=>translate(settings().language,key),action=>{chosen=action;},runner.active?.task.id===id||['running','stopping','unknown'].includes(task.state))).popup({window:owner(),callback:()=>resolve(chosen)});}));
