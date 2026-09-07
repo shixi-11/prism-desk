@@ -20,8 +20,17 @@ if (process.env.PRISM_TEST_HIDE) {
 }
 if (process.env.PRISM_TEST_DATA)
   app.setPath("userData", process.env.PRISM_TEST_DATA);
-if (!app.requestSingleInstanceLock()) app.quit();
+const primaryInstance=app.requestSingleInstanceLock();
+if (!primaryInstance) app.quit();
 let window, store, runner;
+function showWindow(){
+  if(!window||window.isDestroyed())return;
+  if(window.isMinimized())window.restore();
+  window.show();
+  window.focus();
+}
+app.on('second-instance',showWindow);
+app.on('activate',showWindow);
 let resetInProgress=false;
 let geminiLogin=null;
 let validatingApps=false;
@@ -50,6 +59,7 @@ function handle(method, fn) {
   });
 }
 app.whenReady().then(() => {
+  if(!primaryInstance)return;
   store = new TaskStore(require('./storage.cjs').taskRoot(app.getAppPath(),dataPath()));
   store.recover();
   runner = new Runner(store);
