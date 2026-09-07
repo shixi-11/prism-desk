@@ -12,7 +12,7 @@ const fs=require('node:fs'),path=require('node:path'),assert=require('node:asser
  try{
   const page=await app.firstWindow(),errors=[];page.on('pageerror',e=>errors.push(e.message));
   await page.getByLabel('Switch language').waitFor();
-  assert.deepEqual(await page.locator('.sidebar footer button').allTextContents(),['账号','共享能力','归档','设置']);
+  assert.deepEqual(await page.locator('.sidebar footer button').allTextContents(),['账号','共享能力','归档','设置','认识作者shixilin.com']);
   await app.evaluate(({app,shell,clipboard})=>{
    app.__opens=0;app.__copied=null;app.__loginCount=0;
    shell.openExternal=async()=>{app.__opens++;throw Error('The login flow must not open a browser');};

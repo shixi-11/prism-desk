@@ -6,6 +6,8 @@
 
 ## English
 
+Created by [Shixi Lin](https://shixilin.com/).
+
 Prism Desk is a Windows workspace for subscription CLIs. When one account runs out of allowance, you can move the task to another without rebuilding its conversation and progress notes by hand. The project folder stays the same.
 
 ### What you can do
@@ -153,6 +155,8 @@ For an issue report, include the app and CLI versions, reproduction steps and a 
 [MIT](LICENSE). Prism Desk is an independent project. Provider names and trademarks belong to their respective owners.
 
 ## 简体中文
+
+由林拾汐创作。[认识作者 → shixilin.com](https://shixilin.com/)
 
 棱镜是一款面向订阅 CLI 的 Windows 桌面工作台。一个账号额度用完，可以把任务交给另一个账号，不必手动重建对话、重新整理进度。切换后仍使用原项目目录。
 

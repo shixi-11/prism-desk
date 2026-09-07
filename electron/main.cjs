@@ -102,6 +102,7 @@ app.whenReady().then(() => {
   const loginState=(id,state)=>{const value={id,...state};accountLoginStates.set(id,value);emit('account-login',value);};
   const verifyAccount=async id=>{const status=await require('./core.cjs').accountStatus(id,app.getAppPath());require('./accounts.cjs').recordVerified(id,status);broadcastAccounts();emit('quota',{id,...status});return status;};
   handle('accounts',()=>require('./accounts.cjs').accountList());
+  handle('authorHomepage',()=>shell.openExternal('https://shixilin.com/'));
   handle('saveAccount',input=>{assertAccountIdle();const result=require('./accounts.cjs').saveAccount(input,path.join(dataPath(),'accounts'));broadcastAccounts();return result;});
   handle('enableAccount',(id,enabled)=>{assertAccountIdle();if(typeof enabled!=='boolean')throw Error('账号设置无效。');const result=require('./accounts.cjs').setEnabled(id,enabled);broadcastAccounts();return result;});
   handle('verifyAccount',async id=>{assertAccountIdle();accountOperation=true;messageQueue.paused=true;try{return await verifyAccount(id);}finally{accountOperation=false;messageQueue.paused=false;messageQueue.pump();}});

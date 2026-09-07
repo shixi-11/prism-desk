@@ -834,6 +834,7 @@ function App() {
             <BookOpen size={18} />{tr("共享能力")}</button>
           <button onClick={()=>setTaskDialog({action:'history'})}><Archive size={18}/>{tr('归档')}</button>
           <button onClick={()=>setModal("settings")}><Settings2 size={18}/>{tr("设置")}</button>
+          <button className="author-homepage" onClick={()=>api.authorHomepage().catch(fail)}><ArrowUpRight size={18}/><span>{tr("认识作者")}<small>shixilin.com</small></span></button>
         </footer>
       </aside>
       <main className="main">
