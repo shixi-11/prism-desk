@@ -383,5 +383,19 @@
   "登录链接已准备好": "Enlace de inicio de sesión listo",
   "复制登录链接": "Copiar enlace de inicio de sesión",
   "登录链接已复制": "Enlace de inicio de sesión copiado",
-  "粘贴到已打开的浏览器地址栏，完成授权后返回这里。": "Pégalo en la barra de direcciones de un navegador abierto. Completa la autorización y vuelve aquí."
+  "粘贴到已打开的浏览器地址栏，完成授权后返回这里。": "Pégalo en la barra de direcciones de un navegador abierto. Completa la autorización y vuelve aquí.",
+  "授权码": "Código de autorización",
+  "浏览器显示授权码时，将完整内容粘贴到这里。": "Si el navegador muestra un código de autorización, pégalo completo aquí.",
+  "粘贴浏览器给出的授权码": "Pega el código de autorización del navegador",
+  "提交授权码": "Enviar código",
+  "已提交": "Enviado",
+  "授权码已提交，正在等待登录结果…": "Código enviado. Esperando el resultado del inicio de sesión…",
+  "登录未完成，请重新获取链接后重试。": "No se completó el inicio de sesión. Obtén un enlace nuevo e inténtalo de nuevo.",
+  "此平台无需手动输入授权码。": "Esta plataforma no requiere introducir un código manualmente.",
+  "当前登录已结束或尚未就绪，请重新获取登录链接。": "La sesión de inicio de sesión ha terminado o aún no está lista. Obtén un enlace nuevo.",
+  "请粘贴完整的授权码，不要包含空格或换行。": "Pega el código de autorización completo, sin espacios ni saltos de línea.",
+  "授权码已提交，请等待登录结果。": "El código ya se ha enviado. Espera el resultado del inicio de sesión.",
+  "授权码未能提交，请重新获取登录链接。": "No se pudo enviar el código. Obtén un enlace de inicio de sesión nuevo.",
+  "继续登录": "Continuar inicio de sesión",
+  "复制登录链接到浏览器，授权后将网页给出的授权码粘贴到下方。": "Copia el enlace de inicio de sesión en el navegador. Tras autorizar, pega abajo el código que muestra la página."
 }

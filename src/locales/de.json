@@ -383,5 +383,19 @@
   "登录链接已准备好": "Anmeldelink bereit",
   "复制登录链接": "Anmeldelink kopieren",
   "登录链接已复制": "Anmeldelink kopiert",
-  "粘贴到已打开的浏览器地址栏，完成授权后返回这里。": "Füge ihn in die Adressleiste eines geöffneten Browsers ein. Schließe die Autorisierung ab und kehre hierher zurück."
+  "粘贴到已打开的浏览器地址栏，完成授权后返回这里。": "Füge ihn in die Adressleiste eines geöffneten Browsers ein. Schließe die Autorisierung ab und kehre hierher zurück.",
+  "授权码": "Autorisierungscode",
+  "浏览器显示授权码时，将完整内容粘贴到这里。": "Wenn der Browser einen Autorisierungscode anzeigt, füge ihn hier vollständig ein.",
+  "粘贴浏览器给出的授权码": "Autorisierungscode aus dem Browser einfügen",
+  "提交授权码": "Code senden",
+  "已提交": "Gesendet",
+  "授权码已提交，正在等待登录结果…": "Code gesendet. Anmeldeergebnis wird abgewartet…",
+  "登录未完成，请重新获取链接后重试。": "Die Anmeldung wurde nicht abgeschlossen. Fordere einen neuen Link an und versuche es erneut.",
+  "此平台无需手动输入授权码。": "Auf dieser Plattform muss kein Code manuell eingegeben werden.",
+  "当前登录已结束或尚未就绪，请重新获取登录链接。": "Diese Anmeldesitzung ist beendet oder noch nicht bereit. Fordere einen neuen Anmeldelink an.",
+  "请粘贴完整的授权码，不要包含空格或换行。": "Füge den vollständigen Autorisierungscode ohne Leerzeichen oder Zeilenumbrüche ein.",
+  "授权码已提交，请等待登录结果。": "Der Code wurde bereits gesendet. Warte auf das Anmeldeergebnis.",
+  "授权码未能提交，请重新获取登录链接。": "Der Code konnte nicht gesendet werden. Fordere einen neuen Anmeldelink an.",
+  "继续登录": "Anmeldung fortsetzen",
+  "复制登录链接到浏览器，授权后将网页给出的授权码粘贴到下方。": "Kopiere den Anmeldelink in deinen Browser. Füge nach der Autorisierung den auf der Seite angezeigten Code unten ein."
 }

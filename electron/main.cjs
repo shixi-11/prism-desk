@@ -121,6 +121,7 @@ app.whenReady().then(() => {
     }catch(error){accountOperation=false;messageQueue.paused=false;loginState(id,{phase:'error',hasUrl:false,message:error.message});messageQueue.pump();throw error;}
   });
   handle('copyAccountLogin',id=>{const login=accountLogins.get(id);const profile=PROFILES.find(p=>p.id===id);const url=profile&&login?.url&&require('./account-providers.cjs').officialLoginUrl(profile.provider,login.url);if(!url)throw Error('登录链接尚未准备好，请稍候。');clipboard.writeText(url);return {copied:true};});
+  handle('submitAccountLoginCode',async(id,code)=>{const login=accountLogins.get(id);if(!login)throw Error('当前登录已结束或尚未就绪，请重新获取登录链接。');const result=await login.submitCode(code);if(accountLogins.get(id)===login&&accountLoginStates.get(id)?.phase==='waiting')loginState(id,{phase:'waiting',hasUrl:!!login.url,codeSubmitted:true});return result;});
   handle('cancelAccountLogin',async id=>{await accountLogins.get(id)?.cancel();});
   handle("task", (id) => {const task=runner.active?.task.id===id?runner.active.task:store.get(id);if(task.unread){task.unread=false;store.save(task);broadcastTasks();}return {task,events:store.events(id)};});
   handle('taskMenu',id=>new Promise(resolve=>{const task=store.get(id);let chosen=null;Menu.buildFromTemplate(require('./task-menu.cjs').taskMenuTemplate(task,store.list(),key=>translate(settings().language,key),action=>{chosen=action;},runner.active?.task.id===id||['running','stopping','unknown'].includes(task.state))).popup({window:owner(),callback:()=>resolve(chosen)});}));

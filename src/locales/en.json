@@ -383,5 +383,19 @@
   "登录链接已准备好": "Sign-in link ready",
   "复制登录链接": "Copy sign-in link",
   "登录链接已复制": "Sign-in link copied",
-  "粘贴到已打开的浏览器地址栏，完成授权后返回这里。": "Paste it into the address bar of an open browser. Complete authorization, then return here."
+  "粘贴到已打开的浏览器地址栏，完成授权后返回这里。": "Paste it into the address bar of an open browser. Complete authorization, then return here.",
+  "授权码": "Authorization code",
+  "浏览器显示授权码时，将完整内容粘贴到这里。": "If your browser displays an authorization code, paste the entire code here.",
+  "粘贴浏览器给出的授权码": "Paste the authorization code from your browser",
+  "提交授权码": "Submit code",
+  "已提交": "Submitted",
+  "授权码已提交，正在等待登录结果…": "Code submitted. Waiting for the sign-in result…",
+  "登录未完成，请重新获取链接后重试。": "Sign-in was not completed. Get a new link and try again.",
+  "此平台无需手动输入授权码。": "This platform does not require manual code entry.",
+  "当前登录已结束或尚未就绪，请重新获取登录链接。": "This sign-in session has ended or is not ready. Get a new sign-in link.",
+  "请粘贴完整的授权码，不要包含空格或换行。": "Paste the complete authorization code without spaces or line breaks.",
+  "授权码已提交，请等待登录结果。": "The code has been submitted. Wait for the sign-in result.",
+  "授权码未能提交，请重新获取登录链接。": "The code could not be submitted. Get a new sign-in link.",
+  "继续登录": "Continue sign-in",
+  "复制登录链接到浏览器，授权后将网页给出的授权码粘贴到下方。": "Copy the sign-in link into your browser. After authorizing, paste the code shown on the page below."
 }

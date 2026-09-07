@@ -383,5 +383,19 @@
   "登录链接已准备好": "Lien de connexion prêt",
   "复制登录链接": "Copier le lien de connexion",
   "登录链接已复制": "Lien de connexion copié",
-  "粘贴到已打开的浏览器地址栏，完成授权后返回这里。": "Collez-le dans la barre d’adresse d’un navigateur ouvert. Terminez l’autorisation, puis revenez ici."
+  "粘贴到已打开的浏览器地址栏，完成授权后返回这里。": "Collez-le dans la barre d’adresse d’un navigateur ouvert. Terminez l’autorisation, puis revenez ici.",
+  "授权码": "Code d’autorisation",
+  "浏览器显示授权码时，将完整内容粘贴到这里。": "Si le navigateur affiche un code d’autorisation, collez-le ici en entier.",
+  "粘贴浏览器给出的授权码": "Collez le code d’autorisation du navigateur",
+  "提交授权码": "Envoyer le code",
+  "已提交": "Envoyé",
+  "授权码已提交，正在等待登录结果…": "Code envoyé. En attente du résultat de la connexion…",
+  "登录未完成，请重新获取链接后重试。": "La connexion n’a pas abouti. Obtenez un nouveau lien et réessayez.",
+  "此平台无需手动输入授权码。": "Cette plateforme ne nécessite pas de saisie manuelle de code.",
+  "当前登录已结束或尚未就绪，请重新获取登录链接。": "Cette session de connexion est terminée ou n’est pas prête. Obtenez un nouveau lien de connexion.",
+  "请粘贴完整的授权码，不要包含空格或换行。": "Collez le code d’autorisation complet, sans espaces ni sauts de ligne.",
+  "授权码已提交，请等待登录结果。": "Le code a été envoyé. Attendez le résultat de la connexion.",
+  "授权码未能提交，请重新获取登录链接。": "Le code n’a pas pu être envoyé. Obtenez un nouveau lien de connexion.",
+  "继续登录": "Poursuivre la connexion",
+  "复制登录链接到浏览器，授权后将网页给出的授权码粘贴到下方。": "Copiez le lien de connexion dans votre navigateur. Après l’autorisation, collez ci-dessous le code affiché sur la page."
 }
