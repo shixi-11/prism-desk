@@ -583,3 +583,7 @@ html:not([lang^="zh"]) .empty h1 { font-size:clamp(26px,3vw,44px); }
 .compose-actions { flex-wrap:wrap; row-gap:8px; }
 
 .sidebar > footer button.author-homepage{padding:10px 7px;border-bottom:0;font-size:14px}.author-homepage span{display:flex;flex-direction:column;gap:3px}.author-homepage small{font:11px var(--font-body);opacity:.75}
+.task-plan h2,.relay-preferences h2{font:400 20px var(--font-title);margin:0 0 16px}
+.plan-heading h2{margin:0}.plan-heading{margin-bottom:16px}.task-plan,.relay-preferences{padding-block:18px;border-bottom:1px solid var(--line)}
+.relay-preferences li{margin:8px 0}.relay-preferences li>button:first-child{display:flex;flex:1;flex-direction:column;align-items:flex-start;gap:4px;padding-inline:0}
+.question-choices fieldset>button{justify-content:flex-start;text-align:start;flex-direction:column;align-items:flex-start}

@@ -3,6 +3,12 @@ const {CONFIG,saveProfiles}=require('./config.cjs');
 const {providerFor,providerCatalog}=require('./account-providers.cjs');
 const revision=p=>crypto.createHash('sha256').update(JSON.stringify(p)).digest('hex');
 function accountList(){return {providers:providerCatalog(),profiles:CONFIG.profiles.map(p=>{let cliAvailable=false;try{require('./discovery.cjs').resolveExecutable(p);cliAvailable=true;}catch{}return {...p,revision:revision(p),cliAvailable};})};}
+function renameAccount(id,name){
+ const profile=CONFIG.profiles.find(p=>p.id===id);if(!profile)throw Error('账号不存在。');
+ if(typeof name!=='string'||!name.trim()||name.trim().length>60)throw Error('请填写 1–60 字的账号名称。');
+ const next={...profile,name:name.trim()};saveProfiles(CONFIG.profiles.map(p=>p.id===id?next:p));return next;
+}
+
 function canonical(file){let parent=path.resolve(file);const tail=[];while(!fs.existsSync(parent)){const above=path.dirname(parent);if(above===parent)break;tail.unshift(path.basename(parent));parent=above;}return path.join(fs.existsSync(parent)?fs.realpathSync.native(parent):parent,...tail).replace(/[\\/]+$/,'').toLowerCase();}
 function overlaps(a,b){return a===b||a.startsWith(b+path.sep)||b.startsWith(a+path.sep);}
 function validateHome(home,id){
@@ -49,4 +55,4 @@ function recordVerified(id,status){
  saveProfiles(CONFIG.profiles.map(p=>p.id===id?next:p));require('./models.cjs').invalidate(id);return next;
 }
 function clearAccountSessions(store,id){for(const view of ['active','archived','deleted'])for(const task of store.list(view)){if(task.sessions?.[id]){delete task.sessions[id];store.save(task);}}}
-module.exports={accountList,saveAccount,setEnabled,prepareLogin,recordVerified,clearAccountSessions,validateHome,revision};
+module.exports={renameAccount,accountList,saveAccount,setEnabled,prepareLogin,recordVerified,clearAccountSessions,validateHome,revision};

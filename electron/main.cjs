@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, dialog, shell, Menu, clipboard } = require("electron");
+const { app, BrowserWindow, ipcMain, dialog, shell, Menu, clipboard, Tray } = require("electron");
 const callers=new (require('node:async_hooks').AsyncLocalStorage)();
 const windows=new Set();
 const owner=()=>callers.getStore()||[...windows][0];
@@ -26,6 +26,19 @@ if (process.env.PRISM_TEST_DATA)
 const primaryInstance=app.requestSingleInstanceLock();
 if (!primaryInstance) app.quit();
 let window, store, runner, messageQueue, quotaDisplay;
+let tray,quitting=false,quitPending=false;
+async function quitPrism(){
+ if(quitPending)return;quitPending=true;if(messageQueue)messageQueue.paused=true;
+ try{
+   if(runner?.active){
+     const idle=new Promise((resolve,reject)=>{const timer=setTimeout(()=>{runner.off('idle',done);reject(Error('任务尚未停止，请稍后再退出'));},30000);const done=()=>{clearTimeout(timer);resolve();};runner.once('idle',done);});
+     idle.catch(()=>{});delete runner.active.requestedHandoff;
+     await runner.stop();await idle;
+   }
+   await Promise.allSettled([...accountLogins.values()].map(login=>login.cancel()));
+   quitting=true;tray?.destroy();app.quit();
+ }catch(e){quitPending=false;if(messageQueue)messageQueue.paused=false;showWindow();emit('error',e.message);}
+}
 function showWindow(){
   window=owner();
   if(!window||window.isDestroyed())return;
@@ -43,7 +56,7 @@ let accountQueries=0;
 let validatingApps=false;
 const dataPath = () => app.getPath("userData");
 const emit = (type, value) => {
-  if(type==='quota'&&quotaDisplay)quotaDisplay.save(value);
+  if(type==='quota'&&quotaDisplay){quotaDisplay.save(value);value=quotaDisplay.values[value.id];}
   for(const win of windows)if(!win.isDestroyed())win.webContents.send("prism:event", { type, value });
 };
 function settings() {
@@ -102,6 +115,24 @@ app.whenReady().then(() => {
   const loginState=(id,state)=>{const value={id,...state};accountLoginStates.set(id,value);emit('account-login',value);};
   const verifyAccount=async id=>{const status=await require('./core.cjs').accountStatus(id,app.getAppPath());require('./accounts.cjs').recordVerified(id,status);broadcastAccounts();emit('quota',{id,...status});return status;};
   handle('accounts',()=>require('./accounts.cjs').accountList());
+  handle('answerQuestion',(id,requestId,answers)=>require('./questions.cjs').answer(runner,id,requestId,answers));
+  handle('renameAccount',(id,name)=>{const result=require('./accounts.cjs').renameAccount(id,name);broadcastAccounts();return result;});
+  handle('savePlan',(id,input)=>require('./task-plan.cjs').save(store,runner,id,input));
+  handle('relayPreferences',(id,order)=>{if(!Array.isArray(order)||new Set(order).size!==order.length||order.some(id=>!PROFILES.some(p=>p.id===id)))throw Error('接续顺序无效');const task=runner.active?.task.id===id?runner.active.task:store.get(id);task.relayOrder=order;store.save(task);emit('state',task);return task;});
+  handle('planAction',(id,action,revision)=>{
+    const task=store.get(id);runner.assertIdle(task);
+    if(accountOperation||validatingApps||resetInProgress||messageQueue.running||messageQueue.items.some(i=>i.taskId===id&&i.status==='waiting'))throw Error('请等待当前执行结束。');
+    if(revision!==task.workPlan?.revision)throw Error('计划已更新，请重新打开后编辑');
+    if(action==='draft'){
+      if(!task.workPlan?.goal)throw Error('请先设置目标');
+      runner.run(id,'请依据已保存的目标和当前项目，只制订计划，不实施。列出可执行步骤及验收条件，等待我确认。',[],{planning:true}).catch(e=>emit('error',e.message));
+    }else if(action==='execute'){
+      if(!task.workPlan?.steps?.length)throw Error('请先保存计划步骤');
+      task.planReviewRequired=false;task.planApproved=task.workPlan.revision;store.save(task);
+      messageQueue.enqueue(id,'我已确认保存的目标和计划。请按计划继续执行，先核对现有成果，避免重复成功操作。');
+    }else throw Error('计划操作无效');
+    return store.get(id);
+  });
   handle('authorHomepage',()=>shell.openExternal('https://shixilin.com/'));
   handle('saveAccount',input=>{assertAccountIdle();const result=require('./accounts.cjs').saveAccount(input,path.join(dataPath(),'accounts'));broadcastAccounts();return result;});
   handle('enableAccount',(id,enabled)=>{assertAccountIdle();if(typeof enabled!=='boolean')throw Error('账号设置无效。');const result=require('./accounts.cjs').setEnabled(id,enabled);broadcastAccounts();return result;});
@@ -190,7 +221,7 @@ app.whenReady().then(() => {
   handle("quota", async(id,model) => {
     if(accountOperation)throw Error('请等待账号操作结束。');
     accountQueries++;
-    try{const result=await require('./core.cjs').accountStatus(id,app.getAppPath(),model);emit('quota',{id,...result});return result;}catch(error){const result=quotaDisplay.failure(id,error);emit('quota',result);return result;}finally{accountQueries--;}
+    try{const result=await require('./core.cjs').accountStatus(id,app.getAppPath(),model);if(result.email){require('./accounts.cjs').recordVerified(id,result);broadcastAccounts();}emit('quota',{id,...result});return result;}catch(error){const result=quotaDisplay.failure(id,error);emit('quota',result);return result;}finally{accountQueries--;}
   });
   handle('loginGemini',async()=>{
     if(geminiLogin)throw Error('Google 登录窗口已打开，请完成当前授权');
@@ -212,21 +243,23 @@ app.whenReady().then(() => {
       return await require('./reset-credits.cjs').consumeReset(id,app.getAppPath(),dataPath());
     }finally{resetInProgress=false;}
   });
-  handle('models',id=>require('./models.cjs').modelOptions(id,app.getAppPath()));
-  handle('modelSettings',(id,input,profileId)=>require('./models.cjs').updateSelectionForRunner(store,runner,id,input,profileId));
-  handle("run", async (id, text, imageIds=[]) => {
+  handle('models',id=>{if(accountOperation)throw Error('请等待账号操作结束。');return require('./models.cjs').modelOptions(id,app.getAppPath());});
+  handle('modelSettings',(id,input,profileId)=>{if(accountOperation)throw Error('请等待账号操作结束。');return require('./models.cjs').updateSelectionForRunner(store,runner,id,input,profileId);});
+  handle("run", async (id, text, imageIds=[], choiceEventId) => {
     if(accountOperation)throw Error('请先完成或取消账号登录。');
     if(validatingApps)throw Error('请等待本机应用验证结束');
     if(resetInProgress)throw Error('请等待重置卡操作结束');
     const task = store.get(id);
     if(PROFILES.find(p=>p.id===task.profile)?.disabled)throw Error('账号尚未启用，请先登录或选择其他账号。');
+    if(choiceEventId){const source=store.events(id).find(e=>e.id===choiceEventId&&e.type==='assistant');if(!source)throw Error('这项选择已失效，请继续当前任务');if(store.events(id).some(e=>e.choiceEventId===choiceEventId))throw Error('已提交选择');}
     const images=require('./attachments.cjs').attachmentFiles(store.dir(id),imageIds);
     if(typeof text!=='string')throw Error('请填写指令。');
     text=text.trim()||(images.length?'请查看这些图片。':'');if(!text||text.length>60000)throw Error('请输入 1–60000 字的指令。');
     if(images.length&&!['Codex','Claude'].includes(PROFILES.find(p=>p.id===task.profile)?.provider))throw Error('当前入口暂不支持图片，请选择 Codex 或 Claude');
-    if(settings().busySend==='steer'&&await runner.steer(id,text,images))return {steered:true};
+    if(settings().busySend==='steer'&&await runner.steer(id,text,images)){if(choiceEventId)runner.event(id,'notice',{choiceEventId,text:'已提交选择 · '+text});return {steered:true};}
     const busy=!!runner.active||messageQueue.running;
-    const item=messageQueue.enqueue(id,text,images);
+    const item=messageQueue.enqueue(id,text,images,{planning:!!task.planReviewRequired});
+    if(choiceEventId)runner.event(id,'notice',{choiceEventId,text:'已提交选择 · '+text});
     return {started:!busy,queued:busy,id:item.id};
   });
   handle("switch", (id, profile) => runner.switch(id, profile));
@@ -321,6 +354,7 @@ app.whenReady().then(() => {
   window.loadFile(path.join(__dirname, "..", "dist", "index.html"),{query:taskId?{task:taskId}:{}});
   window.webContents.once('did-finish-load',()=>messageQueue.pump());
   window.on("close", (event) => {
+    if(!quitting&&tray){event.preventDefault();window.hide();return;}
     if (runner.active && windows.size===1) {
       event.preventDefault();
       emit("error", "任务仍在执行，请先停止或等待结束后关闭棱镜。");
@@ -329,6 +363,15 @@ app.whenReady().then(() => {
   return window;
   }
   window=makeWindow();
+  if(!process.env.PRISM_TEST_HIDE||process.env.PRISM_TEST_TRAY){
+    tray=new Tray(path.join(__dirname,'..','src','assets','prism.ico'));
+    tray.setToolTip('棱镜 · Prism');
+    const updateTray=()=>tray.setContextMenu(Menu.buildFromTemplate([
+      {label:translate(settings().language,'打开棱镜'),click:showWindow},
+      {type:'separator'},
+      {label:translate(settings().language,'退出棱镜'),click:quitPrism},
+    ]));updateTray();tray.on('right-click',updateTray);tray.on('click',showWindow);
+  }
 });
 app.on("window-all-closed", () => app.quit());
-app.on('before-quit',()=>{for(const login of accountLogins.values())login.cancel().catch(()=>{});});
+app.on('before-quit',event=>{if(tray&&!quitting){event.preventDefault();quitPrism();return;}quitting=true;for(const login of accountLogins.values())login.cancel().catch(()=>{});});

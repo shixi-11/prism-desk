@@ -25,6 +25,12 @@ Prism Desk is a Windows workspace for subscription CLIs. When one account runs o
 
 ### Messages, settings and previews
 
+**Goal and plan** keeps a task goal and editable steps, with progress saved across sessions. **Plan first** runs with read-only permissions and returns a draft for review. **Confirm plan and execute** explicitly starts implementation with the task’s configured permissions. Later planning messages remain read-only until confirmation. Long plans stay in the local handoff record.
+
+Model changes can be applied within the same account using **Switch and continue**. A confirmed execution records its account, model and reasoning level; a saved selection alone is not shown as a completed switch. **Automatic handoff preferences** sets account priority and uses each account’s saved model and reasoning level, while still respecting image and write-access requirements.
+
+Each account card has an editable **Nickname** with a pencil button. This changes its display name, not its login identity. Native Codex questions and supported question-and-list messages offer clickable choices and a custom answer. Closing the Windows title-bar **×** hides Prism in the notification area; use the tray menu’s **Quit Prism** to stop active work and exit.
+
 Right-click a task to rename, pin, mark unread, archive, group by project or section, share, copy, fork, open its folder or conversation, open another window, or delete it. **Archived and deleted** in the sidebar restores hidden tasks. Deleting a task preserves its workspace and conversation files. Project selection changes where future work runs; existing files stay in their original folder. Forking starts fresh CLI sessions and copies conversation attachments; the separate-workspace option starts with an empty folder. Share previews a local Markdown document for copying or saving; it does not create a hosted public link. Task changes are synchronized across open windows.
 
 The top bar has view settings and toggles for the bottom execution log and account sidebar. Their state is saved locally. In Accounts, **Check all accounts** queries every configured profile and displays available allowance, reset times, Codex reset credits and credit expiry dates. A failed query does not stop the remaining accounts.
@@ -293,6 +299,12 @@ npm run build:desktop
 采用 [MIT 许可证](LICENSE)。棱镜是独立项目，各提供方名称与商标归其所有者所有。
 
 ### 消息、设置与预览
+
+「目标与计划」保存当前任务的目标、步骤和完成进度，重开后仍可继续。「先制订计划」以只读权限运行，生成待核对步骤；点击「确认计划并执行」后，才按任务已设置的权限开始实施。确认前继续讨论计划也保持只读，完整计划进入本地交接记录。
+
+同账号更换模型或思考等级后，可点击「切换并继续」。实际执行开始后会显示生效配置，并在切换时留下提示。「自动接续偏好」可调整账号优先顺序，各账号使用在此任务中保存的模型与思考等级；接续仍按图片支持和写入权限筛选，不静默降低所选模型。
+
+账号卡片显示「备注名」和铅笔按钮，回车保存、Esc 取消；修改备注名不改变登录身份。原生 Codex 提问及符合格式的文字选项提供可点击按钮和自行填写入口。窗口右上角 × 将棱镜收进通知区，后台任务继续运行；右键托盘图标选择「退出棱镜」，才会停止执行并退出。
 
 右键任务可重命名、置顶、标记未读、归档、按项目或分区整理、分享、复制、分叉、打开工作目录或对话文档、在新窗口中打开，以及删除任务。侧栏“归档与已删除”可恢复任务；删除保留工作目录和对话文件。选择项目会改变后续执行的工作目录，已有文件留在原处。分叉复制对话和附件，并建立新的 CLI 会话；独立工作区选项使用新的空白文件夹。“分享”先预览本地 Markdown 文档，支持复制或保存，不生成托管的公开链接。多个窗口会同步任务变更。
 

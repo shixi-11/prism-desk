@@ -8,7 +8,7 @@ async function runGrok(runner,task,profile,text,instructions) {
       rpc.write(m.method==='session/request_permission' ? {id:m.id,result:{outcome:{outcome:'cancelled'}}} : {id:m.id,error:{code:-32601,message:'Unsupported client operation'}});return;
     }
     const u=m.params?.update;if(m.method!=='session/update'||!u)return;
-    if(u.sessionUpdate==='agent_message_chunk' && u.content?.type==='text') {answer+=u.content.text;runner.emit('delta',{taskId:task.id,text:u.content.text});}
+    if(u.sessionUpdate==='agent_message_chunk' && u.content?.type==='text') {runner.confirmExecution?.(task,profile);answer+=u.content.text;runner.emit('delta',{taskId:task.id,text:u.content.text});}
     if(['tool_call','tool_call_update'].includes(u.sessionUpdate)) runner.event(task.id,'tool',{text:u.title||u.toolCallId||'Grok 工具',data:u,profile:profile.id});
     if(u.sessionUpdate==='plan')runner.event(task.id,'plan',{data:u});
   });

@@ -69,7 +69,7 @@ async function runGemini(runner,task,profile,text,instructions) {
     const update=message.params?.update;
     if(message.method!=='session/update'||!update)return;
     if(update.sessionUpdate==='agent_message_chunk'&&update.content?.type==='text'){
-      answer+=update.content.text;runner.emit('delta',{taskId:task.id,text:update.content.text});
+      runner.confirmExecution?.(task,profile);answer+=update.content.text;runner.emit('delta',{taskId:task.id,text:update.content.text});
     }
     if(['tool_call','tool_call_update'].includes(update.sessionUpdate))runner.event(task.id,'tool',{text:update.title||'Gemini 工具',data:update,profile:profile.id});
     if(update.sessionUpdate==='plan')runner.event(task.id,'plan',{data:update});

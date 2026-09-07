@@ -1,6 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import Markdown from "react-markdown";
+import QuestionChoices,{proseQuestion} from "./QuestionChoices.jsx";
+import TaskPlan from "./TaskPlan.jsx";
 import AccountManager from "./AccountManager.jsx";
 import PreviewPanel,{LinkedMarkdown} from "./PreviewPanel.jsx";
 import {ImageAttachments,QueuedMessages,ActivityPanel,GeneralSettings,AccountQuota} from "./TaskControls.jsx";
@@ -300,7 +302,7 @@ function ModelControls({task,profile,disabled,onSave}) {
     <label>{tr("思考等级")}<select aria-label={tr("思考等级")} value={effort} disabled={disabled||busy||!model} onChange={e=>save(current,e.target.value)}>
       {!model?.efforts.includes(effort)&&<option value={effort}>{labels[effort]||effort}</option>}{model?.efforts.map(v=><option key={v} value={v}>{labels[v]||v} · {v}</option>)}
     </select></label>
-    <small>{error||(!catalog?tr("正在读取模型选项…"):busy?tr("正在保存…"):tr(task.execution?"下次执行生效":"设置用于此账号的下一次执行"))}</small>
+    <small>{error||(!catalog?tr("正在读取模型选项…"):busy?tr("正在保存…"):tr(!saved?"设置用于此账号的下一次执行":task.execution?.confirmed&&task.execution.profile===profile.id&&task.execution.model===current&&task.execution.effort===effort?"当前已生效":task.execution?"设置已保存，下次执行生效":"设置已保存，发送消息或切换并继续后生效"))}</small>
     {catalog&&<span className="model-source" title={tr(catalog.note)} aria-label={tr(catalog.note)}>ⓘ</span>}
   </div>;
 }
@@ -318,6 +320,9 @@ function Inspector({
   draftSettings,
   onDraftAccount,
   onHandoff,
+  onSavePlan,
+  onPlanAction,
+  onRelayPreferences,
   storage,
   disabled,
 }) {
@@ -331,6 +336,10 @@ function Inspector({
   const selected = profiles.find((p) => p.id === target);
   useEffect(()=>{if(!task&&(!profiles.some(p=>p.id===target&&!p.disabled))){const next=profiles.find(p=>!p.disabled)?.id;setTarget(next);onDraftAccount?.(next||'');}},[profiles,task?.id]);
   const quota = quotas[target];
+  const selectedConfig=task?.modelSettings?.[target];
+  const activeConfig=task?.execution||task?.lastExecution;
+  const changedModel=!!selectedConfig&&(!activeConfig||activeConfig.model!==selectedConfig?.model||activeConfig.effort!==selectedConfig?.effort);
+  const relayOrder=[...(task?.relayOrder||[]).filter(id=>profiles.some(p=>p.id===id)),...profiles.filter(p=>!(task?.relayOrder||[]).includes(p.id)).map(p=>p.id)];
   const running = task?.state === "running";
   const canStop = running && ["Codex","Claude","Grok"].includes(profiles.find(p=>p.id===task.profile)?.provider);
   const [clock,setClock]=useState(Date.now());
@@ -363,16 +372,16 @@ function Inspector({
         </div>
         {selected&&<ModelControls key={(task?.id||'draft')+target} task={task||{modelSettings:draftSettings}} profile={selected} disabled={!!selected.disabled} onSave={value=>onModelSettings(value,target)}/>}
         <div className="execution-status" role="status"><span className="status-dot" />{tr(labels[task?.state]||"就绪")}</div>
-        {task?.execution&&<p className="active-config">{tr("本轮执行")} · {task.execution.model} · {task.execution.effort}</p>}
+        {activeConfig&&<p className="active-config" role="status">{tr(task?.execution?(task.execution.confirmed?'当前已生效':'正在启动'):'上次已生效')} · {activeConfig.reportedModel||activeConfig.model} · {activeConfig.effort}</p>}
                 <button
           className="relay outline"
-          disabled={disabled || selected?.disabled || !selected || !!task && target === task.profile}
+          disabled={disabled || selected?.disabled || !selected || !!task && target === task.profile && !changedModel}
           onClick={() => task ? onSwitch(target) : onNew()}
         >
           <ArrowRightLeft size={16} />
           {task ? tr("切换并继续") : tr("新建任务后开始")}
         </button>
-        <p className="relay-note">{!task?tr("先新建任务，再切换执行账号。"):task.state==='unknown'?tr("先核对上次执行进度，再切换账号。"):disabled?tr("请等待当前执行结束。"):target===task.profile?tr("已是当前账号；选择其他账号后可切换。"):tr("切换后，在同一任务中发送指令继续。")}</p>
+        <p className="relay-note">{!task?tr("先新建任务，再切换执行账号。"):task.state==='unknown'?tr("先核对上次执行进度，再切换账号。"):disabled?tr("请等待当前执行结束。"):target===task.profile&&!changedModel?tr("已是当前账号；选择其他账号后可切换。"):tr("切换后，在同一任务中发送指令继续。")}</p>
         {task && (
           <p className="relay-note">{tr("当前：")}{profiles.find((p) => p.id === task.profile)?.provider} /{" "}
             {tr(profiles.find((p) => p.id === task.profile)?.name)}
@@ -382,6 +391,9 @@ function Inspector({
         {canStop&&<button className="outline stop-handoff" onClick={()=>onHandoff(target)}>{tr("停止并交接")}</button>}
       </section>
       <div className="inspector-scroll">
+      {task&&<TaskPlan key={task.id} task={task} busy={disabled} onSave={onSavePlan} onAction={onPlanAction}/>}
+      {task&&<section className="relay-preferences"><h2>{tr('自动接续偏好')}</h2><p>{tr('按顺序寻找账号，使用各账号已保存的模型与思考等级。')}</p><ol>{relayOrder.map((id,i)=>{const p=profiles.find(p=>p.id===id),c=task.modelSettings?.[id];return <li key={id}><button title={tr('设置模型与思考等级')} onClick={()=>setTarget(id)}>{p.provider} / {tr(p.name)}<small>{c?.model||p.model} · {c?.effort||(p.provider==='Codex'?'xhigh':p.provider==='Gemini'?'auto':'high')}</small></button><button aria-label={tr('优先使用')+' '+p.name} disabled={i===0} onClick={()=>onRelayPreferences([id,...relayOrder.filter(v=>v!==id)])}>↑</button></li>;})}</ol></section>}
+
       <section>
         <div className="quota">
           <span>{tr("剩余额度")}</span>
@@ -472,13 +484,13 @@ function Inspector({
     </aside>
   );
 }
-function Conversation({ task, events, streaming, onNew, onPreview }) {
+function Conversation({ task, events, streaming, onNew, onPreview, onChoice }) {
   const end = useRef(null);
   useEffect(() => {
     end.current?.scrollIntoView({ block: "end", behavior: "instant" });
   }, [events.length, streaming]);
   const messages = events.filter((e) =>
-    ["user", "assistant", "handoff", "notice"].includes(e.type),
+    ["user", "assistant", "handoff", "notice", "question"].includes(e.type),
   );
   if (!messages.length)
     return (
@@ -501,7 +513,7 @@ function Conversation({ task, events, streaming, onNew, onPreview }) {
         ["handoff","notice"].includes(e.type) ? (
           <div key={e.id} className="handoff">
             <ArrowRightLeft size={14} />
-            <div><p>{tr(e.text)}</p>{e.progress&&<details className="handoff-progress"><summary>{tr("交接进度")}</summary>
+            <div><p>{e.executionStatus?`${tr(e.executionStatus)} · ${e.provider} / ${tr(e.accountName)} · ${e.execution.reportedModel||e.execution.model} · ${e.execution.effort}`:tr(e.text)}</p>{e.progress&&<details className="handoff-progress"><summary>{tr("交接进度")}</summary>
             <strong>{tr("任务要求")}</strong><p>{e.progress.request||tr("尚无记录")}</p>
             <strong>{tr("进度备注")}</strong><p>{e.progress.checkpoint||tr("尚无记录")}</p>
             <strong>{tr("上轮报告（需结合文件核对）")}</strong><div className="prose"><Markdown>{e.progress.report||tr("尚无报告")}</Markdown></div>
@@ -523,7 +535,9 @@ function Conversation({ task, events, streaming, onNew, onPreview }) {
               {e.type === "assistant" && <small>{e.profile}</small>}
             </header>
             <div className="prose">
-              <LinkedMarkdown onPreview={onPreview}>{e.text || ""}</LinkedMarkdown>
+              <LinkedMarkdown onPreview={onPreview}>{e.type==='assistant'&&proseQuestion(e.text)?proseQuestion(e.text).prefix:e.text||""}</LinkedMarkdown>
+              {e.type==='question'&&<QuestionChoices questions={e.questions} disabled={task.state!=='running'||!task.activeQuestionIds?.includes(e.requestId)} answer={events.find(v=>v.questionRequestId===e.requestId)?.text} onAnswer={answers=>api.answerQuestion(task.id,e.requestId,answers)}/>}
+              {e.type==='assistant'&&proseQuestion(e.text)&&<QuestionChoices questions={[proseQuestion(e.text)]} disabled={task.state==='unknown'||task.state==='stopping'} answer={events.find(v=>v.choiceEventId===e.id)?.text} onAnswer={answers=>onChoice(e.id,answers.choice.answers[0])}/>}
               <ImageAttachments taskId={task.id} images={e.images} onPreview={image=>onPreview(image.path)}/>
             </div>
           </article>
@@ -793,6 +807,7 @@ function App() {
   const changeProfile = async (target) => {
     try {
       await api.switch(task.id, target);
+      await api.run(task.id,'先核对已保存的工作记录，继续当前任务尚未完成的工作。');
       await load(task.id);
     } catch (e) {
       fail(e);
@@ -848,6 +863,7 @@ function App() {
         <Conversation
           task={task}
           events={events}
+          onChoice={async(eventId,answer)=>{await api.run(task.id,answer,[],eventId);}}
           streaming={streaming}
           onPreview={target=>setPreview({id:Date.now(),target,task})}
           onNew={() => setModal("new")}
@@ -954,9 +970,12 @@ function App() {
         quotas={quotas}
         checking={checking}
         onRefresh={refresh}
+        onSavePlan={async input=>{const updated=await api.savePlan(task.id,input);if(current.current===updated.id)setTask(updated);}}
+        onPlanAction={async action=>{const id=task.id;await api.planAction(id,action,task.workPlan?.revision);if(current.current===id)await load(id);}}
+        onRelayPreferences={async order=>{try{const updated=await api.relayPreferences(task.id,order);if(current.current===updated.id)setTask(updated);}catch(e){fail(e);}}}
         onSwitch={changeProfile}
         onCapabilities={() => setModal("capabilities")}
-        onModelSettings={async(settings,id)=>{if(task)setTask(await api.modelSettings(task.id,settings,id));else setDraftSettings(old=>({...old,[id]:settings}));if(init.profiles.find(p=>p.id===id)?.provider==='Claude')await refresh(id,settings.model);}}
+        onModelSettings={async(settings,id)=>{if(task){const updated=await api.modelSettings(task.id,settings,id);if(current.current===updated.id)setTask(updated);}else setDraftSettings(old=>({...old,[id]:settings}));if(init.profiles.find(p=>p.id===id)?.provider==='Claude')await refresh(id,settings.model);}}
         draftSettings={draftSettings}
         storage={init.taskStorage}
         onHandoff={async id=>{try{await api.stopAndContinue(task.id,id);}catch(e){fail(e);}}}

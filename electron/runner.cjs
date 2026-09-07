@@ -30,6 +30,17 @@ class Runner extends EventEmitter {
     this.store.save(task);
     this.emit("state", task);
   }
+  confirmExecution(task,profile,reportedModel){
+    if(!this.active||this.active.task.id!==task.id||!task.execution||this.active.confirmed)return;
+    this.active.confirmed=true;
+    task.execution.confirmed=true;
+    if(reportedModel)task.execution.reportedModel=reportedModel;
+    const previous=task.lastExecution;
+    task.lastExecution={...task.execution,confirmedAt:new Date().toISOString()};
+    const changed=previous&&(previous.profile!==profile.id||previous.model!==profile.model||previous.effort!==profile.effort);
+    this.event(task.id,'notice',{text:`${changed?'已切换':'已开始执行'} · ${profile.provider} / ${profile.name} · ${reportedModel||profile.model} · ${profile.effort}`,executionStatus:changed?'已切换':'已开始执行',accountName:profile.name,provider:profile.provider,execution:task.lastExecution});
+    this.store.save(task);this.emit('state',task);
+  }
   assertIdle(task) {
     if (this.active || ["running", "stopping", "unknown"].includes(task.state))
       throw Error("请等待当前执行结束；状态未知时需先核对工作目录。");
@@ -63,28 +74,31 @@ class Runner extends EventEmitter {
     active.images=[...(active.images||[]),...images].slice(-5);
     this.store.context(active.task);return true;
   }
-  async run(id, text, images=[]) {
+  async run(id, text, images=[], options={}) {
     if (typeof text !== "string" || !text.trim() || text.length > 60000)
       throw Error("请输入 1–60000 字的指令。");
     const task = this.store.get(id);
     this.assertIdle(task);
+    if(task.planReviewRequired&&!options.planning)throw Error('请核对计划并确认后执行');
     require('./task-settings.cjs').applyPendingMode(task);
     let profile = require('./models.cjs').selection(task,profileFor(task.profile));
     if(profile.disabled)throw Error('账号尚未启用，请先登录或选择其他账号。');
     require('./task-settings.cjs').validateMode(task.mode,profile);
     if(images.length&&!['Codex','Claude'].includes(profile.provider))throw Error('当前入口暂不支持图片，请选择 Codex 或 Claude');
     this.event(id, "user", { text: text.trim(), images, profile: profile.id });
-    this.active = { task, profile, images, phase: "starting", pending: new Map(), cancelRequested:false };
+    this.active = { task, profile, images, planning:!!options.planning, phase: "starting", pending: new Map(), cancelRequested:false };
+    const planRevision=task.workPlan?.revision;
+    if(options.planning){task.planReviewRequired=true;delete task.sessions[profile.id];this.store.save(task);}
     this.state(task, "running");
     try {
       const attempted=new Set();let instruction=text;
       while(true) {
         if(task.pendingModelRefresh?.[profile.id]){delete task.sessions[profile.id];delete task.pendingModelRefresh[profile.id];this.store.save(task);}
         attempted.add(profile.id);
-        Object.assign(this.active,{profile,started:false,quotaExhausted:false,quotaByWindow:{},rpc:null,proc:null,turnId:null,grok:false,sessionId:null});
-        task.execution = {profile:profile.id, model:profile.model, effort:profile.effort, mode:task.mode};
+        Object.assign(this.active,{profile,questions:new Map(),confirmed:false,started:false,quotaExhausted:false,quotaByWindow:{},rpc:null,proc:null,turnId:null,grok:false,sessionId:null});
+        task.execution = {profile:profile.id, model:profile.model, effort:profile.effort, mode:options.planning?'read-only':task.mode};
         const record=this.store.context(task);
-        const instructions=environmentPrompt(task,capabilities(),record);
+        const instructions=environmentPrompt({...task,mode:task.execution.mode},capabilities(),record)+(options.planning?'\n本轮只制订计划，禁止实施。读取必要材料后给出可核对的步骤与验收条件，等待用户确认。最后用 JSON 代码块返回 {"steps":[{"text":"步骤及验收条件"}]}，供界面展示待确认步骤。':'');
         this.state(task,'running');
         try {
           if(profile.provider==='Codex')await this.codex(task,profile,instruction,instructions);
@@ -98,7 +112,8 @@ class Runner extends EventEmitter {
         if(this.active.quotaExhausted)this.event(id,'notice',{text:`${profile.provider} / ${profile.name} 订阅额度已耗尽。${task.autoSwitch===false?'自动接续已关闭，请选择其他账号继续。':'正在检查可接续的账号。'}`});
         if(task.autoSwitch===false || this.active.cancelRequested || !this.active.quotaExhausted || task.state!=='failed')break;
         require('./task-settings.cjs').applyPendingMode(task);
-        const next=PROFILES.find(p=>!p.disabled&&!attempted.has(p.id) && (!this.active.images.length||['Codex','Claude'].includes(p.provider)) && (task.mode==='read-only'||p.write&&['Codex','Claude'].includes(p.provider)));
+        const ordered=[...(task.relayOrder||[]).map(id=>PROFILES.find(p=>p.id===id)).filter(Boolean),...PROFILES.filter(p=>!(task.relayOrder||[]).includes(p.id))];
+        const next=ordered.find(p=>!p.disabled&&!attempted.has(p.id) && (!this.active.images.length||['Codex','Claude'].includes(p.provider)) && (task.execution.mode==='read-only'||p.write&&['Codex','Claude'].includes(p.provider)));
         if(!next){this.event(id,'notice',{text:'已尝试所有符合当前权限的入口；没有自动重复调用。'});break;}
         this.active.pending.clear();
         this.emit('approval-reset',{taskId:task.id});
@@ -107,8 +122,10 @@ class Runner extends EventEmitter {
         instruction='继续这条任务尚未完成的工作。先读取持久工作记录和当前项目文件，核对前序账号实际完成的部分；已有成功操作不得重复执行，部分写入先核实再续做。不要要求用户重新描述任务。';
       }
     } finally {
+      if(options.planning){delete task.sessions[profile.id];if(task.state==='idle')require('./task-plan.cjs').capture(task,this.store.events(id),planRevision);}
       task.requestedHandoff = this.active?.requestedHandoff || null;
       delete task.execution;
+      delete task.activeQuestionIds;
       this.store.save(task);
       this.active = null;
       this.store.context(task);
@@ -119,7 +136,7 @@ class Runner extends EventEmitter {
       task.requestedHandoff = null;
       this.store.save(task);
       this.switch(id,next);
-      return this.run(id,'先读取交接记录并核对已改动的文件，继续上一条尚未完成的工作；不要重复已经成功的操作。');
+      return this.run(id,options.planning?'继续制订计划，不实施，等待用户确认。':'先读取交接记录并核对已改动的文件，继续上一条尚未完成的工作；不要重复已经成功的操作。',[],options);
     }
     if(next){task.requestedHandoff=null;this.store.save(task);this.event(id,'notice',{text:'未能确认旧执行安全结束，已取消自动交接。请先核对进度。'});}
     return this.store.get(id);
@@ -140,6 +157,7 @@ class Runner extends EventEmitter {
     rpc.on("message", (message) => {
       const p = message.params || {};
       if (message.id !== undefined) {
+        if(message.method==="item/tool/requestUserInput"&&require("./questions.cjs").request(this,task,message))return;
         if (message.method?.endsWith("requestApproval")) {
           this.active?.pending.set(String(message.id), message);
           this.emit("approval", {
@@ -204,6 +222,7 @@ class Runner extends EventEmitter {
       if (message.method === "turn/started") {
         this.active.turnId = p.turn.id;
         this.active.started = true;
+        this.confirmExecution(task,profile);
       }
     });
     try {
@@ -214,14 +233,14 @@ class Runner extends EventEmitter {
       if(profile.email&&auth.account.email?.toLowerCase()!==profile.email.toLowerCase())throw Error('登录账号与已有账号身份不一致，请使用原账号登录。');
       if(this.active.cancelRequested){this.state(task,'paused');return;}
       const usage=await rpc.call('account/rateLimits/read');
-      const quota=quotaView(usage);this.emit('quota',{id:profile.id,...quota,status:'官方额度查询',checkedAt:new Date().toISOString()});
+      const quota=quotaView(usage);this.emit('quota',{id:profile.id,email:auth.account.email,...quota,status:'官方额度查询',checkedAt:new Date().toISOString()});
       if(quota.remaining===0){this.active.quotaExhausted=true;this.state(task,'failed');return;}
       const options = {
         cwd: task.cwd,
         model: profile.model,
         modelProvider: "openai",
-        approvalPolicy: require('./task-settings.cjs').codexPermissions(task.mode).approvalPolicy,
-        sandbox: require('./task-settings.cjs').codexPermissions(task.mode).sandbox,
+        approvalPolicy: require('./task-settings.cjs').codexPermissions((task.execution?.mode||task.mode)).approvalPolicy,
+        sandbox: require('./task-settings.cjs').codexPermissions((task.execution?.mode||task.mode)).sandbox,
         developerInstructions: instructions,
       };
       const session = task.sessions[profile.id];
@@ -243,7 +262,7 @@ class Runner extends EventEmitter {
         effort: profile.effort || "xhigh",
         summary:'auto',
         sandboxPolicy:
-          task.mode === "full-access" ? { type: "dangerFullAccess" } : task.mode === "read-only"
+          (task.execution?.mode||task.mode) === "full-access" ? { type: "dangerFullAccess" } : (task.execution?.mode||task.mode) === "read-only"
             ? { type: "readOnly" }
             : {
                 type: "workspaceWrite",
@@ -252,6 +271,7 @@ class Runner extends EventEmitter {
               },
       });
       this.active.turnId = started.turn.id;
+      this.confirmExecution(task,profile);
       this.active.started = true;
       if(this.active.cancelRequested)await rpc.call('turn/interrupt',{threadId:task.sessions[profile.id],turnId:started.turn.id});
       await finished;
@@ -311,17 +331,17 @@ class Runner extends EventEmitter {
       "--append-system-prompt",
       instructions,
       "--permission-mode",
-      task.mode === "full-access" ? "bypassPermissions" : "dontAsk",
+      (task.execution?.mode||task.mode) === "full-access" ? "bypassPermissions" : "dontAsk",
       "--allowedTools",
-      task.mode === "read-only"
+      (task.execution?.mode||task.mode) === "read-only"
         ? "Read,Glob,Grep"
         : "Read,Glob,Grep,Edit,Write,Bash",
       "--tools",
-      task.mode === "read-only"
+      (task.execution?.mode||task.mode) === "read-only"
         ? "Read,Glob,Grep"
         : "Read,Glob,Grep,Edit,Write,Bash",
     ];
-    if(task.mode === "full-access")args.push("--dangerously-skip-permissions");
+    if((task.execution?.mode||task.mode) === "full-access")args.push("--dangerously-skip-permissions");
     if(this.active.images?.length)args.push('--input-format','stream-json');
     if (task.sessions[profile.id])
       args.push("--resume", task.sessions[profile.id]);
@@ -351,6 +371,7 @@ class Runner extends EventEmitter {
           const q=recordClaude(profile.id,msg.rate_limit_info,profile.model);if(q){this.emit('quota',q);this.active.quotaByWindow[msg.rate_limit_info.rateLimitType||'unknown']=require('./quota.cjs').normalizeClaude(msg.rate_limit_info,Date.now(),profile.model);this.active.quotaExhausted=Object.values(this.active.quotaByWindow).some(w=>w?.exhausted);}
           if(msg.rate_limit_info?.isUsingOverage){this.event(task.id,'notice',{text:'CLI 返回额外付费用量状态，棱镜已停止此执行。'});this.active.cancelRequested=true;this.active.quotaExhausted=false;proc.kill();}
         }
+        if ((msg.type==='system'&&msg.subtype==='init')||msg.type==='assistant') this.confirmExecution(task,profile,msg.model||msg.message?.model);
         if (msg.session_id) {
           task.sessions[profile.id] = msg.session_id;
           this.store.save(task);

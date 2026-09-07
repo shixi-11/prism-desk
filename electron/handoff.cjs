@@ -7,7 +7,7 @@ function snapshot(task, events) {
   const files = [...new Set(tools.flatMap(e=>e.data?.type==='fileChange' && Array.isArray(e.data.changes) ? e.data.changes.map(c=>c.path).filter(p=>typeof p==='string') : []))];
   return {
     at: new Date().toISOString(), state: task.state,
-    request: lastUser?.text || '', checkpoint: task.checkpoint || '',
+    workPlan:task.workPlan||null, planReviewRequired:!!task.planReviewRequired, request: lastUser?.text || '', checkpoint: task.checkpoint || '',
     report: recent.findLast(e => e.type === 'assistant')?.text || '',
     evidence: tools.slice(-8).map(e => ({id:e.id, text:(e.text || '').slice(0,500), status:e.data?.status ?? e.data?.exitCode ?? null})),
     toolCount: tools.length,

@@ -1,0 +1,24 @@
+const {_electron:electron}=require('./script-utils.cjs').dependency('playwright');
+const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict');
+(async()=>{
+ const root=path.resolve(__dirname,'..'),dir=path.join(root,'.local','task-controls-qa',String(Date.now()));fs.mkdirSync(dir,{recursive:true});
+ const config=path.join(dir,'config.json');fs.writeFileSync(config,JSON.stringify({profiles:[{id:'codex-ui',provider:'Codex',name:'团队-1',model:'model-one',home:path.join(dir,'account'),executable:process.execPath,write:true,email:'qa@example.com'},{id:'claude-ui',provider:'Claude',name:'团队-2',model:'opus',home:path.join(dir,'account2'),executable:process.execPath,write:true}],assistant:{path:'',instructions:''},skillsPath:'',storageRoot:''}));
+ const app=await electron.launch({executablePath:path.join(root,'node_modules/electron/dist/electron.exe'),args:[root],env:{...process.env,PRISM_CONFIG:config,PRISM_TEST_DATA:dir,PRISM_TEST_HIDE:'1'}});
+ try{
+  const page=await app.firstWindow(),errors=[];page.on('pageerror',e=>errors.push(e.message));
+  await app.evaluate(({ipcMain})=>{ipcMain.removeHandler('prism:models');ipcMain.handle('prism:models',()=>({models:[{id:'model-one',name:'Model One',efforts:['high','max'],defaultEffort:'high'},{id:'model-two',name:'Model Two',efforts:['high','max'],defaultEffort:'max'}],note:''}));});
+  await page.getByLabel('Switch language').waitFor();
+  const task=await page.evaluate(dir=>window.prism.create({title:'控件验收',cwd:dir,profile:'codex-ui'}),dir);
+  await page.reload();await page.getByRole('button',{name:'编辑目标与计划',exact:true}).click();
+  await page.getByRole('textbox',{name:'目标',exact:true}).fill('验证目标在重开后仍保留');await page.getByRole('button',{name:'添加步骤',exact:true}).click();await page.getByRole('textbox',{name:'计划步骤 1',exact:true}).fill('核对保存与模型接续');await page.locator('.plan-actions').getByRole('button',{name:'保存',exact:true}).click();
+  await page.getByText('验证目标在重开后仍保留',{exact:true}).waitFor();await page.getByLabel('步骤状态 1',{exact:true}).selectOption('completed');await page.waitForFunction(()=>document.querySelector('.task-plan select')?.value==='completed');
+  await page.getByRole('button',{name:'优先使用 团队-2',exact:true}).click();await page.waitForFunction(()=>document.querySelector('.relay-preferences li button')?.textContent.includes('Claude'));
+  await page.getByRole('button',{name:'账号',exact:true}).click();await page.getByRole('button',{name:'修改备注名 团队-1',exact:true}).click();await page.getByRole('textbox',{name:'备注名',exact:true}).fill('主力账号');await page.getByRole('textbox',{name:'备注名',exact:true}).press('Enter');await page.getByText('备注名：主力账号',{exact:true}).waitFor();assert.equal(await page.getByRole('button',{name:'显示邮箱',exact:true}).first().isEnabled(),true);await page.getByRole('button',{name:'修改备注名 主力账号',exact:true}).click();await page.getByRole('textbox',{name:'备注名',exact:true}).fill('不要保存');await page.getByRole('textbox',{name:'备注名',exact:true}).press('Escape');await page.getByText('备注名：主力账号',{exact:true}).waitFor();await page.screenshot({path:path.join(dir,'accounts.png')});await page.getByRole('button',{name:'关闭',exact:true}).click();
+  const saved=await page.evaluate(id=>window.prism.task(id),task.id);assert.equal(saved.task.workPlan.steps[0].status,'completed');assert.equal(saved.task.relayOrder[0],'claude-ui');
+  const event={id:'question-test',type:'assistant',at:new Date().toISOString(),profile:'codex-ui',text:'小主人，你想优先选择哪项？\n\n- 第一项\n- 第二项\n- 第三项'};fs.appendFileSync(path.join(dir,'tasks',task.id,'events.jsonl'),JSON.stringify(event)+'\n');
+  await app.evaluate(({ipcMain})=>{ipcMain.removeHandler('prism:run');ipcMain.handle('prism:run',(_e,id,text)=>{globalThis.qaAnswer=text;return {queued:true};});});
+  await page.reload();await page.getByRole('button',{name:'第二项',exact:true}).click();await page.getByRole('button',{name:'提交选择',exact:true}).click();await page.getByText('已提交选择 · 第二项',{exact:true}).waitFor();assert.equal(await app.evaluate(()=>globalThis.qaAnswer),'第二项');
+  for(const [width,height] of [[1460,940],[1024,768]]){await app.evaluate(({BrowserWindow},{width,height})=>BrowserWindow.getAllWindows()[0].setSize(width,height),{width,height});assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));const shot=await app.evaluate(async({BrowserWindow})=>(await BrowserWindow.getAllWindows()[0].webContents.capturePage(undefined,{stayHidden:true,stayAwake:true})).toPNG().toString('base64'));fs.writeFileSync(path.join(dir,`controls-${width}.png`),Buffer.from(shot,'base64'));}
+  assert.deepEqual(errors,[]);console.log(JSON.stringify({ok:true,dir,checks:['plan persistence','plan step completion','relay order','nickname save/cancel','email visibility','question submission','window widths']}));
+ }finally{await app.close();}
+})().catch(e=>{console.error(e);process.exitCode=1;});
