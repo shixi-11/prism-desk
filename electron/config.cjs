@@ -12,7 +12,6 @@ function defaultConfig(env = process.env) {
     ['Codex', 'codex.exe', 'gpt-5.6-sol', true],
     ['Claude', 'claude.exe', 'opus', true],
     ['Grok', 'grok.exe', 'grok-4.6', false],
-    ['Gemini', 'node.exe', 'auto', false],
   ];
   return {
     profiles: definitions.map(([provider, executable, model, write]) => ({

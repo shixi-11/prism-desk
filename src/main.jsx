@@ -336,7 +336,7 @@ function Inspector({
           <select
             aria-label={tr("执行账号")}
             value={target || ""}
-            onChange={(e) => {setTarget(e.target.value);if(!task)onDraftAccount(e.target.value);}}
+            onChange={(e) => {const id=e.target.value;setTarget(id);if(!task)onDraftAccount(id);const q=quotas[id];if(!checking.includes(id)&&(!q?.checkedAt||Date.now()-new Date(q.checkedAt).getTime()>300000))onRefresh(id);}}
             disabled={disabled && !canStop}
           >
             {profiles.map((p) => (
@@ -347,7 +347,7 @@ function Inspector({
           </select>
           <ChevronDown size={15} />
         </div>
-        {(!task||target===task.profile)&&<ModelControls key={(task?.id||'draft')+target} task={task||{modelSettings:draftSettings}} profile={selected} disabled={false} onSave={value=>onModelSettings(value,target)}/>}
+        {<ModelControls key={(task?.id||'draft')+target} task={task||{modelSettings:draftSettings}} profile={selected} disabled={false} onSave={value=>onModelSettings(value,target)}/>}
         <div className="execution-status" role="status"><span className="status-dot" />{tr(labels[task?.state]||"就绪")}</div>
         {task?.execution&&<p className="active-config">{tr("本轮执行")} · {task.execution.model} · {task.execution.effort}</p>}
                 <button
@@ -372,7 +372,7 @@ function Inspector({
         <div className="quota">
           <span>{tr("剩余额度")}</span>
           <strong>
-            {stale ? tr("已过期") : quota?.remaining===0 ? tr("已用完") : quota?.remaining != null ? `${quota.remaining}%` : quota ? tr("暂时查不到") : tr("未查询")}
+            {stale ? tr("需要刷新") : quota?.remaining===0 ? tr("已用完") : quota?.remaining != null ? `${quota.remaining}%` : quota ? tr("暂时查不到") : tr("未查询")}
           </strong>
         </div>
         {quota?.windows?.map((w, i) => (
@@ -407,7 +407,7 @@ function Inspector({
         <div className="quota-meta">
           <span>
             {stale
-              ? tr("数据已过期，请刷新")
+              ? tr("上次查询已超过 5 分钟，请刷新")
               : quota?.checkedAt
                 ? new Date(quota.checkedAt).toLocaleTimeString(locale(), {
                     hour: "2-digit",
@@ -593,6 +593,7 @@ function App() {
   const [quotas, setQuotas] = useState({});
   const [checking, setChecking] = useState([]);
   const [bulk,setBulk]=useState(null);
+  const [loggingIn,setLoggingIn]=useState([]);
   const [approvals, setApprovals] = useState([]);
   const approval = approvals[0];
   const finishApproval = () => setApprovals((old) => old.slice(1));
@@ -742,7 +743,7 @@ function App() {
       setQuotas((old) => ({
         ...old,
         [id]: {
-          status: e.message,
+          status: e.message.replace(/^Error invoking remote method '[^']+': Error: /,""),
           remaining: null,
           checkedAt: new Date().toISOString(),
         },
@@ -752,6 +753,7 @@ function App() {
     }
   };
   const refreshAll=async()=>{if(bulk||checking.length)return;const profiles=[...init.profiles];let cursor=0,done=0;setBulk({done:0,total:profiles.length});try{await Promise.all(Array.from({length:Math.min(2,profiles.length)},async()=>{while(cursor<profiles.length){const profile=profiles[cursor++];await refresh(profile.id);setBulk({done:++done,total:profiles.length});}}));}finally{setBulk(null);}};
+  const loginClaude=async id=>{setLoggingIn(old=>[...old,id]);try{await api.loginClaude(id);await refresh(id);}catch(e){fail(Error((e.message||String(e)).replace(/^Error invoking remote method '[^']+': Error: /,"")));}finally{setLoggingIn(old=>old.filter(value=>value!==id));}};
   const changeMode = async (mode) => {
     try {
       const t = await api.update(task.id, { mode });
@@ -924,7 +926,7 @@ function App() {
         onRefresh={refresh}
         onSwitch={changeProfile}
         onCapabilities={() => setModal("capabilities")}
-        onModelSettings={async(settings,id)=>{if(task)setTask(await api.modelSettings(task.id,settings));else setDraftSettings(old=>({...old,[id]:settings}));if(init.profiles.find(p=>p.id===id)?.provider==='Claude')await refresh(id,settings.model);}}
+        onModelSettings={async(settings,id)=>{if(task)setTask(await api.modelSettings(task.id,settings,id));else setDraftSettings(old=>({...old,[id]:settings}));if(init.profiles.find(p=>p.id===id)?.provider==='Claude')await refresh(id,settings.model);}}
         draftSettings={draftSettings}
         storage={init.taskStorage}
         onHandoff={async id=>{try{await api.stopAndContinue(task.id,id);}catch(e){fail(e);}}}
@@ -967,14 +969,14 @@ function App() {
             {init.profiles.map((p) => (
               <div key={p.id}>
                 <strong>{p.provider}</strong>
-                <span>{tr(p.name)}</span>
+                <span>{tr(p.name)}{(quotas[p.id]?.email||p.email)&&<small className="account-email">{quotas[p.id]?.email||p.email}{p.subscriptionType?` · ${p.subscriptionType}`:""}</small>}</span>
                 <AccountQuota profile={p} quota={quotas[p.id]}/>
                 <button
                   className="outline"
-                  disabled={!!bulk||checking.includes(p.id)}
-                  onClick={() => refresh(p.id)}
+                  disabled={!!bulk||checking.includes(p.id)||loggingIn.includes(p.id)}
+                  onClick={() => p.provider==="Claude"&&quotas[p.id]?.authRequired?loginClaude(p.id):refresh(p.id)}
                 >
-                  {checking.includes(p.id) ? tr("查询中…") : tr("查询")}
+                  {loggingIn.includes(p.id)?tr("等待浏览器登录"):checking.includes(p.id)?tr("查询中…"):p.provider==="Claude"&&quotas[p.id]?.authRequired?tr("重新登录"):tr("查询")}
                 </button>
               </div>
             ))}

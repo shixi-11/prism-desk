@@ -256,5 +256,10 @@
   "底部执行记录": "Registro inferior",
   "右侧账号栏": "Panel de cuentas",
   "一键查询全部": "Consultar todas las cuentas",
-  "查询时间": "Hora de consulta"
+  "查询时间": "Hora de consulta",
+  "重新登录": "Volver a iniciar sesión",
+  "等待浏览器登录": "Esperando inicio de sesión",
+  "Claude 尚未登录，请重新登录后查询。": "Inicia sesión de nuevo en Claude para consultar el uso.",
+  "需要刷新": "Actualizar datos",
+  "上次查询已超过 5 分钟，请刷新": "La última consulta fue hace más de 5 minutos. Actualiza los datos."
 }

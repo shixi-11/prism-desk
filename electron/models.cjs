@@ -11,11 +11,12 @@ async function modelOptions(id,cwd){
  const value={models,note:p.provider==='Gemini'?'由 Gemini CLI 自动选模；暂不提供独立思考等级':p.provider==='Claude'?'官方模型别名；实际可用性由订阅与组织权限决定':p.provider==='Grok'?'来自当前 CLI；思考等级暂提供已验证的 high':'来自当前 CLI 模型目录；实际调用仍受账号权限限制'};cache.set(id,{at:Date.now(),value});return value;
 }
 function selection(task,profile){const saved=task.modelSettings?.[profile.id];return {...profile,model:saved?.model||profile.model,effort:saved?.effort||(profile.provider==='Codex'?'xhigh':profile.provider==='Gemini'?'auto':'high')};}
-async function saveSelection(store,task,input,beforeSave=()=>{}){
+async function saveSelection(store,task,input,beforeSave=()=>{},profileId=task.profile){
  if(!input||typeof input.model!=='string'||typeof input.effort!=='string')throw Error('模型设置无效');
- const list=await modelOptions(task.profile,task.cwd);const model=list.models.find(m=>m.id===input.model);if(!model||!model.efforts.includes(input.effort))throw Error('当前模型不支持所选思考等级');
+ profileFor(profileId);
+ const list=await modelOptions(profileId,task.cwd);const model=list.models.find(m=>m.id===input.model);if(!model||!model.efforts.includes(input.effort))throw Error('当前模型不支持所选思考等级');
  const current=store.get(task.id);if(current.profile!==task.profile)throw Error('账号已改变，请重新选择模型');task=current;beforeSave(task);
- task.modelSettings={...task.modelSettings,[task.profile]:{model:input.model,effort:input.effort}};task.pendingModelRefresh={...task.pendingModelRefresh,[task.profile]:true};return store.save(task);
+ task.modelSettings={...task.modelSettings,[profileId]:{model:input.model,effort:input.effort}};task.pendingModelRefresh={...task.pendingModelRefresh,[profileId]:true};return store.save(task);
 }
-async function updateSelectionForRunner(store,runner,id,input){const updated=await saveSelection(store,store.get(id),input);if(runner.active?.task.id===id){runner.active.task.modelSettings=updated.modelSettings;runner.active.task.pendingModelRefresh=updated.pendingModelRefresh;}return updated;}
+async function updateSelectionForRunner(store,runner,id,input,profileId){const updated=await saveSelection(store,store.get(id),input,()=>{},profileId);if(runner.active?.task.id===id){runner.active.task.modelSettings=updated.modelSettings;runner.active.task.pendingModelRefresh=updated.pendingModelRefresh;}return updated;}
 module.exports={modelOptions,selection,saveSelection,updateSelectionForRunner};

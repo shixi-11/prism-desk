@@ -239,9 +239,14 @@ async function claudeAuth(profile, cwd) {
   } catch {
     throw Error("无法确认 Claude 订阅登录，调用已停止。");
   }
+  return verifyClaudeStatus(profile,status,code);
+}
+function verifyClaudeStatus(profile,status,code=0){
   if (code !== 0 || !status.loggedIn || status.authMethod !== "claude.ai")
-    throw Error("这个 Claude 入口没有可确认的订阅登录，调用已阻止。");
-  return { email: status.email || null, authMethod: status.authMethod };
+    throw Object.assign(Error("Claude 尚未登录，请重新登录后查询。"),{code:'AUTH_REQUIRED'});
+  if(profile.email&&status.email?.toLowerCase()!==profile.email.toLowerCase())throw Object.assign(Error('登录邮箱与此账号入口不符，请重新登录。'),{code:'AUTH_REQUIRED'});
+  if(profile.subscriptionType&&status.subscriptionType!==profile.subscriptionType)throw Object.assign(Error('登录的订阅类型与此账号入口不符，请重新选择订阅。'),{code:'AUTH_REQUIRED'});
+  return { email: status.email || null, authMethod: status.authMethod,subscriptionType:status.subscriptionType };
 }
 function scanSkills() {
   const found = [];
@@ -412,6 +417,7 @@ module.exports = {
   quotaView,
   accountStatus,
   claudeAuth,
+  verifyClaudeStatus,
   capabilities,
   TaskStore,
   environmentPrompt,

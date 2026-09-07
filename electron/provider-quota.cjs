@@ -61,7 +61,7 @@ async function grokQuota(profile, cwd) {
 }
 async function readClaudeUsage(profile, cwd) {
   const {spawnCLI,claudeAuth} = require('./core.cjs');
-  await claudeAuth(profile,cwd);
+  const auth=await claudeAuth(profile,cwd);
   const proc = spawnCLI(profile, ['--print','--verbose','--input-format','stream-json','--output-format','stream-json','--no-session-persistence','--setting-sources','','--settings','{"apiKeyHelper":"","env":{},"disableAllHooks":true}','--strict-mcp-config','--mcp-config','{"mcpServers":{}}','--tools','','--permission-mode','dontAsk'], cwd);
   return new Promise((resolve,reject) => {
     let buffer='', done=false, finalError, finalValue;
@@ -71,7 +71,7 @@ async function readClaudeUsage(profile, cwd) {
     proc.on('close',()=>{if(!done)finish(Error('Claude 额度查询连接提前结束。'));finalError?reject(finalError):resolve(finalValue);});
     proc.stderr.on('data',()=>{});
     proc.stdout.setEncoding('utf8');
-    proc.stdout.on('data',data=>{buffer+=data;if(buffer.length>1048576)return finish(Error('Claude 额度响应超出大小限制。'));let i;while((i=buffer.indexOf('\n'))>=0){const line=buffer.slice(0,i);buffer=buffer.slice(i+1);let msg;try{msg=JSON.parse(line);}catch{continue;}if(msg.type!=='control_response')continue;const r=msg.response;if(r?.request_id==='prism-quota-init'){if(r.subtype==='error')return finish(Error('Claude 不支持初始化额度查询。'));proc.stdin.write(JSON.stringify({type:'control_request',request_id:'prism-quota-usage',request:{subtype:'get_usage'}})+'\n');} else if(r?.request_id==='prism-quota-usage'){if(r.subtype==='error')return finish(Error('当前 Claude CLI 未能返回结构化额度。'));finish(null,r.response);}}});
+    proc.stdout.on('data',data=>{buffer+=data;if(buffer.length>1048576)return finish(Error('Claude 额度响应超出大小限制。'));let i;while((i=buffer.indexOf('\n'))>=0){const line=buffer.slice(0,i);buffer=buffer.slice(i+1);let msg;try{msg=JSON.parse(line);}catch{continue;}if(msg.type!=='control_response')continue;const r=msg.response;if(r?.request_id==='prism-quota-init'){if(r.subtype==='error')return finish(Error('Claude 不支持初始化额度查询。'));proc.stdin.write(JSON.stringify({type:'control_request',request_id:'prism-quota-usage',request:{subtype:'get_usage'}})+'\n');} else if(r?.request_id==='prism-quota-usage'){if(r.subtype==='error')return finish(Error('当前 Claude CLI 未能返回结构化额度。'));finish(null,{...r.response,prismAccount:auth});}}});
     proc.stdin.write(JSON.stringify({type:'control_request',request_id:'prism-quota-init',request:{subtype:'initialize'}})+'\n');
   });
 }
@@ -85,6 +85,6 @@ async function claudeQuota(profile,cwd) {
     return {id:profile.id,...cached,extraUsageEnabled:null,cached:true,status:'实时额度查询暂不可用；显示执行时的额度记录'};
   }
   const flag=usage?.rate_limits?.extra_usage?.is_enabled;
-  return {id:profile.id,...claudeUsageView(usage,profile.model),extraUsageEnabled:typeof flag==='boolean'?flag:null};
+  return {id:profile.id,email:usage.prismAccount?.email,subscriptionType:usage.prismAccount?.subscriptionType,...claudeUsageView(usage,profile.model),extraUsageEnabled:typeof flag==='boolean'?flag:null};
 }
 module.exports={grokQuotaView,claudeUsageView,grokQuota,claudeQuota,readClaudeUsage,grokPaidUsageState};

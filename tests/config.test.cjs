@@ -18,7 +18,7 @@ function fixture(t) {
 test('unconfigured install has generic isolated accounts and no personal assistant source', t => {
   const root=fixture(t), env={USERPROFILE:root, LOCALAPPDATA:path.join(root,'appdata')};
   const config=loadConfig(path.join(root,'absent.json'),env);
-  assert.equal(config.profiles.length,4);
+  assert.equal(config.profiles.length,3);
   assert.deepEqual(config.assistant,{path:'',instructions:''});
   assert.equal(config.skillsPath,'');
   assert.equal(config.geminiEntry,'');

@@ -256,5 +256,10 @@
   "底部执行记录": "Journal inférieur",
   "右侧账号栏": "Panneau des comptes",
   "一键查询全部": "Vérifier tous les comptes",
-  "查询时间": "Heure de vérification"
+  "查询时间": "Heure de vérification",
+  "重新登录": "Se reconnecter",
+  "等待浏览器登录": "En attente de connexion",
+  "Claude 尚未登录，请重新登录后查询。": "Reconnectez-vous à Claude pour consulter votre utilisation.",
+  "需要刷新": "Actualisation nécessaire",
+  "上次查询已超过 5 分钟，请刷新": "La dernière vérification date de plus de 5 minutes. Actualisez les données."
 }

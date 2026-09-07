@@ -256,5 +256,10 @@
   "底部执行记录": "Unteres Ausführungsprotokoll",
   "右侧账号栏": "Kontoseitenleiste",
   "一键查询全部": "Alle Konten prüfen",
-  "查询时间": "Prüfzeit"
+  "查询时间": "Prüfzeit",
+  "重新登录": "Erneut anmelden",
+  "等待浏览器登录": "Warten auf Browser-Anmeldung",
+  "Claude 尚未登录，请重新登录后查询。": "Melden Sie sich erneut bei Claude an, um die Nutzung zu prüfen.",
+  "需要刷新": "Aktualisierung nötig",
+  "上次查询已超过 5 分钟，请刷新": "Die letzte Prüfung liegt über 5 Minuten zurück. Bitte aktualisieren."
 }

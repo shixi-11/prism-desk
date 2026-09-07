@@ -33,6 +33,7 @@ app.on('second-instance',showWindow);
 app.on('activate',showWindow);
 let resetInProgress=false;
 let geminiLogin=null;
+const claudeLogins=new Map();
 let validatingApps=false;
 const dataPath = () => app.getPath("userData");
 const emit = (type, value) => {
@@ -128,7 +129,17 @@ app.whenReady().then(() => {
     validatingApps=true;
     try{await require('./app-validation.cjs').validateApps();return capabilities();}finally{validatingApps=false;}
   });
-  handle("quota", (id,model) => accountStatus(id, app.getAppPath(),model));
+  handle("quota", async(id,model) => {
+    try{return await accountStatus(id,app.getAppPath(),model);}catch(error){if(error.code!=='AUTH_REQUIRED')throw error;return {id,authRequired:true,status:error.message,remaining:null,windows:[],checkedAt:new Date().toISOString()};}
+  });
+  handle('loginClaude',async id=>{
+    const profile=PROFILES.find(p=>p.id===id&&p.provider==='Claude');if(!profile)throw Error('请选择 Claude 账号');
+    if(runner.active?.profile.id===id)throw Error('请等待此账号当前执行结束');
+    if(claudeLogins.has(id))throw Error('登录正在进行，请完成浏览器授权');
+    const login=require('./claude-login.cjs').startClaudeLogin(profile,app.getAppPath(),url=>shell.openExternal(url));claudeLogins.set(id,login);
+    try{return await login.completed;}finally{claudeLogins.delete(id);}
+  });
+  handle('cancelClaudeLogin',async id=>{await claudeLogins.get(id)?.cancel();});
   handle('loginGemini',async()=>{
     if(geminiLogin)throw Error('Google 登录窗口已打开，请完成当前授权');
     const profile=PROFILES.find(p=>p.provider==='Gemini');
@@ -149,7 +160,7 @@ app.whenReady().then(() => {
     }finally{resetInProgress=false;}
   });
   handle('models',id=>require('./models.cjs').modelOptions(id,app.getAppPath()));
-  handle('modelSettings',(id,input)=>require('./models.cjs').updateSelectionForRunner(store,runner,id,input));
+  handle('modelSettings',(id,input,profileId)=>require('./models.cjs').updateSelectionForRunner(store,runner,id,input,profileId));
   handle("run", async (id, text, imageIds=[]) => {
     if(validatingApps)throw Error('请等待本机应用验证结束');
     if(resetInProgress)throw Error('请等待重置卡操作结束');
@@ -258,3 +269,4 @@ app.whenReady().then(() => {
   });
 });
 app.on("window-all-closed", () => app.quit());
+app.on('before-quit',()=>{for(const login of claudeLogins.values())login.cancel().catch(()=>{});});

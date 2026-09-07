@@ -558,6 +558,7 @@ html:not([lang^="zh"]) .empty h1 { font-size:clamp(26px,3vw,44px); }
 .account-quota>div { display:grid; gap:4px; }
 .account-list>div { align-items:start; }
 .account-list>div>button { grid-column:3; grid-row:1 / span 3; }
+.account-list .account-email { display:block; margin-top:5px; grid-column:auto; grid-row:auto; overflow-wrap:anywhere; }
 .appearance-controls { flex-wrap:wrap; justify-content:flex-end; gap:8px; }
 .image-attachments>div { position:relative; }
 .image-attachments .image-preview { padding:0; display:block; background:var(--surface); border:1px solid var(--line); border-radius:5px; overflow:hidden; }
