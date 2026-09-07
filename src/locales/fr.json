@@ -375,5 +375,6 @@
   "登录链接尚未准备好，请稍候。": "Le lien de connexion n’est pas encore prêt. Veuillez patienter.",
   "账号尚未启用，请先登录或选择其他账号。": "Ce compte n’est pas activé. Connectez-vous ou choisissez un autre compte.",
   "账号检查超时，请重试。": "Le délai de vérification du compte a expiré. Réessayez.",
-  "账号配置已在外部改变，请重启后重试。": "La configuration des comptes a été modifiée en dehors de Prism. Redémarrez l’application et réessayez."
+  "账号配置已在外部改变，请重启后重试。": "La configuration des comptes a été modifiée en dehors de Prism. Redémarrez l’application et réessayez.",
+  "浏览器未能自动打开，请点击“重新打开登录页”。": "Le navigateur n’a pas pu s’ouvrir automatiquement. Cliquez sur « Rouvrir la page de connexion »."
 }

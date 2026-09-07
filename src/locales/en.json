@@ -375,5 +375,6 @@
   "登录链接尚未准备好，请稍候。": "The sign-in link is not ready yet. Please wait.",
   "账号尚未启用，请先登录或选择其他账号。": "This account is not enabled. Sign in or select another account.",
   "账号检查超时，请重试。": "Account verification timed out. Please try again.",
-  "账号配置已在外部改变，请重启后重试。": "Account configuration changed outside Prism. Restart the app and try again."
+  "账号配置已在外部改变，请重启后重试。": "Account configuration changed outside Prism. Restart the app and try again.",
+  "浏览器未能自动打开，请点击“重新打开登录页”。": "The browser could not open automatically. Click “Reopen sign-in page”."
 }

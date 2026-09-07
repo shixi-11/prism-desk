@@ -112,9 +112,13 @@ app.whenReady().then(() => {
       require('./accounts.cjs').clearAccountSessions(store,id);
       require('./accounts.cjs').prepareLogin(id);broadcastAccounts();
       loginState(id,{phase:'starting',hasUrl:false});
-      const login=require('./account-login.cjs').startAccountLogin(profile,app.getAppPath(),()=>loginState(id,{phase:'waiting',hasUrl:true}));
+      const login=require('./account-login.cjs').startAccountLogin(profile,app.getAppPath(),url=>{
+        loginState(id,{phase:'waiting',hasUrl:true});
+        shell.openExternal(url).catch(()=>{
+          if(accountLogins.get(id)?.url===url)loginState(id,{phase:'waiting',hasUrl:true,message:'浏览器未能自动打开，请点击“重新打开登录页”。'});
+        });
+      });
       accountLogins.set(id,login);
-      loginState(id,{phase:'waiting',hasUrl:!!login.url});
       login.completed.then(async result=>{if(result.cancelled){loginState(id,{phase:'cancelled',hasUrl:false});return;}loginState(id,{phase:'verifying',hasUrl:false});await verifyAccount(id);loginState(id,{phase:'connected',hasUrl:false});}).catch(error=>loginState(id,{phase:'error',hasUrl:false,message:error.message})).finally(()=>{accountLogins.delete(id);accountOperation=false;messageQueue.paused=false;messageQueue.pump();});
       return {id};
     }catch(error){accountOperation=false;messageQueue.paused=false;loginState(id,{phase:'error',hasUrl:false,message:error.message});messageQueue.pump();throw error;}

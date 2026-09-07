@@ -20,6 +20,8 @@ import {
   Terminal,
   RefreshCw,
   BookOpen,
+  Archive,
+  UsersRound,
   Sparkles,
   X,
   Settings2,
@@ -350,6 +352,7 @@ function Inspector({
             onChange={(e) => {const id=e.target.value;setTarget(id);if(!task)onDraftAccount(id);const q=quotas[id];if(!checking.includes(id)&&(!q?.checkedAt||Date.now()-new Date(q.checkedAt).getTime()>300000))onRefresh(id);}}
             disabled={disabled && !canStop}
           >
+            {!selected&&<option value="" disabled>{tr("待登录")}</option>}
             {profiles.map((p) => (
               <option value={p.id} key={p.id} disabled={p.disabled}>
                 {p.provider} / {tr(p.name)}
@@ -358,7 +361,7 @@ function Inspector({
           </select>
           <ChevronDown size={15} />
         </div>
-        {<ModelControls key={(task?.id||'draft')+target} task={task||{modelSettings:draftSettings}} profile={selected} disabled={false} onSave={value=>onModelSettings(value,target)}/>}
+        {selected&&<ModelControls key={(task?.id||'draft')+target} task={task||{modelSettings:draftSettings}} profile={selected} disabled={!!selected.disabled} onSave={value=>onModelSettings(value,target)}/>}
         <div className="execution-status" role="status"><span className="status-dot" />{tr(labels[task?.state]||"就绪")}</div>
         {task?.execution&&<p className="active-config">{tr("本轮执行")} · {task.execution.model} · {task.execution.effort}</p>}
                 <button
@@ -825,12 +828,12 @@ function App() {
           )}
         </nav>
         <footer>
-          <button onClick={()=>setTaskDialog({action:'history'})}><BookOpen size={18}/>{tr('归档与已删除')}</button>
-          <button onClick={()=>setModal("settings")}><Settings2 size={18}/>{tr("设置")}</button>
           <button onClick={() => setModal("accounts")}>
-            <Settings2 size={16} />{tr("账号")}</button>
+            <UsersRound size={18} />{tr("账号")}</button>
           <button onClick={() => setModal("capabilities")}>
-            <BookOpen size={16} />{tr("共享能力")}</button>
+            <BookOpen size={18} />{tr("共享能力")}</button>
+          <button onClick={()=>setTaskDialog({action:'history'})}><Archive size={18}/>{tr('归档与已删除')}</button>
+          <button onClick={()=>setModal("settings")}><Settings2 size={18}/>{tr("设置")}</button>
         </footer>
       </aside>
       <main className="main">

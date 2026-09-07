@@ -375,5 +375,6 @@
   "登录链接尚未准备好，请稍候。": "Der Anmeldelink ist noch nicht verfügbar. Bitte warten.",
   "账号尚未启用，请先登录或选择其他账号。": "Dieses Konto ist nicht aktiviert. Melde dich an oder wähle ein anderes Konto.",
   "账号检查超时，请重试。": "Zeitüberschreitung bei der Kontoprüfung. Bitte erneut versuchen.",
-  "账号配置已在外部改变，请重启后重试。": "Die Kontokonfiguration wurde außerhalb von Prism geändert. Starte die App neu und versuche es erneut."
+  "账号配置已在外部改变，请重启后重试。": "Die Kontokonfiguration wurde außerhalb von Prism geändert. Starte die App neu und versuche es erneut.",
+  "浏览器未能自动打开，请点击“重新打开登录页”。": "Der Browser konnte nicht automatisch geöffnet werden. Klicke auf „Anmeldeseite erneut öffnen“."
 }
