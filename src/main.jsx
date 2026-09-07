@@ -1,8 +1,13 @@
 import React, { useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import Markdown from "react-markdown";
+import PreviewPanel,{LinkedMarkdown} from "./PreviewPanel.jsx";
+import {ImageAttachments,QueuedMessages,ActivityPanel,GeneralSettings} from "./TaskControls.jsx";
 import {
   Sun,
+  Languages,
+  ImagePlus,
+  PanelRightOpen,
   Moon,
   Monitor,
   Plus,
@@ -451,7 +456,7 @@ function Inspector({
     </aside>
   );
 }
-function Conversation({ task, events, streaming, onNew }) {
+function Conversation({ task, events, streaming, onNew, onPreview }) {
   const end = useRef(null);
   useEffect(() => {
     end.current?.scrollIntoView({ block: "end", behavior: "instant" });
@@ -502,7 +507,8 @@ function Conversation({ task, events, streaming, onNew }) {
               {e.type === "assistant" && <small>{e.profile}</small>}
             </header>
             <div className="prose">
-              <Markdown>{e.text || ""}</Markdown>
+              <LinkedMarkdown onPreview={onPreview}>{e.text || ""}</LinkedMarkdown>
+              <ImageAttachments taskId={task.id} images={e.images} onPreview={image=>onPreview(image.path)}/>
             </div>
           </article>
         ),
@@ -512,7 +518,7 @@ function Conversation({ task, events, streaming, onNew }) {
           <header>{tr("太初")}<span className="status-dot" />
           </header>
           <div className="prose">
-            <Markdown>{streaming}</Markdown>
+            <LinkedMarkdown onPreview={onPreview}>{streaming}</LinkedMarkdown>
           </div>
         </article>
       )}
@@ -571,10 +577,13 @@ function App() {
   const [task, setTask] = useState(null);
   const [events, setEvents] = useState([]);
   const [modal, setModal] = useState("");
+  const [preview,setPreview]=useState(null);
   const [theme, setTheme] = useState("system");
   const [language,changeLanguage]=useState('zh');
   const [draftSettings,setDraftSettings]=useState({}),[draftAccount,setDraftAccount]=useState('');
   const [text, setText] = useState("");
+  const [images,setImages]=useState([]),[uploading,setUploading]=useState(false),[sending,setSending]=useState(false),[queue,setQueue]=useState([]),[thinking,setThinking]=useState(""),[activity,setActivity]=useState("");
+  const drafts=useRef({}),loadSequence=useRef(0),pendingImageFiles=useRef([]);
   const [streaming, setStreaming] = useState("");
   const [toast, setToast] = useState("");
   const [quotas, setQuotas] = useState({});
@@ -586,7 +595,11 @@ function App() {
   const current = useRef(null);
   const fail = (error) => setToast(error.message || String(error));
   const load = async (id) => {
+    if(current.current)drafts.current[current.current]={text,images};
+    const sequence=++loadSequence.current;
     const result = await api.task(id);
+    if(sequence!==loadSequence.current)return;
+    setText(drafts.current[id]?.text||"");setImages(drafts.current[id]?.images||[]);setThinking("");setActivity("");
     setTask(result.task);
     current.current = id;
     setEvents(result.events);
@@ -601,7 +614,7 @@ function App() {
     api
       .init()
       .then((data) => {
-        setInit(data);
+        setInit(data);setQueue(data.queue||[]);
         setDraftAccount(data.profiles[0]?.id||'');
         setTheme(data.settings.theme==='system'?(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'):data.settings.theme);
         setLanguage(data.settings.language||'zh');changeLanguage(data.settings.language||'zh');
@@ -611,6 +624,7 @@ function App() {
       .catch(fail);
     return api.subscribe(({ type, value }) => {
       if(type==='approval-reset'){setApprovals(old=>old.filter(a=>a.taskId!==value.taskId));return;}
+      if(type==='queue'){setQueue(value);return;}
       if(type==='quota'){setQuotas(old=>({...old,[value.id]:value}));return;}
       if (type === "error") return fail(value);
       if (type === "state" || type === "idle") {
@@ -638,7 +652,12 @@ function App() {
         return;
       }
       if (value.taskId !== current.current) return;
+      if(type==='reasoning'){setThinking(old=>old+value.text);return;}
+      if(type==='activity'){setActivity(value.text);return;}
       if (type === "event") {
+        if(value.event.type==='user'){setThinking('');setActivity('');}
+        if(value.event.type==='reasoning')setThinking('');
+        if(value.event.type==='tool')setActivity('');
         setEvents((old) =>
           old.some((e) => e.id === value.event.id)
             ? old
@@ -685,9 +704,11 @@ function App() {
   };
   const create = async (values) => {
     const made = await api.create({...values,profile:draftAccount,executionOptions:draftSettings[draftAccount]});
+    if(!task)drafts.current[made.id]={text,images:[]};
     setInit((old) => ({ ...old, tasks: [made, ...old.tasks] }));
     setModal("");
     await load(made.id);
+    if(pendingImageFiles.current.length){const files=pendingImageFiles.current;pendingImageFiles.current=[];const inputs=await Promise.all(files.map(async file=>{const bytes=new Uint8Array(await file.arrayBuffer());let binary="";for(let i=0;i<bytes.length;i+=32768)binary+=String.fromCharCode(...bytes.subarray(i,i+32768));return{name:file.name,data:btoa(binary)};}));setImages(await api.addImages(made.id,inputs));}
   };
   const send = async () => {
     if (!task) {
@@ -695,12 +716,18 @@ function App() {
       return;
     }
     try {
-      await api.run(task.id, text);
-      setText("");
+      if(sending||uploading)return;setSending(true);
+      const sentText=text,sentImages=images,sentId=task.id;
+      const result=await api.run(sentId,sentText,sentImages.map(image=>image.id));
+      drafts.current[sentId]={text:"",images:[]};
+      if(current.current===sentId){setText(value=>value===sentText?"":value);setImages(value=>value.filter(image=>!sentImages.some(sent=>sent.id===image.id)));}
+      if(result.queued&&init.settings.busySend==='steer')setToast(tr('当前无法实时引导，消息已排队'));
     } catch (e) {
       fail(e);
-    }
+    } finally {setSending(false);}
   };
+  const savePreferences=async update=>{try{const settings=await api.preferences(update);setInit(old=>({...old,settings}));}catch(e){fail(e);}};
+  const addImages=async files=>{if(!task){if(files){const list=Array.from(files).filter(file=>file.type.startsWith("image/"));if(list.length>5){fail(Error(tr("每条消息最多添加 5 张图片")));return;}if(list.some(file=>file.size>10*1024*1024)){fail(Error(tr("图片不能超过 10 MB")));return;}pendingImageFiles.current=list;}setModal("new");return;}const taskId=task.id;setUploading(true);try{let inputs=null;if(files){const list=Array.from(files).filter(file=>file.type.startsWith("image/"));if(!list.length)return;if(images.length+list.length>5)throw Error(tr("每条消息最多添加 5 张图片"));inputs=await Promise.all(list.map(async file=>{if(file.size>10*1024*1024)throw Error(tr("图片不能超过 10 MB"));const bytes=new Uint8Array(await file.arrayBuffer());let binary="";for(let i=0;i<bytes.length;i+=32768)binary+=String.fromCharCode(...bytes.subarray(i,i+32768));return{name:file.name,data:btoa(binary)};}));}const added=await api.addImages(taskId,inputs);if(images.length+added.length>5)throw Error(tr("每条消息最多添加 5 张图片"));if(current.current===taskId)setImages(old=>[...old,...added].slice(0,5));else drafts.current[taskId]={...drafts.current[taskId],images:[...(drafts.current[taskId]?.images||[]),...added].slice(0,5)};}catch(e){fail(e);}finally{setUploading(false);}};
   const refresh = async (id,model) => {
     setChecking(id);
     try {
@@ -765,6 +792,7 @@ function App() {
           )}
         </nav>
         <footer>
+          <button onClick={()=>setModal("settings")}><Settings2 size={18}/>{tr("设置")}</button>
           <button onClick={() => setModal("accounts")}>
             <Settings2 size={16} />{tr("账号")}</button>
           <button onClick={() => setModal("capabilities")}>
@@ -777,12 +805,13 @@ function App() {
             <h2>{task?.title || tr("新任务")}</h2>
             <p>{tr("一个任务，持续向前。")}</p>
           </div>
-          <div className="appearance-controls"><select className="language-toggle" aria-label="Switch language" title={tr("界面语言")} value={language} onChange={async e=>{const next=e.target.value;try{await api.language(next);setLanguage(next);changeLanguage(next);}catch(e){fail(e);}}}>{languages.map(l=><option key={l.id} value={l.id} lang={l.id}>{l.name}</option>)}</select><ThemeSwitch value={theme} onChange={setAppearance} /></div>
+          <div className="appearance-controls"><button title={tr("画布与预览")} disabled={!task} onClick={()=>setPreview({id:Date.now(),target:null,task})}><PanelRightOpen size={18}/></button><label className="language-control"><Languages size={18} aria-hidden="true"/><select className="language-toggle" aria-label="Switch language" title={tr("界面语言")} value={language} onChange={async e=>{const next=e.target.value;try{await api.language(next);setLanguage(next);changeLanguage(next);}catch(e){fail(e);}}}>{languages.map(l=><option key={l.id} value={l.id} lang={l.id}>{l.name}</option>)}</select></label><ThemeSwitch value={theme} onChange={setAppearance} /></div>
         </header>
         <Conversation
           task={task}
           events={events}
           streaming={streaming}
+          onPreview={target=>setPreview({id:Date.now(),target,task})}
           onNew={() => setModal("new")}
         />
         <div className="bottom-area">
@@ -801,16 +830,21 @@ function App() {
               >{tr("已核对，继续任务")}</button>
             </div>
           )}
-          <div className="composer">
+          <ActivityPanel task={task} events={events} thinking={thinking} activity={activity}/>
+          <QueuedMessages items={queue.filter(item=>item.taskId===task?.id&&item.status!=="sending")} onCancel={id=>api.cancelQueued(id).catch(fail)} onRetry={id=>api.retryQueued(id).catch(fail)}/>
+          <div className="composer" onDragOver={e=>{if(e.dataTransfer.types.includes("Files"))e.preventDefault();}} onDrop={e=>{e.preventDefault();addImages(e.dataTransfer.files);}}>
+            <ImageAttachments taskId={task?.id} images={images} onRemove={id=>setImages(old=>old.filter(image=>image.id!==id))} onPreview={image=>image.path&&setPreview({id:Date.now(),target:image.path,task})}/>
             <textarea dir="auto"
               aria-label={tr("任务指令")}
               value={text}
               onChange={(e) => setText(e.target.value)}
+              onPaste={e=>{if(Array.from(e.clipboardData.files).some(file=>file.type.startsWith("image/"))){e.preventDefault();addImages(e.clipboardData.files);}}}
               placeholder={tr("写下你的想法，或者接着上次的工作…")}
               onKeyDown={(e) => {
-                if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
+                if(e.nativeEvent.isComposing||e.keyCode===229)return;
+                if (e.key === "Enter" && (init.settings.sendShortcut==='enter'?!e.shiftKey:((e.ctrlKey||e.metaKey)&&!e.shiftKey))) {
                   e.preventDefault();
-                  if (!anyBusy && text.trim()) send();
+                  if ((text.trim()||images.length)&&!sending&&!uploading) send();
                 }
               }}
             />
@@ -832,8 +866,9 @@ function App() {
               <span className="separator" />
               {task && <PermissionControl task={task} profile={init.profiles.find(p=>p.id===task.profile)} defaultMode={init.settings.defaultMode||'workspace-write'} onChange={changeMode} onDefault={async mode=>{try{await api.defaultMode(mode);setInit(old=>({...old,settings:{...old.settings,defaultMode:mode}}));}catch(e){fail(e);}}}/>}
               {task?.pendingMode&&<small className="permission-pending">{tr("下次执行生效")}</small>}
+              <button title={tr("添加图片")} aria-label={tr("添加图片")} disabled={uploading||images.length>=5} onClick={()=>addImages(null)}><ImagePlus size={19}/></button>
               <span className="compose-spacer" />
-              {busy ? (
+              {busy && (
                 <button
                   className="outline"
                   onClick={() => api.stop().catch(fail)}
@@ -844,22 +879,21 @@ function App() {
                       ? tr("正在停止")
                       : tr("停止")}
                 </button>
-              ) : (
+              )}
                 <button
                   className="primary send"
                   onClick={send}
                   disabled={
-                    !text.trim() || anyBusy || task?.state === "unknown"
+                    (!text.trim()&&!images.length) || sending || uploading || task?.state === "unknown"
                   }
-                >{tr("发送")}<Send size={17} />
+                >{tr(anyBusy?(init.settings.busySend==='steer'?'引导':'排队'):'发送')}<Send size={17} />
                 </button>
-              )}
             </div>
           </div>
           <div className="task-tools">
             <span>{task ? tr(labels[task.state]) : tr("等待开始")}</span>
             {task && <label className="auto-relay"><input type="checkbox" checked={task.autoSwitch!==false} disabled={anyBusy} onChange={async e=>{const previous=task;const autoSwitch=e.target.checked;setTask({...task,autoSwitch});try{setTask(await api.update(task.id,{autoSwitch}));}catch(error){setTask(previous);fail(error);}}}/>{tr("额度耗尽后自动接续")}</label>}
-            <span className="mono">CTRL + ENTER</span>
+            <span className="mono">{init.settings.sendShortcut==='enter'?'ENTER':'CTRL / ⌘ + ENTER'}</span>
             {task && (
               <>
                 <button onClick={() => setModal("checkpoint")}>{tr("进度备注")}</button>
@@ -892,6 +926,7 @@ function App() {
         onNew={()=>setModal('new')}
         disabled={anyBusy || task?.state === "unknown"}
       />
+      {preview&&<PreviewPanel task={preview.task} request={preview} onClose={()=>setPreview(null)}/>}
       {toast && (
         <div className="toast" role="alert">
           <p>{toast}</p>
@@ -900,6 +935,7 @@ function App() {
           </button>
         </div>
       )}
+      {modal === "settings" && <Modal title={tr("设置")} onClose={()=>setModal("")}><GeneralSettings settings={{...init.settings,theme}} onSave={savePreferences} storage={init.taskStorage} onAccounts={()=>setModal("accounts")} onDefault={async mode=>{try{await api.defaultMode(mode);setInit(old=>({...old,settings:{...old.settings,defaultMode:mode}}));}catch(e){fail(e);}}} onAppearance={setAppearance} languageControl={<label>{tr("界面语言")}<select value={language} onChange={async e=>{try{await api.language(e.target.value);setLanguage(e.target.value);changeLanguage(e.target.value);}catch(error){fail(error);}}}>{languages.map(l=><option key={l.id} value={l.id}>{l.name}</option>)}</select></label>}/></Modal>}
       {modal === "new" && (
         <NewTask onClose={() => setModal("")} onCreate={create} />
       )}{" "}

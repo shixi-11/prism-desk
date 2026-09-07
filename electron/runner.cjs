@@ -54,7 +54,15 @@ class Runner extends EventEmitter {
     this.store.context(task);
     return this.store.save(task);
   }
-  async run(id, text) {
+  async steer(id,text,images=[]){
+    const active=this.active;
+    if(!active||active.task.id!==id||active.profile.provider!=='Codex'||!active.rpc||!active.turnId||active.cancelRequested)return false;
+    await active.rpc.call('turn/steer',{threadId:active.task.sessions[active.profile.id],expectedTurnId:active.turnId,input:require('./attachments.cjs').codexInput(text,images)});
+    this.event(id,'user',{text,images,profile:active.profile.id,steered:true});
+    active.images=[...(active.images||[]),...images].slice(-5);
+    this.store.context(active.task);return true;
+  }
+  async run(id, text, images=[]) {
     if (typeof text !== "string" || !text.trim() || text.length > 60000)
       throw Error("请输入 1–60000 字的指令。");
     const task = this.store.get(id);
@@ -62,8 +70,9 @@ class Runner extends EventEmitter {
     require('./task-settings.cjs').applyPendingMode(task);
     let profile = require('./models.cjs').selection(task,profileFor(task.profile));
     require('./task-settings.cjs').validateMode(task.mode,profile);
-    this.event(id, "user", { text: text.trim(), profile: profile.id });
-    this.active = { task, profile, phase: "starting", pending: new Map(), cancelRequested:false };
+    if(images.length&&!['Codex','Claude'].includes(profile.provider))throw Error('当前入口暂不支持图片，请选择 Codex 或 Claude');
+    this.event(id, "user", { text: text.trim(), images, profile: profile.id });
+    this.active = { task, profile, images, phase: "starting", pending: new Map(), cancelRequested:false };
     this.state(task, "running");
     try {
       const attempted=new Set();let instruction=text;
@@ -87,7 +96,7 @@ class Runner extends EventEmitter {
         if(this.active.quotaExhausted)this.event(id,'notice',{text:`${profile.provider} / ${profile.name} 订阅额度已耗尽。${task.autoSwitch===false?'自动接续已关闭，请选择其他账号继续。':'正在检查可接续的账号。'}`});
         if(task.autoSwitch===false || this.active.cancelRequested || !this.active.quotaExhausted || task.state!=='failed')break;
         require('./task-settings.cjs').applyPendingMode(task);
-        const next=PROFILES.find(p=>!attempted.has(p.id) && (task.mode==='read-only'||p.write&&['Codex','Claude'].includes(p.provider)));
+        const next=PROFILES.find(p=>!attempted.has(p.id) && (!this.active.images.length||['Codex','Claude'].includes(p.provider)) && (task.mode==='read-only'||p.write&&['Codex','Claude'].includes(p.provider)));
         if(!next){this.event(id,'notice',{text:'已尝试所有符合当前权限的入口；没有自动重复调用。'});break;}
         this.active.pending.clear();
         this.emit('approval-reset',{taskId:task.id});
@@ -157,6 +166,9 @@ class Runner extends EventEmitter {
           itemId: p.itemId,
           text: p.delta,
         });
+      if(message.method==='item/reasoning/summaryTextDelta')this.emit('reasoning',{taskId:task.id,itemId:p.itemId,text:p.delta});
+      if(message.method==='item/reasoning/summaryPartAdded')this.emit('reasoning',{taskId:task.id,itemId:p.itemId,text:'\n\n'});
+      if(message.method==='item/started'&&['commandExecution','fileChange','mcpToolCall','webSearch'].includes(p.item?.type))this.emit('activity',{taskId:task.id,text:p.item.command||p.item.type});
       if (message.method === "item/completed") {
         const item = p.item;
         if (item?.type === "agentMessage")
@@ -164,6 +176,7 @@ class Runner extends EventEmitter {
             text: item.text,
             profile: profile.id,
           });
+        else if(item?.type==='reasoning'&&item.summary?.length)this.event(task.id,'reasoning',{text:item.summary.join('\n'),profile:profile.id});
         else if (
           [
             "commandExecution",
@@ -222,9 +235,10 @@ class Runner extends EventEmitter {
       this.active.started = true;
       const started = await rpc.call("turn/start", {
         threadId: result.thread.id,
-        input: [{ type: "text", text: text.trim() }],
+        input: require('./attachments.cjs').codexInput(text,this.active.images),
         model: profile.model,
         effort: profile.effort || "xhigh",
+        summary:'auto',
         sandboxPolicy:
           task.mode === "full-access" ? { type: "dangerFullAccess" } : task.mode === "read-only"
             ? { type: "readOnly" }
@@ -305,6 +319,7 @@ class Runner extends EventEmitter {
         : "Read,Glob,Grep,Edit,Write,Bash",
     ];
     if(task.mode === "full-access")args.push("--dangerously-skip-permissions");
+    if(this.active.images?.length)args.push('--input-format','stream-json');
     if (task.sessions[profile.id])
       args.push("--resume", task.sessions[profile.id]);
     const proc = spawnCLI(profile, args, task.cwd);
@@ -370,7 +385,7 @@ class Runner extends EventEmitter {
     proc.stderr.on("data", (data) => {
       errorText = (errorText + data).slice(-4000);
     });
-    proc.stdin.end(text.trim());
+    proc.stdin.end(this.active.images?.length?require('./attachments.cjs').claudeInput(text,this.active.images):text.trim());
     const code = await new Promise((resolve, reject) => {
       proc.on("close", resolve);
       proc.on("error", reject);

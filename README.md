@@ -21,6 +21,14 @@ Prism Desk is a Windows workspace for subscription CLIs. When one account runs o
 | Keep your work locally | Choose a permanent task-storage folder, add progress notes and export a Markdown conversation record. |
 | Work in your language | Choose one of nine interface languages, including right-to-left Arabic, and switch between light and dark desert themes. |
 
+### Messages, settings and previews
+
+Paste screenshots, drop images into the composer or use the image button (up to five images, 10 MB each). Codex receives local images; Claude receives native image content when its subscription checks pass. Claude image execution has not yet been verified against a signed-in account.
+
+Send more messages while work runs: they wait in order and can be cancelled. Settings lets you choose Enter or Ctrl/⌘+Enter and queueing or live guidance. Live guidance uses Codex's active turn; other providers fall back to the queue. Failed or interrupted sends hold subsequent messages for review. Drafts are retained while switching tasks in the open app.
+
+Open the preview panel or click a file link to view images, PDFs, Markdown, code and text. Text files can be edited and saved; external changes are checked before saving. HTML previews display standalone pages; interactive projects can use their running HTTP address. Some websites block embedding. The activity panel shows CLI-provided reasoning summaries, plans and execution status when available.
+
 ### Before your first task
 
 Install the official CLI for each provider you want to use, then sign in through that CLI. Signing in to a website or desktop app alone does not configure Prism.
@@ -61,8 +69,9 @@ git clone https://github.com/shixi-11/prism-desk.git
 cd prism-desk
 npm install
 npm run build
+npm run build:desktop
 powershell -NoProfile -ExecutionPolicy Bypass -File scripts/build-host.ps1
-npm start
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts/start.ps1
 ```
 
 The build script compiles the Windows process host used to stop CLI subprocesses together. It uses the .NET Framework compiler included with Windows.
@@ -126,6 +135,7 @@ Assistant files and skills can be shared across accounts. MCP permissions and ap
 ```powershell
 npm test
 npm run build
+npm run build:desktop
 ```
 
 Unit tests use isolated account fixtures. Optional desktop and live CLI checks are described in [scripts/README.md](scripts/README.md); live checks require test accounts and may consume subscription allowance.
@@ -193,8 +203,9 @@ git clone https://github.com/shixi-11/prism-desk.git
 cd prism-desk
 npm install
 npm run build
+npm run build:desktop
 powershell -NoProfile -ExecutionPolicy Bypass -File scripts/build-host.ps1
-npm start
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts/start.ps1
 ```
 
 构建脚本使用 Windows 自带的 .NET Framework 编译器生成进程宿主，用于一起停止 CLI 及其子进程。
@@ -258,6 +269,7 @@ Codex 和 Claude 适配器支持文件修改任务；Grok 支持只读研究。�
 ```powershell
 npm test
 npm run build
+npm run build:desktop
 ```
 
 单元测试使用隔离的模拟账号配置。桌面检查与真实 CLI 检查见 [scripts/README.md](scripts/README.md)；真实调用需要配置测试账号，并可能消耗订阅额度。
@@ -267,3 +279,11 @@ npm run build
 ### 许可证
 
 采用 [MIT 许可证](LICENSE)。棱镜是独立项目，各提供方名称与商标归其所有者所有。
+
+### 消息、设置与预览
+
+支持粘贴截图、拖入图片或点击图片按钮，每条最多 5 张、每张不超过 10 MB。Codex 使用原生图片输入；Claude 在订阅检查通过后使用原生图片消息，目前尚未完成已登录账号的图片实测。
+
+执行中可继续发送，消息依次排队，也可取消。设置中可选择 Enter 或 Ctrl/⌘+Enter 发送，以及排队或实时引导；实时引导使用 Codex 当前轮次，其他入口转为排队。失败或中断后，后续消息暂停等待核对。应用打开期间，切换任务会保留各自的输入草稿。
+
+点击预览按钮或对话中的文件链接，可查看图片、PDF、Markdown、代码和文本；文本支持编辑保存，并检查文件是否已被外部修改。HTML 可直接预览独立页面，交互项目可填写已启动的 HTTP 地址。部分网站禁止嵌入。思考与执行面板显示 CLI 实际返回的思考摘要、计划和执行状态。

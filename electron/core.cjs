@@ -377,7 +377,7 @@ class TaskStore {
         .map((e) => {
           if(e.type==='plan')return `\n### plan · ${e.at}\n${JSON.stringify(e.data)}\n`;
           if (e.type !== "tool")
-            return `\n### ${e.type} · ${e.at}\n${e.text || ""}\n`;
+            return `\n### ${e.type} · ${e.at}\n${e.text || ""}\n${(e.images||[]).map(image=>`图片附件：${image.name} (${image.path})`).join('\n')}\n`;
           const evidence = path.join(
             this.dir(task.id),
             "evidence",

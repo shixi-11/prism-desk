@@ -22,7 +22,7 @@ if (process.env.PRISM_TEST_DATA)
   app.setPath("userData", process.env.PRISM_TEST_DATA);
 const primaryInstance=app.requestSingleInstanceLock();
 if (!primaryInstance) app.quit();
-let window, store, runner;
+let window, store, runner, messageQueue;
 function showWindow(){
   if(!window||window.isDestroyed())return;
   if(window.isMinimized())window.restore();
@@ -63,12 +63,16 @@ app.whenReady().then(() => {
   store = new TaskStore(require('./storage.cjs').taskRoot(app.getAppPath(),dataPath()));
   store.recover();
   runner = new Runner(store);
-  for (const type of ["event", "delta", "state", "idle", "approval", "quota", "approval-reset"])
+  messageQueue=new (require('./message-queue.cjs').MessageQueue)(store,runner,path.join(dataPath(),'message-queue.json'));
+  messageQueue.on('change',items=>emit('queue',items));
+  messageQueue.on('failure',error=>emit('error',error.message));
+  for (const type of ["event", "delta", "state", "idle", "approval", "quota", "approval-reset", "reasoning", "activity"])
     runner.on(type, (value) => emit(type, value));
   handle("init", () => ({
     tasks: store.list(),
     profiles: PROFILES.map(({ home, executable, ...p }) => p),
     settings: settings(),
+    queue:messageQueue.items,
     taskStorage:store.root,
     capabilities: capabilities(),
     approvals: runner.active
@@ -81,6 +85,28 @@ app.whenReady().then(() => {
       : [],
   }));
   handle("task", (id) => ({ task: store.get(id), events: store.events(id) }));
+  handle('cancelQueued',id=>messageQueue.cancel(id));
+  handle('retryQueued',id=>messageQueue.retry(id));
+  handle('preferences',update=>{
+    const allowed={sendShortcut:['enter','ctrl-enter'],busySend:['queue','steer']};
+    for(const [key,value]of Object.entries(update))if(!allowed[key]?.includes(value))throw Error('Invalid preference');
+    const next={...settings(),...update};atomic(path.join(dataPath(),'settings.json'),next);return next;
+  });
+  handle('addImages',async(id,inputs)=>{
+    store.get(id);const {nativeImage}=require('electron');
+    if(!inputs){const result=await dialog.showOpenDialog(window,{properties:['openFile','multiSelections'],filters:[{name:'Images',extensions:['png','jpg','jpeg','webp','gif']}]});if(result.canceled)return [];inputs=result.filePaths.map(file=>{if(fs.statSync(file).size>10*1024*1024)throw Error('图片不能超过 10 MB');return {name:path.basename(file),data:fs.readFileSync(file).toString('base64')};});}
+    if(!Array.isArray(inputs)||inputs.length>5)throw Error('每条消息最多添加 5 张图片');
+    return inputs.map(input=>require('./attachments.cjs').addAttachment(store.dir(id),input,nativeImage));
+  });
+  handle('imageThumbnail',(id,imageId)=>{store.get(id);const [image]=require('./attachments.cjs').attachmentFiles(store.dir(id),[imageId]);return require('electron').nativeImage.createFromPath(image.path).resize({width:180}).toDataURL();});
+  const previewFiles=new Set();
+  handle('preview',async(id,target,relativeTo)=>{
+    const task=store.get(id);
+    if(!target){const picked=await dialog.showOpenDialog(window,{properties:['openFile'],defaultPath:task.cwd});if(picked.canceled)return null;target=picked.filePaths[0];}
+    const base=relativeTo&&previewFiles.has(relativeTo)?path.dirname(relativeTo):task.cwd;
+    const result=await require('./preview.cjs').readPreview(target,base);if(result.path)previewFiles.add(result.path);return result;
+  });
+  handle('savePreview',async(file,text,version)=>{if(!previewFiles.has(file))throw Error('请先打开文件');return require('./preview.cjs').savePreview(file,text,version);});
   handle("create", async input => {
     input={...input,mode:input.mode??require('./task-settings.cjs').newTaskMode(settings(),PROFILES.find(p=>p.id===(input.profile||PROFILES[0].id)))};
     if(input.executionOptions){const list=await require('./models.cjs').modelOptions(input.profile,app.getAppPath());const m=list.models.find(m=>m.id===input.executionOptions.model);if(!m?.efforts.includes(input.executionOptions.effort))throw Error('模型或思考等级无效');}
@@ -124,15 +150,18 @@ app.whenReady().then(() => {
   });
   handle('models',id=>require('./models.cjs').modelOptions(id,app.getAppPath()));
   handle('modelSettings',(id,input)=>require('./models.cjs').updateSelectionForRunner(store,runner,id,input));
-  handle("run", (id, text) => {
+  handle("run", async (id, text, imageIds=[]) => {
     if(validatingApps)throw Error('请等待本机应用验证结束');
     if(resetInProgress)throw Error('请等待重置卡操作结束');
-    if (runner.active) throw Error("请等待当前执行完成。");
     const task = store.get(id);
-    runner.assertIdle(task);
-    if (typeof text !== "string" || !text.trim()) throw Error("请填写指令。");
-    runner.run(id, text).catch((e) => emit("error", e.message));
-    return { started: true };
+    const images=require('./attachments.cjs').attachmentFiles(store.dir(id),imageIds);
+    if(typeof text!=='string')throw Error('请填写指令。');
+    text=text.trim()||(images.length?'请查看这些图片。':'');if(!text||text.length>60000)throw Error('请输入 1–60000 字的指令。');
+    if(images.length&&!['Codex','Claude'].includes(PROFILES.find(p=>p.id===task.profile)?.provider))throw Error('当前入口暂不支持图片，请选择 Codex 或 Claude');
+    if(settings().busySend==='steer'&&await runner.steer(id,text,images))return {steered:true};
+    const busy=!!runner.active||messageQueue.running;
+    const item=messageQueue.enqueue(id,text,images);
+    return {started:!busy,queued:busy,id:item.id};
   });
   handle("switch", (id, profile) => runner.switch(id, profile));
   handle('stopAndContinue', (id, profile) => runner.stopAndContinue(id, profile));
@@ -212,13 +241,14 @@ app.whenReady().then(() => {
       nodeIntegration: false,
       sandbox: true,
       backgroundThrottling: false,
-      offscreen: !!process.env.PRISM_TEST_HIDE,
     },
   });
   window.webContents.setWindowOpenHandler(() => ({ action: "deny" }));
   window.setMenu(null);
+  if(process.platform==='win32')window.setAppDetails({appId:'org.prismdesk.app',appIconPath:path.join(__dirname,'..','src','assets','prism.ico'),relaunchDisplayName:'棱镜',relaunchCommand:`"${process.execPath}" "${path.resolve(__dirname,'..')}" --user-data-dir="${app.getPath('userData')}"`});
   window.webContents.on("will-navigate", (event) => event.preventDefault());
   window.loadFile(path.join(__dirname, "..", "dist", "index.html"));
+  window.webContents.once('did-finish-load',()=>messageQueue.pump());
   window.on("close", (event) => {
     if (runner.active) {
       event.preventDefault();

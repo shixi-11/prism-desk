@@ -526,3 +526,44 @@ html:not([lang^="zh"]) .empty h1 { font-size:clamp(26px,3vw,44px); }
 .permission-option:has(input:disabled) { opacity:.5; cursor:default; }
 .permission-panel p { font-size:14px; line-height:1.7; color:var(--muted); margin:14px 0; }
 .permission-panel button { width:100%; padding:10px; border-top:1px solid var(--line); font-size:14px; white-space:normal; }
+.language-control { display:flex; align-items:center; gap:7px; border:1px solid var(--line); padding-inline-start:10px; border-radius:3px; }
+.language-control .language-toggle { border:0; padding-inline-start:0; }
+.file-link { display:inline; padding:0; border:0; background:none; color:var(--accent); text-decoration:underline; text-underline-offset:3px; cursor:pointer; }
+.preview-panel { position:absolute; inset-block:0; inset-inline-end:0; width:clamp(420px,48vw,900px); z-index:35; display:flex; flex-direction:column; background:var(--surface); color:var(--text); border-inline-start:1px solid var(--line); box-shadow:var(--shadow); }
+.preview-panel.expanded { width:85%; }
+.preview-panel header { display:flex; align-items:center; gap:12px; padding:18px; border-bottom:1px solid var(--line); }
+.preview-panel header span { flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:13px; }
+.preview-panel header strong { font-size:16px; }
+.preview-address { display:flex; align-items:center; gap:8px; padding:12px 18px; }
+.preview-address input { min-width:0; flex:1; background:var(--bg); color:var(--text); border:1px solid var(--line); padding:9px; }
+.preview-tools { display:flex; gap:16px; padding:0 18px 12px; border-bottom:1px solid var(--line); }
+.preview-tools button { display:flex; align-items:center; gap:6px; }
+.preview-content { flex:1; min-height:0; overflow:auto; }
+.preview-content>img { display:block; width:100%; height:100%; object-fit:contain; }
+.preview-content iframe { width:100%; height:100%; border:0; background:white; }
+.preview-content article,.preview-content pre { padding:24px; margin:0; }
+.preview-content pre { white-space:pre-wrap; overflow-wrap:anywhere; }
+.preview-content textarea { display:block; width:100%; height:100%; resize:none; padding:20px; border:0; background:var(--bg); color:var(--text); font-family:monospace; font-size:14px; line-height:1.7; tab-size:2; }
+.preview-error,.preview-panel footer { padding:12px 18px; font-size:13px; line-height:1.6; color:var(--muted); }
+.image-attachments { display:flex; gap:10px; flex-wrap:wrap; padding:8px 0; }
+.image-attachments>div { position:relative; }
+.image-attachments .image-preview { padding:0; display:block; background:var(--surface); border:1px solid var(--line); border-radius:5px; overflow:hidden; }
+.image-attachments img { width:80px; height:70px; object-fit:cover; display:block; }
+.image-attachments .remove-image { position:absolute; inset-inline-end:-5px; top:-5px; padding:3px; border-radius:50%; background:var(--surface); border:1px solid var(--line); }
+.queued-messages { max-height:130px; overflow:auto; background:var(--writing-bg); border:1px solid var(--line); padding:10px 14px; margin-bottom:8px; font-size:12px; }
+.queued-messages>div { display:flex; align-items:center; gap:10px; padding-top:8px; flex-wrap:wrap; }
+.queued-messages span { min-width:0; flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.queued-messages small { flex-basis:100%; color:var(--muted); }
+.activity-panel { background:var(--writing-bg); border:1px solid var(--line); margin-bottom:8px; padding:9px 13px; font-size:12px; }
+.activity-panel summary { display:flex; align-items:center; gap:8px; cursor:pointer; }
+.activity-panel summary svg { margin-inline-start:auto; }
+.activity-panel>div { max-height:170px; overflow:auto; line-height:1.7; }
+.activity-panel p { white-space:pre-wrap; }
+.activity-panel pre { white-space:pre-wrap; overflow-wrap:anywhere; }
+.general-settings { display:flex; flex-direction:column; gap:15px; }
+.general-settings label { display:grid; gap:8px; }
+.general-settings select { width:100%; border:1px solid var(--line); padding:10px; background:var(--bg); color:var(--text); }
+.general-settings p { margin:-6px 0 0; font-size:13px; line-height:1.6; color:var(--muted); }
+.general-settings button { display:flex; gap:8px; align-items:center; padding:8px 0; }
+.general-settings code { font-size:11px; overflow-wrap:anywhere; }
+.compose-actions { flex-wrap:wrap; row-gap:8px; }
