@@ -31,6 +31,10 @@ function grokQuotaView(result, now = Date.now()) {
   if (!Number.isFinite(used) && Number.isFinite(c?.monthlyLimit?.val) && c.monthlyLimit.val > 0 && Number.isFinite(c?.used?.val) && c.used.val >= 0) used = c.used.val / c.monthlyLimit.val * 100;
   const start = epoch(c?.currentPeriod?.start || c?.billingPeriodStart);
   const resetsAt = epoch(c?.currentPeriod?.end || c?.billingPeriodEnd);
+  // Official pager credit_balance_from_config uses zero when the optional
+  // percentage is omitted. Apply only to a confirmed live unified period;
+  // malformed, empty, legacy, and expired responses must remain unknown.
+  if(c?.isUnifiedBillingUser===true&&!Object.hasOwn(c,'creditUsagePercent')&&!c.monthlyLimit&&start!==null&&start*1000<=now&&resetsAt*1000>now)used=0;
   const kind = c?.currentPeriod?.type;
   const minutes = kind === 'USAGE_PERIOD_TYPE_WEEKLY' ? 10080 : start && resetsAt > start ? Math.round((resetsAt - start) / 60) : null;
   const resultView = summarize(Number.isFinite(used) && used >= 0 ? [{ remaining: clamp(100 - used), minutes, resetsAt, kind: kind || 'billing_period' }] : [], 'grok-official-billing', now);
@@ -52,21 +56,24 @@ async function grokQuota(profile, cwd) {
   const rpc = new Rpc(profile, cwd);
   try {
     await rpc.init();
+    let identity=null;
+    try{identity=await rpc.call('_x.ai/auth/info',{},15000);}catch{}
     const billing=await rpc.call('_x.ai/billing', {}, 25000);
     let topup=null;
     try {topup=await rpc.call('_x.ai/auto-topup-rule',{},15000);}catch{}
-    return {id:profile.id,...grokQuotaView(billing),...grokPaidUsageState(billing,topup)};
+    return {id:profile.id,...(typeof identity?.email==='string'?{email:identity.email}:{}),...grokQuotaView(billing),...grokPaidUsageState(billing,topup)};
   }
   finally { await rpc.end(); }
 }
-async function readClaudeUsage(profile, cwd) {
-  const {spawnCLI,claudeAuth} = require('./core.cjs');
+async function readClaudeUsage(profile, cwd, dependencies={}) {
+  const {spawnCLI,claudeAuth} = {...require('./core.cjs'),...dependencies};
   const auth=await claudeAuth(profile,cwd);
   const proc = spawnCLI(profile, ['--print','--verbose','--input-format','stream-json','--output-format','stream-json','--no-session-persistence','--setting-sources','','--settings','{"apiKeyHelper":"","env":{},"disableAllHooks":true}','--strict-mcp-config','--mcp-config','{"mcpServers":{}}','--tools','','--permission-mode','dontAsk'], cwd);
   return new Promise((resolve,reject) => {
     let buffer='', done=false, finalError, finalValue;
-    const timer=setTimeout(()=>finish(Error('Claude 额度查询超时；未将该账号判为耗尽。')),30000);
-    function finish(error,value) {if(done)return;done=true;finalError=error?Object.assign(error,{queryUnavailable:true}):null;finalValue=value;clearTimeout(timer);proc.stdin.end();proc.kill();}
+    const timer=setTimeout(()=>finish(Error('Claude 额度查询超时；未将该账号判为耗尽。')),dependencies.timeoutMs||30000);
+    function finish(error,value) {if(done)return;done=true;finalError=error?Object.assign(error,{queryUnavailable:true}):null;finalValue=value;clearTimeout(timer);try{proc.stdin.end();proc.kill();}catch{}finalError?reject(finalError):resolve(finalValue);}
+    proc.stdin.on('error',()=>finish(Error('Claude 额度查询连接提前结束。')));
     proc.on('error',e=>finish(e));
     proc.on('close',()=>{if(!done)finish(Error('Claude 额度查询连接提前结束。'));finalError?reject(finalError):resolve(finalValue);});
     proc.stderr.on('data',()=>{});
@@ -75,9 +82,15 @@ async function readClaudeUsage(profile, cwd) {
     proc.stdin.write(JSON.stringify({type:'control_request',request_id:'prism-quota-init',request:{subtype:'initialize'}})+'\n');
   });
 }
+async function readClaudeUsageWithRetry(profile,cwd,read=readClaudeUsage) {
+  for(let attempt=0;attempt<2;attempt++){
+    try{const usage=await read(profile,cwd);if(attempt===0&&claudeUsageView(usage,profile.model).remaining===null){await new Promise(r=>setTimeout(r,250));continue;}return usage;}
+    catch(error){if(!error.queryUnavailable||attempt===1)throw error;await new Promise(r=>setTimeout(r,250));}
+  }
+}
 async function claudeQuota(profile,cwd) {
   let usage;
-  try {usage=await readClaudeUsage(profile,cwd);} catch(error) {
+  try {usage=await readClaudeUsageWithRetry(profile,cwd);} catch(error) {
     // Authentication failures never fall back to a former authenticated snapshot.
     if(!error.queryUnavailable)throw error;
     const cached=require('./quota.cjs').cachedQuota(profile.id,Date.now(),profile.model);
@@ -87,4 +100,4 @@ async function claudeQuota(profile,cwd) {
   const flag=usage?.rate_limits?.extra_usage?.is_enabled;
   return {id:profile.id,email:usage.prismAccount?.email,subscriptionType:usage.prismAccount?.subscriptionType,...claudeUsageView(usage,profile.model),extraUsageEnabled:typeof flag==='boolean'?flag:null};
 }
-module.exports={grokQuotaView,claudeUsageView,grokQuota,claudeQuota,readClaudeUsage,grokPaidUsageState};
+module.exports={grokQuotaView,claudeUsageView,grokQuota,claudeQuota,readClaudeUsage,readClaudeUsageWithRetry,grokPaidUsageState};

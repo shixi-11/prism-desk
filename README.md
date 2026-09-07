@@ -128,7 +128,9 @@ Choose **Read only**, **Edit project**, or **Full access** in the composer. Full
 
 Codex and Claude adapters support file-editing tasks. Grok supports read-only research. Available models depend on the installed CLI and the selected account.
 
-The allowance panel shows information returned by the provider. Missing values remain unknown. Authentication or network errors do not trigger an account switch as if the allowance were exhausted. Automatic handoff requires a recognized exhaustion response and a completed previous execution.
+The allowance panel shows information returned by the provider. For valid unified Grok periods, omitted zero usage follows the official client's interpretation; empty, malformed, or expired responses remain unknown. Claude queries retry once after a transient connection failure or missing usage response, but never after an authentication failure. Authentication or network errors do not trigger an account switch as if the allowance were exhausted. Automatic handoff requires a recognized exhaustion response and a completed previous execution.
+
+Account emails are masked by default; use the eye button to reveal or hide them. Query history stays on this device. After restart, records retain their original date and time and are marked for refresh. Historical readings never authorize execution or reset-credit use.
 
 Prism does not fall back to API-key billing or purchase credits. Claude and Grok execution requires confirmation that extra billing is disabled. Using an existing Codex reset credit requires a separate confirmation for the selected account.
 
@@ -262,7 +264,9 @@ Copy-Item config.example.json .local/config.json
 
 Codex 和 Claude 适配器支持文件修改任务；Grok 支持只读研究。可用模型由已安装的 CLI 和所选账号决定。
 
-额度栏展示提供方返回的信息，缺失的数值保留为未知。认证失败和网络错误不会被当作额度耗尽来切换账号。自动接续需要收到可识别的额度耗尽响应，并等待前一次执行结束。
+额度栏展示提供方返回的信息。Grok 的有效统一额度周期按官方客户端口径解析省略的零使用量；空响应、异常数值和过期周期仍保留为未知。Claude 查询遇到短暂连接故障或未返回额度时会重试一次，认证失败不重试。认证失败和网络错误不会被当作额度耗尽来切换账号。自动接续需要收到可识别的额度耗尽响应，并等待前一次执行结束。
+
+账号页的邮箱默认遮罩显示，点击眼睛图标可展开或隐藏。查询记录仅保存在本机；重启后显示原查询日期和时间，并标明需要刷新。历史记录不用于执行授权或重置卡操作。
 
 棱镜不回退到 API Key 计费，也不购买额度。Claude 和 Grok 执行前需确认额外计费已关闭；使用已有的 Codex 重置卡，需要针对所选账号单独确认。
 

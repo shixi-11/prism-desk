@@ -25,7 +25,7 @@ if (process.env.PRISM_TEST_DATA)
   app.setPath("userData", process.env.PRISM_TEST_DATA);
 const primaryInstance=app.requestSingleInstanceLock();
 if (!primaryInstance) app.quit();
-let window, store, runner, messageQueue;
+let window, store, runner, messageQueue, quotaDisplay;
 function showWindow(){
   window=owner();
   if(!window||window.isDestroyed())return;
@@ -43,6 +43,7 @@ let accountQueries=0;
 let validatingApps=false;
 const dataPath = () => app.getPath("userData");
 const emit = (type, value) => {
+  if(type==='quota'&&quotaDisplay)quotaDisplay.save(value);
   for(const win of windows)if(!win.isDestroyed())win.webContents.send("prism:event", { type, value });
 };
 function settings() {
@@ -68,6 +69,7 @@ app.whenReady().then(() => {
   if(!primaryInstance)return;
   store = new TaskStore(require('./storage.cjs').taskRoot(app.getAppPath(),dataPath()));
   store.recover();
+  quotaDisplay=new (require('./quota-display.cjs').QuotaDisplay)(dataPath());
   runner = new Runner(store);
   messageQueue=new (require('./message-queue.cjs').MessageQueue)(store,runner,path.join(dataPath(),'message-queue.json'));
   messageQueue.on('change',items=>emit('queue',items));
@@ -78,6 +80,7 @@ app.whenReady().then(() => {
     tasks: store.list(),
     archivedTasks:store.list('archived'),deletedTasks:store.list('deleted'),
     accountLogins:Object.fromEntries(accountLoginStates),
+    quotas:quotaDisplay.snapshot(PROFILES),
     profiles: PROFILES.map(({ home, executable, ...p }) => p),
     settings: settings(),
     queue:messageQueue.items,
@@ -110,6 +113,7 @@ app.whenReady().then(() => {
     accountOperation=true;messageQueue.paused=true;
     try{
       require('./accounts.cjs').clearAccountSessions(store,id);
+      quotaDisplay.clear(id);
       require('./accounts.cjs').prepareLogin(id);broadcastAccounts();
       loginState(id,{phase:'starting',hasUrl:false});
       const login=require('./account-login.cjs').startAccountLogin(profile,app.getAppPath(),()=>{
@@ -185,7 +189,7 @@ app.whenReady().then(() => {
   handle("quota", async(id,model) => {
     if(accountOperation)throw Error('请等待账号操作结束。');
     accountQueries++;
-    try{return await accountStatus(id,app.getAppPath(),model);}catch(error){if(error.code!=='AUTH_REQUIRED')throw error;return {id,authRequired:true,status:error.message,remaining:null,windows:[],checkedAt:new Date().toISOString()};}finally{accountQueries--;}
+    try{const result=await require('./core.cjs').accountStatus(id,app.getAppPath(),model);emit('quota',{id,...result});return result;}catch(error){const result=quotaDisplay.failure(id,error);emit('quota',result);return result;}finally{accountQueries--;}
   });
   handle('loginGemini',async()=>{
     if(geminiLogin)throw Error('Google 登录窗口已打开，请完成当前授权');

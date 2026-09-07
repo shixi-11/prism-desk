@@ -33,6 +33,8 @@ The older live UI checks require the capabilities they assert: two usable Codex 
 
 ## Application probes
 
+`quota-display-ui-check.cjs` uses isolated mock accounts to check bulk-query failure isolation, email reveal/hide, history restoration after restart, and Arabic layout. It does not query real accounts. Set `PRISM_NODE_MODULES` if Playwright is installed outside this project.
+
 Application probes discover installed applications through the configured discovery module. For Resolve, `PRISM_RESOLVE_DIR`, `RESOLVE_SCRIPT_API`, and `PRISM_PYTHON` can override the installation directory, SDK root, and Python executable. Probes inspect existing interfaces; a connected SDK does not certify editing or rendering operations.
 
 Keep `.local`, runtime outputs, screenshots containing private information, and live account configuration out of source control. No source script needs to be removed from the repository; the optional live checks must remain excluded from unattended CI unless its environment is deliberately configured.

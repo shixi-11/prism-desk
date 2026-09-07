@@ -397,5 +397,9 @@
   "授权码已提交，请等待登录结果。": "Der Code wurde bereits gesendet. Warte auf das Anmeldeergebnis.",
   "授权码未能提交，请重新获取登录链接。": "Der Code konnte nicht gesendet werden. Fordere einen neuen Anmeldelink an.",
   "继续登录": "Anmeldung fortsetzen",
-  "复制登录链接到浏览器，授权后将网页给出的授权码粘贴到下方。": "Kopiere den Anmeldelink in deinen Browser. Füge nach der Autorisierung den auf der Seite angezeigten Code unten ein."
+  "复制登录链接到浏览器，授权后将网页给出的授权码粘贴到下方。": "Kopiere den Anmeldelink in deinen Browser. Füge nach der Autorisierung den auf der Seite angezeigten Code unten ein.",
+  "显示邮箱": "E-Mail anzeigen",
+  "隐藏邮箱": "E-Mail verbergen",
+  "邮箱暂未返回": "E-Mail noch nicht verfügbar",
+  "上次查询记录，请刷新": "Frühere Abfrage; bitte aktualisieren"
 }

@@ -397,5 +397,9 @@
   "授权码已提交，请等待登录结果。": "The code has been submitted. Wait for the sign-in result.",
   "授权码未能提交，请重新获取登录链接。": "The code could not be submitted. Get a new sign-in link.",
   "继续登录": "Continue sign-in",
-  "复制登录链接到浏览器，授权后将网页给出的授权码粘贴到下方。": "Copy the sign-in link into your browser. After authorizing, paste the code shown on the page below."
+  "复制登录链接到浏览器，授权后将网页给出的授权码粘贴到下方。": "Copy the sign-in link into your browser. After authorizing, paste the code shown on the page below.",
+  "显示邮箱": "Show email",
+  "隐藏邮箱": "Hide email",
+  "邮箱暂未返回": "Email not returned yet",
+  "上次查询记录，请刷新": "Previous query; refresh for current usage"
 }

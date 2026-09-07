@@ -335,9 +335,9 @@ function Inspector({
   const canStop = running && ["Codex","Claude","Grok"].includes(profiles.find(p=>p.id===task.profile)?.provider);
   const [clock,setClock]=useState(Date.now());
   useEffect(()=>{const timer=setInterval(()=>setClock(Date.now()),30000);return()=>clearInterval(timer);},[]);
-  const stale =
+  const stale = quota?.cached ||
     quota?.checkedAt &&
-    clock - new Date(quota.checkedAt).getTime() > 300000;
+    (clock - new Date(quota.checkedAt).getTime() > 300000 || quota.windows?.some(w=>w.resetsAt&&w.resetsAt*1000<=clock));
   return (
     <aside className="inspector">
       <section className="inspector-fixed">
@@ -636,7 +636,7 @@ function App() {
     api
       .init()
       .then((data) => {
-        setInit(data);setQueue(data.queue||[]);setAccountLogins(data.accountLogins||{});
+        setInit(data);setQuotas(old=>({...data.quotas,...old}));setQueue(data.queue||[]);setAccountLogins(data.accountLogins||{});
         setDraftAccount(data.profiles.find(p=>!p.disabled)?.id||'');
         setTheme(data.settings.theme==='system'?(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'):data.settings.theme);
         setLanguage(data.settings.language||'zh');changeLanguage(data.settings.language||'zh');
