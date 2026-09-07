@@ -261,5 +261,10 @@
   "等待浏览器登录": "Warten auf Browser-Anmeldung",
   "Claude 尚未登录，请重新登录后查询。": "Melden Sie sich erneut bei Claude an, um die Nutzung zu prüfen.",
   "需要刷新": "Aktualisierung nötig",
-  "上次查询已超过 5 分钟，请刷新": "Die letzte Prüfung liegt über 5 Minuten zurück. Bitte aktualisieren."
+  "上次查询已超过 5 分钟，请刷新": "Die letzte Prüfung liegt über 5 Minuten zurück. Bitte aktualisieren.",
+  "可以直接开始对话，也可以选择项目文件夹。": "Beginnen Sie direkt ein Gespräch oder wählen Sie einen Projektordner.",
+  "工作目录（可选）": "Arbeitsordner (optional)",
+  "留空即可开始，文件保存在独立任务工作区": "Leer lassen, um einen eigenen Aufgabenbereich zu verwenden",
+  "任务工作区": "Aufgabenbereich",
+  "先新建任务，再切换执行账号。": "Erstellen Sie zuerst eine Aufgabe, bevor Sie das Konto wechseln."
 }

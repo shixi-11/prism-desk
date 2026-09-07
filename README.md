@@ -43,7 +43,7 @@ Add each account to `.local/config.json` with its executable and the login direc
 
 ### A typical task
 
-1. Click **New task**, give it a name and choose the project folder.
+1. Click **New task** and give it a name. The project folder is optional; leaving it blank creates a separate, persistent task workspace.
 2. Select an execution account, model and reasoning effort. Use **Read only** for review, or **Edit project** for editing.
 3. Enter your request and send it with **Ctrl + Enter**. Follow the conversation and execution log as work progresses.
 4. Add important decisions or remaining work to the progress notes. To change accounts, select the next account and use the handoff control; stop the current execution first when required.
@@ -177,7 +177,7 @@ For an issue report, include the app and CLI versions, reproduction steps and a 
 
 ### 怎么使用
 
-1. 点击**新建任务**，填写名称，选择实际要工作的项目文件夹。
+1. 点击**新建任务**并填写名称。工作目录可留空，棱镜会创建独立、持久的任务工作区；也可以选择已有的项目文件夹。
 2. 选择**执行账号、模型和思考等级**。查看或分析资料时使用只读模式，需要改文件时选择**项目内编辑**。
 3. 输入要求，点击发送或按 **Ctrl + Enter**。在对话和执行记录中查看进展。
 4. 把重要决定和待办写入**进度备注**。需要换号时，选择下一个账号并使用接续按钮；当前仍在执行时，先按提示停止。

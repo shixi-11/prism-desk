@@ -164,7 +164,7 @@ function NewTask({ onClose, onCreate }) {
   return (
     <Modal title={tr("从一个任务开始")} onClose={onClose}>
       <form onSubmit={submit}>
-        <p className="muted">{tr("选好工作目录，之后换账号也留在同一个任务里。")}</p>
+        <p className="muted">{tr("可以直接开始对话，也可以选择项目文件夹。")}</p>
         <label>{tr("任务名称")}<input
             value={title}
             onChange={(e) => setTitle(e.target.value)}
@@ -173,12 +173,11 @@ function NewTask({ onClose, onCreate }) {
             required
           />
         </label>
-        <label>{tr("工作目录")}<div className="field-row">
+        <label>{tr("工作目录（可选）")}<div className="field-row">
             <input
               value={cwd}
               onChange={(e) => setCwd(e.target.value)}
-              placeholder={tr("选择已有的项目文件夹")}
-              required
+              placeholder={tr("留空即可开始，文件保存在独立任务工作区")}
             />
             <button
               type="button"
@@ -358,7 +357,7 @@ function Inspector({
           <ArrowRightLeft size={16} />
           {task ? tr("切换并继续") : tr("新建任务后开始")}
         </button>
-        <p className="relay-note">{!task?tr("先新建任务并选择工作目录，再切换执行账号。"):task.state==='unknown'?tr("先核对上次执行进度，再切换账号。"):disabled?tr("请等待当前执行结束。"):target===task.profile?tr("已是当前账号；选择其他账号后可切换。"):tr("切换后，在同一任务中发送指令继续。")}</p>
+        <p className="relay-note">{!task?tr("先新建任务，再切换执行账号。"):task.state==='unknown'?tr("先核对上次执行进度，再切换账号。"):disabled?tr("请等待当前执行结束。"):target===task.profile?tr("已是当前账号；选择其他账号后可切换。"):tr("切换后，在同一任务中发送指令继续。")}</p>
         {task && (
           <p className="relay-note">{tr("当前：")}{profiles.find((p) => p.id === task.profile)?.provider} /{" "}
             {tr(profiles.find((p) => p.id === task.profile)?.name)}
@@ -476,7 +475,7 @@ function Conversation({ task, events, streaming, onNew, onPreview }) {
             : tr("选好工作目录，我们就从这里开始。")}
         </p>
         {!task && (
-          <button className="empty-start" onClick={onNew}>{tr("选择工作目录")}<ArrowUpRight size={16} />
+          <button className="empty-start" onClick={onNew}>{tr("新建任务")}<ArrowUpRight size={16} />
           </button>
         )}
       </div>
@@ -868,7 +867,7 @@ function App() {
               >
                 <FolderOpen size={19} />
                 <span>
-                  {task ? task.cwd.split(/[\\/]/).pop() : tr("选择工作目录")}
+                  {task ? task.workspaceKind==='managed'?tr("任务工作区"):task.cwd.split(/[\\/]/).pop() : tr("选择工作目录")}
                 </span>
               </button>
               <span className="separator" />

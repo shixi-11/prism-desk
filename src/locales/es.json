@@ -261,5 +261,10 @@
   "等待浏览器登录": "Esperando inicio de sesión",
   "Claude 尚未登录，请重新登录后查询。": "Inicia sesión de nuevo en Claude para consultar el uso.",
   "需要刷新": "Actualizar datos",
-  "上次查询已超过 5 分钟，请刷新": "La última consulta fue hace más de 5 minutos. Actualiza los datos."
+  "上次查询已超过 5 分钟，请刷新": "La última consulta fue hace más de 5 minutos. Actualiza los datos.",
+  "可以直接开始对话，也可以选择项目文件夹。": "Inicia una conversación o elige una carpeta de proyecto.",
+  "工作目录（可选）": "Carpeta de trabajo (opcional)",
+  "留空即可开始，文件保存在独立任务工作区": "Déjalo vacío para usar un espacio propio para la tarea",
+  "任务工作区": "Espacio de la tarea",
+  "先新建任务，再切换执行账号。": "Crea una tarea antes de cambiar la cuenta de ejecución."
 }

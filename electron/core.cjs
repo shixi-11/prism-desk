@@ -314,20 +314,20 @@ class TaskStore {
   create({ title, cwd, profile = PROFILES[0].id, mode = "read-only" }) {
     if (typeof title !== "string" || !title.trim() || title.length > 100)
       throw Error("请填写 1–100 字的任务名。");
-    if (
-      typeof cwd !== "string" ||
-      !path.isAbsolute(cwd) ||
-      !fs.statSync(cwd).isDirectory()
-    )
+    const managed=cwd==null||(typeof cwd==='string'&&!cwd.trim());
+    if(!managed&&(typeof cwd!=='string'||!path.isAbsolute(cwd)||!fs.existsSync(cwd)||!fs.statSync(cwd).isDirectory()))
       throw Error("请选择已有的工作目录。");
     require('./task-settings.cjs').validateMode(mode,profileFor(profile));
     if(mode!=='read-only' && !profileFor(profile).write)throw Error('这个入口只支持只读研究。');
     if (!["read-only", "workspace-write", "full-access"].includes(mode))
       throw Error("工作模式无效。");
+    const id=crypto.randomUUID();
+    if(managed){cwd=path.join(this.dir(id),'workspace');fs.mkdirSync(cwd,{recursive:true});}
     return this.save({
-      id: crypto.randomUUID(),
+      id,
       title: title.trim(),
       cwd: fs.realpathSync.native(cwd),
+      workspaceKind:managed?'managed':'project',
       profile,
       mode,
       state: "idle",
