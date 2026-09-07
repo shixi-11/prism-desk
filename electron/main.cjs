@@ -245,6 +245,7 @@ app.whenReady().then(() => {
   });
   window.webContents.setWindowOpenHandler(() => ({ action: "deny" }));
   window.setMenu(null);
+  window.once('ready-to-show',()=>{if(!process.env.PRISM_TEST_HIDE)window.showInactive();});
   if(process.platform==='win32')window.setAppDetails({appId:'org.prismdesk.app',appIconPath:path.join(__dirname,'..','src','assets','prism.ico'),relaunchDisplayName:'棱镜',relaunchCommand:`"${process.execPath}" "${path.resolve(__dirname,'..')}" --user-data-dir="${app.getPath('userData')}"`});
   window.webContents.on("will-navigate", (event) => event.preventDefault());
   window.loadFile(path.join(__dirname, "..", "dist", "index.html"));
