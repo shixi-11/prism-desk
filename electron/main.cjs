@@ -1,4 +1,5 @@
 const { app, BrowserWindow, ipcMain, dialog, shell, Menu, clipboard, Tray } = require("electron");
+const updateBootstrap=require('./update-bootstrap.cjs');
 const callers=new (require('node:async_hooks').AsyncLocalStorage)();
 const windows=new Set();
 const owner=()=>callers.getStore()||[...windows][0];
@@ -25,8 +26,10 @@ if (process.env.PRISM_TEST_DATA)
   app.setPath("userData", process.env.PRISM_TEST_DATA);
 const primaryInstance=app.requestSingleInstanceLock();
 if (!primaryInstance) app.quit();
+const bootstrapError=primaryInstance?updateBootstrap.bootstrap(app,path.resolve(__dirname,'..')):null;
 let window, store, runner, messageQueue, quotaDisplay;
 let tray,quitting=false,quitPending=false;
+let updater,updateInstalling=false,operations=0;
 async function quitPrism(){
  if(quitPending)return;quitPending=true;if(messageQueue)messageQueue.paused=true;
  try{
@@ -75,7 +78,9 @@ function handle(method, fn) {
       event.senderFrame !== event.sender.mainFrame
     )
       throw Error("非法调用来源");
-    return callers.run(BrowserWindow.fromWebContents(event.sender),()=>fn(...args));
+    if(updateInstalling&&!['updateStatus'].includes(method))throw Error('正在切换新版，请稍候');
+    operations++;
+    try{return await callers.run(BrowserWindow.fromWebContents(event.sender),()=>fn(...args));}finally{operations--;}
   });
 }
 app.whenReady().then(() => {
@@ -83,7 +88,18 @@ app.whenReady().then(() => {
   store = new TaskStore(require('./storage.cjs').taskRoot(app.getAppPath(),dataPath()));
   store.recover();
   quotaDisplay=new (require('./quota-display.cjs').QuotaDisplay)(dataPath());
+  const draftFile=win=>path.join(dataPath(),'drafts',win.draftKey+'.json');
+  ipcMain.on('prism:saveDrafts',(event,value)=>{
+    try{const win=[...windows].find(w=>w.webContents===event.sender);if(!win||event.senderFrame!==event.sender.mainFrame)throw Error('非法调用来源');
+      const encoded=JSON.stringify(value);if(encoded.length>4*1024*1024||!value||typeof value!=='object'||Array.isArray(value))throw Error('草稿过大');
+      updateBootstrap.write(draftFile(win),value);event.returnValue=true;
+    }catch(error){event.returnValue={error:error.message};}
+  });
   runner = new Runner(store);
+  updater=new (require('./updater.cjs').Updater)(app.getAppPath(),process.env.PRISM_TEST_DATA?{root:path.join(dataPath(),'installation')}:{ });
+  updater.on('change',value=>emit('app-update',value));
+  if(bootstrapError){updater.state.status='error';updater.state.error=bootstrapError;}
+  updater.current().then(current=>updater.set({current,...(updater.state.latest===current?{status:'current'}:{})})).catch(()=>{});
   messageQueue=new (require('./message-queue.cjs').MessageQueue)(store,runner,path.join(dataPath(),'message-queue.json'));
   messageQueue.on('change',items=>emit('queue',items));
   messageQueue.on('failure',error=>emit('error',error.message));
@@ -93,6 +109,8 @@ app.whenReady().then(() => {
   for (const type of ["event", "delta", "state", "idle", "approval", "quota", "approval-reset", "reasoning", "activity"])
     runner.on(type, (value) => emit(type, value));
   handle("init", () => ({
+    appUpdate:updater.snapshot(),
+    drafts:updateBootstrap.read(draftFile(owner()),{}),
     tasks: store.list(),
     archivedTasks:store.list('archived'),deletedTasks:store.list('deleted'),
     accountLogins:Object.fromEntries(accountLoginStates),
@@ -112,6 +130,35 @@ app.whenReady().then(() => {
       : [],
   }));
   const broadcastTasks=()=>emit('task-list',{tasks:store.list(),archivedTasks:store.list('archived'),deletedTasks:store.list('deleted')});
+  const updateBusy=()=>runner.active||messageQueue.running||messageQueue.items.some(i=>['waiting','sending'].includes(i.status))||accountOperation||accountQueries||resetInProgress||accountLogins.size||geminiLogin||validatingApps||quitPending||store.list().some(t=>['running','stopping','unknown'].includes(t.state));
+  async function installUpdate(automatic=false){
+    if(updateInstalling||updateBusy()||operations>(automatic?0:1))throw Error('等待任务和账号操作结束后更新');
+    updateInstalling=true;messageQueue.paused=true;
+    const opened=[...windows].filter(w=>!w.isDestroyed());
+    const token=require('node:crypto').randomUUID(),deadline=Date.now()+5000;
+    try{
+      const ready=await Promise.allSettled(opened.map(w=>Promise.race([w.webContents.executeJavaScript(`window.__prismPrepareUpdate?.(${automatic},${JSON.stringify(token)},${deadline}) === true`),new Promise(resolve=>setTimeout(()=>resolve(false),5000))])));
+      if(!opened.length||ready.some(v=>v.status!=='fulfilled'||!v.value)||updateBusy())throw Error('请保存并关闭编辑窗口，空闲后将自动更新');
+      updateBootstrap.write(path.join(dataPath(),'update-windows.json'),opened.map(w=>({key:w.draftKey,hidden:!w.isVisible(),bounds:w.getBounds()})));
+      const target=await updater.activate();
+      app.relaunch({execPath:path.join(target,'runtime','desktop','Prism.exe'),args:[target,'--user-data-dir='+dataPath()]});
+      quitting=true;tray?.destroy();app.quit();
+    }catch(error){updateInstalling=false;messageQueue.paused=false;try{updater.cancelActivation();}catch{}const layoutFile=path.join(dataPath(),'update-windows.json');try{if(fs.existsSync(layoutFile))fs.unlinkSync(layoutFile);}catch{}for(const w of opened)if(!w.isDestroyed())w.webContents.executeJavaScript(`window.__prismCancelUpdate?.(${JSON.stringify(token)})`).catch(()=>{});messageQueue.pump();throw error;}
+  }
+  handle('updateStatus',()=>updater.snapshot());
+  handle('updateHealthy',()=>{if(!process.env.PRISM_TEST_DATA)updateBootstrap.healthy(app.getAppPath());return true;});
+  handle('checkUpdates',()=>updater.check());
+  handle('prepareUpdate',()=>updater.prepare());
+  handle('automaticUpdates',value=>updater.automatic(value));
+  handle('installUpdate',()=>installUpdate(false));
+  let autoUpdating=false,lastAutoCheck=0;
+  async function autoUpdate(){
+    if(autoUpdating||updateInstalling||!updater.state.automatic)return;autoUpdating=true;
+    try{
+      if(Date.now()-lastAutoCheck>4*60*60*1000){lastAutoCheck=Date.now();await updater.check();}
+    }catch{}finally{autoUpdating=false;}
+  }
+  if(!process.env.PRISM_TEST_DATA){setTimeout(autoUpdate,60000).unref();setInterval(autoUpdate,30000).unref();}
   const publicProfiles=()=>PROFILES.map(({home,executable,...p})=>p);
   const broadcastAccounts=()=>emit('accounts',publicProfiles());
   const assertAccountIdle=()=>{if(runner.active||accountOperation||accountQueries||resetInProgress||store.list().some(t=>['running','stopping','unknown'].includes(t.state)))throw Error('请等待当前执行或账号操作结束。');};
@@ -334,7 +381,7 @@ app.whenReady().then(() => {
       fs.copyFileSync(record.path, result.filePath);
     return !result.canceled;
   });
-  function makeWindow(taskId){
+  function makeWindow(taskId,restore){
   const window = new BrowserWindow({
     width: 1460,
     height: 940,
@@ -343,7 +390,7 @@ app.whenReady().then(() => {
     title: `棱镜 · Prism v${app.getVersion()}`,
     icon: path.join(__dirname, "..", "src", "assets", "prism.ico"),
     backgroundColor: "#272119",
-    show: !process.env.PRISM_TEST_HIDE,
+    show: false,
     webPreferences: {
       preload: path.join(__dirname, "preload.cjs"),
       contextIsolation: true,
@@ -353,12 +400,14 @@ app.whenReady().then(() => {
     },
   });
   windows.add(window);
+  window.draftKey=restore?.key||(taskId?require('node:crypto').randomUUID():'primary');
+  if(restore?.bounds&&[restore.bounds.x,restore.bounds.y,restore.bounds.width,restore.bounds.height].every(Number.isFinite))window.setBounds(restore.bounds);
   window.on('page-title-updated',event=>event.preventDefault());
   window.on('closed',()=>windows.delete(window));
   window.webContents.setWindowOpenHandler(() => ({ action: "deny" }));
   window.setMenu(null);
-  window.once('ready-to-show',()=>{if(!process.env.PRISM_TEST_HIDE)window.showInactive();});
-  if(process.platform==='win32')window.setAppDetails({appId:'org.prismdesk.app',appIconPath:path.join(__dirname,'..','src','assets','prism.ico'),relaunchDisplayName:'棱镜',relaunchCommand:`"${process.execPath}" "${path.resolve(__dirname,'..')}" --user-data-dir="${app.getPath('userData')}"`});
+  window.once('ready-to-show',()=>{if(!process.env.PRISM_TEST_HIDE&&!restore?.hidden)window.showInactive();});
+  if(process.platform==='win32')window.setAppDetails({appId:'org.prismdesk.app',appIconPath:path.join(__dirname,'..','src','assets','prism.ico'),relaunchDisplayName:'棱镜',relaunchCommand:`"${path.join(updater.root,'runtime','desktop','Prism.exe')}" "${updater.root}" --user-data-dir="${app.getPath('userData')}"`});
   window.webContents.on("will-navigate", (event) => event.preventDefault());
   window.loadFile(path.join(__dirname, "..", "dist", "index.html"),{query:taskId?{task:taskId}:{}});
   window.webContents.once('did-finish-load',()=>messageQueue.pump());
@@ -371,7 +420,11 @@ app.whenReady().then(() => {
   });
   return window;
   }
-  window=makeWindow();
+  const windowFile=path.join(dataPath(),'update-windows.json'),restoreWindows=updateBootstrap.read(windowFile,[]);
+  const layouts=Array.isArray(restoreWindows)?restoreWindows.filter(item=>item&&(item.key==='primary'||/^[a-f0-9-]{36}$/.test(item.key))).slice(0,20):[];
+  window=makeWindow(undefined,layouts[0]);
+  for(const layout of layouts.slice(1))makeWindow(undefined,layout);
+  if(fs.existsSync(windowFile))fs.unlinkSync(windowFile);
   if(!process.env.PRISM_TEST_HIDE||process.env.PRISM_TEST_TRAY){
     tray=new Tray(path.join(__dirname,'..','src','assets','prism.ico'));
     tray.setToolTip('棱镜 · Prism');

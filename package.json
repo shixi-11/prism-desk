@@ -21,6 +21,7 @@
   },
   "devDependencies": {
     "electron": "^44.2.0",
+    "npm": "10.9.4",
     "rcedit": "^4.0.1",
     "vite": "^7.0.0"
   },

@@ -1,6 +1,7 @@
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
+const DEFAULT_CONFIG_PATH=path.join(require('./update-bootstrap.cjs').installation(path.resolve(__dirname,'..')),'.local','config.json');
 
 // This file contains configuration conventions only. Credentials remain in the
 // provider's own login directory and must never be copied into configuration.
@@ -45,7 +46,7 @@ function validate(config) {
   return config;
 }
 
-function loadConfig(file = process.env.PRISM_CONFIG || path.join(__dirname, '../.local/config.json'), env = process.env) {
+function loadConfig(file = process.env.PRISM_CONFIG || DEFAULT_CONFIG_PATH, env = process.env) {
   const defaults = defaultConfig(env);
   if (!fs.existsSync(file)) {
     if (env.PRISM_CONFIG && file === env.PRISM_CONFIG) throw Error('The explicitly selected PRISM configuration file does not exist.');
@@ -57,7 +58,7 @@ function loadConfig(file = process.env.PRISM_CONFIG || path.join(__dirname, '../
   return validate({...defaults, ...local, assistant: {...defaults.assistant, ...local.assistant}});
 }
 
-const CONFIG_PATH=process.env.PRISM_CONFIG||path.join(__dirname,'../.local/config.json');
+const CONFIG_PATH=process.env.PRISM_CONFIG||DEFAULT_CONFIG_PATH;
 const CONFIG = loadConfig();
 function saveProfiles(profiles){
   const latest=loadConfig(CONFIG_PATH);

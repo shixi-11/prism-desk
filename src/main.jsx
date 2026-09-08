@@ -603,6 +603,8 @@ function ExecutionLog({ events }) {
 }
 function App() {
   const [init, setInit] = useState(null);
+  const [appUpdate,setAppUpdate]=useState(null);
+  const hasAppUpdate=appUpdate?.latest&&appUpdate.latest!==appUpdate.current;
   const [task, setTask] = useState(null);
   const [events, setEvents] = useState([]);
   const [modal, setModal] = useState("");
@@ -630,7 +632,7 @@ function App() {
   const current = useRef(null);
   const fail = (error) => setToast(error.message || String(error));
   const load = async (id) => {
-    if(current.current)drafts.current[current.current]={text,images};
+    if(init||current.current)drafts.current[current.current||'_new']={text,images};
     const sequence=++loadSequence.current;
     const result = await api.task(id);
     if(sequence!==loadSequence.current)return;
@@ -649,16 +651,21 @@ function App() {
     api
       .init()
       .then((data) => {
+        drafts.current=data.drafts||{};
+        if(!data.tasks.length){setText(drafts.current._new?.text||'');setImages(drafts.current._new?.images||[]);}
         setInit(data);setQuotas(old=>({...data.quotas,...old}));setQueue(data.queue||[]);setAccountLogins(data.accountLogins||{});
+        setAppUpdate(data.appUpdate);
         setDraftAccount(data.profiles.find(p=>!p.disabled)?.id||'');
         setTheme(data.settings.theme==='system'?(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'):data.settings.theme);
         setLanguage(data.settings.language||'zh');changeLanguage(data.settings.language||'zh');
         setApprovals(data.approvals || []);
         const requested=new URLSearchParams(location.search).get('task');
-        if (data.tasks.length) load(data.tasks.find(t=>t.id===requested)?.id||data.tasks[0].id);
+        if (data.tasks.length) load(data.tasks.find(t=>t.id===(requested||drafts.current._selected))?.id||data.tasks[0].id);
+        api.updateHealthy().catch(fail);
       })
       .catch(fail);
     return api.subscribe(({ type, value }) => {
+      if(type==='app-update'){setAppUpdate(value);return;}
       if(type==='accounts'){setInit(old=>old?{...old,profiles:value}:old);if(!current.current)setDraftAccount(old=>value.some(p=>p.id===old&&!p.disabled)?old:value.find(p=>!p.disabled)?.id||'');return;}
       if(type==='account-login'){setAccountLogins(old=>({...old,[value.id]:value}));return;}
       if(type==='task-list'){setInit(old=>old?{...old,...value}:old);const selected=value.tasks.find(t=>t.id===current.current);if(selected)setTask(selected);else if(current.current){++loadSequence.current;current.current=null;setTask(null);setEvents([]);setText('');setImages([]);setStreaming('');setThinking('');setActivity('');}return;}
@@ -707,6 +714,36 @@ function App() {
       if (type === "delta") setStreaming((old) => old + value.text);
     });
   }, []);
+  const updateSnapshot=useRef(null),lastInteraction=useRef(Date.now());
+  updateSnapshot.current=()=>{
+    drafts.current[current.current||'_new']={text,images};
+    drafts.current._selected=current.current;
+    api.saveDrafts(drafts.current);
+    return !uploading&&!sending&&!preview&&!taskDialog&&!pendingImageFiles.current.length;
+  };
+  useEffect(()=>{
+    if(!init)return;
+    const timer=setTimeout(()=>{try{updateSnapshot.current();}catch(e){fail(e);}},300);
+    return()=>clearTimeout(timer);
+  },[init,text,images,task?.id]);
+  useEffect(()=>{
+    const touched=()=>{lastInteraction.current=Date.now();};
+    for(const event of ['pointerdown','keydown','input','wheel'])document.addEventListener(event,touched,true);
+    const cancelled=new Set();let activeToken=null;
+    window.__prismCancelUpdate=token=>{cancelled.add(token);if(cancelled.size>20)cancelled.delete(cancelled.values().next().value);if(activeToken===token){document.body.inert=false;activeToken=null;}};
+    window.__prismPrepareUpdate=(automatic,token,deadline)=>{
+      if(cancelled.has(token)||Date.now()>deadline)return false;
+      // Any open dialog can own unsaved state. The explicit update button is
+      // the only exception; other settings controls persist immediately.
+      const dialogs=document.querySelectorAll('.modal');
+      if(dialogs.length&&(automatic||dialogs.length!==1||!dialogs[0].querySelector('.update-settings')))return false;
+      if(automatic&&Date.now()-lastInteraction.current<60000)return false;
+      try{if(!updateSnapshot.current?.())return false;document.body.inert=true;activeToken=token;return true;}catch{return false;}
+    };
+    const save=()=>{try{updateSnapshot.current?.();}catch{}};
+    window.addEventListener('beforeunload',save);
+    return()=>{delete window.__prismPrepareUpdate;delete window.__prismCancelUpdate;window.removeEventListener('beforeunload',save);for(const event of ['pointerdown','keydown','input','wheel'])document.removeEventListener(event,touched,true);};
+  },[]);
   useEffect(() => {
     const mq = matchMedia("(prefers-color-scheme: dark)");
     const apply = () =>
@@ -847,7 +884,7 @@ function App() {
           <button onClick={() => setModal("capabilities")}>
             <BookOpen size={18} />{tr("共享能力")}</button>
           <button onClick={()=>setTaskDialog({action:'history'})}><Archive size={18}/>{tr('归档')}</button>
-          <button onClick={()=>setModal("settings")}><Settings2 size={18}/>{tr("设置")}</button>
+          <button aria-label={tr('设置')} onClick={()=>setModal("settings")}><span className="settings-icon"><Settings2 size={18}/>{hasAppUpdate&&<i className="update-dot" aria-hidden="true"/>}</span>{tr("设置")}{hasAppUpdate&&<small className="update-label">{tr('有更新')}</small>}</button>
           <button className="author-homepage" onClick={()=>api.authorHomepage().catch(fail)}><ArrowUpRight size={18}/><span>{tr("认识作者")}<small>shixilin.com</small></span></button>
         </footer>
       </aside>
@@ -857,7 +894,7 @@ function App() {
             <h2>{task?.title || tr("新任务")}</h2>
             <p>{tr("一个任务，持续向前。")}</p>
           </div>
-          <div className="appearance-controls"><div className="view-controls"><button aria-label={tr("视图设置")} title={tr("视图设置")} onClick={()=>setModal("view")}><Settings2 size={19}/></button><button aria-label={tr("底部执行记录")} title={tr("底部执行记录")} aria-pressed={view.log} onClick={()=>changeView({log:!view.log})}><PanelBottom size={19}/></button><button aria-label={tr("右侧账号栏")} title={tr("右侧账号栏")} aria-pressed={view.inspector} onClick={()=>changeView({inspector:!view.inspector})}><PanelRight size={19}/></button></div><button title={tr("画布与预览")} disabled={!task} onClick={()=>setPreview({id:Date.now(),target:null,task})}><PanelRightOpen size={18}/></button><label className="language-control"><Languages size={18} aria-hidden="true"/><select className="language-toggle" aria-label="Switch language" title={tr("界面语言")} value={language} onChange={async e=>{const next=e.target.value;try{await api.language(next);setLanguage(next);changeLanguage(next);}catch(e){fail(e);}}}>{languages.map(l=><option key={l.id} value={l.id} lang={l.id}>{l.name}</option>)}</select></label><ThemeSwitch value={theme} onChange={setAppearance} /></div>
+          <div className="appearance-controls">{hasAppUpdate&&<button className="update-indicator" aria-label={tr("发现新版本")} title={tr("发现新版本")} onClick={()=>setModal("settings")}><Download size={18}/><i className="update-dot" aria-hidden="true"/></button>}<div className="view-controls"><button aria-label={tr("视图设置")} title={tr("视图设置")} onClick={()=>setModal("view")}><Settings2 size={19}/></button><button aria-label={tr("底部执行记录")} title={tr("底部执行记录")} aria-pressed={view.log} onClick={()=>changeView({log:!view.log})}><PanelBottom size={19}/></button><button aria-label={tr("右侧账号栏")} title={tr("右侧账号栏")} aria-pressed={view.inspector} onClick={()=>changeView({inspector:!view.inspector})}><PanelRight size={19}/></button></div><button title={tr("画布与预览")} disabled={!task} onClick={()=>setPreview({id:Date.now(),target:null,task})}><PanelRightOpen size={18}/></button><label className="language-control"><Languages size={18} aria-hidden="true"/><select className="language-toggle" aria-label="Switch language" title={tr("界面语言")} value={language} onChange={async e=>{const next=e.target.value;try{await api.language(next);setLanguage(next);changeLanguage(next);}catch(e){fail(e);}}}>{languages.map(l=><option key={l.id} value={l.id} lang={l.id}>{l.name}</option>)}</select></label><ThemeSwitch value={theme} onChange={setAppearance} /></div>
         </header>
         <Conversation
           task={task}

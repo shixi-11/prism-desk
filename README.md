@@ -64,6 +64,12 @@ Open **Accounts → Connect account**, choose Codex, Claude or Grok, and name th
 
 The next account receives saved conversation, progress notes and tool records. A provider's internal model state is not transferred.
 
+### Automatic updates
+
+**Settings → Software updates** follows this repository’s `main` branch. Automatic checking is enabled by default: Prism checks after startup and every four hours. A steady blue dot beside Settings and an update icon in the top bar indicate an available version. There is no pop-up or automatic restart. Choose **Download and prepare**, then **Update and restart** when convenient. The dot remains until the installed revision is current. Each window’s drafts are saved before restarting; tasks, queued messages, account operations, editing dialogs and previews block the restart until finished or closed.
+
+Updates keep the same account configuration, task storage and user-data directory. The original checkout and previous installation remain available. A failed download or build leaves the running version intact; if the new app fails to finish startup, opening Prism again restores the previous version. Local source changes block updates, and preparation requires at least 2 GB free. Git must remain installed; the desktop build includes the Node runtime and npm needed for future builds. Installations predating this updater need one manual pull and rebuild using the installation commands below.
+
 ### Day and night
 
 Switch between light and dark themes from the top bar.
@@ -227,6 +233,12 @@ powershell -NoProfile -ExecutionPolicy Bypass -File scripts/start.ps1
 ```
 
 构建脚本使用 Windows 自带的 .NET Framework 编译器生成进程宿主，用于一起停止 CLI 及其子进程。
+
+### 自动更新
+
+**设置 → 软件更新**跟随本仓库的 `main` 分支，默认在启动后及每四小时自动检查一次。有新版时，设置旁显示常亮蓝点，右上角出现更新入口，不弹窗、不自行重启。方便时点击**下载并准备 → 更新并重启**，更新到当前版本后蓝点消失。重启前保存各窗口的草稿；任务、待发送消息、账号操作、编辑对话框和预览面板尚未处理完时，会阻止重启。
+
+更新沿用账号配置、会话存储和用户数据目录，保留原始源码目录及上一版安装。下载或构建失败时继续使用当前版本；新版未完成启动时，再次打开棱镜会恢复上一版。有本地源码修改时暂停更新，准备新版至少需要 2 GB 可用空间。Git 需保持可用；桌面构建已包含后续构建所需的 Node 运行时和 npm。尚未包含更新功能的旧安装，需要先手动拉取一次代码并按上述命令重新构建。
 
 ### 配置
 
