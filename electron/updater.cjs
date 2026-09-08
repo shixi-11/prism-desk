@@ -13,8 +13,8 @@ function command(file,args,cwd,timeout=120000,extraEnv={}){return new Promise((r
 });}
 class Updater extends EventEmitter{
  constructor(appRoot,{run=command,platform=process.platform,root=installation(appRoot)}={}){super();this.appRoot=appRoot;this.root=root;this.run=run;this.platform=platform;this.file=path.join(this.root,'.local','updates','status.json');this.activeFile=path.join(this.root,'.local','updates','active.json');const saved=read(this.file);this.state={automatic:saved.automatic!==false,status:saved.latest&&saved.latest!==saved.current?(validVersion(this.root,saved.latest)?'ready':'available'):'idle',current:saved.current||'',latest:saved.latest||'',checkedAt:saved.checkedAt||null,error:read(this.activeFile).error||'',repository:REPOSITORY};this.busy=false;}
- set(value){Object.assign(this.state,value);write(this.file,this.state);this.emit('change',{...this.state});return {...this.state};}
- snapshot(){return {...this.state};}
+ set(value){Object.assign(this.state,value);write(this.file,this.state);this.emit('change',this.snapshot());return this.snapshot();}
+ snapshot(){return {...this.state,version:read(path.join(this.appRoot,'package.json')).version||null};}
  automatic(value){if(typeof value!=='boolean')throw Error('Invalid update preference');return this.set({automatic:value});}
  async current(){return this.run('git',['rev-parse','HEAD'],this.appRoot);}
  async check(){

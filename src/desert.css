@@ -611,3 +611,11 @@ html:not([lang^="zh"]) .empty h1 { font-size:clamp(26px,3vw,44px); }
 
 
 .settings-icon,.update-indicator{position:relative;display:inline-flex;align-items:center;justify-content:center}.update-dot{position:absolute;inset-inline-end:-3px;top:-3px;width:7px;height:7px;border-radius:50%;background:#3399f5;box-shadow:0 0 0 2px var(--bg);pointer-events:none}.update-indicator .update-dot{inset-inline-end:2px;top:2px}.sidebar .update-label{margin-inline-start:auto;color:#3399f5;font-size:11px}.update-indicator{color:var(--text)}
+.general-settings .update-settings{gap:12px;padding-top:20px;padding-bottom:4px}
+.general-settings .update-settings.standalone{border-top:0;padding-top:0}
+.update-metadata{display:grid;gap:10px;line-height:1.6;font-size:13px;color:var(--muted)}
+.update-version{color:var(--text)}
+.general-settings .update-settings .update-status{margin-top:4px}
+.general-settings .update-settings .update-actions{margin-top:12px;margin-bottom:4px;gap:12px}
+.update-build-details{font-size:12px;color:var(--muted);margin-top:4px}
+.update-build-details summary{cursor:pointer}.update-build-details code{display:block;margin-top:8px;overflow-wrap:anywhere}

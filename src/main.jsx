@@ -4,6 +4,7 @@ import Markdown from "react-markdown";
 import QuestionChoices,{proseQuestion} from "./QuestionChoices.jsx";
 import RelayPreferences from "./RelayPreferences.jsx";
 import GoalBar from "./GoalBar.jsx";
+import UpdateSettings from "./UpdateSettings.jsx";
 import {goalProse} from './goal-message.js';
 import AccountManager from "./AccountManager.jsx";
 import PreviewPanel,{LinkedMarkdown} from "./PreviewPanel.jsx";
@@ -884,7 +885,8 @@ function App() {
           <button onClick={() => setModal("capabilities")}>
             <BookOpen size={18} />{tr("共享能力")}</button>
           <button onClick={()=>setTaskDialog({action:'history'})}><Archive size={18}/>{tr('归档')}</button>
-          <button aria-label={tr('设置')} onClick={()=>setModal("settings")}><span className="settings-icon"><Settings2 size={18}/>{hasAppUpdate&&<i className="update-dot" aria-hidden="true"/>}</span>{tr("设置")}{hasAppUpdate&&<small className="update-label">{tr('有更新')}</small>}</button>
+          <button aria-label={tr('设置')} onClick={()=>setModal("settings")}><Settings2 size={18}/>{tr("设置")}</button>
+          <button aria-label={tr('检查更新')} onClick={()=>setModal("updates")}><span className="settings-icon"><Download size={18}/>{hasAppUpdate&&<i className="update-dot" aria-hidden="true"/>}</span>{tr("检查更新")}{hasAppUpdate&&<small className="update-label">{tr('有更新')}</small>}</button>
           <button className="author-homepage" onClick={()=>api.authorHomepage().catch(fail)}><ArrowUpRight size={18}/><span>{tr("认识作者")}<small>shixilin.com</small></span></button>
         </footer>
       </aside>
@@ -894,7 +896,7 @@ function App() {
             <h2>{task?.title || tr("新任务")}</h2>
             <p>{tr("一个任务，持续向前。")}</p>
           </div>
-          <div className="appearance-controls">{hasAppUpdate&&<button className="update-indicator" aria-label={tr("发现新版本")} title={tr("发现新版本")} onClick={()=>setModal("settings")}><Download size={18}/><i className="update-dot" aria-hidden="true"/></button>}<div className="view-controls"><button aria-label={tr("视图设置")} title={tr("视图设置")} onClick={()=>setModal("view")}><Settings2 size={19}/></button><button aria-label={tr("底部执行记录")} title={tr("底部执行记录")} aria-pressed={view.log} onClick={()=>changeView({log:!view.log})}><PanelBottom size={19}/></button><button aria-label={tr("右侧账号栏")} title={tr("右侧账号栏")} aria-pressed={view.inspector} onClick={()=>changeView({inspector:!view.inspector})}><PanelRight size={19}/></button></div><button title={tr("画布与预览")} disabled={!task} onClick={()=>setPreview({id:Date.now(),target:null,task})}><PanelRightOpen size={18}/></button><label className="language-control"><Languages size={18} aria-hidden="true"/><select className="language-toggle" aria-label="Switch language" title={tr("界面语言")} value={language} onChange={async e=>{const next=e.target.value;try{await api.language(next);setLanguage(next);changeLanguage(next);}catch(e){fail(e);}}}>{languages.map(l=><option key={l.id} value={l.id} lang={l.id}>{l.name}</option>)}</select></label><ThemeSwitch value={theme} onChange={setAppearance} /></div>
+          <div className="appearance-controls">{hasAppUpdate&&<button className="update-indicator" aria-label={tr("发现新版本")} title={tr("发现新版本")} onClick={()=>setModal("updates")}><Download size={18}/><i className="update-dot" aria-hidden="true"/></button>}<div className="view-controls"><button aria-label={tr("视图设置")} title={tr("视图设置")} onClick={()=>setModal("view")}><Settings2 size={19}/></button><button aria-label={tr("底部执行记录")} title={tr("底部执行记录")} aria-pressed={view.log} onClick={()=>changeView({log:!view.log})}><PanelBottom size={19}/></button><button aria-label={tr("右侧账号栏")} title={tr("右侧账号栏")} aria-pressed={view.inspector} onClick={()=>changeView({inspector:!view.inspector})}><PanelRight size={19}/></button></div><button title={tr("画布与预览")} disabled={!task} onClick={()=>setPreview({id:Date.now(),target:null,task})}><PanelRightOpen size={18}/></button><label className="language-control"><Languages size={18} aria-hidden="true"/><select className="language-toggle" aria-label="Switch language" title={tr("界面语言")} value={language} onChange={async e=>{const next=e.target.value;try{await api.language(next);setLanguage(next);changeLanguage(next);}catch(e){fail(e);}}}>{languages.map(l=><option key={l.id} value={l.id} lang={l.id}>{l.name}</option>)}</select></label><ThemeSwitch value={theme} onChange={setAppearance} /></div>
         </header>
         <Conversation
           task={task}
@@ -1031,6 +1033,7 @@ function App() {
       {taskDialog&&<Modal title={taskDialog.title||tr(taskDialog.action==='history'?'归档与已删除':taskDialog.action==='section-new'?'新建分区':'分享对话')} wide={!!taskDialog.text} onClose={()=>setTaskDialog(null)}>
         {taskDialog.action==='history'?<div className="task-history">{['archivedTasks','deletedTasks'].map(key=><section key={key}><h3>{tr(key==='archivedTasks'?'已归档':'已删除')}</h3>{!init[key]?.length&&<p>{tr('暂无任务')}</p>}{init[key]?.map(t=><div className="history-row" key={t.id}><span>{t.title}</span><button onClick={()=>taskAction(t.id,'restore')}>{tr('恢复任务')}</button></div>)}</section>)}</div>:taskDialog.action==='section-new'?<form onSubmit={async e=>{e.preventDefault();if(!sectionName.trim())return;await taskAction(taskDialog.id,'section',sectionName);setTaskDialog(null);}}><label>{tr('分区名称')}<input autoFocus maxLength={60} value={sectionName} onChange={e=>setSectionName(e.target.value)}/></label><button type="submit" disabled={!sectionName.trim()}>{tr('保存')}</button></form>:<><p>{tr('复制或保存对话文档后即可分享。')}</p><div className="share-conversation"><Markdown>{taskDialog.text}</Markdown></div><div className="dialog-actions"><button onClick={()=>taskAction(taskDialog.id,'copy-conversation')}>{tr('复制对话')}</button><button onClick={()=>taskAction(taskDialog.id,'save-conversation')}>{tr('保存 Markdown')}</button></div></>}
       </Modal>}
+      {modal === "updates" && <Modal title={tr("软件更新")} onClose={()=>setModal("")}><div className="general-settings"><UpdateSettings checkOnOpen standalone/></div></Modal>}
       {modal === "settings" && <Modal title={tr("设置")} onClose={()=>setModal("")}><GeneralSettings settings={{...init.settings,theme}} onSave={savePreferences} storage={init.taskStorage} onAccounts={()=>setModal("accounts")} onDefault={async mode=>{try{await api.defaultMode(mode);setInit(old=>({...old,settings:{...old.settings,defaultMode:mode}}));}catch(e){fail(e);}}} onAppearance={setAppearance} languageControl={<label>{tr("界面语言")}<select value={language} onChange={async e=>{try{await api.language(e.target.value);setLanguage(e.target.value);changeLanguage(e.target.value);}catch(error){fail(error);}}}>{languages.map(l=><option key={l.id} value={l.id}>{l.name}</option>)}</select></label>}/></Modal>}
       {modal === "new" && (
         <NewTask onClose={() => setModal("")} onCreate={create} />
