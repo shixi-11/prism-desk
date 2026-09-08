@@ -161,7 +161,7 @@ function PermissionControl({task,profile,defaultMode,onChange,onDefault}){
  return <details className="permission-control" ref={root} onKeyDown={e=>{if(e.key==='Escape'){root.current.open=false;root.current.querySelector('summary').focus();}}}>
   <summary>{tr(permissionModes.find(p=>p[0]===mode)?.[1]||'只读')}<ChevronDown size={14}/></summary>
   <div className="permission-panel">
-   <div role="radiogroup" aria-label={tr('文件修改权限')}>{permissionModes.map(([id,label,description])=><label className="permission-option" key={id}><input type="radio" name="task-permission" value={id} checked={mode===id} disabled={task.state==='unknown'||(id!=='read-only'&&(!profile?.write||!['Codex','Claude'].includes(profile.provider)))} onChange={()=>onChange(id)}/><span><strong>{tr(label)}</strong><small>{tr(description)}</small></span></label>)}</div>
+   <div role="radiogroup" aria-label={tr('文件修改权限')}>{permissionModes.map(([id,label,description])=><label className="permission-option" key={id}><input type="radio" name="task-permission" value={id} checked={mode===id} disabled={task.state==='unknown'||(id!=='read-only'&&(!profile?.write||!['Codex','Claude','Grok'].includes(profile.provider)))} onChange={()=>onChange(id)}/><span><strong>{tr(label)}</strong><small>{tr(description)}</small></span></label>)}</div>
    {task.pendingMode&&<p>{tr('下次执行生效')}</p>}
    <button type="button" disabled={saving||defaultMode===mode} onClick={async()=>{setSaving(true);try{await onDefault(mode);}finally{setSaving(false);}}}>{tr(defaultMode===mode?'已设为新任务默认权限':'设为新任务默认权限')}</button>
   </div>

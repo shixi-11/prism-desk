@@ -6,7 +6,7 @@ export default function RelayPreferences({task,profiles,onSaveOrder,onModelSetti
  const [open,setOpen]=useState(false),[order,setOrder]=useState(ids),[dragging,setDragging]=useState(null),[over,setOver]=useState(null),[editing,setEditing]=useState(null),[saving,setSaving]=useState(false),[notice,setNotice]=useState(''),[error,setError]=useState('');
  useEffect(()=>setOrder(ids),[ids.join('|')]);
  const describe=p=>{const c=task.modelSettings?.[p.id];return `${c?.model||p.model} · ${c?.effort||(p.provider==='Codex'?'xhigh':p.provider==='Gemini'?'auto':'high')}`;};
- const skipReason=p=>p.disabled?'已停用':(task.execution?.mode||task.mode)!=='read-only'&&!(p.write&&['Codex','Claude'].includes(p.provider))?'当前任务需要写入，此账号会被跳过':'';
+ const skipReason=p=>p.disabled?'已停用':(task.execution?.mode||task.mode)!=='read-only'&&!(p.write&&['Codex','Claude','Grok'].includes(p.provider))?'当前任务需要写入，此账号会被跳过':'';
  const move=async(from,to)=>{
   if(saving||from===to||!order.includes(from)||!order.includes(to))return;
   const before=order,next=order.filter(id=>id!==from);next.splice(order.indexOf(to),0,from);

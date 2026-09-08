@@ -37,7 +37,7 @@ Right-click a task to rename, pin, mark unread, archive, group by project or sec
 
 The top bar has view settings and toggles for the bottom execution log and account sidebar. Their state is saved locally. In Accounts, **Check all accounts** queries every configured profile and displays available allowance, reset times, Codex reset credits and credit expiry dates. A failed query does not stop the remaining accounts.
 
-Paste screenshots, drop images into the composer or use the image button (up to five images, 10 MB each). Codex receives local images; Claude receives native image content when its subscription checks pass. Claude image execution has not yet been verified against a signed-in account.
+Paste screenshots, drop images into the composer or use the image button (up to five images, 10 MB each). Codex receives local images; Claude receives native image content when its subscription checks pass. Claude image execution has not yet been verified against a signed-in account. Grok uses direct image content when the CLI advertises it, otherwise its native Read tool opens the attached images; this path has been verified with a signed-in subscription.
 
 Send more messages while work runs: they wait in order and can be cancelled. Settings lets you choose Enter or Ctrl/⌘+Enter and queueing or live guidance. Live guidance uses Codex's active turn; other providers fall back to the queue. Failed or interrupted sends hold subsequent messages for review. Drafts are retained while switching tasks in the open app.
 
@@ -138,11 +138,11 @@ Tasks are stored in the application's user-data directory unless `storageRoot` i
 
 ### File and command permissions
 
-Choose **Read only**, **Edit project**, or **Full access** in the composer. Full access is available for Codex and Claude: it permits files outside the project and automatically approves tool execution, within operating-system permissions. Changes made during execution are queued for the next run. New installations default to Edit project for supported accounts. Choose **Use as default for new tasks** to save a preference; existing tasks keep their own permissions. Read-only adapters remain read only.
+Choose **Read only**, **Edit project**, or **Full access** in the composer. Full access is available for Codex, Claude, and Grok: it permits files outside the project and automatically approves tool execution, within operating-system permissions. Changes made during execution are queued for the next run. New installations default to Edit project for supported accounts. Choose **Use as default for new tasks** to save a preference; existing tasks keep their own permissions. Read-only adapters remain read only.
 
 ### Accounts and local tools
 
-Codex and Claude adapters support file-editing tasks. Grok supports read-only research. Available models depend on the installed CLI and the selected account.
+Codex, Claude, and Grok adapters support file-editing tasks. Grok follows the selected task permissions: read-only disables editing and shell tools; Edit project uses the CLI workspace profile and operation confirmations; Full access permits tool execution. Existing profiles with `write: false` remain read-only until explicitly enabled. Available models depend on the installed CLI and the selected account.
 
 The allowance panel shows information returned by the provider. For valid unified Grok periods, omitted zero usage follows the official client's interpretation; empty, malformed, or expired responses remain unknown. Claude queries retry once after a transient connection failure or missing usage response, but never after an authentication failure. Authentication or network errors do not trigger an account switch as if the allowance were exhausted. Automatic handoff requires a recognized exhaustion response and a completed previous execution.
 
@@ -282,11 +282,11 @@ Copy-Item config.example.json .local/config.json
 
 ### 文件与命令权限
 
-在输入框下方选择**只读**、**项目内编辑**或**完全访问**。Codex 和 Claude 支持完全访问，可在操作系统权限范围内访问项目外文件，并自动允许工具执行。执行中修改权限会排到下一轮生效。首次使用时，支持编辑的账号默认采用项目内编辑。点击**设为新任务默认权限**可保存偏好，已有任务仍保留各自权限；只读入口继续使用只读。
+在输入框下方选择**只读**、**项目内编辑**或**完全访问**。Codex、Claude 和 Grok 支持完全访问，可在操作系统权限范围内访问项目外文件，并自动允许工具执行。执行中修改权限会排到下一轮生效。首次使用时，支持编辑的账号默认采用项目内编辑。点击**设为新任务默认权限**可保存偏好，已有任务仍保留各自权限；只读入口继续使用只读。
 
 ### 账号与本机工具
 
-Codex 和 Claude 适配器支持文件修改任务；Grok 支持只读研究。可用模型由已安装的 CLI 和所选账号决定。
+Codex、Claude 和 Grok 适配器支持文件修改任务。Grok 按任务权限运行：只读禁用编辑和命令执行，项目内编辑使用 CLI 的 workspace 配置与操作确认，完全访问允许工具执行。已有账号配置中的 `write: false` 保持只读，需明确改为 `true` 才启用写入。可用模型由已安装的 CLI 和所选账号决定。
 
 额度栏展示提供方返回的信息。Grok 的有效统一额度周期按官方客户端口径解析省略的零使用量；空响应、异常数值和过期周期仍保留为未知。Claude 查询遇到短暂连接故障或未返回额度时会重试一次，认证失败不重试。认证失败和网络错误不会被当作额度耗尽来切换账号。自动接续需要收到可识别的额度耗尽响应，并等待前一次执行结束。
 
@@ -326,7 +326,7 @@ npm run build:desktop
 
 顶部提供视图设置、底部执行记录和右侧账号栏开关，并记住开关状态。账号页的**一键查询全部**会查询所有已配置账号，展示剩余额度、恢复时间、Codex 重置卡数量与到期时间。单个账号查询失败不影响其他账号。
 
-支持粘贴截图、拖入图片或点击图片按钮，每条最多 5 张、每张不超过 10 MB。Codex 使用原生图片输入；Claude 在订阅检查通过后使用原生图片消息，目前尚未完成已登录账号的图片实测。
+支持粘贴截图、拖入图片或点击图片按钮，每条最多 5 张、每张不超过 10 MB。Codex 使用原生图片输入；Claude 在订阅检查通过后使用原生图片消息，目前尚未完成已登录账号的图片实测。Grok 在 CLI 声明支持时使用直接图片输入，否则由原生 Read 工具查看附件；已用真实订阅账号验证读图。
 
 执行中可继续发送，消息依次排队，也可取消。设置中可选择 Enter 或 Ctrl/⌘+Enter 发送，以及排队或实时引导；实时引导使用 Codex 当前轮次，其他入口转为排队。失败或中断后，后续消息暂停等待核对。应用打开期间，切换任务会保留各自的输入草稿。
 

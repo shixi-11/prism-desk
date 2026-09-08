@@ -1,12 +1,12 @@
 const {CONFIG}=require('./config.cjs');
 const MODES=['read-only','workspace-write','full-access'];
 function newTaskMode(settings,profile){
-  if(!profile?.write||!['Codex','Claude'].includes(profile.provider))return 'read-only';
+  if(!profile?.write||!['Codex','Claude','Grok'].includes(profile.provider))return 'read-only';
   return MODES.includes(settings.defaultMode)?settings.defaultMode:'workspace-write';
 }
 function validateMode(mode,profile){
   if(!MODES.includes(mode))throw Error('Invalid permission mode');
-  if(mode!=='read-only'&&(!profile?.write||!['Codex','Claude'].includes(profile.provider)))throw Error('这个入口仅支持只读研究。');
+  if(mode!=='read-only'&&(!profile?.write||!['Codex','Claude','Grok'].includes(profile.provider)))throw Error('这个入口仅支持只读研究。');
 }
 function applyPendingMode(task){
   if(!task.pendingMode)return;
