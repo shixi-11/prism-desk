@@ -1,5 +1,6 @@
 const fs=require('node:fs'),path=require('node:path'),{spawn}=require('node:child_process'),{EventEmitter}=require('node:events');
 const {read,write,SHA,installation,versionPath,validVersion}=require('./update-bootstrap.cjs');
+const {latestRelease,compareVersions}=require('./release.cjs');
 const REPOSITORY='https://github.com/shixi-11/prism-desk.git';
 function command(file,args,cwd,timeout=120000,extraEnv={}){return new Promise((resolve,reject)=>{
  let stdout='',stderr='',timedOut=false,settled=false,logBytes=0;
@@ -12,7 +13,7 @@ function command(file,args,cwd,timeout=120000,extraEnv={}){return new Promise((r
  child.on('error',error=>finish(error));child.on('close',code=>finish(null,code));
 });}
 class Updater extends EventEmitter{
- constructor(appRoot,{run=command,platform=process.platform,root=installation(appRoot)}={}){super();this.appRoot=appRoot;this.root=root;this.run=run;this.platform=platform;this.file=path.join(this.root,'.local','updates','status.json');this.activeFile=path.join(this.root,'.local','updates','active.json');const saved=read(this.file);this.state={automatic:saved.automatic!==false,status:saved.latest&&saved.latest!==saved.current?(validVersion(this.root,saved.latest)?'ready':'available'):'idle',current:saved.current||'',latest:saved.latest||'',checkedAt:saved.checkedAt||null,error:read(this.activeFile).error||'',repository:REPOSITORY};this.busy=false;}
+ constructor(appRoot,{run=command,fetchRelease=latestRelease,platform=process.platform,root=installation(appRoot)}={}){super();this.appRoot=appRoot;this.root=root;this.run=run;this.fetchRelease=fetchRelease;this.platform=platform;this.file=path.join(this.root,'.local','updates','status.json');this.activeFile=path.join(this.root,'.local','updates','active.json');const saved=read(this.file);this.state={automatic:saved.automatic!==false,status:saved.release&&saved.latest&&saved.latest!==saved.current?(validVersion(this.root,saved.latest)?'ready':'available'):'idle',current:saved.current||'',latest:saved.release?saved.latest||'':saved.current||'',release:saved.release||null,checkedAt:saved.checkedAt||null,error:read(this.activeFile).error||'',repository:REPOSITORY};this.busy=false;}
  set(value){Object.assign(this.state,value);write(this.file,this.state);this.emit('change',this.snapshot());return this.snapshot();}
  snapshot(){return {...this.state,version:read(path.join(this.appRoot,'package.json')).version||null};}
  automatic(value){if(typeof value!=='boolean')throw Error('Invalid update preference');return this.set({automatic:value});}
@@ -20,10 +21,15 @@ class Updater extends EventEmitter{
  async check(){
   if(this.busy)return this.snapshot();this.busy=true;
   try{this.set({status:'checking',error:''});if(this.platform!=='win32')throw Error('自动安装目前支持 Windows 源码安装版');
-   const [current,result]=await Promise.all([this.current(),this.run('git',['ls-remote',REPOSITORY,'refs/heads/main'],this.root)]),latest=result.split(/\s/)[0];
+   const [current,release]=await Promise.all([this.current(),this.fetchRelease()]);
+   if(!SHA.test(current))throw Error('无法确认本地版本');
+   if(!release||compareVersions(release.version,this.snapshot().version)<=0)return this.set({current,latest:current,release,checkedAt:new Date().toISOString(),status:'current',detail:''});
+   const tag=`refs/tags/${release.tag}`,result=await this.run('git',['ls-remote',REPOSITORY,tag,tag+'^{}'],this.root);
+   const refs=result.split(/\r?\n/).map(line=>line.trim().split(/\s+/));
+   const latest=(refs.find(row=>row[1]===tag+'^{}')||refs.find(row=>row[1]===tag)||[])[0];
    if(!SHA.test(current)||!SHA.test(latest))throw Error('无法确认 GitHub 版本');
-   if(read(this.activeFile).failed===latest)return this.set({current,latest,checkedAt:new Date().toISOString(),status:'error',error:'此版本启动失败，等待后续版本或手动重试'});
-   return this.set({current,latest,checkedAt:new Date().toISOString(),status:latest===current?'current':validVersion(this.root,latest)?'ready':'available'});
+   if(read(this.activeFile).failed===latest)return this.set({current,latest,release,checkedAt:new Date().toISOString(),status:'error',error:'此版本启动失败，等待后续版本或手动重试',detail:''});
+   return this.set({current,latest,release,checkedAt:new Date().toISOString(),status:latest===current?'current':validVersion(this.root,latest)?'ready':'available',detail:''});
   }catch(error){return this.set({status:'error',error:error.message});}finally{this.busy=false;}
  }
  async prepare(){
@@ -42,6 +48,7 @@ class Updater extends EventEmitter{
     try{await this.run('git',['merge-base','--is-ancestor',this.state.current,sha],stage);}catch{throw Error('本地版本与主线分叉，无法自动更新');}
     await this.run('git',['checkout','--detach',sha],stage);
     if(await this.run('git',['rev-parse','HEAD'],stage)!==sha)throw Error('下载版本校验失败');
+    if(read(path.join(stage,'package.json')).version!==this.state.release?.version)throw Error('下载版本号与发布说明不一致');
     this.set({detail:'正在安装依赖'});
     const node=path.join(this.appRoot,'runtime','node','node.exe'),npm=path.join(this.appRoot,'node_modules','npm','bin','npm-cli.js');
     if(!fs.existsSync(node)||!fs.existsSync(npm))throw Error('更新运行环境缺失，请先运行 npm run build:desktop');

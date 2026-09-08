@@ -501,5 +501,8 @@
   "此版本启动失败，等待后续版本或手动重试": "Esta versión no pudo iniciarse. Espera otra versión o vuelve a intentarlo manualmente.",
   "自动检查更新": "Buscar actualizaciones automáticamente",
   "发现新版时亮起蓝点，确认后下载并更新。": "Un punto azul indica una actualización disponible. Tú decides cuándo descargarla e instalarla.",
-  "有更新": "Actualización"
+  "有更新": "Actualización",
+  "新版本": "Nueva versión",
+  "更新内容": "Novedades",
+  "稍后": "Más tarde"
 }

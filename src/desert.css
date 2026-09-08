@@ -619,3 +619,7 @@ html:not([lang^="zh"]) .empty h1 { font-size:clamp(26px,3vw,44px); }
 .general-settings .update-settings .update-actions{margin-top:12px;margin-bottom:4px;gap:12px}
 .update-build-details{font-size:12px;color:var(--muted);margin-top:4px}
 .update-build-details summary{cursor:pointer}.update-build-details code{display:block;margin-top:8px;overflow-wrap:anywhere}
+.update-release{padding:16px 0 4px;border-top:1px solid var(--line);font-size:14px;line-height:1.7}
+.update-release time{display:block;font-size:12px;color:var(--muted);margin-top:4px}
+.update-release ul{padding-inline-start:20px;margin:12px 0 0}.update-release li+li{margin-top:8px}
+.update-release p{margin:8px 0}.update-actions{flex-wrap:wrap}

@@ -160,13 +160,13 @@ class Rpc extends EventEmitter {
   }
   async init() {
     if (this.provider === "Grok") {
-      const info = await this.call("initialize", { protocolVersion: 1, clientCapabilities: { fs: { readTextFile: false, writeTextFile: false }, terminal: false }, clientInfo: { name: "prism", version: "0.1.0" } });
+      const info = await this.call("initialize", { protocolVersion: 1, clientCapabilities: { fs: { readTextFile: false, writeTextFile: false }, terminal: false }, clientInfo: { name: "prism", version: require('../package.json').version } });
       if (!info.authMethods?.some(m => m.id === "cached_token")) throw Error("Grok 未提供本机订阅认证入口。");
       await this.call("authenticate", { methodId: "cached_token", _meta: { headless: true } });
       return info;
     }
     await this.call("initialize", {
-      clientInfo: { name: "prism_workbench", title: "棱镜", version: "0.1.0" },
+      clientInfo: { name: "prism_workbench", title: "棱镜", version: require('../package.json').version },
       capabilities: { experimentalApi: true },
     });
     this.write({ method: "initialized", params: {} });

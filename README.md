@@ -66,7 +66,7 @@ The next account receives saved conversation, progress notes and tool records. A
 
 ### Automatic updates
 
-**Settings → Software updates** follows this repository’s `main` branch. Automatic checking is enabled by default: Prism checks after startup and every four hours. A steady blue dot beside Settings and an update icon in the top bar indicate an available version. There is no pop-up or automatic restart. Choose **Download and prepare**, then **Update and restart** when convenient. The dot remains until the installed revision is current. Each window’s drafts are saved before restarting; tasks, queued messages, account operations, editing dialogs and previews block the restart until finished or closed.
+**Check for updates** in the sidebar follows published stable [GitHub Releases](https://github.com/shixi-11/prism-desk/releases). It shows the installed version, available version, and change notes before downloading. Choose **Later** to keep using your current version. Ordinary main-branch commits do not trigger update notices. Automatic checking is enabled by default: Prism checks after startup and every four hours. A steady blue dot beside Check for updates and an update icon in the top bar indicate an available version. Checking does not download, install, or restart the app. Choose **Download and prepare**, then **Update and restart** when convenient. The dot remains until the installed revision is current. Each window’s drafts are saved before restarting; tasks, queued messages, account operations, editing dialogs and previews block the restart until finished or closed.
 
 Updates keep the same account configuration, task storage and user-data directory. The original checkout and previous installation remain available. A failed download or build leaves the running version intact; if the new app fails to finish startup, opening Prism again restores the previous version. Local source changes block updates, and preparation requires at least 2 GB free. Git must remain installed; the desktop build includes the Node runtime and npm needed for future builds. Installations predating this updater need one manual pull and rebuild using the installation commands below.
 
@@ -236,7 +236,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File scripts/start.ps1
 
 ### 自动更新
 
-**设置 → 软件更新**跟随本仓库的 `main` 分支，默认在启动后及每四小时自动检查一次。侧栏提供常驻的**检查更新**入口，点击即可检查并打开结果面板。有新版时，该入口旁显示常亮蓝点，右上角也会出现更新入口，不弹窗、不自行重启。方便时点击**下载并准备 → 更新并重启**，更新到当前版本后蓝点消失。重启前保存各窗口的草稿；任务、待发送消息、账号操作、编辑对话框和预览面板尚未处理完时，会阻止重启。
+侧栏的**检查更新**只跟随正式稳定的 [GitHub Releases](https://github.com/shixi-11/prism-desk/releases)，先显示当前版本、新版本和更新内容；点击**稍后**可继续使用当前版本。普通代码提交不会反复提醒升级。默认在启动后及每四小时自动检查一次。侧栏提供常驻的**检查更新**入口，点击即可检查并打开结果面板。有新版时，该入口旁显示常亮蓝点，右上角也会出现更新入口，检查不会自行下载、安装或重启。方便时点击**下载并准备 → 更新并重启**，更新到当前版本后蓝点消失。重启前保存各窗口的草稿；任务、待发送消息、账号操作、编辑对话框和预览面板尚未处理完时，会阻止重启。
 
 更新沿用账号配置、会话存储和用户数据目录，保留原始源码目录及上一版安装。下载或构建失败时继续使用当前版本；新版未完成启动时，再次打开棱镜会恢复上一版。有本地源码修改时暂停更新，准备新版至少需要 2 GB 可用空间。Git 需保持可用；桌面构建已包含后续构建所需的 Node 运行时和 npm。尚未包含更新功能的旧安装，需要先手动拉取一次代码并按上述命令重新构建。
 
@@ -332,3 +332,9 @@ npm run build:desktop
 
 点击预览按钮或对话中的文件链接，可查看图片、PDF、Markdown、代码和文本；文本支持编辑保存，并检查文件是否已被外部修改。HTML 可直接预览独立页面，交互项目可填写已启动的 HTTP 地址。部分网站禁止嵌入。思考与执行面板显示 CLI 实际返回的思考摘要、计划和执行状态。
 在**账号 → 接入账号**中选择 Codex、Claude 或 Grok，填写名称，再点**保存并继续 → 获取登录链接 → 复制登录链接**。将链接粘贴到浏览器地址栏；若 Claude 显示授权码，回到棱镜的**授权码**输入框粘贴完整内容，再点**提交授权码**。授权码仅交给正在等待的官方 CLI，提交后清空输入框。授权完成后，棱镜会自动检查订阅登录，账号无需重启即可进入执行列表。也可检查已有登录、取消登录或重新复制链接、改名，以及停用或启用账号；停用保留历史任务与本机凭据。高级设置支持选择官方 CLI 程序，或使用已有的独立账号目录；已有账号的平台和登录目录保持固定。本机缺少 CLI 时会提供官方安装说明，后续平台通过独立适配器接入。
+
+## Contributor release rules / 贡献者发布规则
+
+Agents and contributors: read [AGENTS.md](AGENTS.md) and [RELEASING.md](RELEASING.md) before publishing. Run `npm run release:check` to validate the version and release notes.
+
+后续 agent 与贡献者发布前请读取 [AGENTS.md](AGENTS.md) 和 [RELEASING.md](RELEASING.md)，运行 `npm run release:check` 核对版本号和更新说明。

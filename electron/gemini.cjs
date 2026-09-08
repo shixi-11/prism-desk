@@ -38,7 +38,7 @@ function geminiStatus(profile) {
     loginRequired:!present};
 }
 async function initializeGemini(rpc) {
-  const info = await rpc.call('initialize',{protocolVersion:1,clientCapabilities:{fs:{readTextFile:false,writeTextFile:false},terminal:false},clientInfo:{name:'prism',version:'0.1.0'}});
+  const info = await rpc.call('initialize',{protocolVersion:1,clientCapabilities:{fs:{readTextFile:false,writeTextFile:false},terminal:false},clientInfo:{name:'prism',version:require('../package.json').version}});
   if (!info.authMethods?.some(item=>item.id==='oauth-personal')) throw Error('Gemini 未提供 Google OAuth 登录入口。');
   await rpc.call('authenticate',{methodId:'oauth-personal'});
   return info;

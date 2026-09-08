@@ -501,5 +501,8 @@
   "此版本启动失败，等待后续版本或手动重试": "This version failed to start. Wait for a newer version or retry manually.",
   "自动检查更新": "Check for updates automatically",
   "发现新版时亮起蓝点，确认后下载并更新。": "A blue dot appears when an update is available. Download and install when you choose.",
-  "有更新": "Update"
+  "有更新": "Update",
+  "新版本": "New version",
+  "更新内容": "What’s new",
+  "稍后": "Later"
 }

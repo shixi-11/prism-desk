@@ -1,0 +1,14 @@
+# Prism contributor instructions
+
+Read `RELEASING.md` before changing versions, update behavior, or publishing. These rules apply to every agent and contributor working in this repository.
+
+- The current development line advances through 0.1.1, 0.1.2, and subsequent patch releases. Do not jump to a new minor or major version without an explicitly agreed milestone.
+- Every public software release needs a new version and concrete English and Simplified Chinese release notes. Ordinary development commits do not constitute releases.
+- Keep `package.json`, both root version fields in `package-lock.json`, and `release.json` synchronized. Runtime titles, protocol metadata, and Windows executable metadata must derive from `package.json`; do not hard-code duplicate version numbers.
+- Use one immutable `vX.Y.Z` tag and one GitHub Release per version. The release has complete English and Simplified Chinese sections, English first. Never move a published tag, silently replace its code, or create separate language releases.
+- Stable update discovery must use published stable GitHub Releases, not arbitrary `main` commits. Show the installed version, available version, and update notes before download.
+- Users choose whether to download and when to install. Automatic checks only notify. Never download, install, restart, spend credits, or erase user work merely because an update is available. Closing the panel means keeping the current version.
+- Preserve task permissions across providers, attachment handoff, independent account authentication, task history, drafts, and rollback. Do not weaken subscription-only billing guards.
+- Run `npm run release:check`, the tests relevant to the change, and `npm run build`. Verify actual update UI for updater changes. Publish only after the verified changes are committed and pushed.
+- Use `npm run release:publish` for the tagged GitHub Release. It validates version consistency, non-empty bilingual notes, the remote commit, and monotonic release versions. It does not replace testing or user authorization.
+- Record unfinished work and verification limits in the existing task or a concise local handoff under `.local/`. Do not commit credentials, account configuration, task records, private assistant material, generated caches, or device-specific paths.
