@@ -41,6 +41,7 @@ import {
 } from "lucide-react";
 import "./style.css";
 import "./desert.css";
+import "./typography.css";
 import {tr,setLanguage,locale,languages} from './i18n.js';
 
 const api = window.prism;
@@ -888,7 +889,7 @@ function App() {
           <button onClick={()=>setTaskDialog({action:'history'})}><Archive size={18}/>{tr('归档')}</button>
           <button aria-label={tr('设置')} onClick={()=>setModal("settings")}><Settings2 size={18}/>{tr("设置")}</button>
           <button aria-label={tr('检查更新')} onClick={()=>setModal("updates")}><span className="settings-icon"><Download size={18}/>{hasAppUpdate&&<i className="update-dot" aria-hidden="true"/>}</span>{tr("检查更新")}{hasAppUpdate&&<small className="update-label">{tr('有更新')}</small>}</button>
-          <div className="project-links"><button className="author-homepage" onClick={()=>api.authorHomepage().catch(fail)}><ArrowUpRight size={18}/><span>{tr("认识作者")}<small>shixilin.com</small></span></button><button className="github-link" aria-label="GitHub · Prism" title="GitHub · Prism" onClick={()=>api.projectRepository().catch(fail)}><Github size={20}/></button></div>
+          <div className="project-links"><button className="author-homepage" title="shixilin.com" onClick={()=>api.authorHomepage().catch(fail)}><ArrowUpRight size={18}/><span>{tr("认识作者")}</span></button><button className="github-link" aria-label="GitHub · Prism" title="GitHub · Prism" onClick={()=>api.projectRepository().catch(fail)}><Github size={20}/></button></div>
         </footer>
       </aside>
       <main className="main">

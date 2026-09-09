@@ -4,6 +4,12 @@
 
 [English](#english) · [简体中文](#简体中文)
 
+**[Latest version / 最新版本](https://github.com/shixi-11/prism-desk/releases/latest)** · **[Install / 安装指南](#install)** · **[中文安装指南](#安装)**
+
+> Distribution: Windows source installation. No standalone .exe/.msi installer is currently published. GitHub’s “Source code” downloads are source files, not an installable client.
+>
+> 当前提供 Windows 源码安装，尚未发布可直接安装的 .exe/.msi 客户端。GitHub 的“Source code”下载是源码，首次使用请按下方安装指南构建。
+
 ## English
 
 Created by [Shixi Lin](https://shixilin.com/).
@@ -82,10 +88,12 @@ Switch between light and dark themes from the top bar.
 
 ### Install
 
-You will need Windows, Node.js 22.12 or later, npm, and the official CLIs for your chosen providers. Sign in to each CLI separately.
+These commands install stable version **v0.1.3**. Check the [latest Release](https://github.com/shixi-11/prism-desk/releases/latest) for its version and bilingual change notes.
+
+You will need Windows, Git, Node.js 22.12 or later, npm, and the official CLIs for your chosen providers. Sign in to each CLI separately.
 
 ```powershell
-git clone https://github.com/shixi-11/prism-desk.git
+git clone --branch v0.1.3 https://github.com/shixi-11/prism-desk.git
 cd prism-desk
 npm install
 npm run build
@@ -220,10 +228,12 @@ For an issue report, include the app and CLI versions, reproduction steps and a 
 
 ### 安装
 
-需要 Windows、Node.js 22.12 或更新版本、npm，以及准备使用的官方 CLI。各 CLI 需分别完成登录。
+以下命令安装稳定版 **v0.1.3**。[最新发布页](https://github.com/shixi-11/prism-desk/releases/latest)提供版本号与中英文更新内容。
+
+需要 Windows、Git、Node.js 22.12 或更新版本、npm，以及准备使用的官方 CLI。各 CLI 需分别完成登录。
 
 ```powershell
-git clone https://github.com/shixi-11/prism-desk.git
+git clone --branch v0.1.3 https://github.com/shixi-11/prism-desk.git
 cd prism-desk
 npm install
 npm run build

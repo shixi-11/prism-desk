@@ -1,0 +1,38 @@
+/* Reading and controls share one quiet sans face; serif is reserved for identity. */
+:root {
+  --font-body: "Segoe UI", "Noto Sans SC", "Source Han Sans SC", "Microsoft YaHei UI", "PingFang SC", sans-serif;
+  --font-title: "Noto Serif SC", "Source Han Serif SC", "Songti SC", "SimSun", serif;
+  font-family: var(--font-body);
+  line-height: 1.6;
+}
+button, input, select, textarea { font-family: var(--font-body); }
+h2, h3, .modal h2, .modal h3, .task-plan h2, .relay-preferences h2 { font-family: var(--font-body); font-weight: 500; }
+.brand > span, .brand .wordmark, .empty h1 { font-family: var(--font-title); font-weight: 400; }
+.topbar h2 { font-family: var(--font-body); font-size: 24px; font-weight: 500; line-height: 1.4; }
+.new-task, .sidebar > footer button { font: 500 15px/1.5 var(--font-body); }
+.sidebar > footer button { padding-block: 12px; gap: 12px; }
+.sidebar > footer button svg { width: 19px; height: 19px; flex-shrink: 0; }
+.task-caption, .section-title h2 { font: 500 15px/1.5 var(--font-body); }
+nav button { font-size: 14px; line-height: 1.5; }
+.topbar p, .empty p { font: 400 15px/1.8 var(--font-body); }
+.empty h1 { letter-spacing: 0; }
+.select-wrap select, .quota, .quota strong, .relay, .send { font: 400 15px/1.5 var(--font-body); }
+.quota strong { font-weight: 500; font-variant-numeric: tabular-nums; }
+.composer textarea { font: 400 15px/1.75 var(--font-body); }
+.message { font-family: var(--font-body); line-height: 1.8; }
+.message pre, .message code, .preview-content textarea { font-family: var(--mono); }
+.sidebar .project-links { display: flex; align-items: center; gap: 6px; padding-top: 8px; }
+.sidebar .project-links .author-homepage,
+.sidebar .project-links .github-link {
+  height: 40px; padding: 8px; border: 0; border-radius: 5px;
+  background: transparent; font: 400 13px/1.5 var(--font-body);
+  text-shadow: none; color: #f1dfbf;
+}
+.sidebar .project-links .author-homepage { flex: 1; gap: 8px; min-width: 0; justify-content: flex-start; }
+.sidebar .project-links .author-homepage span { display: block; white-space: normal; text-align: start; line-height: 1.4; }
+.sidebar .project-links .author-homepage svg { width: 17px; height: 17px; flex: 0 0 17px; }
+.sidebar .project-links .github-link { flex: 0 0 40px; width: 40px; justify-content: center; }
+.sidebar .project-links .github-link svg { width: 20px; height: 20px; }
+.sidebar .project-links button:hover { background: #e9d1ab1c; }
+.sidebar .project-links button:focus-visible { outline: 2px solid #f1dfbf; outline-offset: 2px; }
+
