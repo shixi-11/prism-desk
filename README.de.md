@@ -31,12 +31,12 @@ Prism wird derzeit als **Installation aus dem Quellcode für Windows** bereitges
 
 ### Installation
 
-Diese Befehle installieren die stabile Version **v0.1.13**. Den aktuellen Versionsstand und die zweisprachigen Änderungshinweise finden Sie in der [neuesten Veröffentlichung](https://github.com/shixi-11/prism-desk/releases/latest).
+Diese Befehle installieren die stabile Version **v0.1.14**. Den aktuellen Versionsstand und die zweisprachigen Änderungshinweise finden Sie in der [neuesten Veröffentlichung](https://github.com/shixi-11/prism-desk/releases/latest).
 
 Sie benötigen Windows, Git, Node.js 22.12 oder neuer, npm und die offiziellen CLIs der gewählten Anbieter. Melden Sie sich bei jedem CLI separat an.
 
 ```powershell
-git clone --branch v0.1.13 https://github.com/shixi-11/prism-desk.git
+git clone --branch v0.1.14 https://github.com/shixi-11/prism-desk.git
 cd prism-desk
 npm install
 npm run build
@@ -180,7 +180,7 @@ E-Mail-Adressen der Konten sind standardmäßig maskiert; mit der Augenschaltfl�
 
 Prism weicht nicht auf eine Abrechnung per API-Schlüssel aus und kauft keine Guthaben. Zusätzliche Nutzung, automatisches Aufladen und Kontingentabfragen sind für alle Konten rein informativ und blockieren die Ausführung nicht. Der Anbieter entscheidet über die Verfügbarkeit; Ausgabenlimits verwalten Nutzer auf dessen Plattform. Die Nutzung eines vorhandenen Codex-Reset-Guthabens erfordert eine separate Bestätigung für das ausgewählte Konto. Ein Zurücksetzungsguthaben kann auch während einer laufenden Aufgabe verwendet werden; die Aufgabe läuft weiter. Die Bestätigung und der Schutz vor doppelten Anfragen bleiben bestehen. Ein bereits beendeter Durchlauf wird nicht automatisch neu gestartet. Für eine inaktive Aufgabe lassen sich Konto, Modell und Denkaufwand auswählen, während eine andere Aufgabe läuft. Wechseln und Fortsetzen nutzt die bestehende Warteschlange und unterbricht die laufende Aufgabe nicht. Die zusätzliche Nutzung von Claude wird nur als Information angezeigt und blockiert die Ausführung in Prism nicht. Verfügbarkeit und Abrechnung richten sich nach den Einstellungen des Claude-Kontos oder der Organisation; dabei können Teamguthaben verbraucht oder zusätzliche Kosten verursacht werden.
 
-Der Gesprächsstatus unterscheidet Verarbeitung, Nachdenken, Werkzeuge, Antworten, Bestätigung, Stoppen, gestoppt und beendet. Der runde Sendepfeil wird während der Aufgabe zur Stopptaste. Zusätzliche Anweisungen und die Warteschlange bleiben verfügbar, ohne Sprachsteuerung.
+Der runde Sendepfeil wird während der Aufgabe zur Stopptaste. Zusätzliche Anweisungen und die Warteschlange bleiben verfügbar, ohne Sprachsteuerung.
 
 Assistentendateien und Skills können gemeinsam von mehreren Konten verwendet werden. MCP-Berechtigungen und Anwendungsverbindungen müssen für jede Ausführungsumgebung eingerichtet werden. Die Anwendungserkennung listet installierte Einstiegspunkte auf; die Überprüfungsfunktion prüft die unterstützten Operationen separat.
 
@@ -209,3 +209,5 @@ Lesen Sie vor dem Veröffentlichen [AGENTS.md](AGENTS.md) und [RELEASING.md](REL
 [MIT](LICENSE). Prism Desk ist ein unabhängiges Projekt. Anbieternamen und Marken gehören ihren jeweiligen Inhabern.
 
 Dateien können im Gespräch abgelegt oder über die Anhangsschaltfläche ausgewählt werden: maximal fünf pro Nachricht, 10 MB pro Bild und 50 MB pro anderer Datei. Dokumente behalten ihren ursprünglichen Inhalt und werden als lokale Dateiverweise an die gewählte CLI übergeben. Lesen und Vorschau hängen vom Format und den verfügbaren Werkzeugen ab. Aktiver Statustext erhält einen sanften Schimmer, der die Einstellung für reduzierte Bewegung berücksichtigt.
+
+Die vorübergehende Anzeige „Denkt nach“ erscheint während eines aktiven Durchgangs, wenn keine Antwort, Werkzeugaktivität oder ausstehende Bestätigung angezeigt wird. Beim Stoppen oder Abschluss verschwindet sie, ohne auf Denktext der CLI angewiesen zu sein. Unter dem Gespräch bleibt keine dauerhafte Abschlussanzeige stehen.

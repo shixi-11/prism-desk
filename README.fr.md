@@ -31,12 +31,12 @@ Prism est actuellement distribué sous forme d’**installation à partir des so
 
 ### Installation
 
-Ces commandes installent la version stable **v0.1.13**. Consultez la [dernière version publiée](https://github.com/shixi-11/prism-desk/releases/latest) pour connaître son numéro et lire ses notes de modification bilingues.
+Ces commandes installent la version stable **v0.1.14**. Consultez la [dernière version publiée](https://github.com/shixi-11/prism-desk/releases/latest) pour connaître son numéro et lire ses notes de modification bilingues.
 
 Vous aurez besoin de Windows, de Git, de Node.js 22.12 ou ultérieur, de npm et des CLI officiels des fournisseurs de votre choix. Connectez-vous séparément à chaque CLI.
 
 ```powershell
-git clone --branch v0.1.13 https://github.com/shixi-11/prism-desk.git
+git clone --branch v0.1.14 https://github.com/shixi-11/prism-desk.git
 cd prism-desk
 npm install
 npm run build
@@ -180,7 +180,7 @@ Les adresses e-mail des comptes sont masquées par défaut ; utilisez le bouton 
 
 Prism ne bascule pas vers une facturation par clé API et n’achète pas de crédits. Pour tous les comptes, l’utilisation supplémentaire, la recharge automatique et les relevés de quota sont informatifs et ne bloquent pas l’exécution. Le fournisseur décide de la disponibilité et l’utilisateur gère ses plafonds de dépenses sur sa plateforme. L’utilisation d’un crédit de réinitialisation Codex existant nécessite une confirmation distincte pour le compte sélectionné. Vous pouvez utiliser un crédit de réinitialisation pendant une tâche ; celle-ci continue de s’exécuter. La confirmation et la protection contre les demandes en double restent en place. Un tour déjà terminé ne redémarre pas automatiquement. Une tâche inactive peut choisir son compte, son modèle et son niveau de raisonnement pendant qu’une autre s’exécute. Le changement suivi de la reprise passe par la file d’attente existante, sans interrompre la tâche en cours. L’utilisation supplémentaire de Claude est indiquée à titre informatif et ne bloque pas l’exécution dans Prism. Sa disponibilité et sa facturation dépendent des paramètres du compte ou de l’organisation Claude ; elle peut consommer des crédits d’équipe ou entraîner des frais supplémentaires.
 
-Le statut en fin de conversation distingue travail, réflexion, outils, réponse, confirmation, arrêt en cours, arrêt confirmé et fin du tour. La flèche ronde devient un bouton d’arrêt pendant la tâche. Les instructions supplémentaires et la file d’attente restent disponibles, sans commande vocale.
+La flèche ronde devient un bouton d’arrêt pendant la tâche. Les instructions supplémentaires et la file d’attente restent disponibles, sans commande vocale.
 
 Les fichiers de l’assistant et les compétences peuvent être partagés entre les comptes. Les autorisations MCP et les connexions aux applications doivent être configurées pour chaque environnement d’exécution. La détection des applications répertorie les points d’entrée installés ; l’action de vérification contrôle séparément les opérations prises en charge.
 
@@ -209,3 +209,5 @@ Avant toute publication, lisez [AGENTS.md](AGENTS.md) et [RELEASING.md](RELEASIN
 [MIT](LICENSE). Prism Desk est un projet indépendant. Les noms et marques des fournisseurs appartiennent à leurs propriétaires respectifs.
 
 Déposez des fichiers dans la conversation ou utilisez le bouton de pièces jointes : cinq par message au maximum, 10 Mo par image et 50 Mo par autre fichier. Les documents conservent leur contenu original et sont transmis au CLI choisi sous forme de références locales ; la lecture et l’aperçu dépendent du format et des outils disponibles. Le texte d’état actif présente un léger reflet animé qui respecte la préférence de réduction des animations.
+
+L’indicateur temporaire « Réflexion » apparaît pendant un tour actif lorsqu’aucune réponse, activité d’outil ou attente de confirmation n’est affichée. Il disparaît à l’arrêt ou à la fin du tour, sans nécessiter de texte de raisonnement du CLI. Aucun libellé de fin ne reste sous la conversation.

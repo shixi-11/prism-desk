@@ -31,12 +31,12 @@ Actualmente, Prism se distribuye mediante una **instalación desde el código fu
 
 ### Instalación
 
-Estos comandos instalan la versión estable **v0.1.13**. Consulta la [última versión publicada](https://github.com/shixi-11/prism-desk/releases/latest) para conocer su número y leer las notas de cambios bilingües.
+Estos comandos instalan la versión estable **v0.1.14**. Consulta la [última versión publicada](https://github.com/shixi-11/prism-desk/releases/latest) para conocer su número y leer las notas de cambios bilingües.
 
 Necesitarás Windows, Git, Node.js 22.12 o posterior, npm y las CLI oficiales de los proveedores que elijas. Inicia sesión en cada CLI por separado.
 
 ```powershell
-git clone --branch v0.1.13 https://github.com/shixi-11/prism-desk.git
+git clone --branch v0.1.14 https://github.com/shixi-11/prism-desk.git
 cd prism-desk
 npm install
 npm run build
@@ -180,7 +180,7 @@ Las direcciones de correo de las cuentas se ocultan parcialmente de forma predet
 
 Prism no recurre a la facturación mediante claves API ni compra créditos. El uso adicional, la recarga automática y las consultas de cuota son informativos para todas las cuentas y no bloquean la ejecución. El proveedor decide la disponibilidad y el usuario gestiona los límites de gasto en su plataforma. Usar un crédito de restablecimiento de Codex existente requiere una confirmación independiente para la cuenta seleccionada. Puedes usar un crédito de restablecimiento mientras se ejecuta una tarea; la tarea continúa. Se mantienen la confirmación y la protección contra solicitudes duplicadas. Un turno que ya haya finalizado no se reinicia automáticamente. Una tarea inactiva puede seleccionar su cuenta, modelo y nivel de razonamiento mientras se ejecuta otra. Cambiar y continuar utiliza la cola existente sin interrumpir la tarea en ejecución. El uso adicional de Claude es informativo y no bloquea la ejecución en Prism. Su disponibilidad y facturación dependen de la configuración de la cuenta u organización de Claude; puede consumir créditos del equipo o generar cargos adicionales.
 
-El estado al final de la conversación distingue trabajo, razonamiento, herramientas, respuesta, confirmación, detención y finalización. La flecha de envío se convierte en un botón de parada durante la tarea. Se mantienen las instrucciones adicionales y la cola, sin control de voz.
+La flecha de envío se convierte en un botón de parada durante la tarea. Se mantienen las instrucciones adicionales y la cola, sin control de voz.
 
 Los archivos del asistente y las habilidades se pueden compartir entre cuentas. Los permisos MCP y las conexiones con aplicaciones deben configurarse para cada entorno de ejecución. La detección de aplicaciones enumera los puntos de entrada instalados; la acción de verificación comprueba por separado las operaciones admitidas.
 
@@ -209,3 +209,5 @@ Antes de publicar, lee [AGENTS.md](AGENTS.md) y [RELEASING.md](RELEASING.md). Ca
 [MIT](LICENSE). Prism Desk es un proyecto independiente. Los nombres y las marcas de los proveedores pertenecen a sus respectivos propietarios.
 
 Puede soltar archivos en la conversación o usar el botón de adjuntos: hasta cinco por mensaje, 10 MB por imagen y 50 MB por otro archivo. Los documentos conservan su contenido original y se pasan al CLI seleccionado como referencias a archivos locales; la lectura y la vista previa dependen del formato y de las herramientas disponibles. El texto de estado activo tiene un brillo suave que respeta la preferencia de movimiento reducido.
+
+El indicador temporal «Pensando» aparece durante un turno activo cuando no se muestra una respuesta, actividad de herramientas ni una confirmación pendiente. Desaparece al detenerse o finalizar el turno, sin requerir texto de razonamiento del CLI. No queda una etiqueta permanente de finalización bajo la conversación.

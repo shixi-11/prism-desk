@@ -1,14 +1,12 @@
 {
-  "version": "0.1.13",
+  "version": "0.1.14",
   "date": "2026-09-10",
   "notes": {
     "en": [
-      "Import files using the attachment button or drag them into the conversation. Up to five attachments are supported per message: 10 MB per image and 50 MB per other file. Documents keep their original content and reach the selected CLI as local file references; format support depends on its tools.",
-      "File cards show names and support removal. Existing image handling is preserved, including Grok image sends. Active status text now shimmers gently instead of using a pulsing dot, with reduced-motion support."
+      "The transient “Thinking” indicator appears during an active turn when no reply, tool activity or confirmation is being shown. It disappears when the turn stops or ends; it does not require reasoning text from the CLI. No permanent ended-status label remains below the conversation."
     ],
     "zh": [
-      "支持通过附件按钮导入文件，或将文件拖入会话区域。每条消息最多 5 个附件，图片每张不超过 10 MB，其他文件每个不超过 50 MB。文档保留原始内容，以本地路径交给所选 CLI；格式解析能力取决于其可用工具。",
-      "文件卡片显示名称并支持移除，保留原有图像处理并修复 Grok 图片发送入口。运行状态改为文字本身的柔和微光，不再使用跳动圆点，并适配减少动态效果的偏好。"
+      "“正在思考”是临时提示：本轮运行中，未在显示回复、工具活动或等待确认时出现；停止或结束后隐藏，不要求 CLI 先传回思考文本。会话底部不再常驻“本轮已结束”等状态文字。"
     ]
   }
 }
