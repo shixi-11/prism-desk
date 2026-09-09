@@ -29,12 +29,12 @@ Prism currently ships as a **Windows source installation**. No standalone `.exe`
 
 ### Install
 
-These commands install stable version **v0.1.9**. Check the [latest Release](https://github.com/shixi-11/prism-desk/releases/latest) for its version and bilingual change notes.
+These commands install stable version **v0.1.10**. Check the [latest Release](https://github.com/shixi-11/prism-desk/releases/latest) for its version and bilingual change notes.
 
 You will need Windows, Git, Node.js 22.12 or later, npm, and the official CLIs for your chosen providers. Sign in to each CLI separately.
 
 ```powershell
-git clone --branch v0.1.9 https://github.com/shixi-11/prism-desk.git
+git clone --branch v0.1.10 https://github.com/shixi-11/prism-desk.git
 cd prism-desk
 npm install
 npm run build
@@ -176,7 +176,7 @@ The allowance panel shows information returned by the provider. For valid unifie
 
 Account emails are masked by default; use the eye button to reveal or hide them. Query history stays on this device. After restart, records retain their original date and time and are marked for refresh. Historical readings never authorize execution or reset-credit use.
 
-Prism does not fall back to API-key billing or purchase credits. Claude and Grok execution requires confirmation that extra billing is disabled. Using an existing Codex reset credit requires a separate confirmation for the selected account. You can use a reset credit while a task is running; the task keeps running. Confirmation and duplicate-request protection still apply. A turn that has already ended is not restarted automatically. An idle task can select its account, model and reasoning effort while another task runs. Switching and continuing uses the existing queue and does not interrupt the running task.
+Prism does not fall back to API-key billing or purchase credits. Grok execution requires confirmation that extra billing is disabled. Using an existing Codex reset credit requires a separate confirmation for the selected account. You can use a reset credit while a task is running; the task keeps running. Confirmation and duplicate-request protection still apply. A turn that has already ended is not restarted automatically. An idle task can select its account, model and reasoning effort while another task runs. Switching and continuing uses the existing queue and does not interrupt the running task. Claude extra usage is informational and does not block execution in Prism. Availability and charges follow the Claude account or organization settings; extra usage may consume team credits or incur additional charges.
 
 Assistant files and skills can be shared across accounts. MCP permissions and application connections must be configured for each execution environment. Application discovery lists installed entry points; the verification action checks supported operations separately.
 

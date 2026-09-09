@@ -581,5 +581,6 @@
   "插件来源不可用，请重新检查。": "Die Plug-in-Quelle ist nicht verfügbar. Prüfen Sie erneut.",
   "请选择已有的技能目录。": "Wählen Sie einen vorhandenen Skill-Ordner aus.",
   "此目录没有可读取的 SKILL.md，请选择技能目录。": "Es wurde keine lesbare SKILL.md gefunden. Wählen Sie einen Skill-Ordner aus.",
-  "来源不可移除。": "Diese Quelle kann nicht entfernt werden."
+  "来源不可移除。": "Diese Quelle kann nicht entfernt werden.",
+  "Claude 额外用量已开启；是否可用及消费限额由团队管理，棱镜不拦截。": "Die zusätzliche Nutzung von Claude ist aktiviert. Verfügbarkeit und Ausgabenlimits werden vom Team verwaltet; Prism blockiert sie nicht."
 }

@@ -581,5 +581,6 @@
   "插件来源不可用，请重新检查。": "La fuente del complemento no está disponible. Compruébala de nuevo.",
   "请选择已有的技能目录。": "Elige una carpeta de habilidades existente.",
   "此目录没有可读取的 SKILL.md，请选择技能目录。": "No se encontró ningún SKILL.md legible. Elige una carpeta de habilidades.",
-  "来源不可移除。": "Esta fuente no se puede quitar."
+  "来源不可移除。": "Esta fuente no se puede quitar.",
+  "Claude 额外用量已开启；是否可用及消费限额由团队管理，棱镜不拦截。": "El uso adicional de Claude está activado. Tu equipo gestiona su disponibilidad y los límites de gasto; Prism no lo bloquea."
 }

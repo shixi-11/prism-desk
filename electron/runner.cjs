@@ -317,8 +317,9 @@ class Runner extends EventEmitter {
   async claude(task, profile, text, instructions) {
     const usage=await require('./provider-quota.cjs').claudeQuota(profile,task.cwd);
     this.emit('quota',usage);
-    if(usage.extraUsageEnabled!==false)throw Error(usage.extraUsageEnabled===true?'此 Claude 账号已启用额外付费用量。请先在 Claude 关闭额外用量，或选择其他账号；棱镜未发起模型请求。':'无法确认此 Claude 账号已关闭额外付费用量；棱镜未发起模型请求，请刷新或选择其他账号。');
-    if(usage.remaining===0){this.active.quotaExhausted=true;this.state(task,'failed');return;}
+    // Claude extra usage is controlled by the subscription's administrator.
+    // Report the flag without blocking; subscription authentication still applies.
+    if(usage.remaining===0&&usage.extraUsageEnabled!==true){this.active.quotaExhausted=true;this.state(task,'failed');return;}
     if(this.active.cancelRequested){this.state(task,'paused');return;}
     const settingsFile = path.join(
       this.store.dir(task.id),
@@ -386,7 +387,7 @@ class Runner extends EventEmitter {
         }
         if(msg.type==='rate_limit_event') {
           const q=recordClaude(profile.id,msg.rate_limit_info,profile.model);if(q){this.emit('quota',q);this.active.quotaByWindow[msg.rate_limit_info.rateLimitType||'unknown']=require('./quota.cjs').normalizeClaude(msg.rate_limit_info,Date.now(),profile.model);this.active.quotaExhausted=Object.values(this.active.quotaByWindow).some(w=>w?.exhausted);}
-          if(msg.rate_limit_info?.isUsingOverage){this.event(task.id,'notice',{text:'CLI 返回额外付费用量状态，棱镜已停止此执行。'});this.active.cancelRequested=true;this.active.quotaExhausted=false;proc.kill();}
+          if(msg.rate_limit_info?.isUsingOverage)this.active.quotaExhausted=false;
         }
         if ((msg.type==='system'&&msg.subtype==='init')||msg.type==='assistant') this.confirmExecution(task,profile,msg.model||msg.message?.model);
         if (msg.session_id) {

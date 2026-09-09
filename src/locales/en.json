@@ -581,5 +581,6 @@
   "请选择已有的技能目录。": "Choose an existing skill folder.",
   "此目录没有可读取的 SKILL.md，请选择技能目录。": "No readable SKILL.md was found. Choose a skill folder.",
   "来源不可移除。": "This source cannot be removed.",
-  "检查与同步": "Check & sync"
+  "检查与同步": "Check & sync",
+  "Claude 额外用量已开启；是否可用及消费限额由团队管理，棱镜不拦截。": "Claude extra usage is enabled. Availability and spending limits are managed by your team; Prism does not block it."
 }
