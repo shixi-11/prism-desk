@@ -50,7 +50,9 @@ class Runner extends EventEmitter {
   }
   switch(id, profile) {
     const task = this.store.get(id);
-    this.assertIdle(task);
+    // Account selection belongs to this task; another task may keep running.
+    if (this.active?.task.id === id || ["running", "stopping", "unknown"].includes(task.state))
+      throw Error("请等待当前执行结束；状态未知时需先核对工作目录。");
     require('./task-settings.cjs').applyPendingMode(task);
     const nextProfile=profileFor(profile);
     if(nextProfile.disabled)throw Error('账号尚未启用，请先登录或选择其他账号。');

@@ -65,6 +65,27 @@ test("switching while execution or crash state is unresolved is rejected", (t) =
   assert.equal(store.get(task.id).state, "unknown");
   assert.throws(() => runner.switch(task.id, "codex-test-3"));
 });
+test("an idle task can switch accounts while another task runs without changing the active task", async (t) => {
+  const { store, task } = setup(t);
+  const other = store.create({title:'Other task',cwd:task.cwd});
+  const runner = new Runner(store);
+  task.state='running';store.save(task);
+  const active={task,profile:{id:task.profile},pending:new Map([['output','open']])};
+  runner.active=active;
+  const before=JSON.stringify(store.get(task.id));
+  runner.switch(other.id,'claude-test-1');
+  assert.equal(store.get(other.id).profile,'claude-test-1');
+  assert.equal(runner.active,active);
+  assert.equal(active.pending.get('output'),'open');
+  assert.equal(JSON.stringify(store.get(task.id)),before);
+  await assert.rejects(runner.run(other.id,'queued work must wait'),/请等待/);
+  assert.throws(()=>runner.switch(task.id,'codex-test-2'),/请等待/);
+  for(const state of ['stopping','unknown']){
+    const blocked=store.get(other.id);blocked.state=state;store.save(blocked);
+    assert.throws(()=>runner.switch(other.id,'codex-test-2'),/请等待/);
+  }
+});
+
 test("returning to an old account never resumes a stale native context", (t) => {
   const { store, task } = setup(t);
   task.sessions = { "codex-test-1": "old-thread" };

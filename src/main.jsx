@@ -961,7 +961,7 @@ function App() {
         onHandoff={async id=>{try{await api.stopAndContinue(task.id,id);}catch(e){fail(e);}}}
         onDraftAccount={setDraftAccount}
         onNew={()=>setModal('new')}
-        disabled={anyBusy || task?.state === "unknown"}
+        disabled={busy || task?.state === "unknown"}
       />}
       {preview&&<PreviewPanel task={preview.task} request={preview} onClose={()=>setPreview(null)}/>}
       {modal==='view'&&<Modal title={tr('视图设置')} onClose={()=>setModal('')}><div className="view-options"><label><input type="checkbox" checked={view.log} onChange={e=>changeView({log:e.target.checked})}/>{tr('底部执行记录')}</label><label><input type="checkbox" checked={view.inspector} onChange={e=>changeView({inspector:e.target.checked})}/>{tr('右侧账号栏')}</label></div></Modal>}

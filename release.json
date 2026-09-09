@@ -1,14 +1,14 @@
 {
-  "version": "0.1.8",
+  "version": "0.1.9",
   "date": "2026-09-10",
   "notes": {
     "en": [
-      "Codex reset credits can now be used while a task is running. Redemption uses a separate connection and leaves the running task and its output stream intact.",
-      "Manual account-specific confirmation, duplicate-request protection and retry idempotency remain in place. Finished turns are not automatically restarted. Concurrency and interface checks use simulated redemption without spending real credits."
+      "Idle tasks can now select an execution account and apply account, model and reasoning settings while another task runs. The account controls no longer inherit another task’s busy state.",
+      "Account switching checks the selected task instead of locking all tasks. The running task and its output remain intact; continuing another task still uses the existing execution queue. Running, stopping and unresolved tasks retain their switch protection."
     ],
     "zh": [
-      "Codex 重置卡现在可在任务运行期间手动使用；重置通过独立连接执行，保留正在运行的任务及其输出连接。",
-      "保留针对所选账号的手动确认、防重复请求与失败重试幂等保护。已结束的轮次不会自动重启；并发和界面检查使用模拟重置，未消耗真实重置卡。"
+      "其他会话运行时，空闲会话现在可以选择执行账号，并应用账号、模型与思考等级设置；账号控制区不再误用其他会话的忙碌状态。",
+      "后台切换账号只检查目标会话，保留正在运行的任务及输出连接；继续其他任务仍沿用现有执行队列。正在运行、停止中和状态未核对的会话继续保留切换保护。"
     ]
   }
 }

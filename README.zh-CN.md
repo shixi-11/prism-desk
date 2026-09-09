@@ -29,12 +29,12 @@
 
 ### 安装
 
-以下命令安装稳定版 **v0.1.8**。[最新发布页](https://github.com/shixi-11/prism-desk/releases/latest)提供版本号与中英文更新内容。
+以下命令安装稳定版 **v0.1.9**。[最新发布页](https://github.com/shixi-11/prism-desk/releases/latest)提供版本号与中英文更新内容。
 
 需要 Windows、Git、Node.js 22.12 或更新版本、npm，以及准备使用的官方 CLI。各 CLI 需分别完成登录。
 
 ```powershell
-git clone --branch v0.1.8 https://github.com/shixi-11/prism-desk.git
+git clone --branch v0.1.9 https://github.com/shixi-11/prism-desk.git
 cd prism-desk
 npm install
 npm run build
@@ -176,7 +176,7 @@ Codex、Claude 和 Grok 适配器支持文件修改任务。Grok 按任务权限
 
 账号页的邮箱默认遮罩显示，点击眼睛图标可展开或隐藏。查询记录仅保存在本机；重启后显示原查询日期和时间，并标明需要刷新。历史记录不用于执行授权或重置卡操作。
 
-棱镜不回退到 API Key 计费，也不购买额度。Claude 和 Grok 执行前需确认额外计费已关闭；使用已有的 Codex 重置卡，需要针对所选账号单独确认。 任务运行时也可使用重置卡，当前任务继续运行；仍需手动确认，并保留重复请求保护。已经结束的那一轮不会自动重启。
+棱镜不回退到 API Key 计费，也不购买额度。Claude 和 Grok 执行前需确认额外计费已关闭；使用已有的 Codex 重置卡，需要针对所选账号单独确认。 任务运行时也可使用重置卡，当前任务继续运行；仍需手动确认，并保留重复请求保护。已经结束的那一轮不会自动重启。 其他任务运行时，空闲任务仍可选择账号、模型和思考等级；切换并继续沿用现有队列，不中断正在运行的任务。
 
 助手文件和技能可跨账号共享。MCP 权限与应用连接需在各执行环境分别配置。本机应用列表展示已发现的安装入口，验证功能另行检查其支持的具体操作。
 
