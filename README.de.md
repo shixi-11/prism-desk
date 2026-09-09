@@ -31,12 +31,12 @@ Prism wird derzeit als **Installation aus dem Quellcode für Windows** bereitges
 
 ### Installation
 
-Diese Befehle installieren die stabile Version **v0.1.11**. Den aktuellen Versionsstand und die zweisprachigen Änderungshinweise finden Sie in der [neuesten Veröffentlichung](https://github.com/shixi-11/prism-desk/releases/latest).
+Diese Befehle installieren die stabile Version **v0.1.12**. Den aktuellen Versionsstand und die zweisprachigen Änderungshinweise finden Sie in der [neuesten Veröffentlichung](https://github.com/shixi-11/prism-desk/releases/latest).
 
 Sie benötigen Windows, Git, Node.js 22.12 oder neuer, npm und die offiziellen CLIs der gewählten Anbieter. Melden Sie sich bei jedem CLI separat an.
 
 ```powershell
-git clone --branch v0.1.11 https://github.com/shixi-11/prism-desk.git
+git clone --branch v0.1.12 https://github.com/shixi-11/prism-desk.git
 cd prism-desk
 npm install
 npm run build
@@ -179,6 +179,8 @@ Der Kontingentbereich zeigt die vom Anbieter zurückgegebenen Informationen an. 
 E-Mail-Adressen der Konten sind standardmäßig maskiert; mit der Augenschaltfläche können Sie sie ein- oder ausblenden. Der Abfrageverlauf bleibt auf diesem Gerät. Nach einem Neustart behalten die Einträge ihr ursprüngliches Datum und ihre ursprüngliche Uhrzeit und werden zur Aktualisierung markiert. Historische Abfragewerte autorisieren niemals eine Ausführung oder die Nutzung von Reset-Guthaben.
 
 Prism weicht nicht auf eine Abrechnung per API-Schlüssel aus und kauft keine Guthaben. Zusätzliche Nutzung, automatisches Aufladen und Kontingentabfragen sind für alle Konten rein informativ und blockieren die Ausführung nicht. Der Anbieter entscheidet über die Verfügbarkeit; Ausgabenlimits verwalten Nutzer auf dessen Plattform. Die Nutzung eines vorhandenen Codex-Reset-Guthabens erfordert eine separate Bestätigung für das ausgewählte Konto. Ein Zurücksetzungsguthaben kann auch während einer laufenden Aufgabe verwendet werden; die Aufgabe läuft weiter. Die Bestätigung und der Schutz vor doppelten Anfragen bleiben bestehen. Ein bereits beendeter Durchlauf wird nicht automatisch neu gestartet. Für eine inaktive Aufgabe lassen sich Konto, Modell und Denkaufwand auswählen, während eine andere Aufgabe läuft. Wechseln und Fortsetzen nutzt die bestehende Warteschlange und unterbricht die laufende Aufgabe nicht. Die zusätzliche Nutzung von Claude wird nur als Information angezeigt und blockiert die Ausführung in Prism nicht. Verfügbarkeit und Abrechnung richten sich nach den Einstellungen des Claude-Kontos oder der Organisation; dabei können Teamguthaben verbraucht oder zusätzliche Kosten verursacht werden.
+
+Der Gesprächsstatus unterscheidet Verarbeitung, Nachdenken, Werkzeuge, Antworten, Bestätigung, Stoppen, gestoppt und beendet. Der runde Sendepfeil wird während der Aufgabe zur Stopptaste. Zusätzliche Anweisungen und die Warteschlange bleiben verfügbar, ohne Sprachsteuerung.
 
 Assistentendateien und Skills können gemeinsam von mehreren Konten verwendet werden. MCP-Berechtigungen und Anwendungsverbindungen müssen für jede Ausführungsumgebung eingerichtet werden. Die Anwendungserkennung listet installierte Einstiegspunkte auf; die Überprüfungsfunktion prüft die unterstützten Operationen separat.
 

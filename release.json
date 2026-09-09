@@ -1,14 +1,14 @@
 {
-  "version": "0.1.11",
+  "version": "0.1.12",
   "date": "2026-09-10",
   "notes": {
     "en": [
-      "Extra usage, prepaid balance and automatic top-up settings are informational for every account. Prism no longer requires these settings to be disabled before execution. Users manage them on the provider’s platform.",
-      "Zero allowance readings no longer reject Codex, Claude or Grok tasks locally. The service determines whether execution is available; actual quota errors still use the existing failure and relay handling. Subscription authentication, API-key isolation and manual reset-credit confirmation remain unchanged."
+      "A live status indicator now appears below the last message. It uses available execution signals to distinguish working, thinking, tools, replies and confirmation, and clearly marks stopping, stopped, failed and ended turns.",
+      "The round send arrow becomes a stop button while the selected task runs. Pending stop requests prevent duplicate clicks; drafts can still be steered or queued. No voice controls are added. Motion respects reduced-motion preferences."
     ],
     "zh": [
-      "所有账号的额外用量、预付余额和自动充值状态均改为仅提醒，不再要求关闭后才能执行；用户在对应平台自行管理这些设置。",
-      "Codex、Claude 和 Grok 不再仅凭零额度查询结果在本地拒绝任务，能否执行以平台实际结果为准；真实额度错误仍沿用失败与接续处理。保留订阅登录校验、API Key 隔离和重置卡手动确认。"
+      "最后一条消息下方新增实时状态，依据执行信号区分处理、思考、工具调用、回复和等待确认，并明确标记正在停止、已停止、执行未完成和本轮结束。",
+      "圆形发送箭头在当前任务运行时切换为停止按钮；停止处理中防止重复点击，追加内容仍可引导或排队。不加入语音控件，并适配减少动态效果的偏好。"
     ]
   }
 }

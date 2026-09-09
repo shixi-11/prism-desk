@@ -583,5 +583,12 @@
   "此目录没有可读取的 SKILL.md，请选择技能目录。": "No se encontró ningún SKILL.md legible. Elige una carpeta de habilidades.",
   "来源不可移除。": "Esta fuente no se puede quitar.",
   "Claude 额外用量已开启；是否可用及消费限额由团队管理，棱镜不拦截。": "El uso adicional de Claude está activado. Tu equipo gestiona su disponibilidad y los límites de gasto; Prism no lo bloquea.",
-  "此账号已启用额外用量或自动充值；请在对应平台管理消费限额，棱镜仅提醒、不拦截。": "Esta cuenta tiene activado el uso adicional o la recarga automática. Gestiona los límites de gasto en la plataforma del proveedor; Prism solo avisa y no bloquea la ejecución."
+  "此账号已启用额外用量或自动充值；请在对应平台管理消费限额，棱镜仅提醒、不拦截。": "Esta cuenta tiene activado el uso adicional o la recarga automática. Gestiona los límites de gasto en la plataforma del proveedor; Prism solo avisa y no bloquea la ejecución.",
+  "正在思考…": "Pensando…",
+  "正在调用工具…": "Usando herramientas…",
+  "正在回复…": "Respondiendo…",
+  "等待确认…": "Esperando confirmación…",
+  "正在停止…": "Deteniendo…",
+  "已停止": "Detenido",
+  "本轮已结束": "Turno finalizado"
 }

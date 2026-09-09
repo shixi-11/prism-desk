@@ -116,7 +116,7 @@
   "已取消": "Cancelled",
   "请核对重置结果": "Please check the reset result",
   "；请先刷新核对结果，再次请求会复用未完成的操作编号。": "; refresh to check the result. A retry will reuse the pending operation ID.",
-  "正在处理…": "Processing…",
+  "正在处理…": "Working…",
   "使用重置卡": "Use reset credit",
   "数据已过期，请刷新": "Out of date. Please refresh.",
   "等待查询": "Not checked yet",
@@ -583,5 +583,12 @@
   "来源不可移除。": "This source cannot be removed.",
   "检查与同步": "Check & sync",
   "Claude 额外用量已开启；是否可用及消费限额由团队管理，棱镜不拦截。": "Claude extra usage is enabled. Availability and spending limits are managed by your team; Prism does not block it.",
-  "此账号已启用额外用量或自动充值；请在对应平台管理消费限额，棱镜仅提醒、不拦截。": "Extra usage or auto top-up is enabled for this account. Manage spending limits on the provider’s platform; Prism only notifies and does not block execution."
+  "此账号已启用额外用量或自动充值；请在对应平台管理消费限额，棱镜仅提醒、不拦截。": "Extra usage or auto top-up is enabled for this account. Manage spending limits on the provider’s platform; Prism only notifies and does not block execution.",
+  "正在思考…": "Thinking…",
+  "正在调用工具…": "Using tools…",
+  "正在回复…": "Responding…",
+  "等待确认…": "Waiting for confirmation…",
+  "正在停止…": "Stopping…",
+  "已停止": "Stopped",
+  "本轮已结束": "Turn ended"
 }

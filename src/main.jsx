@@ -8,6 +8,9 @@ import UpdateSettings from "./UpdateSettings.jsx";
 import {goalProse} from './goal-message.js';
 import AccountManager from "./AccountManager.jsx";
 import CapabilityDialog from "./CapabilityDialog.jsx";
+import ConversationStatus from "./ConversationStatus.jsx";
+import ComposerSubmit from "./ComposerSubmit.jsx";
+import "./conversation-status.css";
 import PreviewPanel,{LinkedMarkdown} from "./PreviewPanel.jsx";
 import {ImageAttachments,QueuedMessages,GeneralSettings,AccountQuota} from "./TaskControls.jsx";
 import {
@@ -34,7 +37,6 @@ import {
   Settings2,
   ChevronDown,
   Square,
-  Send,
   Download,
   Check,
   CircleDot,
@@ -427,15 +429,15 @@ function Inspector({
     </aside>
   );
 }
-function Conversation({ task, events, streaming, onNew, onPreview, onChoice }) {
+function Conversation({ task, events, streaming, thinking, activity, awaitingApproval, onNew, onPreview, onChoice }) {
   const end = useRef(null);
   useEffect(() => {
     end.current?.scrollIntoView({ block: "end", behavior: "instant" });
-  }, [events.length, streaming]);
+  }, [events.length, streaming, task?.state]);
   const messages = events.filter((e) =>
     ["user", "assistant", "handoff", "notice", "question"].includes(e.type),
   );
-  if (!messages.length)
+  if (!messages.length && (!task || task.state==='idle'))
     return (
       <div className="empty">
         <h1>{tr("小主人，今天想造点什么？")}</h1>
@@ -495,6 +497,7 @@ function Conversation({ task, events, streaming, onNew, onPreview, onChoice }) {
           </div>
         </article>
       )}
+      <ConversationStatus task={task} hasMessages={messages.some(e=>["user","assistant"].includes(e.type))} streaming={streaming} thinking={thinking} activity={activity} awaitingApproval={awaitingApproval}/>
       <div ref={end} />
     </div>
   );
@@ -630,6 +633,7 @@ function App() {
         );
         if (value.id === current.current) {
           setTask(value);
+          if (!['running','stopping'].includes(value.state)) {setThinking('');setActivity('');}
           if (type === "idle") setStreaming("");
         }
       }
@@ -642,8 +646,8 @@ function App() {
         return;
       }
       if (value.taskId !== current.current) return;
-      if(type==='reasoning'){setThinking(old=>old+value.text);return;}
-      if(type==='activity'){setActivity(value.text);return;}
+      if(type==='reasoning'){setActivity('');setThinking(old=>old+value.text);return;}
+      if(type==='activity'){setThinking('');setActivity(value.text);return;}
       if (type === "event") {
         if(value.event.type==='user'){setThinking('');setActivity('');}
         if(value.event.type==='reasoning')setThinking('');
@@ -655,7 +659,7 @@ function App() {
         );
         if (value.event.type === "assistant") setStreaming("");
       }
-      if (type === "delta") setStreaming((old) => old + value.text);
+      if (type === "delta") {setThinking("");setActivity("");setStreaming((old) => old + value.text);}
     });
   }, []);
   const updateSnapshot=useRef(null),lastInteraction=useRef(Date.now());
@@ -846,6 +850,9 @@ function App() {
           events={events}
           onChoice={async(eventId,answer)=>{await api.run(task.id,answer,[],eventId);}}
           streaming={streaming}
+          thinking={thinking}
+          activity={activity}
+          awaitingApproval={approvals.some(a=>a.taskId===task?.id)}
           onPreview={target=>setPreview({id:Date.now(),target,task})}
           onNew={() => setModal("new")}
         />
@@ -904,26 +911,7 @@ function App() {
               {task?.pendingMode&&<small className="permission-pending">{tr("下次执行生效")}</small>}
               <button title={tr("添加图片")} aria-label={tr("添加图片")} disabled={uploading||images.length>=5} onClick={()=>addImages(null)}><ImagePlus size={19}/></button>
               <span className="compose-spacer" />
-              {busy && (
-                <button
-                  className="outline"
-                  onClick={() => api.stop().catch(fail)}
-                  disabled={task.state === "stopping"}
-                >
-                  <Square size={14} />
-                  {task.state === "stopping"
-                      ? tr("正在停止")
-                      : tr("停止")}
-                </button>
-              )}
-                <button
-                  className="primary send"
-                  onClick={send}
-                  disabled={
-                    (!text.trim()&&!images.length) || sending || uploading || task?.goalLifecycle?.status==='paused' || task?.state === "unknown" || !!task&&(!init.profiles.find(p=>p.id===task.profile)||init.profiles.find(p=>p.id===task.profile)?.disabled) || Object.values(accountLogins).some(s=>['starting','waiting','verifying'].includes(s.phase))
-                  }
-                >{tr(anyBusy?(init.settings.busySend==='steer'?'引导':'排队'):'发送')}<Send size={17} />
-                </button>
+              <ComposerSubmit key={task?.id||'draft'} busy={busy} stopping={task?.state==='stopping'} hasDraft={!!text.trim()||!!images.length} onSend={send} onStop={()=>api.stop().catch(fail)} sendLabel={anyBusy?(init.settings.busySend==='steer'?'引导':'排队'):'发送'} disabled={(!text.trim()&&!images.length) || sending || uploading || task?.goalLifecycle?.status==='paused' || task?.state === "unknown" || !!task&&(!init.profiles.find(p=>p.id===task.profile)||init.profiles.find(p=>p.id===task.profile)?.disabled) || Object.values(accountLogins).some(s=>['starting','waiting','verifying'].includes(s.phase))}/>
             </div>
           </div>
           <div className="task-tools">

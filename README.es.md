@@ -31,12 +31,12 @@ Actualmente, Prism se distribuye mediante una **instalación desde el código fu
 
 ### Instalación
 
-Estos comandos instalan la versión estable **v0.1.11**. Consulta la [última versión publicada](https://github.com/shixi-11/prism-desk/releases/latest) para conocer su número y leer las notas de cambios bilingües.
+Estos comandos instalan la versión estable **v0.1.12**. Consulta la [última versión publicada](https://github.com/shixi-11/prism-desk/releases/latest) para conocer su número y leer las notas de cambios bilingües.
 
 Necesitarás Windows, Git, Node.js 22.12 o posterior, npm y las CLI oficiales de los proveedores que elijas. Inicia sesión en cada CLI por separado.
 
 ```powershell
-git clone --branch v0.1.11 https://github.com/shixi-11/prism-desk.git
+git clone --branch v0.1.12 https://github.com/shixi-11/prism-desk.git
 cd prism-desk
 npm install
 npm run build
@@ -179,6 +179,8 @@ El panel de cuota muestra la información que devuelve el proveedor. En los peri
 Las direcciones de correo de las cuentas se ocultan parcialmente de forma predeterminada; usa el botón con forma de ojo para mostrarlas u ocultarlas. El historial de consultas permanece en este dispositivo. Después de reiniciar, los registros conservan su fecha y hora originales y se marcan para actualizarse. Las lecturas históricas nunca autorizan la ejecución ni el uso de créditos de restablecimiento.
 
 Prism no recurre a la facturación mediante claves API ni compra créditos. El uso adicional, la recarga automática y las consultas de cuota son informativos para todas las cuentas y no bloquean la ejecución. El proveedor decide la disponibilidad y el usuario gestiona los límites de gasto en su plataforma. Usar un crédito de restablecimiento de Codex existente requiere una confirmación independiente para la cuenta seleccionada. Puedes usar un crédito de restablecimiento mientras se ejecuta una tarea; la tarea continúa. Se mantienen la confirmación y la protección contra solicitudes duplicadas. Un turno que ya haya finalizado no se reinicia automáticamente. Una tarea inactiva puede seleccionar su cuenta, modelo y nivel de razonamiento mientras se ejecuta otra. Cambiar y continuar utiliza la cola existente sin interrumpir la tarea en ejecución. El uso adicional de Claude es informativo y no bloquea la ejecución en Prism. Su disponibilidad y facturación dependen de la configuración de la cuenta u organización de Claude; puede consumir créditos del equipo o generar cargos adicionales.
+
+El estado al final de la conversación distingue trabajo, razonamiento, herramientas, respuesta, confirmación, detención y finalización. La flecha de envío se convierte en un botón de parada durante la tarea. Se mantienen las instrucciones adicionales y la cola, sin control de voz.
 
 Los archivos del asistente y las habilidades se pueden compartir entre cuentas. Los permisos MCP y las conexiones con aplicaciones deben configurarse para cada entorno de ejecución. La detección de aplicaciones enumera los puntos de entrada instalados; la acción de verificación comprueba por separado las operaciones admitidas.
 
