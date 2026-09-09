@@ -3,7 +3,7 @@ const path = require('node:path');
 const net = require('node:net');
 const { execFile, spawn } = require('node:child_process');
 const crypto = require('node:crypto');
-const root = path.resolve(__dirname, '../.local/app-validation');
+const root = path.join(process.env.PRISM_TEST_DATA || path.join(require('./update-bootstrap.cjs').installation(path.resolve(__dirname, '..')), '.local'), 'app-validation');
 function outputPath(base, name) {
   const target = path.resolve(base, name);
   if (!target.startsWith(path.resolve(base) + path.sep)) throw Error('Output must remain inside validation directory');

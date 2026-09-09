@@ -277,6 +277,25 @@ app.whenReady().then(() => {
   handle('language',language=>{if(!isSupportedLanguage(language))throw Error('Unsupported language');atomic(path.join(dataPath(),'settings.json'),{...settings(),language});});
   handle('defaultMode',mode=>{if(!require('./task-settings.cjs').MODES.includes(mode))throw Error('Invalid permission mode');atomic(path.join(dataPath(),'settings.json'),{...settings(),defaultMode:mode});return mode;});
   handle("scan", () => require('./diagnostics.cjs').verifyCapabilities());
+  const shared = require('./shared-capabilities.cjs').manager();
+  handle('inspectCapabilities', () => { shared.view({ check: true }); return capabilities(); });
+  handle('syncCapabilities', (token, pluginId) => { shared.sync(token, pluginId); return capabilities(); });
+  handle('addCapabilitySource', async kind => {
+    if (!['skills', 'assistant'].includes(kind)) throw Error('来源类型无效。');
+    const selected = await dialog.showOpenDialog(owner(), { ...directoryDialog(settings().language), title: translate(settings().language, kind === 'assistant' ? '选择助手目录' : '添加技能目录') });
+    if (selected.canceled) return null;
+    shared.addSource(selected.filePaths[0], kind);
+    return capabilities();
+  });
+  handle('removeCapabilitySource', (id, token) => { shared.removeSource(id, token); return capabilities(); });
+  handle('openCapabilitySource', async (id, token) => {
+    const view = shared.assertToken(token);
+    const source = [...view.sources, ...view.plugins].find(item => item.id === id);
+    if (!source || !fs.existsSync(source.path)) throw Error('来源目录不存在，请重新选择。');
+    const result = await shell.openPath(source.path);
+    if (result) throw Error(result);
+    return null;
+  });
   handle('validateApps',async()=>{
     if(runner.active||validatingApps)throw Error('请等待当前执行或应用验证结束');
     validatingApps=true;

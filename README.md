@@ -29,12 +29,12 @@ Prism currently ships as a **Windows source installation**. No standalone `.exe`
 
 ### Install
 
-These commands install stable version **v0.1.6**. Check the [latest Release](https://github.com/shixi-11/prism-desk/releases/latest) for its version and bilingual change notes.
+These commands install stable version **v0.1.7**. Check the [latest Release](https://github.com/shixi-11/prism-desk/releases/latest) for its version and bilingual change notes.
 
 You will need Windows, Git, Node.js 22.12 or later, npm, and the official CLIs for your chosen providers. Sign in to each CLI separately.
 
 ```powershell
-git clone --branch v0.1.6 https://github.com/shixi-11/prism-desk.git
+git clone --branch v0.1.7 https://github.com/shixi-11/prism-desk.git
 cd prism-desk
 npm install
 npm run build
@@ -179,6 +179,10 @@ Account emails are masked by default; use the eye button to reveal or hide them.
 Prism does not fall back to API-key billing or purchase credits. Claude and Grok execution requires confirmation that extra billing is disabled. Using an existing Codex reset credit requires a separate confirmation for the selected account.
 
 Assistant files and skills can be shared across accounts. MCP permissions and application connections must be configured for each execution environment. Application discovery lists installed entry points; the verification action checks supported operations separately.
+
+Open **Shared capabilities** and choose **Check shared capabilities → Sync local sources** to compare local skill entry files and paths with the last sync. System skills and added folders enter the shared index after syncing. Under **Sources & connections**, use **Connect skill references** for each plugin you want to reference. The next task turn receives the index of source references; the original files stay in place.
+
+The plugin list shows the newest recognized version in each local cache source, which may include uninstalled packages. This does not establish the latest online release or tool authorization. Update plugins in their original app, then check again. Codex MCP connections need separate configuration and verification in the account’s independent CLI. The current Claude, Grok, and Gemini execution channels do not enable external MCP; connecting skill references does not change this limitation.
 
 ### Development
 

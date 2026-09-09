@@ -31,12 +31,12 @@ Prism wird derzeit als **Installation aus dem Quellcode für Windows** bereitges
 
 ### Installation
 
-Diese Befehle installieren die stabile Version **v0.1.6**. Den aktuellen Versionsstand und die zweisprachigen Änderungshinweise finden Sie in der [neuesten Veröffentlichung](https://github.com/shixi-11/prism-desk/releases/latest).
+Diese Befehle installieren die stabile Version **v0.1.7**. Den aktuellen Versionsstand und die zweisprachigen Änderungshinweise finden Sie in der [neuesten Veröffentlichung](https://github.com/shixi-11/prism-desk/releases/latest).
 
 Sie benötigen Windows, Git, Node.js 22.12 oder neuer, npm und die offiziellen CLIs der gewählten Anbieter. Melden Sie sich bei jedem CLI separat an.
 
 ```powershell
-git clone --branch v0.1.6 https://github.com/shixi-11/prism-desk.git
+git clone --branch v0.1.7 https://github.com/shixi-11/prism-desk.git
 cd prism-desk
 npm install
 npm run build
@@ -181,6 +181,10 @@ E-Mail-Adressen der Konten sind standardmäßig maskiert; mit der Augenschaltfl�
 Prism weicht nicht auf eine Abrechnung per API-Schlüssel aus und kauft keine Guthaben. Für die Ausführung mit Claude und Grok muss bestätigt werden, dass die zusätzliche Abrechnung deaktiviert ist. Die Nutzung eines vorhandenen Codex-Reset-Guthabens erfordert eine separate Bestätigung für das ausgewählte Konto.
 
 Assistentendateien und Skills können gemeinsam von mehreren Konten verwendet werden. MCP-Berechtigungen und Anwendungsverbindungen müssen für jede Ausführungsumgebung eingerichtet werden. Die Anwendungserkennung listet installierte Einstiegspunkte auf; die Überprüfungsfunktion prüft die unterstützten Operationen separat.
+
+Unter **Gemeinsame Fähigkeiten** vergleicht **Gemeinsame Fähigkeiten prüfen → Lokale Quellen synchronisieren** die lokalen Skill-Einstiegsdateien und ihre Pfade mit dem letzten Synchronisierungsstand. System-Skills und hinzugefügte Ordner werden nach der Synchronisierung in den gemeinsamen Index aufgenommen. Unter **Quellen und Verbindungen** lässt sich mit **Skill-Referenzen verbinden** das Referenzmaterial einzelner Plugins einbinden. Der nächste Aufgabendurchlauf erhält den Index der Quellenverweise; die Originaldateien bleiben an ihrem bisherigen Speicherort.
+
+Die Plugin-Liste zeigt die neueste erkannte Version aus jeder lokalen Cache-Quelle. Darunter können sich bereits deinstallierte Pakete befinden. Das bestätigt weder die neueste Online-Veröffentlichung noch eine erteilte Tool-Autorisierung. Plugins sollten zunächst in ihrer ursprünglichen Anwendung aktualisiert und anschließend erneut geprüft werden. Codex-MCP-Verbindungen müssen in der unabhängigen CLI des jeweiligen Kontos separat eingerichtet und überprüft werden. Die aktuellen Ausführungskanäle von Claude, Grok und Gemini aktivieren kein externes MCP; das Einbinden von Skill-Referenzen ändert diese Einschränkung nicht.
 
 ### Entwicklung
 

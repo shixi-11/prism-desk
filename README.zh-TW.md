@@ -31,12 +31,12 @@ Prism 目前以 **Windows 原始碼安裝**方式提供。尚未發布獨立的 
 
 ### 安裝
 
-以下指令會安裝穩定版本 **v0.1.6**。請查看[最新發布版本](https://github.com/shixi-11/prism-desk/releases/latest)，確認其版本與雙語變更說明。
+以下指令會安裝穩定版本 **v0.1.7**。請查看[最新發布版本](https://github.com/shixi-11/prism-desk/releases/latest)，確認其版本與雙語變更說明。
 
 你需要 Windows、Git、Node.js 22.12 或更新版本、npm，以及所選供應商的官方 CLI。請分別登入各個 CLI。
 
 ```powershell
-git clone --branch v0.1.6 https://github.com/shixi-11/prism-desk.git
+git clone --branch v0.1.7 https://github.com/shixi-11/prism-desk.git
 cd prism-desk
 npm install
 npm run build
@@ -181,6 +181,10 @@ Codex、Claude 與 Grok 介接器支援檔案編輯任務。Grok 會遵循所選
 Prism 不會改用 API 金鑰計費，也不會購買點數。Claude 與 Grok 執行前，必須確認額外計費已停用。使用既有的 Codex 重置卡時，必須針對所選帳號另外確認。
 
 助理檔案與技能可以跨帳號共用。MCP 權限與應用程式連線必須在每個執行環境中分別設定。應用程式探索會列出已安裝的進入點；驗證操作會另外檢查支援的操作。
+
+開啟**共用能力**，選擇**檢查共用能力 → 同步本機最新內容**，對照上次同步紀錄檢查本機技能入口檔案與路徑。系統技能及新增的目錄會在同步後納入共用索引。在**來源與接入**中，為需要參考的外掛選擇**接入技能資料**。下一輪任務會取得來源索引並按需讀取，原始檔案仍保留在來源位置。
+
+外掛清單顯示各快取來源中最新的可識別版本，可能包含已解除安裝的外掛；這不代表它是線上最新版本，也不代表工具已獲授權。請先在原應用程式更新外掛，再回來檢查。Codex 的 MCP 連線需在帳號的獨立 CLI 中分別設定與驗證；Claude、Grok、Gemini 目前的執行通道未開放外部 MCP，接入技能資料不會改變這項限制。
 
 ### 開發
 

@@ -7,6 +7,7 @@ import GoalBar from "./GoalBar.jsx";
 import UpdateSettings from "./UpdateSettings.jsx";
 import {goalProse} from './goal-message.js';
 import AccountManager from "./AccountManager.jsx";
+import CapabilityDialog from "./CapabilityDialog.jsx";
 import PreviewPanel,{LinkedMarkdown} from "./PreviewPanel.jsx";
 import {ImageAttachments,QueuedMessages,GeneralSettings,AccountQuota} from "./TaskControls.jsx";
 import {
@@ -42,6 +43,7 @@ import {
 import "./style.css";
 import "./desert.css";
 import "./typography.css";
+import "./capabilities.css";
 import {tr,setLanguage,locale,languages} from './i18n.js';
 
 const api = window.prism;
@@ -223,72 +225,6 @@ function NewTask({ onClose, onCreate }) {
           </button>
         </footer>
       </form>
-    </Modal>
-  );
-}
-function CapabilityDialog({ data, onClose, onScan }) {
-  const [query, setQuery] = useState("");
-  const [appQuery,setAppQuery]=useState('');
-  const [scanning,setScanning]=useState(false);
-  return (
-    <Modal title={tr("共享能力")} wide onClose={onClose}>
-      <p className="muted">{tr("按需读取同一份太初与技能。插件、MCP 和软件授权需在各执行入口分别接通。")}</p>
-      <div className="cap-detail">
-        <Sparkles size={18} />
-        <div>
-          <strong>{tr("太初")}</strong>
-          <p>{data.taichu.exists ? tr("入口已发现") : tr("入口不可用")}</p>
-          <code>{data.taichu.path}</code>
-        </div>
-      </div>
-      <p className="capability-legend">{tr("已发现：找到程序；检测通过：版本命令或服务响应正常。实际任务操作仍需单独验证。")}</p>
-      <h3>{tr("本机应用")}<span className="mono">{data.apps.length}</span></h3>
-      <input aria-label={tr("搜索应用")} placeholder={tr("搜索应用名称或类别，例如 ComfyUI")} value={appQuery} onChange={e=>setAppQuery(e.target.value)}/>
-      <div className="app-list">
-      {data.apps.filter(a=>(a.name+' '+a.category).toLowerCase().includes(appQuery.toLowerCase())).map((app) => (
-        <div className="app-row" key={app.name}>
-          <Monitor size={16} />
-          <strong>{app.name}</strong>
-          <span>{app.verification?.ok ? app.verification.label||tr("命令已实测") : app.verification ? app.probe==='comfy'?tr("服务未连接"):tr("检测未通过") : app.installed ? tr("程序已发现，待实测") : tr("未发现")}</span>
-          <code>{app.path}</code>
-          {app.taskVerification&&<small className="task-verified">{tr("本机任务已实测")} · {tr(app.name==='ComfyUI'?'无模型工作流与文件输出':app.name==='Blender'?'场景保存、重开与几何核验':app.name==='FFmpeg'?'无声视频编码与逐帧解码':'计算与中文文件读写')}</small>}
-          <small>{tr(app.category)} · {tr(app.note)}</small>
-          {app.verification && <small>{app.verification.ok ? app.verification.version : app.verification.error}</small>}
-          {app.interfaceObservation&&<small>{tr(app.interfaceObservation.detail)}</small>}
-        </div>
-      ))}
-      {!data.apps.some(a=>(a.name+' '+a.category).toLowerCase().includes(appQuery.toLowerCase()))&&<p className="muted">{tr("未找到匹配的已识别应用。")}</p>}
-      </div>
-      <h3>{tr("技能目录")}<span className="mono">{data.skills.length}</span>
-      </h3>
-      <input
-        placeholder={tr("搜索技能名称与说明")}
-        value={query}
-        onChange={(e) => setQuery(e.target.value)}
-        aria-label={tr("搜索技能")}
-      />
-      <div className="skill-list">
-        {data.skills
-          .filter((s) =>
-            (s.name + s.description)
-              .toLowerCase()
-              .includes(query.toLowerCase()),
-          )
-          .map((s) => (
-            <details key={s.name}>
-              <summary>{s.name}</summary>
-              <p>{tr(s.description)}</p>
-              <code>{s.path}</code>
-            </details>
-          ))}
-      </div>
-      <footer>
-        <button className="outline" disabled={scanning} onClick={async()=>{setScanning(true);try{await onScan();}finally{setScanning(false);}}}>
-          <RefreshCw size={16} />
-          {scanning?tr("正在检测…"):tr("检测本机能力")}
-        </button>
-        <button className="outline" disabled={scanning} onClick={async()=>{setScanning(true);try{await onScan(true);}finally{setScanning(false);}}}>{tr("验证应用调用")}</button>
-      </footer>
     </Modal>
   );
 }
@@ -477,6 +413,11 @@ function Inspector({
           <Monitor size={18} />
           <span>{tr("本机应用")}</span>
           <small>{cap.apps.filter((a) => a.taskVerification?.ok).length} {tr("个任务已实测")}</small>
+        </button>
+        <button className="capability-open" onClick={onCapabilities}>
+          <RefreshCw size={16} />
+          <span>{tr("检查与同步")}</span>
+          <ArrowUpRight size={15} />
         </button>
       </section>
       <div className="inspector-foot">
@@ -1044,14 +985,9 @@ function App() {
         <CapabilityDialog
           data={init.capabilities}
           onClose={() => setModal("")}
-          onScan={async (verifyTasks=false) => {
-            try {
-              const data = verifyTasks?await api.validateApps():await api.scan();
-              setInit((old) => ({ ...old, capabilities: data }));
-            } catch (e) {
-              fail(e);
-            }
-          }}
+          Modal={Modal}
+          api={api}
+          onUpdate={data => setInit(old => ({ ...old, capabilities: data }))}
         />
       )}
       {modal === "accounts" && (

@@ -1,12 +1,16 @@
 {
-  "version": "0.1.6",
+  "version": "0.1.7",
   "date": "2026-09-10",
   "notes": {
     "en": [
-      "Account removal confirmation expands directly below the selected account’s actions, without jumping to the top of the account list."
+      "Shared capabilities now has a local source check and explicit sync, with separate views for skills, apps, and source connections. It reports new, changed, and missing skill entries and rejects stale scan results.",
+      "System skills and selected cached plugin references can be added to the shared task index. Add assistant or skill folders from the interface; removing a source preserves its files. New cached plugin versions wait for explicit sync.",
+      "Local source sync does not establish the latest online version, transfer authentication, or enable MCP tools. Application task-verification records now remain in the installation’s persistent data across Prism updates."
     ],
     "zh": [
-      "移除确认在对应账号的操作按钮下方就地展开，不再跳到账号列表顶部。"
+      "共享能力新增本机来源检查与手动同步，分别展示技能、应用和来源接入；列出新增、更新及失效入口，并拦截过期的检查结果。",
+      "系统技能和手动选择的插件缓存资料可进入共享任务索引；支持选择助手目录、添加技能目录，移除来源保留原文件。缓存中的新插件版本须手动同步后使用。",
+      "本机同步不代表线上最新版，不迁移登录授权，也不启用 MCP 工具。应用任务验证记录改为随安装目录持久保存，避免升级棱镜后丢失。"
     ]
   }
 }

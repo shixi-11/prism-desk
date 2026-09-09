@@ -29,12 +29,12 @@
 
 ### 安装
 
-以下命令安装稳定版 **v0.1.6**。[最新发布页](https://github.com/shixi-11/prism-desk/releases/latest)提供版本号与中英文更新内容。
+以下命令安装稳定版 **v0.1.7**。[最新发布页](https://github.com/shixi-11/prism-desk/releases/latest)提供版本号与中英文更新内容。
 
 需要 Windows、Git、Node.js 22.12 或更新版本、npm，以及准备使用的官方 CLI。各 CLI 需分别完成登录。
 
 ```powershell
-git clone --branch v0.1.6 https://github.com/shixi-11/prism-desk.git
+git clone --branch v0.1.7 https://github.com/shixi-11/prism-desk.git
 cd prism-desk
 npm install
 npm run build
@@ -179,6 +179,10 @@ Codex、Claude 和 Grok 适配器支持文件修改任务。Grok 按任务权限
 棱镜不回退到 API Key 计费，也不购买额度。Claude 和 Grok 执行前需确认额外计费已关闭；使用已有的 Codex 重置卡，需要针对所选账号单独确认。
 
 助手文件和技能可跨账号共享。MCP 权限与应用连接需在各执行环境分别配置。本机应用列表展示已发现的安装入口，验证功能另行检查其支持的具体操作。
+
+打开**共享能力**，选择**检查共享能力 → 同步本机最新**，对照上次同步记录检查本机技能入口文件和路径。系统技能与添加的目录会在同步后进入共享索引。在**来源与接入**中，为需要使用的插件选择**接入技能资料**。下一轮任务会收到来源索引并按需读取，原文件保留在来源位置。
+
+插件列表展示各缓存来源中最新的可识别版本，可能包含已经卸载的插件；这不能证明插件是线上最新版，也不能证明工具已授权。请先在原应用更新插件，再回来检查。Codex 的 MCP 连接需要在账号独立 CLI 中分别配置和验证；Claude、Grok、Gemini 当前执行通道未开放外部 MCP，接入技能资料不会改变这一限制。
 
 ### 开发
 

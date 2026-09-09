@@ -31,12 +31,12 @@ Prism est actuellement distribué sous forme d’**installation à partir des so
 
 ### Installation
 
-Ces commandes installent la version stable **v0.1.6**. Consultez la [dernière version publiée](https://github.com/shixi-11/prism-desk/releases/latest) pour connaître son numéro et lire ses notes de modification bilingues.
+Ces commandes installent la version stable **v0.1.7**. Consultez la [dernière version publiée](https://github.com/shixi-11/prism-desk/releases/latest) pour connaître son numéro et lire ses notes de modification bilingues.
 
 Vous aurez besoin de Windows, de Git, de Node.js 22.12 ou ultérieur, de npm et des CLI officiels des fournisseurs de votre choix. Connectez-vous séparément à chaque CLI.
 
 ```powershell
-git clone --branch v0.1.6 https://github.com/shixi-11/prism-desk.git
+git clone --branch v0.1.7 https://github.com/shixi-11/prism-desk.git
 cd prism-desk
 npm install
 npm run build
@@ -181,6 +181,10 @@ Les adresses e-mail des comptes sont masquées par défaut ; utilisez le bouton 
 Prism ne bascule pas vers une facturation par clé API et n’achète pas de crédits. L’exécution avec Claude et Grok nécessite la confirmation que la facturation supplémentaire est désactivée. L’utilisation d’un crédit de réinitialisation Codex existant nécessite une confirmation distincte pour le compte sélectionné.
 
 Les fichiers de l’assistant et les compétences peuvent être partagés entre les comptes. Les autorisations MCP et les connexions aux applications doivent être configurées pour chaque environnement d’exécution. La détection des applications répertorie les points d’entrée installés ; l’action de vérification contrôle séparément les opérations prises en charge.
+
+Dans **Capacités partagées**, choisissez **Vérifier les capacités partagées → Synchroniser les sources locales** pour comparer les fichiers d’entrée des compétences locales et leurs chemins à la dernière synchronisation. Les compétences système et les dossiers ajoutés sont intégrés à l’index partagé après synchronisation. Dans **Sources et connexions**, utilisez **Connecter les références de compétences** pour chaque plugin à consulter. Le tour suivant de la tâche reçoit l’index des références ; les fichiers d’origine restent à leur emplacement.
+
+La liste des plugins affiche la version reconnue la plus récente de chaque cache local, qui peut contenir des paquets désinstallés. Elle ne confirme ni la dernière version publiée en ligne ni l’autorisation des outils. Mettez les plugins à jour dans leur application d’origine, puis relancez la vérification. Les connexions MCP de Codex doivent être configurées et vérifiées séparément dans la CLI indépendante de chaque compte. Les canaux d’exécution actuels de Claude, Grok et Gemini n’activent pas les MCP externes ; connecter les références de compétences ne modifie pas cette limitation.
 
 ### Développement
 

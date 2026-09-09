@@ -31,12 +31,12 @@ Actualmente, Prism se distribuye mediante una **instalación desde el código fu
 
 ### Instalación
 
-Estos comandos instalan la versión estable **v0.1.6**. Consulta la [última versión publicada](https://github.com/shixi-11/prism-desk/releases/latest) para conocer su número y leer las notas de cambios bilingües.
+Estos comandos instalan la versión estable **v0.1.7**. Consulta la [última versión publicada](https://github.com/shixi-11/prism-desk/releases/latest) para conocer su número y leer las notas de cambios bilingües.
 
 Necesitarás Windows, Git, Node.js 22.12 o posterior, npm y las CLI oficiales de los proveedores que elijas. Inicia sesión en cada CLI por separado.
 
 ```powershell
-git clone --branch v0.1.6 https://github.com/shixi-11/prism-desk.git
+git clone --branch v0.1.7 https://github.com/shixi-11/prism-desk.git
 cd prism-desk
 npm install
 npm run build
@@ -181,6 +181,10 @@ Las direcciones de correo de las cuentas se ocultan parcialmente de forma predet
 Prism no recurre a la facturación mediante claves API ni compra créditos. La ejecución con Claude y Grok requiere confirmar que la facturación adicional está desactivada. Usar un crédito de restablecimiento de Codex existente requiere una confirmación independiente para la cuenta seleccionada.
 
 Los archivos del asistente y las habilidades se pueden compartir entre cuentas. Los permisos MCP y las conexiones con aplicaciones deben configurarse para cada entorno de ejecución. La detección de aplicaciones enumera los puntos de entrada instalados; la acción de verificación comprueba por separado las operaciones admitidas.
+
+En **Capacidades compartidas**, la opción **Comprobar capacidades compartidas → Sincronizar fuentes locales** compara los archivos de entrada de las habilidades locales y sus rutas con la última sincronización. Las habilidades del sistema y las carpetas añadidas se incorporan al índice compartido al sincronizar. En **Fuentes y conexiones**, selecciona **Conectar referencias de habilidades** para cada plugin que quieras consultar. El siguiente turno de la tarea recibe el índice de referencias; los archivos originales permanecen en su ubicación.
+
+La lista de plugins muestra la versión reconocida más reciente de cada caché local, que puede incluir paquetes desinstalados. Esto no confirma que sea la última versión publicada en línea ni que las herramientas estén autorizadas. Actualiza los plugins en su aplicación de origen y vuelve a comprobarlos. Las conexiones MCP de Codex requieren configuración y verificación independientes en la CLI de cada cuenta. Los canales de ejecución actuales de Claude, Grok y Gemini no habilitan MCP externos; conectar las referencias de habilidades no modifica esta limitación.
 
 ### Desarrollo
 
