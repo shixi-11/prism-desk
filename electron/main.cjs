@@ -319,10 +319,10 @@ app.whenReady().then(() => {
   handle('resetCredit',async id=>{
     if(accountOperation)throw Error('请等待账号操作结束。');
     const profile=PROFILES.find(p=>p.id===id&&p.provider==='Codex');if(!profile)throw Error('请选择 Codex 订阅账号');
-    if(runner.active||resetInProgress)throw Error('请等待当前执行或重置操作结束');
+    if(resetInProgress)throw Error('请等待当前执行或重置操作结束');
     resetInProgress=true;
     try{const answer=await dialog.showMessageBox(owner(),resetCreditDialog(settings().language,profile));if(answer.response!==1)return {outcome:'cancelled'};
-      if(runner.active)throw Error('任务已经开始，请等本轮结束再使用重置卡');
+      // Redemption owns a separate RPC connection and never stops the task runner.
       return await require('./reset-credits.cjs').consumeReset(id,app.getAppPath(),dataPath());
     }finally{resetInProgress=false;}
   });

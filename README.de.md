@@ -31,12 +31,12 @@ Prism wird derzeit als **Installation aus dem Quellcode für Windows** bereitges
 
 ### Installation
 
-Diese Befehle installieren die stabile Version **v0.1.7**. Den aktuellen Versionsstand und die zweisprachigen Änderungshinweise finden Sie in der [neuesten Veröffentlichung](https://github.com/shixi-11/prism-desk/releases/latest).
+Diese Befehle installieren die stabile Version **v0.1.8**. Den aktuellen Versionsstand und die zweisprachigen Änderungshinweise finden Sie in der [neuesten Veröffentlichung](https://github.com/shixi-11/prism-desk/releases/latest).
 
 Sie benötigen Windows, Git, Node.js 22.12 oder neuer, npm und die offiziellen CLIs der gewählten Anbieter. Melden Sie sich bei jedem CLI separat an.
 
 ```powershell
-git clone --branch v0.1.7 https://github.com/shixi-11/prism-desk.git
+git clone --branch v0.1.8 https://github.com/shixi-11/prism-desk.git
 cd prism-desk
 npm install
 npm run build
@@ -178,7 +178,7 @@ Der Kontingentbereich zeigt die vom Anbieter zurückgegebenen Informationen an. 
 
 E-Mail-Adressen der Konten sind standardmäßig maskiert; mit der Augenschaltfläche können Sie sie ein- oder ausblenden. Der Abfrageverlauf bleibt auf diesem Gerät. Nach einem Neustart behalten die Einträge ihr ursprüngliches Datum und ihre ursprüngliche Uhrzeit und werden zur Aktualisierung markiert. Historische Abfragewerte autorisieren niemals eine Ausführung oder die Nutzung von Reset-Guthaben.
 
-Prism weicht nicht auf eine Abrechnung per API-Schlüssel aus und kauft keine Guthaben. Für die Ausführung mit Claude und Grok muss bestätigt werden, dass die zusätzliche Abrechnung deaktiviert ist. Die Nutzung eines vorhandenen Codex-Reset-Guthabens erfordert eine separate Bestätigung für das ausgewählte Konto.
+Prism weicht nicht auf eine Abrechnung per API-Schlüssel aus und kauft keine Guthaben. Für die Ausführung mit Claude und Grok muss bestätigt werden, dass die zusätzliche Abrechnung deaktiviert ist. Die Nutzung eines vorhandenen Codex-Reset-Guthabens erfordert eine separate Bestätigung für das ausgewählte Konto. Ein Zurücksetzungsguthaben kann auch während einer laufenden Aufgabe verwendet werden; die Aufgabe läuft weiter. Die Bestätigung und der Schutz vor doppelten Anfragen bleiben bestehen. Ein bereits beendeter Durchlauf wird nicht automatisch neu gestartet.
 
 Assistentendateien und Skills können gemeinsam von mehreren Konten verwendet werden. MCP-Berechtigungen und Anwendungsverbindungen müssen für jede Ausführungsumgebung eingerichtet werden. Die Anwendungserkennung listet installierte Einstiegspunkte auf; die Überprüfungsfunktion prüft die unterstützten Operationen separat.
 

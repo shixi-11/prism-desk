@@ -1,16 +1,14 @@
 {
-  "version": "0.1.7",
+  "version": "0.1.8",
   "date": "2026-09-10",
   "notes": {
     "en": [
-      "Shared capabilities now has a local source check and explicit sync, with separate views for skills, apps, and source connections. It reports new, changed, and missing skill entries and rejects stale scan results.",
-      "System skills and selected cached plugin references can be added to the shared task index. Add assistant or skill folders from the interface; removing a source preserves its files. New cached plugin versions wait for explicit sync.",
-      "Local source sync does not establish the latest online version, transfer authentication, or enable MCP tools. Application task-verification records now remain in the installation’s persistent data across Prism updates."
+      "Codex reset credits can now be used while a task is running. Redemption uses a separate connection and leaves the running task and its output stream intact.",
+      "Manual account-specific confirmation, duplicate-request protection and retry idempotency remain in place. Finished turns are not automatically restarted. Concurrency and interface checks use simulated redemption without spending real credits."
     ],
     "zh": [
-      "共享能力新增本机来源检查与手动同步，分别展示技能、应用和来源接入；列出新增、更新及失效入口，并拦截过期的检查结果。",
-      "系统技能和手动选择的插件缓存资料可进入共享任务索引；支持选择助手目录、添加技能目录，移除来源保留原文件。缓存中的新插件版本须手动同步后使用。",
-      "本机同步不代表线上最新版，不迁移登录授权，也不启用 MCP 工具。应用任务验证记录改为随安装目录持久保存，避免升级棱镜后丢失。"
+      "Codex 重置卡现在可在任务运行期间手动使用；重置通过独立连接执行，保留正在运行的任务及其输出连接。",
+      "保留针对所选账号的手动确认、防重复请求与失败重试幂等保护。已结束的轮次不会自动重启；并发和界面检查使用模拟重置，未消耗真实重置卡。"
     ]
   }
 }
