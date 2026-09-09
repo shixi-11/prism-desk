@@ -1,16 +1,12 @@
 {
-  "version": "0.1.5",
+  "version": "0.1.6",
   "date": "2026-09-10",
   "notes": {
     "en": [
-      "Remove unused or unconnected accounts with confirmation. Task history and local login folders are preserved; active operations and linked queued messages block removal.",
-      "Repair Windows taskbar identity and shortcuts, and isolate test windows from the desktop application.",
-      "The GitHub homepage now defaults to English, with a language link to the complete Simplified Chinese README."
+      "Account removal confirmation expands directly below the selected account’s actions, without jumping to the top of the account list."
     ],
     "zh": [
-      "新增账号移除与确认步骤，支持移除未登录账号，保留任务记录和本机登录目录；执行、账号操作或关联待发送消息尚未结束时阻止移除。",
-      "修复 Windows 任务栏应用标识和快捷方式，并将测试窗口与正式客户端隔离。",
-      "GitHub 首页默认显示英文，点击语言链接进入完整简体中文说明。"
+      "移除确认在对应账号的操作按钮下方就地展开，不再跳到账号列表顶部。"
     ]
   }
 }

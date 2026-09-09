@@ -628,4 +628,4 @@ html:not([lang^="zh"]) .empty h1 { font-size:clamp(26px,3vw,44px); }
 
 .sidebar .project-links .author-homepage svg{flex:0 0 16px;width:16px;height:16px}.sidebar .project-links .author-homepage small{font-size:10px}.sidebar .project-links .github-link{background:transparent}.sidebar .project-links .github-link:hover{background:#e9d1ab26}
 
-.account-remove-confirm{padding:16px;margin-bottom:16px;border:1px solid var(--line);border-radius:12px;background:var(--surface);}.account-remove-confirm h3{margin:0 0 8px;font-size:15px}.account-remove-confirm p{font-size:13px;line-height:1.6;margin:0 0 12px}
+.account-remove-confirm{grid-column:1/-1;width:100%;box-sizing:border-box;padding:16px;margin-top:12px;border:1px solid var(--line);border-radius:12px;background:var(--surface);}.account-remove-confirm h3{margin:0 0 8px;font-size:15px}.account-remove-confirm p{font-size:13px;line-height:1.6;margin:0 0 12px}
