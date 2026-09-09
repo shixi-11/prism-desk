@@ -1,18 +1,12 @@
 {
-  "version": "0.1.1",
+  "version": "0.1.2",
   "date": "2026-09-09",
   "notes": {
     "en": [
-      "Grok follows task permissions, with file editing and task handoff available in project-editing and full-access modes.",
-      "Grok can view attached screenshots and images through its native image-reading tools.",
-      "A permanent Check for updates entry shows the installed version, available version, and release notes before you decide to download.",
-      "Updates now follow published stable releases. Checking never downloads, installs, or restarts the app automatically."
+      "Added a GitHub shortcut beside the author homepage in the sidebar. It opens the Prism repository in your default browser."
     ],
     "zh": [
-      "Grok 支持修改文件和接续任务，遵循任务选择的只读、项目内编辑或完全访问权限。",
-      "Grok 支持查看随消息添加的截图和图片。",
-      "侧栏常驻“检查更新”，先展示当前版本、新版本和更新内容，再由你决定是否下载。",
-      "更新只跟随正式稳定版本；自动检查不会自行下载、安装或重启软件。"
+      "侧栏作者主页旁新增 GitHub 图标，点击即可在默认浏览器打开棱镜项目仓库。"
     ]
   }
 }

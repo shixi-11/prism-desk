@@ -11,6 +11,7 @@ import PreviewPanel,{LinkedMarkdown} from "./PreviewPanel.jsx";
 import {ImageAttachments,QueuedMessages,GeneralSettings,AccountQuota} from "./TaskControls.jsx";
 import {
   Sun,
+  Github,
   Languages,
   ImagePlus,
   PanelRightOpen,
@@ -887,7 +888,7 @@ function App() {
           <button onClick={()=>setTaskDialog({action:'history'})}><Archive size={18}/>{tr('归档')}</button>
           <button aria-label={tr('设置')} onClick={()=>setModal("settings")}><Settings2 size={18}/>{tr("设置")}</button>
           <button aria-label={tr('检查更新')} onClick={()=>setModal("updates")}><span className="settings-icon"><Download size={18}/>{hasAppUpdate&&<i className="update-dot" aria-hidden="true"/>}</span>{tr("检查更新")}{hasAppUpdate&&<small className="update-label">{tr('有更新')}</small>}</button>
-          <button className="author-homepage" onClick={()=>api.authorHomepage().catch(fail)}><ArrowUpRight size={18}/><span>{tr("认识作者")}<small>shixilin.com</small></span></button>
+          <div className="project-links"><button className="author-homepage" onClick={()=>api.authorHomepage().catch(fail)}><ArrowUpRight size={18}/><span>{tr("认识作者")}<small>shixilin.com</small></span></button><button className="github-link" aria-label="GitHub · Prism" title="GitHub · Prism" onClick={()=>api.projectRepository().catch(fail)}><Github size={20}/></button></div>
         </footer>
       </aside>
       <main className="main">

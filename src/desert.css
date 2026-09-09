@@ -623,3 +623,7 @@ html:not([lang^="zh"]) .empty h1 { font-size:clamp(26px,3vw,44px); }
 .update-release time{display:block;font-size:12px;color:var(--muted);margin-top:4px}
 .update-release ul{padding-inline-start:20px;margin:12px 0 0}.update-release li+li{margin-top:8px}
 .update-release p{margin:8px 0}.update-actions{flex-wrap:wrap}
+
+.sidebar .project-links{display:flex;align-items:center;gap:4px}.sidebar .project-links .author-homepage{flex:1;min-width:0;padding:10px 7px;border:0;font-size:14px;gap:5px}.sidebar .project-links .github-link{flex:0 0 32px;width:32px;height:40px;padding:0;justify-content:center;border:0;border-radius:6px}
+
+.sidebar .project-links .author-homepage svg{flex:0 0 16px;width:16px;height:16px}.sidebar .project-links .author-homepage small{font-size:10px}.sidebar .project-links .github-link{background:transparent}.sidebar .project-links .github-link:hover{background:#e9d1ab26}
