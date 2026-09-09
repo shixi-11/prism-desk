@@ -387,7 +387,7 @@ function Inspector({
         <p className="relay-note">{!task?tr("先新建任务，再切换执行账号。"):task.state==='unknown'?tr("先核对上次执行进度，再切换账号。"):disabled?tr("请等待当前执行结束。"):target===task.profile&&!changedModel?tr("已是当前账号；选择其他账号后可切换。"):tr("切换后，在同一任务中发送指令继续。")}</p>
         {task && (
           <p className="relay-note">{tr("当前：")}{profiles.find((p) => p.id === task.profile)?.provider} /{" "}
-            {tr(profiles.find((p) => p.id === task.profile)?.name)}
+            {tr(profiles.find((p) => p.id === task.profile)?.name||'账号已移除，请切换账号')}
           </p>
         )}
 
@@ -979,7 +979,7 @@ function App() {
                   className="primary send"
                   onClick={send}
                   disabled={
-                    (!text.trim()&&!images.length) || sending || uploading || task?.goalLifecycle?.status==='paused' || task?.state === "unknown" || !!task&&init.profiles.find(p=>p.id===task.profile)?.disabled || Object.values(accountLogins).some(s=>['starting','waiting','verifying'].includes(s.phase))
+                    (!text.trim()&&!images.length) || sending || uploading || task?.goalLifecycle?.status==='paused' || task?.state === "unknown" || !!task&&(!init.profiles.find(p=>p.id===task.profile)||init.profiles.find(p=>p.id===task.profile)?.disabled) || Object.values(accountLogins).some(s=>['starting','waiting','verifying'].includes(s.phase))
                   }
                 >{tr(anyBusy?(init.settings.busySend==='steer'?'引导':'排队'):'发送')}<Send size={17} />
                 </button>

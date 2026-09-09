@@ -30,7 +30,7 @@ function defaultConfig(env = process.env) {
 
 function validate(config) {
   const ids = new Set();
-  if (!Array.isArray(config.profiles) || !config.profiles.length) throw Error('Configuration requires at least one profile.');
+  if (!Array.isArray(config.profiles)) throw Error('Configuration requires a profiles array.');
   for (const profile of config.profiles) {
     if (!profile || !['Codex','Claude','Grok','Gemini'].includes(profile.provider)) throw Error('Unsupported profile provider.');
     if (typeof profile.id !== 'string' || !/^[a-zA-Z0-9_-]+$/.test(profile.id) || ids.has(profile.id)) throw Error('Profile IDs must be unique and contain only letters, numbers, hyphens and underscores.');

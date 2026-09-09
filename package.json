@@ -1,6 +1,6 @@
 {
   "name": "prism-desk",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "private": true,
   "description": "棱镜：同一个任务，在不同 CLI 之间继续。",
   "type": "module",

@@ -15,7 +15,9 @@ const {
 const { Runner } = require("./runner.cjs");
 const { isSupportedLanguage, translate, directoryDialog, resetCreditDialog } = require('./localization.cjs');
 app.setName("棱镜");
-app.setAppUserModelId("org.prismdesk.app");
+const desktopIdentity=require('./desktop-identity.cjs');
+const appId=desktopIdentity.appId(!!process.env.PRISM_TEST_DATA);
+app.setAppUserModelId(appId);
 app.commandLine.appendSwitch("disable-renderer-backgrounding");
 app.commandLine.appendSwitch("disable-backgrounding-occluded-windows");
 if (process.env.PRISM_TEST_HIDE) {
@@ -165,6 +167,12 @@ app.whenReady().then(() => {
   const loginState=(id,state)=>{const value={id,...state};accountLoginStates.set(id,value);emit('account-login',value);};
   const verifyAccount=async id=>{const status=await require('./core.cjs').accountStatus(id,app.getAppPath());require('./accounts.cjs').recordVerified(id,status);broadcastAccounts();emit('quota',{id,...status});return status;};
   handle('accounts',()=>require('./accounts.cjs').accountList());
+  handle('removeAccount',(id,revision)=>{
+    assertAccountIdle();
+    if(accountLogins.size||messageQueue.running||messageQueue.items.some(item=>{try{const task=store.get(item.taskId);return task.profile===id||task.relayOrder?.includes(id);}catch{return false;}}))throw Error('请先结束账号操作或处理关联任务的待发送消息。');
+    const result=require('./accounts.cjs').removeAccount(id,revision);
+    quotaDisplay.clear(id);accountLoginStates.delete(id);broadcastAccounts();return result;
+  });
   handle('answerQuestion',(id,requestId,answers)=>require('./questions.cjs').answer(runner,id,requestId,answers));
   handle('renameAccount',(id,name)=>{const result=require('./accounts.cjs').renameAccount(id,name);broadcastAccounts();return result;});
   handle('savePlan',(id,input)=>require('./task-plan.cjs').save(store,runner,id,input));
@@ -306,6 +314,7 @@ app.whenReady().then(() => {
     if(validatingApps)throw Error('请等待本机应用验证结束');
     if(resetInProgress)throw Error('请等待重置卡操作结束');
     const task = store.get(id);
+    if(!PROFILES.some(p=>p.id===task.profile))throw Error('账号已移除，请切换账号');
     if(PROFILES.find(p=>p.id===task.profile)?.disabled)throw Error('账号尚未启用，请先登录或选择其他账号。');
     if(choiceEventId){const source=store.events(id).find(e=>e.id===choiceEventId&&e.type==='assistant');if(!source)throw Error('这项选择已失效，请继续当前任务');if(store.events(id).some(e=>e.choiceEventId===choiceEventId))throw Error('已提交选择');}
     const images=require('./attachments.cjs').attachmentFiles(store.dir(id),imageIds);
@@ -401,6 +410,7 @@ app.whenReady().then(() => {
     },
   });
   windows.add(window);
+  if(process.platform==='win32'&&!process.env.PRISM_TEST_DATA){try{desktopIdentity.register(app,shell,updater.root);}catch(error){console.warn(error.message);}}
   window.draftKey=restore?.key||(taskId?require('node:crypto').randomUUID():'primary');
   if(restore?.bounds&&[restore.bounds.x,restore.bounds.y,restore.bounds.width,restore.bounds.height].every(Number.isFinite))window.setBounds(restore.bounds);
   window.on('page-title-updated',event=>event.preventDefault());
@@ -408,7 +418,7 @@ app.whenReady().then(() => {
   window.webContents.setWindowOpenHandler(() => ({ action: "deny" }));
   window.setMenu(null);
   window.once('ready-to-show',()=>{if(!process.env.PRISM_TEST_HIDE&&!restore?.hidden)window.showInactive();});
-  if(process.platform==='win32')window.setAppDetails({appId:'org.prismdesk.app',appIconPath:path.join(__dirname,'..','src','assets','prism.ico'),relaunchDisplayName:'棱镜',relaunchCommand:`"${path.join(updater.root,'runtime','desktop','Prism.exe')}" "${updater.root}" --user-data-dir="${app.getPath('userData')}"`});
+  if(process.platform==='win32')window.setAppDetails({appId,appIconPath:path.join(updater.root,'runtime','desktop','Prism.exe'),appIconIndex:0,relaunchDisplayName:'棱镜',relaunchCommand:`"${path.join(updater.root,'runtime','desktop','Prism.exe')}" "${updater.root}" --user-data-dir="${app.getPath('userData')}"`});
   window.webContents.on("will-navigate", (event) => event.preventDefault());
   window.loadFile(path.join(__dirname, "..", "dist", "index.html"),{query:taskId?{task:taskId}:{}});
   window.webContents.once('did-finish-load',()=>messageQueue.pump());

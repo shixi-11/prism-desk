@@ -506,5 +506,11 @@
   "更新内容": "Novedades",
   "稍后": "Más tarde",
   "更新已准备好": "La actualización está lista",
-  "已升级至 v{version}": "Actualizado a v{version}"
+  "已升级至 v{version}": "Actualizado a v{version}",
+  "移除账号": "Eliminar cuenta",
+  "移除": "Eliminar",
+  "确认移除": "Confirmar eliminación",
+  "仅从棱镜移除账号，保留任务记录和本机登录目录。关联任务需切换账号后继续。": "La cuenta se eliminará de Prism. Se conservarán el historial de tareas y la carpeta de inicio de sesión local. Cambia de cuenta para continuar las tareas vinculadas.",
+  "请先结束账号操作或处理关联任务的待发送消息。": "Finaliza las operaciones de cuenta o gestiona los mensajes pendientes de las tareas vinculadas.",
+  "账号已移除，请切换账号": "Cuenta eliminada. Cambia a otra cuenta."
 }

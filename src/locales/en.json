@@ -506,5 +506,11 @@
   "更新内容": "What’s new",
   "稍后": "Later",
   "更新已准备好": "Update is ready",
-  "已升级至 v{version}": "Updated to v{version}"
+  "已升级至 v{version}": "Updated to v{version}",
+  "移除账号": "Remove account",
+  "移除": "Remove",
+  "确认移除": "Confirm removal",
+  "仅从棱镜移除账号，保留任务记录和本机登录目录。关联任务需切换账号后继续。": "Remove this account from Prism. Task history and the local login folder are kept. Switch accounts to continue linked tasks.",
+  "请先结束账号操作或处理关联任务的待发送消息。": "Finish account operations or handle queued messages in linked tasks first.",
+  "账号已移除，请切换账号": "Account removed. Switch to another account."
 }

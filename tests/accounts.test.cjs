@@ -61,3 +61,10 @@ test('browser login accepts only provider OAuth URLs and cancellation waits for 
   const half=Math.floor(url.length/2);proc.stdout.emit('data',url.slice(0,half));assert.equal(opened,undefined);proc.stdout.emit('data',url.slice(half)+'\n');assert.equal(opened,url);assert.equal(captured.options.windowsHide,true);assert.equal(captured.args.includes('--with-api-key'),false);assert.equal(captured.args.includes('--console'),false);await login.cancel();assert.equal(killed,true);assert.deepEqual(await login.completed,{cancelled:true});
  }
 });
+
+test('removal preserves credentials and historical tasks, allows an empty account list, and rejects stale confirmation',()=>{
+ const {removeAccount,revision}=require('../electron/accounts.cjs'),old=structuredClone(CONFIG.profiles);
+ try{const p=saveAccount({provider:'Codex',name:'Remove fixture'},path.join(fixture.root,'remove-fixture'));fs.writeFileSync(path.join(p.home,'auth.json'),'keep');recordVerified(p.id,{email:'fixture@example.com'});const store=new TaskStore(path.join(fixture.root,'remove-history')),task=store.create({title:'Keep history',profile:p.id});
+ assert.throws(()=>removeAccount(p.id,p.revision),/其他窗口/);const current=accountList().profiles.find(a=>a.id===p.id);removeAccount(p.id,current.revision);assert.equal(fs.readFileSync(path.join(p.home,'auth.json'),'utf8'),'keep');assert.equal(store.get(task.id).profile,p.id);assert.throws(()=>store.create({title:'Removed',profile:p.id}),/已接入/);assert.throws(()=>removeAccount(p.id,current.revision),/不存在/);for(const a of [...CONFIG.profiles])removeAccount(a.id,revision(a));assert.deepEqual(loadConfig().profiles,[]);assert.equal(PROFILES.length,0);assert.throws(()=>store.create({title:'No account'}),/已接入/);
+ }finally{saveProfiles(old);}
+});

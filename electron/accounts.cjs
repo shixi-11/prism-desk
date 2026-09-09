@@ -42,6 +42,12 @@ function saveAccount(input,accountRoot){
  if(changed)require('./models.cjs').invalidate(id);
  return {...profile,revision:revision(profile)};
 }
+function removeAccount(id,expectedRevision){
+ const profile=CONFIG.profiles.find(p=>p.id===id);if(!profile)throw Error('账号不存在。');
+ if(expectedRevision!==revision(profile))throw Error('账号已在其他窗口更新，请重新打开设置。');
+ saveProfiles(CONFIG.profiles.filter(p=>p.id!==id));require('./models.cjs').invalidate(id);
+ return {id};
+}
 function setEnabled(id,enabled){
  const profile=CONFIG.profiles.find(p=>p.id===id);if(!profile)throw Error('账号不存在。');
  if(enabled&&(profile.connectionState==='pending'||profile.loginRequired))throw Error('请先登录或检查连接。');
@@ -55,4 +61,4 @@ function recordVerified(id,status){
  saveProfiles(CONFIG.profiles.map(p=>p.id===id?next:p));require('./models.cjs').invalidate(id);return next;
 }
 function clearAccountSessions(store,id){for(const view of ['active','archived','deleted'])for(const task of store.list(view)){if(task.sessions?.[id]){delete task.sessions[id];store.save(task);}}}
-module.exports={renameAccount,accountList,saveAccount,setEnabled,prepareLogin,recordVerified,clearAccountSessions,validateHome,revision};
+module.exports={renameAccount,accountList,saveAccount,removeAccount,setEnabled,prepareLogin,recordVerified,clearAccountSessions,validateHome,revision};

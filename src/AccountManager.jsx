@@ -1,5 +1,5 @@
 import React,{useEffect,useState} from 'react';
-import {Plus,RefreshCw,ExternalLink,FolderOpen,Check,Settings2,Copy,Eye,EyeOff,Pencil,X} from 'lucide-react';
+import {Plus,RefreshCw,ExternalLink,FolderOpen,Check,Settings2,Copy,Eye,EyeOff,Pencil,X,Trash2} from 'lucide-react';
 import {AccountQuota} from './TaskControls.jsx';
 import {tr} from './i18n.js';
 const api=window.prism;
@@ -20,6 +20,7 @@ function AccountName({profile,onSaved}){
 export default function AccountManager({profiles,quotas,checking,bulk,onRefresh,onRefreshAll,loginStates,busy}){
  const [data,setData]=useState(null),[editor,setEditor]=useState(null),[step,setStep]=useState('form'),[working,setWorking]=useState(false),[error,setError]=useState('');
  const [copied,setCopied]=useState(false);
+ const [removing,setRemoving]=useState(null);
  const [authorizationCode,setAuthorizationCode]=useState('');
  const reload=async()=>{const result=await api.accounts();setData(result);return result;};
  useEffect(()=>{reload().catch(e=>setError(errorText(e)));},[profiles]);
@@ -36,6 +37,7 @@ export default function AccountManager({profiles,quotas,checking,bulk,onRefresh,
  const install=()=>action(()=>api.accountInstall(editor.provider));
  const save=e=>{e.preventDefault();action(async()=>{const saved=await api.saveAccount(editor);setEditor(saved);setStep('connect');});};
  return <div className="account-manager">
+  {removing&&<section className="account-remove-confirm" role="alertdialog" aria-labelledby="remove-account-title" aria-describedby="remove-account-detail"><h3 id="remove-account-title">{tr('移除账号')} · {removing.name}</h3><p id="remove-account-detail">{tr('仅从棱镜移除账号，保留任务记录和本机登录目录。关联任务需切换账号后继续。')}</p><div className="dialog-actions"><button autoFocus disabled={working} onClick={()=>setRemoving(null)}>{tr('取消')}</button><button disabled={locked} onClick={()=>action(async()=>{await api.removeAccount(removing.id,removing.revision);setRemoving(null);})}>{tr('确认移除')}</button></div></section>}
   {error&&<p className="connection-error" role="alert">{tr(error)}</p>}
   {editor?<section className="account-setup">
    <div className="connection-heading"><div><small>{tr('账号接入')}</small><h3>{step==='form'?tr(editor.id?'账号设置':'选择平台，接入账号'):editor.name}</h3></div><button onClick={()=>{setEditor(null);setError('');}}>{tr('返回账号列表')}</button></div>
@@ -65,7 +67,7 @@ export default function AccountManager({profiles,quotas,checking,bulk,onRefresh,
   </section>:<>
    <p className="muted">{tr('在这里接入和管理订阅账号，登录成功后即可选择执行。')}</p>
    <div className="account-query-toolbar"><button className="primary" disabled={!data||locked} onClick={()=>begin(null)}><Plus size={17}/>{tr('接入账号')}</button><button disabled={!!bulk||checking.length>0||locked} onClick={onRefreshAll}><RefreshCw size={16} className={bulk?'spinning':''}/>{tr('一键查询全部')}</button><span role="status">{bulk?`${tr('查询中…')} ${bulk.done} / ${bulk.total}`:''}</span></div>
-   <div className="connection-list">{(data?.profiles||profiles).map(p=><article className={`connection-card ${p.disabled?'disabled-account':''}`} key={p.id}><div className="connection-identity"><strong>{p.provider}</strong><AccountName profile={p} onSaved={reload}/>{p.disabled&&<small>{tr((p.connectionState==='pending'||p.loginRequired)?'待登录':'已停用')}</small>}<AccountEmail email={quotas[p.id]?.email||p.email}/></div><AccountQuota profile={p} quota={quotas[p.id]}/><LoginStatus state={loginStates[p.id]}/><div className="connection-card-actions"><button disabled={locked||checking.includes(p.id)} onClick={()=>onRefresh(p.id)}>{tr(checking.includes(p.id)?'查询中…':'查询')}</button><button disabled={locked&&!active(loginStates[p.id])} onClick={()=>{setEditor({...p});setStep('connect');setError('');}}>{tr(active(loginStates[p.id])?'继续登录':'登录账号')}</button><button disabled={locked} aria-label={`${tr('账号设置')} ${p.name}`} onClick={()=>begin(p)}><Settings2 size={15}/>{tr('设置')}</button><button disabled={locked||p.connectionState==='pending'||p.loginRequired} onClick={()=>action(()=>api.enableAccount(p.id,!!p.disabled))}>{tr(p.disabled?'启用':'停用')}</button>{active(loginStates[p.id])&&<button onClick={()=>action(()=>api.cancelAccountLogin(p.id))}>{tr('取消登录')}</button>}</div></article>)}</div>
+   <div className="connection-list">{(data?.profiles||profiles).map(p=><article className={`connection-card ${p.disabled?'disabled-account':''}`} key={p.id}><div className="connection-identity"><strong>{p.provider}</strong><AccountName profile={p} onSaved={reload}/>{p.disabled&&<small>{tr((p.connectionState==='pending'||p.loginRequired)?'待登录':'已停用')}</small>}<AccountEmail email={quotas[p.id]?.email||p.email}/></div><AccountQuota profile={p} quota={quotas[p.id]}/><LoginStatus state={loginStates[p.id]}/><div className="connection-card-actions"><button disabled={locked||checking.includes(p.id)} onClick={()=>onRefresh(p.id)}>{tr(checking.includes(p.id)?'查询中…':'查询')}</button><button disabled={locked&&!active(loginStates[p.id])} onClick={()=>{setEditor({...p});setStep('connect');setError('');}}>{tr(active(loginStates[p.id])?'继续登录':'登录账号')}</button><button disabled={locked} aria-label={`${tr('账号设置')} ${p.name}`} onClick={()=>begin(p)}><Settings2 size={15}/>{tr('设置')}</button><button disabled={locked||p.connectionState==='pending'||p.loginRequired} onClick={()=>action(()=>api.enableAccount(p.id,!!p.disabled))}>{tr(p.disabled?'启用':'停用')}</button><button disabled={locked} aria-label={tr('移除账号')+' '+p.name} onClick={()=>{setRemoving(p);setError('');}}><Trash2 size={15}/>{tr('移除')}</button>{active(loginStates[p.id])&&<button onClick={()=>action(()=>api.cancelAccountLogin(p.id))}>{tr('取消登录')}</button>}</div></article>)}</div>
    <p className="muted">{tr('首批支持 Codex、Claude、Grok；后续平台通过独立适配器接入。')}</p>
   </>}
  </div>;

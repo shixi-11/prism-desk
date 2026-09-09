@@ -1,16 +1,16 @@
 {
-  "version": "0.1.4",
-  "date": "2026-09-09",
+  "version": "0.1.5",
+  "date": "2026-09-10",
   "notes": {
     "en": [
-      "Update checks, preparation and restart have distinct status messages. Preparation waits for you to choose Update and restart.",
-      "A successful updated startup shows the installed version once. Ordinary launches and rollbacks do not report upgrade success.",
-      "Reorganized the full README into matching English and Simplified Chinese sections, with separate download, installation and update guidance."
+      "Remove unused or unconnected accounts with confirmation. Task history and local login folders are preserved; active operations and linked queued messages block removal.",
+      "Repair Windows taskbar identity and shortcuts, and isolate test windows from the desktop application.",
+      "The GitHub homepage now defaults to English, with a language link to the complete Simplified Chinese README."
     ],
     "zh": [
-      "检查、准备和重启分别显示明确状态；准备完成后等待用户点击“更新并重启”。",
-      "新版成功启动后仅提示一次已升级版本，普通启动和回滚不误报升级成功。",
-      "完整整理 GitHub 首页，中英文结构对应，各自提供版本、安装和更新说明。"
+      "新增账号移除与确认步骤，支持移除未登录账号，保留任务记录和本机登录目录；执行、账号操作或关联待发送消息尚未结束时阻止移除。",
+      "修复 Windows 任务栏应用标识和快捷方式，并将测试窗口与正式客户端隔离。",
+      "GitHub 首页默认显示英文，点击语言链接进入完整简体中文说明。"
     ]
   }
 }

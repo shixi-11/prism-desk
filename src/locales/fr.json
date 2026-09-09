@@ -506,5 +506,11 @@
   "更新内容": "Nouveautés",
   "稍后": "Plus tard",
   "更新已准备好": "La mise à jour est prête",
-  "已升级至 v{version}": "Mise à jour vers v{version} effectuée"
+  "已升级至 v{version}": "Mise à jour vers v{version} effectuée",
+  "移除账号": "Retirer le compte",
+  "移除": "Retirer",
+  "确认移除": "Confirmer le retrait",
+  "仅从棱镜移除账号，保留任务记录和本机登录目录。关联任务需切换账号后继续。": "Le compte sera retiré de Prism. L’historique des tâches et le dossier de connexion local seront conservés. Changez de compte pour poursuivre les tâches liées.",
+  "请先结束账号操作或处理关联任务的待发送消息。": "Terminez les opérations du compte ou traitez les messages en attente des tâches liées.",
+  "账号已移除，请切换账号": "Compte retiré. Choisissez un autre compte."
 }
