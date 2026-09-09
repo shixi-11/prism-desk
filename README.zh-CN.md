@@ -2,7 +2,7 @@
 
 <img src="src/assets/prism-icon.svg" width="80" height="80" alt="Prism Desk">
 
-[English](README.md) · [简体中文](README.zh-CN.md)
+[English](README.md) · [简体中文](README.zh-CN.md) · [繁體中文](README.zh-TW.md) · [日本語](README.ja.md) · [한국어](README.ko.md) · [Español](README.es.md) · [Français](README.fr.md) · [Deutsch](README.de.md) · [العربية](README.ar.md)
 
 由林拾汐创作。[认识作者 → shixilin.com](https://shixilin.com/)
 
@@ -49,9 +49,9 @@ powershell -NoProfile -ExecutionPolicy Bypass -File scripts/start.ps1
 
 先安装准备使用的官方 CLI，并在 CLI 中完成登录。仅登录网页或桌面客户端，不等于棱镜已经接入账号。
 
-- **Codex：**按[官方安装说明](https://developers.openai.com/codex/cli/)安装 Codex CLI，使用 ChatGPT 账号登录。
-- **Claude：**安装 [Claude Code](https://code.claude.com/docs/en/setup)，按[登录说明](https://code.claude.com/docs/en/authentication)使用支持的 Claude 订阅账号登录。执行前会检查订阅登录和额外用量设置，额外付费用量需关闭。
-- **Grok：**安装官方 Grok CLI，使用订阅账号登录。
+- **Codex**：按[官方安装说明](https://developers.openai.com/codex/cli/)安装 Codex CLI，使用 ChatGPT 账号登录。
+- **Claude**：安装 [Claude Code](https://code.claude.com/docs/en/setup)，按[登录说明](https://code.claude.com/docs/en/authentication)使用支持的 Claude 订阅账号登录。执行前会检查订阅登录和额外用量设置，额外付费用量需关闭。
+- **Grok**：安装官方 Grok CLI，使用订阅账号登录。
 
 在**账号 → 接入账号**中选择 Codex、Claude 或 Grok，填写名称，再点**保存并继续 → 获取登录链接 → 复制登录链接**。将链接粘贴到浏览器地址栏；若 Claude 显示授权码，回到棱镜的**授权码**输入框粘贴完整内容，再点**提交授权码**。授权码仅交给正在等待的官方 CLI，提交后清空输入框。授权完成后，棱镜会自动检查订阅登录，账号无需重启即可进入执行列表。也可检查已有登录、取消登录或重新复制链接、改名，以及停用或启用账号；停用保留历史任务与本机凭据。高级设置支持选择官方 CLI 程序，或使用已有的独立账号目录；已有账号的平台和登录目录保持固定。本机缺少 CLI 时会提供官方安装说明，后续平台通过独立适配器接入。
 

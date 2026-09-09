@@ -2,7 +2,7 @@
 
 <img src="src/assets/prism-icon.svg" width="80" height="80" alt="Prism Desk">
 
-[English](README.md) · [简体中文](README.zh-CN.md)
+[English](README.md) · [简体中文](README.zh-CN.md) · [繁體中文](README.zh-TW.md) · [日本語](README.ja.md) · [한국어](README.ko.md) · [Español](README.es.md) · [Français](README.fr.md) · [Deutsch](README.de.md) · [العربية](README.ar.md)
 
 Created by [Shixi Lin](https://shixilin.com/).
 
@@ -104,13 +104,13 @@ Open the preview panel or click a file link to view images, PDFs, Markdown, code
 
 ### Automatic updates
 
-1. **Check for updates** reports “New version available” or “You are up to date”. It does not download or restart.
+1. **Check for updates** reports “Update available” or “You’re up to date”. It does not download or restart.
 2. **Download and prepare** reports “Update is ready” when preparation finishes. You can continue using the current version.
 3. **Update and restart** restarts only after you click it. Once the new version successfully starts, “Updated to vX.X.X” appears once. Ordinary launches and rollbacks do not show this success message.
 
 **Check for updates** in the sidebar follows published stable [GitHub Releases](https://github.com/shixi-11/prism-desk/releases). It shows the installed version, available version, and change notes before downloading. Choose **Later** to keep using your current version. Ordinary main-branch commits do not trigger update notices. Automatic checking is enabled by default: Prism checks after startup and every four hours. A steady blue dot beside Check for updates and an update icon in the top bar indicate an available version. Checking does not download, install, or restart the app. Choose **Download and prepare**, then **Update and restart** when convenient. The dot remains until the installed revision is current. Each window’s drafts are saved before restarting; tasks, queued messages, account operations, editing dialogs and previews block the restart until finished or closed.
 
-Updates keep the same account configuration, task storage and user-data directory. The original checkout and previous installation remain available. A failed download or build leaves the running version intact; if the new app fails to finish startup, opening Prism again restores the previous version. Local source changes block updates, and preparation requires at least 2 GB free. Git must remain installed; the desktop build includes the Node runtime and npm needed for future builds. Installations predating this updater need one manual pull and rebuild using the installation commands below.
+Updates keep the same account configuration, task storage and user-data directory. The original checkout and previous installation remain available. A failed download or build leaves the running version intact; if the new app fails to finish startup, opening Prism again restores the previous version. Local source changes block updates, and preparation requires at least 2 GB free. Git must remain installed; the desktop build includes the Node runtime and npm needed for future builds. Installations predating this updater need one manual pull and rebuild using the installation commands above.
 
 ### Day and night
 
