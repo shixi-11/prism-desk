@@ -1,14 +1,14 @@
 {
-  "version": "0.1.10",
+  "version": "0.1.11",
   "date": "2026-09-10",
   "notes": {
     "en": [
-      "Claude extra usage is now informational rather than an execution blocker. Prism no longer refuses a Claude task because extra usage is enabled or stops an ongoing task when the CLI reports overage.",
-      "Claude account and organization settings govern extra usage, which may consume team credits or incur additional charges. Subscription authentication, API-key isolation and Grok billing guards remain in place. The allowance panel explains the Claude behavior."
+      "Extra usage, prepaid balance and automatic top-up settings are informational for every account. Prism no longer requires these settings to be disabled before execution. Users manage them on the provider’s platform.",
+      "Zero allowance readings no longer reject Codex, Claude or Grok tasks locally. The service determines whether execution is available; actual quota errors still use the existing failure and relay handling. Subscription authentication, API-key isolation and manual reset-credit confirmation remain unchanged."
     ],
     "zh": [
-      "Claude 额外用量改为状态提示：不再因开关开启而拒绝执行，也不再因 CLI 报告额外用量而强行停止任务。",
-      "Claude 额外用量由账号及团队设置管理，可能消耗团队余额或产生额外费用。保留订阅登录校验、API Key 隔离和 Grok 计费保护，并更新额度面板说明。"
+      "所有账号的额外用量、预付余额和自动充值状态均改为仅提醒，不再要求关闭后才能执行；用户在对应平台自行管理这些设置。",
+      "Codex、Claude 和 Grok 不再仅凭零额度查询结果在本地拒绝任务，能否执行以平台实际结果为准；真实额度错误仍沿用失败与接续处理。保留订阅登录校验、API Key 隔离和重置卡手动确认。"
     ]
   }
 }

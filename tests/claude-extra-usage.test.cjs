@@ -6,7 +6,7 @@ test('Claude extra usage does not block launch or terminate an overage stream',a
   const root=fs.mkdtempSync(path.join(os.tmpdir(),'prism-claude-overage-'));
   t.after(()=>{const real=fs.realpathSync(root);assert.equal(path.dirname(real).toLowerCase(),fs.realpathSync(os.tmpdir()).toLowerCase());assert.ok(path.basename(real).startsWith('prism-claude-overage-'));fs.rmSync(real,{recursive:true,force:true});});
   const file=path.resolve(__dirname,'../electron/runner.cjs'),localRequire=createRequire(file);
-  for(const [flag,remaining] of [[true,80],[true,0],[false,80],[null,80]]){
+  for(const [flag,remaining] of [[true,80],[true,0],[false,80],[false,0],[null,80],[null,0]]){
     let launched=0,killed=0;
     const context={module:{exports:{}},require:name=>name==='./core.cjs'?{...core,spawnCLI:()=>{
       launched++;const proc=new EventEmitter();proc.pid=123;proc.stdout=new PassThrough();proc.stderr=new PassThrough();proc.stdin=new PassThrough();proc.kill=()=>{killed++;};

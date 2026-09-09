@@ -248,7 +248,7 @@ class Runner extends EventEmitter {
       if(this.active.cancelRequested){this.state(task,'paused');return;}
       const usage=await rpc.call('account/rateLimits/read');
       const quota=quotaView(usage);this.emit('quota',{id:profile.id,email:auth.account.email,...quota,status:'官方额度查询',checkedAt:new Date().toISOString()});
-      if(quota.remaining===0){this.active.quotaExhausted=true;this.state(task,'failed');return;}
+      // Usage readings are informational; the service decides whether this turn can run.
       const options = {
         cwd: task.cwd,
         model: profile.model,
@@ -319,7 +319,6 @@ class Runner extends EventEmitter {
     this.emit('quota',usage);
     // Claude extra usage is controlled by the subscription's administrator.
     // Report the flag without blocking; subscription authentication still applies.
-    if(usage.remaining===0&&usage.extraUsageEnabled!==true){this.active.quotaExhausted=true;this.state(task,'failed');return;}
     if(this.active.cancelRequested){this.state(task,'paused');return;}
     const settingsFile = path.join(
       this.store.dir(task.id),
@@ -504,8 +503,7 @@ class Runner extends EventEmitter {
   }
   async grok(task,profile,text,instructions) {
     const usage=await require('./provider-quota.cjs').grokQuota(profile,task.cwd);this.emit('quota',usage);
-    if(usage.extraUsageEnabled!==false)throw Error('此 Grok 账号的额外付费或自动充值状态未确认关闭；棱镜未发起模型请求，请检查账号计费设置。');
-    if(usage.remaining===0){this.active.quotaExhausted=true;this.state(task,'failed');return;}
+    // Extra usage and top-up settings are managed on the provider's platform.
     return require('./grok.cjs').runGrok(this,task,profile,text,instructions);
   }
   async gemini(task,profile,text,instructions) {return require('./gemini.cjs').runGemini(this,task,profile,text,instructions);}

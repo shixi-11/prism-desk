@@ -582,5 +582,6 @@
   "请选择已有的技能目录。": "Wählen Sie einen vorhandenen Skill-Ordner aus.",
   "此目录没有可读取的 SKILL.md，请选择技能目录。": "Es wurde keine lesbare SKILL.md gefunden. Wählen Sie einen Skill-Ordner aus.",
   "来源不可移除。": "Diese Quelle kann nicht entfernt werden.",
-  "Claude 额外用量已开启；是否可用及消费限额由团队管理，棱镜不拦截。": "Die zusätzliche Nutzung von Claude ist aktiviert. Verfügbarkeit und Ausgabenlimits werden vom Team verwaltet; Prism blockiert sie nicht."
+  "Claude 额外用量已开启；是否可用及消费限额由团队管理，棱镜不拦截。": "Die zusätzliche Nutzung von Claude ist aktiviert. Verfügbarkeit und Ausgabenlimits werden vom Team verwaltet; Prism blockiert sie nicht.",
+  "此账号已启用额外用量或自动充值；请在对应平台管理消费限额，棱镜仅提醒、不拦截。": "Für dieses Konto ist zusätzliche Nutzung oder automatisches Aufladen aktiviert. Verwalten Sie die Ausgabenlimits beim Anbieter; Prism informiert nur und blockiert die Ausführung nicht."
 }

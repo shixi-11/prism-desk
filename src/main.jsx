@@ -389,7 +389,7 @@ function Inspector({
             />{tr("刷新")}</button>
         </div>
         {quota?.status && <p className="account-status">{tr(quota.status)}</p>}
-        {quota?.extraUsageEnabled===true&&<p className="quota-notice">{tr(selected?.provider==='Claude'?"Claude 额外用量已开启；是否可用及消费限额由团队管理，棱镜不拦截。":"此账号启用了额外付费用量，棱镜会阻止执行。请在账号设置中关闭额外付费，或使用其他账号。")}</p>}
+        {quota?.extraUsageEnabled===true&&<p className="quota-notice">{tr("此账号已启用额外用量或自动充值；请在对应平台管理消费限额，棱镜仅提醒、不拦截。")}</p>}
         {selected?.provider==='Gemini'&&<><p className="account-status">{tr("Gemini 当前提供只读接续；登录后仍需执行验证。")}</p><button className="outline" disabled={loginBusy||disabled} onClick={async()=>{setLoginBusy(true);setLoginMessage(tr("请在当前浏览器完成 Google 授权"));try{const result=await api.loginGemini();setLoginMessage(tr(result.ok?"Google 授权已完成；尚未验证模型执行":"登录未完成，请核对浏览器提示后重试"));await onRefresh(target);}catch(e){setLoginMessage(e.message);}finally{setLoginBusy(false);}}}>{tr(loginBusy?"等待浏览器授权…":"登录 Google")}</button><p className="account-status" role="status">{loginMessage}</p></>}
         {quota?.remaining===0&&!stale&&<p className="quota-notice" role="status">{tr("额度已用完，可换账号继续或等待恢复；重置卡需手动使用。")}</p>}
       </section>

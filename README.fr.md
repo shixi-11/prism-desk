@@ -31,12 +31,12 @@ Prism est actuellement distribué sous forme d’**installation à partir des so
 
 ### Installation
 
-Ces commandes installent la version stable **v0.1.10**. Consultez la [dernière version publiée](https://github.com/shixi-11/prism-desk/releases/latest) pour connaître son numéro et lire ses notes de modification bilingues.
+Ces commandes installent la version stable **v0.1.11**. Consultez la [dernière version publiée](https://github.com/shixi-11/prism-desk/releases/latest) pour connaître son numéro et lire ses notes de modification bilingues.
 
 Vous aurez besoin de Windows, de Git, de Node.js 22.12 ou ultérieur, de npm et des CLI officiels des fournisseurs de votre choix. Connectez-vous séparément à chaque CLI.
 
 ```powershell
-git clone --branch v0.1.10 https://github.com/shixi-11/prism-desk.git
+git clone --branch v0.1.11 https://github.com/shixi-11/prism-desk.git
 cd prism-desk
 npm install
 npm run build
@@ -178,7 +178,7 @@ Le panneau de quota affiche les informations renvoyées par le fournisseur. Pour
 
 Les adresses e-mail des comptes sont masquées par défaut ; utilisez le bouton en forme d’œil pour les afficher ou les masquer. L’historique des vérifications reste sur cet appareil. Après un redémarrage, les enregistrements conservent leur date et leur heure d’origine et sont marqués comme devant être actualisés. Les relevés historiques n’autorisent jamais l’exécution ni l’utilisation de crédits de réinitialisation.
 
-Prism ne bascule pas vers une facturation par clé API et n’achète pas de crédits. L’exécution avec Grok nécessite la confirmation que la facturation supplémentaire est désactivée. L’utilisation d’un crédit de réinitialisation Codex existant nécessite une confirmation distincte pour le compte sélectionné. Vous pouvez utiliser un crédit de réinitialisation pendant une tâche ; celle-ci continue de s’exécuter. La confirmation et la protection contre les demandes en double restent en place. Un tour déjà terminé ne redémarre pas automatiquement. Une tâche inactive peut choisir son compte, son modèle et son niveau de raisonnement pendant qu’une autre s’exécute. Le changement suivi de la reprise passe par la file d’attente existante, sans interrompre la tâche en cours. L’utilisation supplémentaire de Claude est indiquée à titre informatif et ne bloque pas l’exécution dans Prism. Sa disponibilité et sa facturation dépendent des paramètres du compte ou de l’organisation Claude ; elle peut consommer des crédits d’équipe ou entraîner des frais supplémentaires.
+Prism ne bascule pas vers une facturation par clé API et n’achète pas de crédits. Pour tous les comptes, l’utilisation supplémentaire, la recharge automatique et les relevés de quota sont informatifs et ne bloquent pas l’exécution. Le fournisseur décide de la disponibilité et l’utilisateur gère ses plafonds de dépenses sur sa plateforme. L’utilisation d’un crédit de réinitialisation Codex existant nécessite une confirmation distincte pour le compte sélectionné. Vous pouvez utiliser un crédit de réinitialisation pendant une tâche ; celle-ci continue de s’exécuter. La confirmation et la protection contre les demandes en double restent en place. Un tour déjà terminé ne redémarre pas automatiquement. Une tâche inactive peut choisir son compte, son modèle et son niveau de raisonnement pendant qu’une autre s’exécute. Le changement suivi de la reprise passe par la file d’attente existante, sans interrompre la tâche en cours. L’utilisation supplémentaire de Claude est indiquée à titre informatif et ne bloque pas l’exécution dans Prism. Sa disponibilité et sa facturation dépendent des paramètres du compte ou de l’organisation Claude ; elle peut consommer des crédits d’équipe ou entraîner des frais supplémentaires.
 
 Les fichiers de l’assistant et les compétences peuvent être partagés entre les comptes. Les autorisations MCP et les connexions aux applications doivent être configurées pour chaque environnement d’exécution. La détection des applications répertorie les points d’entrée installés ; l’action de vérification contrôle séparément les opérations prises en charge.
 
