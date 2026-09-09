@@ -1,14 +1,14 @@
 {
-  "version": "0.1.12",
+  "version": "0.1.13",
   "date": "2026-09-10",
   "notes": {
     "en": [
-      "A live status indicator now appears below the last message. It uses available execution signals to distinguish working, thinking, tools, replies and confirmation, and clearly marks stopping, stopped, failed and ended turns.",
-      "The round send arrow becomes a stop button while the selected task runs. Pending stop requests prevent duplicate clicks; drafts can still be steered or queued. No voice controls are added. Motion respects reduced-motion preferences."
+      "Import files using the attachment button or drag them into the conversation. Up to five attachments are supported per message: 10 MB per image and 50 MB per other file. Documents keep their original content and reach the selected CLI as local file references; format support depends on its tools.",
+      "File cards show names and support removal. Existing image handling is preserved, including Grok image sends. Active status text now shimmers gently instead of using a pulsing dot, with reduced-motion support."
     ],
     "zh": [
-      "最后一条消息下方新增实时状态，依据执行信号区分处理、思考、工具调用、回复和等待确认，并明确标记正在停止、已停止、执行未完成和本轮结束。",
-      "圆形发送箭头在当前任务运行时切换为停止按钮；停止处理中防止重复点击，追加内容仍可引导或排队。不加入语音控件，并适配减少动态效果的偏好。"
+      "支持通过附件按钮导入文件，或将文件拖入会话区域。每条消息最多 5 个附件，图片每张不超过 10 MB，其他文件每个不超过 50 MB。文档保留原始内容，以本地路径交给所选 CLI；格式解析能力取决于其可用工具。",
+      "文件卡片显示名称并支持移除，保留原有图像处理并修复 Grok 图片发送入口。运行状态改为文字本身的柔和微光，不再使用跳动圆点，并适配减少动态效果的偏好。"
     ]
   }
 }

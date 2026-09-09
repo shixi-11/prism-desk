@@ -31,12 +31,12 @@ Prism은 현재 **Windows 소스 설치** 방식으로 제공됩니다. 독립�
 
 ### 설치
 
-다음 명령은 안정 버전 **v0.1.12**을 설치합니다. [최신 릴리스](https://github.com/shixi-11/prism-desk/releases/latest)에서 버전과 두 언어로 제공되는 변경 사항을 확인하세요.
+다음 명령은 안정 버전 **v0.1.13**을 설치합니다. [최신 릴리스](https://github.com/shixi-11/prism-desk/releases/latest)에서 버전과 두 언어로 제공되는 변경 사항을 확인하세요.
 
 Windows, Git, Node.js 22.12 이상, npm, 그리고 선택한 공급자의 공식 CLI가 필요합니다. 각 CLI에 별도로 로그인하세요.
 
 ```powershell
-git clone --branch v0.1.12 https://github.com/shixi-11/prism-desk.git
+git clone --branch v0.1.13 https://github.com/shixi-11/prism-desk.git
 cd prism-desk
 npm install
 npm run build
@@ -207,3 +207,5 @@ npm run build:desktop
 ### 라이선스
 
 [MIT](LICENSE). Prism Desk는 독립 프로젝트입니다. 공급자 이름과 상표는 각 소유자에게 귀속됩니다.
+
+대화 영역에 파일을 끌어 놓거나 첨부 버튼으로 선택할 수 있습니다. 메시지당 최대 5개, 이미지당 10 MB, 기타 파일당 50 MB까지 지원합니다. 문서는 원본 내용을 유지하며 선택한 CLI에 로컬 파일 경로로 전달됩니다. 읽기와 미리보기 지원은 형식과 사용 가능한 도구에 따라 달라집니다. 실행 상태 텍스트에 은은한 빛 효과가 표시되며 동작 줄이기 설정을 따릅니다.

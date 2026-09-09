@@ -17,7 +17,7 @@ import {
   Sun,
   Github,
   Languages,
-  ImagePlus,
+  Paperclip,
   PanelRightOpen,
   PanelRight,
   PanelBottom,
@@ -564,7 +564,7 @@ function App() {
   const [draftSettings,setDraftSettings]=useState({}),[draftAccount,setDraftAccount]=useState('');
   const [text, setText] = useState("");
   const [images,setImages]=useState([]),[uploading,setUploading]=useState(false),[sending,setSending]=useState(false),[queue,setQueue]=useState([]),[thinking,setThinking]=useState(""),[activity,setActivity]=useState("");
-  const drafts=useRef({}),loadSequence=useRef(0),pendingImageFiles=useRef([]);
+  const drafts=useRef({}),loadSequence=useRef(0),pendingImageFiles=useRef([]),attachmentUpload=useRef(false);
   const [streaming, setStreaming] = useState("");
   const [toast, setToast] = useState("");
   const [quotas, setQuotas] = useState({});
@@ -759,7 +759,7 @@ function App() {
     } finally {setSending(false);}
   };
   const savePreferences=async update=>{try{const settings=await api.preferences(update);setInit(old=>({...old,settings}));}catch(e){fail(e);}};
-  const addImages=async files=>{if(!task){if(files){const list=Array.from(files).filter(file=>file.type.startsWith("image/"));if(list.length>5){fail(Error(tr("每条消息最多添加 5 张图片")));return;}if(list.some(file=>file.size>10*1024*1024)){fail(Error(tr("图片不能超过 10 MB")));return;}pendingImageFiles.current=list;}setModal("new");return;}const taskId=task.id;setUploading(true);try{let inputs=null;if(files){const list=Array.from(files).filter(file=>file.type.startsWith("image/"));if(!list.length)return;if(images.length+list.length>5)throw Error(tr("每条消息最多添加 5 张图片"));inputs=await Promise.all(list.map(async file=>{if(file.size>10*1024*1024)throw Error(tr("图片不能超过 10 MB"));const bytes=new Uint8Array(await file.arrayBuffer());let binary="";for(let i=0;i<bytes.length;i+=32768)binary+=String.fromCharCode(...bytes.subarray(i,i+32768));return{name:file.name,data:btoa(binary)};}));}const added=await api.addImages(taskId,inputs);if(images.length+added.length>5)throw Error(tr("每条消息最多添加 5 张图片"));if(current.current===taskId)setImages(old=>[...old,...added].slice(0,5));else drafts.current[taskId]={...drafts.current[taskId],images:[...(drafts.current[taskId]?.images||[]),...added].slice(0,5)};}catch(e){fail(e);}finally{setUploading(false);}};
+  const addImages=async files=>{if(attachmentUpload.current)return;if(!task){if(files){const list=Array.from(files);if(list.length>5){fail(Error(tr("每条消息最多添加 5 个附件")));return;}if(list.some(file=>file.size>(/\.(png|jpe?g|webp|gif|bmp|ico)$/i.test(file.name)?10:50)*1024*1024)){fail(Error(tr("图片不能超过 10 MB，其他文件不能超过 50 MB")));return;}pendingImageFiles.current=list;}setModal("new");return;}const taskId=task.id;attachmentUpload.current=true;setUploading(true);try{let inputs=null;if(files){const list=Array.from(files);if(!list.length)return;if(images.length+list.length>5)throw Error(tr("每条消息最多添加 5 个附件"));inputs=await Promise.all(list.map(async file=>{if(file.size>(/\.(png|jpe?g|webp|gif|bmp|ico)$/i.test(file.name)?10:50)*1024*1024)throw Error(tr("图片不能超过 10 MB，其他文件不能超过 50 MB"));const bytes=new Uint8Array(await file.arrayBuffer());let binary="";for(let i=0;i<bytes.length;i+=32768)binary+=String.fromCharCode(...bytes.subarray(i,i+32768));return{name:file.name,data:btoa(binary)};}));}const added=await api.addImages(taskId,inputs);if(images.length+added.length>5)throw Error(tr("每条消息最多添加 5 个附件"));if(current.current===taskId)setImages(old=>[...old,...added].slice(0,5));else drafts.current[taskId]={...drafts.current[taskId],images:[...(drafts.current[taskId]?.images||[]),...added].slice(0,5)};}catch(e){fail(e);}finally{attachmentUpload.current=false;setUploading(false);}};
   const refresh = async (id,model) => {
     setChecking(old=>[...old,id]);
     try {
@@ -837,7 +837,7 @@ function App() {
           <div className="project-links"><button className="author-homepage" title="shixilin.com" onClick={()=>api.authorHomepage().catch(fail)}><ArrowUpRight size={18}/><span>{tr("认识作者")}</span></button><button className="github-link" aria-label="GitHub · Prism" title="GitHub · Prism" onClick={()=>api.projectRepository().catch(fail)}><Github size={20}/></button></div>
         </footer>
       </aside>
-      <main className="main">
+      <main className="main" onDragOver={e=>{if(e.dataTransfer.types.includes("Files"))e.preventDefault();}} onDrop={e=>{if(e.dataTransfer.types.includes("Files")){e.preventDefault();addImages(e.dataTransfer.files);}}}>
         <header className="topbar">
           <div>
             <h2>{task?.title || tr("新任务")}</h2>
@@ -874,14 +874,14 @@ function App() {
           )}
           {task&&<GoalBar key={task.id} task={task} events={events} thinking={thinking} activity={activity} Modal={Modal} onSave={async input=>{const updated=await api.savePlan(task.id,input);if(current.current===updated.id)setTask(updated);return updated;}} onPlanAction={async(action,revision)=>{const id=task.id;await api.planAction(id,action,revision??task.workPlan?.revision);if(current.current===id)await load(id);}} onGoalAction={async(action,revision)=>{const updated=await api.goalAction(task.id,action,revision);if(current.current===updated.id)setTask(updated);return updated;}}/>}
           <QueuedMessages items={queue.filter(item=>item.taskId===task?.id&&item.status!=="sending")} onCancel={id=>api.cancelQueued(id).catch(fail)} onRetry={id=>api.retryQueued(id).catch(fail)}/>
-          <div className="composer" onDragOver={e=>{if(e.dataTransfer.types.includes("Files"))e.preventDefault();}} onDrop={e=>{e.preventDefault();addImages(e.dataTransfer.files);}}>
+          <div className="composer">
             {task?.goalLifecycle?.status==='paused'?<p className="plan-mode-note">{tr('目标已暂停，请先继续目标。')}</p>:task?.planReviewRequired&&<p className="plan-mode-note">{tr('计划待确认，当前消息仅用于讨论计划。')}<button disabled={anyBusy||!task.workPlan?.steps?.length} onClick={async()=>{try{await api.planAction(task.id,'execute',task.workPlan?.revision);}catch(e){fail(e);}}}>{tr('确认计划并执行')}</button></p>}
             <ImageAttachments taskId={task?.id} images={images} onRemove={id=>setImages(old=>old.filter(image=>image.id!==id))} onPreview={image=>image.path&&setPreview({id:Date.now(),target:image.path,task})}/>
             <textarea dir="auto"
               aria-label={tr("任务指令")}
               value={text}
               onChange={(e) => setText(e.target.value)}
-              onPaste={e=>{if(Array.from(e.clipboardData.files).some(file=>file.type.startsWith("image/"))){e.preventDefault();addImages(e.clipboardData.files);}}}
+              onPaste={e=>{if(e.clipboardData.files.length){e.preventDefault();addImages(e.clipboardData.files);}}}
               placeholder={tr("写下你的想法，或者接着上次的工作…")}
               onKeyDown={(e) => {
                 if(e.nativeEvent.isComposing||e.keyCode===229)return;
@@ -909,7 +909,7 @@ function App() {
               <span className="separator" />
               {task && <PermissionControl task={task} profile={init.profiles.find(p=>p.id===task.profile)} defaultMode={init.settings.defaultMode||'workspace-write'} onChange={changeMode} onDefault={async mode=>{try{await api.defaultMode(mode);setInit(old=>({...old,settings:{...old.settings,defaultMode:mode}}));}catch(e){fail(e);}}}/>}
               {task?.pendingMode&&<small className="permission-pending">{tr("下次执行生效")}</small>}
-              <button title={tr("添加图片")} aria-label={tr("添加图片")} disabled={uploading||images.length>=5} onClick={()=>addImages(null)}><ImagePlus size={19}/></button>
+              <button title={tr("添加附件")} aria-label={tr("添加附件")} disabled={uploading||images.length>=5} onClick={()=>addImages(null)}><Paperclip size={19}/></button>
               <span className="compose-spacer" />
               <ComposerSubmit key={task?.id||'draft'} busy={busy} stopping={task?.state==='stopping'} hasDraft={!!text.trim()||!!images.length} onSend={send} onStop={()=>api.stop().catch(fail)} sendLabel={anyBusy?(init.settings.busySend==='steer'?'引导':'排队'):'发送'} disabled={(!text.trim()&&!images.length) || sending || uploading || task?.goalLifecycle?.status==='paused' || task?.state === "unknown" || !!task&&(!init.profiles.find(p=>p.id===task.profile)||init.profiles.find(p=>p.id===task.profile)?.disabled) || Object.values(accountLogins).some(s=>['starting','waiting','verifying'].includes(s.phase))}/>
             </div>

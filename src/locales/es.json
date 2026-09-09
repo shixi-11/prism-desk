@@ -590,5 +590,12 @@
   "等待确认…": "Esperando confirmación…",
   "正在停止…": "Deteniendo…",
   "已停止": "Detenido",
-  "本轮已结束": "Turno finalizado"
+  "本轮已结束": "Turno finalizado",
+  "添加附件": "Añadir archivo adjunto",
+  "移除附件": "Quitar archivo adjunto",
+  "每条消息最多添加 5 个附件": "Máximo 5 adjuntos por mensaje",
+  "文件不能超过 50 MB": "Los archivos no pueden superar 50 MB",
+  "图片不能超过 10 MB，其他文件不能超过 50 MB": "Imágenes: hasta 10 MB; otros archivos: hasta 50 MB",
+  "附件无效": "Adjunto no válido",
+  "请查看这些附件。": "Revisa estos archivos adjuntos."
 }

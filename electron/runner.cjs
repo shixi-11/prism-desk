@@ -90,7 +90,7 @@ class Runner extends EventEmitter {
     let profile = require('./models.cjs').selection(task,profileFor(task.profile));
     if(profile.disabled)throw Error('账号尚未启用，请先登录或选择其他账号。');
     require('./task-settings.cjs').validateMode(options.planning?'read-only':task.mode,profile);
-    if(images.length&&!['Codex','Claude','Grok'].includes(profile.provider))throw Error('当前入口暂不支持图片，请选择 Codex、Claude 或 Grok');
+    if(images.some(image=>image.kind!=='file')&&!['Codex','Claude','Grok'].includes(profile.provider))throw Error('当前入口暂不支持图片，请选择 Codex、Claude 或 Grok');
     this.event(id, "user", { text: text.trim(), images, profile: profile.id });
     this.active = { task, profile, images, planning:!!options.planning, phase: "starting", pending: new Map(), cancelRequested:false };
     delete task.stopReason;delete task.relaySource;
@@ -122,7 +122,7 @@ class Runner extends EventEmitter {
         if(task.autoSwitch===false || this.active.cancelRequested || !this.active.quotaExhausted || task.state!=='failed')break;
         require('./task-settings.cjs').applyPendingMode(task);
         const ordered=[...(task.relayOrder||[]).map(id=>PROFILES.find(p=>p.id===id)).filter(Boolean),...PROFILES.filter(p=>!(task.relayOrder||[]).includes(p.id))];
-        const next=ordered.find(p=>!p.disabled&&!attempted.has(p.id) && (!this.active.images.length||['Codex','Claude','Grok'].includes(p.provider)) && (task.execution.mode==='read-only'||p.write&&['Codex','Claude','Grok'].includes(p.provider)));
+        const next=ordered.find(p=>!p.disabled&&!attempted.has(p.id) && (!this.active.images.some(image=>image.kind!=='file')||['Codex','Claude','Grok'].includes(p.provider)) && (task.execution.mode==='read-only'||p.write&&['Codex','Claude','Grok'].includes(p.provider)));
         if(!next){this.event(id,'notice',{text:'已尝试所有符合当前权限的入口；没有自动重复调用。'});break;}
         this.active.pending.clear();
         this.emit('approval-reset',{taskId:task.id});
@@ -506,6 +506,6 @@ class Runner extends EventEmitter {
     // Extra usage and top-up settings are managed on the provider's platform.
     return require('./grok.cjs').runGrok(this,task,profile,text,instructions);
   }
-  async gemini(task,profile,text,instructions) {return require('./gemini.cjs').runGemini(this,task,profile,text,instructions);}
+  async gemini(task,profile,text,instructions) {return require('./gemini.cjs').runGemini(this,task,profile,require('./attachments.cjs').attachmentText(text,this.active.images),instructions);}
 }
 module.exports = { Runner };

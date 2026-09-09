@@ -31,12 +31,12 @@ Prism は現在、**Windows でのソースからのインストール**に対�
 
 ### インストール
 
-以下のコマンドで安定版 **v0.1.12** をインストールします。[最新リリース](https://github.com/shixi-11/prism-desk/releases/latest)で、バージョンと二言語の変更履歴を確認してください。
+以下のコマンドで安定版 **v0.1.13** をインストールします。[最新リリース](https://github.com/shixi-11/prism-desk/releases/latest)で、バージョンと二言語の変更履歴を確認してください。
 
 Windows、Git、Node.js 22.12 以降、npm、および利用するプロバイダーの公式 CLI が必要です。各 CLI に個別にサインインしてください。
 
 ```powershell
-git clone --branch v0.1.12 https://github.com/shixi-11/prism-desk.git
+git clone --branch v0.1.13 https://github.com/shixi-11/prism-desk.git
 cd prism-desk
 npm install
 npm run build
@@ -207,3 +207,5 @@ npm run build:desktop
 ### ライセンス
 
 [MIT](LICENSE)。Prism Desk は独立したプロジェクトです。プロバイダーの名称と商標は、それぞれの所有者に帰属します。
+
+会話領域にファイルをドロップするか、添付ボタンから選択できます。1メッセージにつき5個まで、画像は各10 MB、その他のファイルは各50 MBが上限です。文書は元の内容を保持し、ローカルファイルの参照として選択した CLI に渡されます。読み取りとプレビューの対応範囲は形式と利用可能なツールによります。実行中の状態テキストには穏やかな光のアニメーションが付き、視差効果を減らす設定にも対応します。

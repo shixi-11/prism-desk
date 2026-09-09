@@ -1,7 +1,4 @@
 .conversation-status{display:flex;align-items:center;gap:10px;min-height:36px;padding:8px 0 16px;color:var(--muted);font-size:13px;line-height:1.5}
-.conversation-status-mark{width:7px;height:7px;border-radius:50%;background:currentColor;flex:none;opacity:.65}
-.conversation-status.is-active .conversation-status-mark{animation:conversation-pulse 1.6s ease-in-out infinite}
-.conversation-status[data-state="stopped"] .conversation-status-mark{border-radius:2px}
 .composer-submit{display:flex;align-items:center;gap:10px;flex:none}
 .compose-actions .composer-primary{width:44px;height:44px;min-width:44px;padding:0;border:0;border-radius:50%;background:var(--text);color:var(--bg);display:inline-flex;align-items:center;justify-content:center;flex:none}
 .compose-actions .composer-primary:hover:not(:disabled){filter:brightness(.88)}
@@ -9,6 +6,10 @@
 .compose-actions .composer-primary:focus-visible{outline:2px solid var(--text);outline-offset:4px}
 .compose-actions .composer-steer{font-size:13px;padding:8px 10px}
 .composer-stopping{animation:composer-spin 1s linear infinite}
-@keyframes conversation-pulse{0%,100%{opacity:.35;transform:scale(.85)}50%{opacity:1;transform:scale(1.1)}}
 @keyframes composer-spin{to{transform:rotate(360deg)}}
-@media(prefers-reduced-motion:reduce){.conversation-status.is-active .conversation-status-mark,.composer-stopping{animation:none}}
+@media(prefers-reduced-motion:reduce){.composer-stopping{animation:none}}
+
+.conversation-status.is-active .conversation-status-text{background:linear-gradient(100deg,var(--muted) 30%,var(--text) 48%,var(--muted) 66%);background-size:250% 100%;background-clip:text;-webkit-background-clip:text;color:transparent;animation:conversation-shimmer 2.2s linear infinite}
+@keyframes conversation-shimmer{from{background-position:150% 0}to{background-position:-100% 0}}
+@media(prefers-reduced-motion:reduce){.conversation-status.is-active .conversation-status-text{animation:none;background:none;color:var(--muted)}}
+.image-attachments .image-preview.file-attachment{display:flex;align-items:center;gap:8px;padding:12px;max-width:220px;min-height:64px}.file-attachment span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}

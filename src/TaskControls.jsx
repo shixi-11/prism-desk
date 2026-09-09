@@ -1,5 +1,5 @@
 import React,{useEffect,useState} from 'react';
-import {X,ImagePlus,Settings2,ChevronDown} from 'lucide-react';
+import {X,FileText,ImagePlus,Settings2,ChevronDown} from 'lucide-react';
 import {tr,locale} from './i18n.js';
 import UpdateSettings from './UpdateSettings.jsx';
 export function AccountQuota({profile,quota}){
@@ -11,8 +11,8 @@ export function AccountQuota({profile,quota}){
 }
 export function ImageAttachments({taskId,images,onRemove,onPreview}){
  const [thumbs,setThumbs]=useState({});
- useEffect(()=>{let live=true;for(const image of images||[])if(!image.thumbnail)window.prism.imageThumbnail(taskId,image.id).then(src=>{if(live)setThumbs(old=>({...old,[image.id]:src}));}).catch(()=>{});return()=>{live=false;};},[taskId,images]);
- return images?.length?<div className="image-attachments">{images.map(image=><div key={image.id}><button className="image-preview" title={image.name} onClick={()=>onPreview?.(image)}><img alt={image.name} src={image.thumbnail||thumbs[image.id]}/></button>{onRemove&&<button className="remove-image" aria-label={tr('移除图片')} onClick={()=>onRemove(image.id)}><X size={13}/></button>}</div>)}</div>:null;
+ useEffect(()=>{let live=true;for(const image of images||[])if(image.kind!=='file'&&!image.thumbnail)window.prism.imageThumbnail(taskId,image.id).then(src=>{if(live)setThumbs(old=>({...old,[image.id]:src}));}).catch(()=>{});return()=>{live=false;};},[taskId,images]);
+ return images?.length?<div className="image-attachments">{images.map(image=><div key={image.id}><button className={image.kind==='file'?'image-preview file-attachment':'image-preview'} title={image.name} onClick={()=>onPreview?.(image)}>{image.kind==='file'?<><FileText size={22}/><span>{image.name}</span></>:<img alt={image.name} src={image.thumbnail||thumbs[image.id]}/>}</button>{onRemove&&<button className="remove-image" aria-label={tr('移除附件')} onClick={()=>onRemove(image.id)}><X size={13}/></button>}</div>)}</div>:null;
 }
 export function QueuedMessages({items,onCancel,onRetry}){
  if(!items.length)return null;

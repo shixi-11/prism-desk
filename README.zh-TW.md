@@ -31,12 +31,12 @@ Prism 目前以 **Windows 原始碼安裝**方式提供。尚未發布獨立的 
 
 ### 安裝
 
-以下指令會安裝穩定版本 **v0.1.12**。請查看[最新發布版本](https://github.com/shixi-11/prism-desk/releases/latest)，確認其版本與雙語變更說明。
+以下指令會安裝穩定版本 **v0.1.13**。請查看[最新發布版本](https://github.com/shixi-11/prism-desk/releases/latest)，確認其版本與雙語變更說明。
 
 你需要 Windows、Git、Node.js 22.12 或更新版本、npm，以及所選供應商的官方 CLI。請分別登入各個 CLI。
 
 ```powershell
-git clone --branch v0.1.12 https://github.com/shixi-11/prism-desk.git
+git clone --branch v0.1.13 https://github.com/shixi-11/prism-desk.git
 cd prism-desk
 npm install
 npm run build
@@ -207,3 +207,5 @@ npm run build:desktop
 ### 授權條款
 
 [MIT](LICENSE)。Prism Desk 是獨立專案。供應商名稱與商標屬於各自的擁有者。
+
+可將檔案拖入對話區域，或透過附件按鈕選擇檔案；每則訊息最多 5 個附件，圖片每張不超過 10 MB，其他檔案每個不超過 50 MB。文件保留原始內容，以本機檔案路徑交給所選 CLI；讀取與預覽能力取決於格式及可用工具。執行狀態文字帶有柔和微光，並配合減少動態效果的偏好。

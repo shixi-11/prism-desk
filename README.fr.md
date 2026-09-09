@@ -31,12 +31,12 @@ Prism est actuellement distribué sous forme d’**installation à partir des so
 
 ### Installation
 
-Ces commandes installent la version stable **v0.1.12**. Consultez la [dernière version publiée](https://github.com/shixi-11/prism-desk/releases/latest) pour connaître son numéro et lire ses notes de modification bilingues.
+Ces commandes installent la version stable **v0.1.13**. Consultez la [dernière version publiée](https://github.com/shixi-11/prism-desk/releases/latest) pour connaître son numéro et lire ses notes de modification bilingues.
 
 Vous aurez besoin de Windows, de Git, de Node.js 22.12 ou ultérieur, de npm et des CLI officiels des fournisseurs de votre choix. Connectez-vous séparément à chaque CLI.
 
 ```powershell
-git clone --branch v0.1.12 https://github.com/shixi-11/prism-desk.git
+git clone --branch v0.1.13 https://github.com/shixi-11/prism-desk.git
 cd prism-desk
 npm install
 npm run build
@@ -207,3 +207,5 @@ Avant toute publication, lisez [AGENTS.md](AGENTS.md) et [RELEASING.md](RELEASIN
 ### Licence
 
 [MIT](LICENSE). Prism Desk est un projet indépendant. Les noms et marques des fournisseurs appartiennent à leurs propriétaires respectifs.
+
+Déposez des fichiers dans la conversation ou utilisez le bouton de pièces jointes : cinq par message au maximum, 10 Mo par image et 50 Mo par autre fichier. Les documents conservent leur contenu original et sont transmis au CLI choisi sous forme de références locales ; la lecture et l’aperçu dépendent du format et des outils disponibles. Le texte d’état actif présente un léger reflet animé qui respecte la préférence de réduction des animations.

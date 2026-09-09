@@ -248,11 +248,11 @@ app.whenReady().then(() => {
   });
   handle('addImages',async(id,inputs)=>{
     store.get(id);const {nativeImage}=require('electron');
-    if(!inputs){const result=await dialog.showOpenDialog(owner(),{properties:['openFile','multiSelections'],filters:[{name:'Images',extensions:['png','jpg','jpeg','webp','gif']}]});if(result.canceled)return [];inputs=result.filePaths.map(file=>{if(fs.statSync(file).size>10*1024*1024)throw Error('图片不能超过 10 MB');return {name:path.basename(file),data:fs.readFileSync(file).toString('base64')};});}
-    if(!Array.isArray(inputs)||inputs.length>5)throw Error('每条消息最多添加 5 张图片');
+    if(!inputs){const result=await dialog.showOpenDialog(owner(),{properties:['openFile','multiSelections'],filters:[{name:'Files',extensions:['*']}]});if(result.canceled)return [];inputs=result.filePaths.map(file=>{if(fs.statSync(file).size>50*1024*1024)throw Error('文件不能超过 50 MB');return {name:path.basename(file),data:fs.readFileSync(file).toString('base64')};});}
+    if(!Array.isArray(inputs)||inputs.length>5)throw Error('每条消息最多添加 5 个附件');
     return inputs.map(input=>require('./attachments.cjs').addAttachment(store.dir(id),input,nativeImage));
   });
-  handle('imageThumbnail',(id,imageId)=>{store.get(id);const [image]=require('./attachments.cjs').attachmentFiles(store.dir(id),[imageId]);return require('electron').nativeImage.createFromPath(image.path).resize({width:180}).toDataURL();});
+  handle('imageThumbnail',(id,imageId)=>{store.get(id);const [image]=require('./attachments.cjs').attachmentFiles(store.dir(id),[imageId]);if(image.kind==='file')throw Error('附件无效');return require('electron').nativeImage.createFromPath(image.path).resize({width:180}).toDataURL();});
   const previewFiles=new Set();
   handle('preview',async(id,target,relativeTo)=>{
     const task=store.get(id);
@@ -339,8 +339,8 @@ app.whenReady().then(() => {
     const images=require('./attachments.cjs').attachmentFiles(store.dir(id),imageIds);
     if(typeof text!=='string')throw Error('请填写指令。');
     if(task.goalLifecycle?.status==='paused')throw Error('目标已暂停，请先继续目标。');
-    text=text.trim()||(images.length?'请查看这些图片。':'');if(!text||text.length>60000)throw Error('请输入 1–60000 字的指令。');
-    if(images.length&&!['Codex','Claude'].includes(PROFILES.find(p=>p.id===task.profile)?.provider))throw Error('当前入口暂不支持图片，请选择 Codex 或 Claude');
+    text=text.trim()||(images.length?'请查看这些附件。':'');if(!text||text.length>60000)throw Error('请输入 1–60000 字的指令。');
+    if(images.some(image=>image.kind!=='file')&&!['Codex','Claude','Grok'].includes(PROFILES.find(p=>p.id===task.profile)?.provider))throw Error('当前入口暂不支持图片，请选择 Codex、Claude 或 Grok');
     if(settings().busySend==='steer'&&await runner.steer(id,text,images)){if(choiceEventId)runner.event(id,'notice',{choiceEventId,text:'已提交选择 · '+text});return {steered:true};}
     const busy=!!runner.active||messageQueue.running;
     const item=messageQueue.enqueue(id,text,images,{planning:!!task.planReviewRequired});
