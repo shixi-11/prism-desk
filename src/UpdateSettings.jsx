@@ -2,7 +2,7 @@ import React,{useEffect,useState} from 'react';
 import Markdown from 'react-markdown';
 import {tr} from './i18n.js';
 import {releaseNotes} from './release-notes.js';
-const labels={idle:'尚未检查更新',checking:'正在检查更新',current:'已是最新版本',available:'发现新版本',preparing:'正在准备新版',ready:'新版已就绪',restarting:'正在重启更新',error:'更新未完成'};
+const labels={idle:'尚未检查更新',checking:'正在检查更新',current:'已是最新版本',available:'发现新版本',preparing:'正在准备新版',ready:'更新已准备好',restarting:'正在重启更新',error:'更新未完成'};
 export default function UpdateSettings({checkOnOpen=false,standalone=false,onLater}){
  const [state,setState]=useState({}),[error,setError]=useState(''),[busy,setBusy]=useState(false);
  useEffect(()=>{let live=true;const unsub=window.prism.subscribe(({type,value})=>{if(live&&type==='app-update')setState(value);});window.prism[checkOnOpen?'checkUpdates':'updateStatus']().then(value=>{if(live)setState(value);}).catch(e=>{if(live)setError(e.message);});return()=>{live=false;unsub();};},[checkOnOpen]);

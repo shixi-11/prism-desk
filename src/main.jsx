@@ -664,7 +664,7 @@ function App() {
         setApprovals(data.approvals || []);
         const requested=new URLSearchParams(location.search).get('task');
         if (data.tasks.length) load(data.tasks.find(t=>t.id===(requested||drafts.current._selected))?.id||data.tasks[0].id);
-        api.updateHealthy().catch(fail);
+        api.updateHealthy().then(result=>{if(result?.version)setToast(tr('已升级至 v{version}',{version:result.version}));}).catch(fail);
       })
       .catch(fail);
     return api.subscribe(({ type, value }) => {

@@ -146,7 +146,7 @@ app.whenReady().then(() => {
     }catch(error){updateInstalling=false;messageQueue.paused=false;try{updater.cancelActivation();}catch{}const layoutFile=path.join(dataPath(),'update-windows.json');try{if(fs.existsSync(layoutFile))fs.unlinkSync(layoutFile);}catch{}for(const w of opened)if(!w.isDestroyed())w.webContents.executeJavaScript(`window.__prismCancelUpdate?.(${JSON.stringify(token)})`).catch(()=>{});messageQueue.pump();throw error;}
   }
   handle('updateStatus',()=>updater.snapshot());
-  handle('updateHealthy',()=>{if(!process.env.PRISM_TEST_DATA)updateBootstrap.healthy(app.getAppPath());return true;});
+  handle('updateHealthy',()=>process.env.PRISM_TEST_DATA?null:updateBootstrap.healthy(app.getAppPath()));
   handle('checkUpdates',()=>updater.check());
   handle('prepareUpdate',()=>updater.prepare());
   handle('automaticUpdates',value=>updater.automatic(value));

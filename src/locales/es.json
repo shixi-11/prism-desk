@@ -504,5 +504,7 @@
   "有更新": "Actualización",
   "新版本": "Nueva versión",
   "更新内容": "Novedades",
-  "稍后": "Más tarde"
+  "稍后": "Más tarde",
+  "更新已准备好": "La actualización está lista",
+  "已升级至 v{version}": "Actualizado a v{version}"
 }

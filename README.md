@@ -4,17 +4,17 @@
 
 [English](#english) · [简体中文](#简体中文)
 
-**[Latest version / 最新版本](https://github.com/shixi-11/prism-desk/releases/latest)** · **[Install / 安装指南](#install)** · **[中文安装指南](#安装)**
-
-> Distribution: Windows source installation. No standalone .exe/.msi installer is currently published. GitHub’s “Source code” downloads are source files, not an installable client.
->
-> 当前提供 Windows 源码安装，尚未发布可直接安装的 .exe/.msi 客户端。GitHub 的“Source code”下载是源码，首次使用请按下方安装指南构建。
-
 ## English
 
 Created by [Shixi Lin](https://shixilin.com/).
 
 Prism Desk is a Windows workspace for subscription CLIs. When one account runs out of allowance, you can move the task to another without rebuilding its conversation and progress notes by hand. The project folder stays the same.
+
+### Versions and downloads
+
+**[Latest release](https://github.com/shixi-11/prism-desk/releases/latest)** · **[Installation guide](#install)**
+
+Prism currently ships as a **Windows source installation**. No standalone `.exe` or `.msi` installer is published. GitHub’s “Source code” downloads contain source files; follow the installation guide to build and launch the desktop app. Each stable release has one version tag and one page containing complete English and Simplified Chinese change notes.
 
 ### What you can do
 
@@ -29,25 +29,23 @@ Prism Desk is a Windows workspace for subscription CLIs. When one account runs o
 | Keep your work locally | Choose a permanent task-storage folder, add progress notes and export a Markdown conversation record. |
 | Work in your language | Choose one of nine interface languages, including right-to-left Arabic, and switch between light and dark desert themes. |
 
-### Messages, settings and previews
+### Install
 
-The compact **goal bar** above the composer shows the saved goal, execution state and accumulated execution time. Edit, pause, resume or delete the goal from the bar; expand it to see the full goal, editable plan and execution details. Pausing stops the current execution and holds queued messages. Deleting waits for execution to stop, removes the goal and holds pending messages for review; conversation records and workspace files remain available. The timer excludes pauses, idle time and time when the app is closed. Official quota exhaustion is shown separately from network or login failures.
+These commands install stable version **v0.1.4**. Check the [latest Release](https://github.com/shixi-11/prism-desk/releases/latest) for its version and bilingual change notes.
 
-Codex can save goals through Prism’s native tools when you ask it to set or change one. Other entries can propose a goal for you to adopt in the interface. Chat text claiming a goal is saved never changes the actual goal by itself. **Plan first** runs with read-only permissions and returns a draft for review. The composer explicitly indicates when messages only discuss a pending plan; **Confirm plan and execute** starts implementation with the task’s configured permissions. Goals and plans persist across sessions and remain in the handoff record.
+You will need Windows, Git, Node.js 22.12 or later, npm, and the official CLIs for your chosen providers. Sign in to each CLI separately.
 
-Model changes can be applied within the same account using **Switch and continue**. A confirmed execution records its account, model and reasoning level; a saved selection alone is not shown as a completed switch. **Automatic handoff preferences** opens an account list you can drag to reorder, with settings for each account’s model and reasoning level. Changes save automatically for the current task. The list marks accounts that cannot meet the task’s write-access requirements; handoff also respects image support.
+```powershell
+git clone --branch v0.1.4 https://github.com/shixi-11/prism-desk.git
+cd prism-desk
+npm install
+npm run build
+npm run build:desktop
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts/build-host.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts/start.ps1
+```
 
-Each account card has an editable **Nickname** with a pencil button. This changes its display name, not its login identity. Native Codex questions and supported question-and-list messages offer clickable choices and a custom answer. Closing the Windows title-bar **×** hides Prism in the notification area; use the tray menu’s **Quit Prism** to stop active work and exit.
-
-Right-click a task to rename, pin, mark unread, archive, group by project or section, share, copy, fork, open its folder or conversation, open another window, or delete it. **Archived and deleted** in the sidebar restores hidden tasks. Deleting a task preserves its workspace and conversation files. Project selection changes where future work runs; existing files stay in their original folder. Forking starts fresh CLI sessions and copies conversation attachments; the separate-workspace option starts with an empty folder. Share previews a local Markdown document for copying or saving; it does not create a hosted public link. Task changes are synchronized across open windows.
-
-The top bar has view settings and toggles for the bottom execution log and account sidebar. Their state is saved locally. In Accounts, **Check all accounts** queries every configured profile and displays available allowance, reset times, Codex reset credits and credit expiry dates. A failed query does not stop the remaining accounts.
-
-Paste screenshots, drop images into the composer or use the image button (up to five images, 10 MB each). Codex receives local images; Claude receives native image content when its subscription checks pass. Claude image execution has not yet been verified against a signed-in account. Grok uses direct image content when the CLI advertises it, otherwise its native Read tool opens the attached images; this path has been verified with a signed-in subscription.
-
-Send more messages while work runs: they wait in order and can be cancelled. Settings lets you choose Enter or Ctrl/⌘+Enter and queueing or live guidance. Live guidance uses Codex's active turn; other providers fall back to the queue. Failed or interrupted sends hold subsequent messages for review. Drafts are retained while switching tasks in the open app.
-
-Open the preview panel or click a file link to view images, PDFs, Markdown, code and text. Text files can be edited and saved; external changes are checked before saving. HTML previews display standalone pages; interactive projects can use their running HTTP address. Some websites block embedding. The activity panel shows CLI-provided reasoning summaries, plans and execution status when available.
+The build script compiles the Windows process host used to stop CLI subprocesses together. It uses the .NET Framework compiler included with Windows.
 
 ### Before your first task
 
@@ -70,7 +68,47 @@ Open **Accounts → Connect account**, choose Codex, Claude or Grok, and name th
 
 The next account receives saved conversation, progress notes and tool records. A provider's internal model state is not transferred.
 
+### Messages, settings and previews
+
+#### Goals and plans
+
+The compact **goal bar** above the composer shows the saved goal, execution state and accumulated execution time. Edit, pause, resume or delete the goal from the bar; expand it to see the full goal, editable plan and execution details. Pausing stops the current execution and holds queued messages. Deleting waits for execution to stop, removes the goal and holds pending messages for review; conversation records and workspace files remain available. The timer excludes pauses, idle time and time when the app is closed. Official quota exhaustion is shown separately from network or login failures.
+
+Codex can save goals through Prism’s native tools when you ask it to set or change one. Other entries can propose a goal for you to adopt in the interface. Chat text claiming a goal is saved never changes the actual goal by itself. **Plan first** runs with read-only permissions and returns a draft for review. The composer explicitly indicates when messages only discuss a pending plan; **Confirm plan and execute** starts implementation with the task’s configured permissions. Goals and plans persist across sessions and remain in the handoff record.
+
+#### Models and handoff
+
+Model changes can be applied within the same account using **Switch and continue**. A confirmed execution records its account, model and reasoning level; a saved selection alone is not shown as a completed switch. **Automatic handoff preferences** opens an account list you can drag to reorder, with settings for each account’s model and reasoning level. Changes save automatically for the current task. The list marks accounts that cannot meet the task’s write-access requirements; handoff also respects image support.
+
+#### Accounts and windows
+
+Each account card has an editable **Nickname** with a pencil button. This changes its display name, not its login identity. Native Codex questions and supported question-and-list messages offer clickable choices and a custom answer. Closing the Windows title-bar **×** hides Prism in the notification area; use the tray menu’s **Quit Prism** to stop active work and exit.
+
+#### Task organization
+
+Right-click a task to rename, pin, mark unread, archive, group by project or section, share, copy, fork, open its folder or conversation, open another window, or delete it. **Archived and deleted** in the sidebar restores hidden tasks. Deleting a task preserves its workspace and conversation files. Project selection changes where future work runs; existing files stay in their original folder. Forking starts fresh CLI sessions and copies conversation attachments; the separate-workspace option starts with an empty folder. Share previews a local Markdown document for copying or saving; it does not create a hosted public link. Task changes are synchronized across open windows.
+
+#### Views and allowance
+
+The top bar has view settings and toggles for the bottom execution log and account sidebar. Their state is saved locally. In Accounts, **Check all accounts** queries every configured profile and displays available allowance, reset times, Codex reset credits and credit expiry dates. A failed query does not stop the remaining accounts.
+
+#### Images
+
+Paste screenshots, drop images into the composer or use the image button (up to five images, 10 MB each). Codex receives local images; Claude receives native image content when its subscription checks pass. Claude image execution has not yet been verified against a signed-in account. Grok uses direct image content when the CLI advertises it, otherwise its native Read tool opens the attached images; this path has been verified with a signed-in subscription.
+
+#### Messages and drafts
+
+Send more messages while work runs: they wait in order and can be cancelled. Settings lets you choose Enter or Ctrl/⌘+Enter and queueing or live guidance. Live guidance uses Codex's active turn; other providers fall back to the queue. Failed or interrupted sends hold subsequent messages for review. Drafts are retained while switching tasks in the open app.
+
+#### File previews
+
+Open the preview panel or click a file link to view images, PDFs, Markdown, code and text. Text files can be edited and saved; external changes are checked before saving. HTML previews display standalone pages; interactive projects can use their running HTTP address. Some websites block embedding. The activity panel shows CLI-provided reasoning summaries, plans and execution status when available.
+
 ### Automatic updates
+
+1. **Check for updates** reports “New version available” or “You are up to date”. It does not download or restart.
+2. **Download and prepare** reports “Update is ready” when preparation finishes. You can continue using the current version.
+3. **Update and restart** restarts only after you click it. Once the new version successfully starts, “Updated to vX.X.X” appears once. Ordinary launches and rollbacks do not show this success message.
 
 **Check for updates** in the sidebar follows published stable [GitHub Releases](https://github.com/shixi-11/prism-desk/releases). It shows the installed version, available version, and change notes before downloading. Choose **Later** to keep using your current version. Ordinary main-branch commits do not trigger update notices. Automatic checking is enabled by default: Prism checks after startup and every four hours. A steady blue dot beside Check for updates and an update icon in the top bar indicate an available version. Checking does not download, install, or restart the app. Choose **Download and prepare**, then **Update and restart** when convenient. The dot remains until the installed revision is current. Each window’s drafts are saved before restarting; tasks, queued messages, account operations, editing dialogs and previews block the restart until finished or closed.
 
@@ -86,25 +124,9 @@ Switch between light and dark themes from the top bar.
 
 *Theme artwork used by the app.*
 
-### Install
-
-These commands install stable version **v0.1.3**. Check the [latest Release](https://github.com/shixi-11/prism-desk/releases/latest) for its version and bilingual change notes.
-
-You will need Windows, Git, Node.js 22.12 or later, npm, and the official CLIs for your chosen providers. Sign in to each CLI separately.
-
-```powershell
-git clone --branch v0.1.3 https://github.com/shixi-11/prism-desk.git
-cd prism-desk
-npm install
-npm run build
-npm run build:desktop
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts/build-host.ps1
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts/start.ps1
-```
-
-The build script compiles the Windows process host used to stop CLI subprocesses together. It uses the .NET Framework compiler included with Windows.
-
 ### Configure
+
+Most users can connect accounts in **Accounts → Connect account**. The configuration file below is an advanced alternative. Back up an existing file before copying the example.
 
 ```powershell
 New-Item -ItemType Directory -Force .local
@@ -172,6 +194,10 @@ Unit tests use isolated account fixtures. Optional desktop and live CLI checks a
 
 For an issue report, include the app and CLI versions, reproduction steps and a redacted error message. Remove credentials, account details and private conversation content before posting.
 
+### Contributor release rules
+
+Before publishing, read [AGENTS.md](AGENTS.md) and [RELEASING.md](RELEASING.md). Every software release needs a new version, one immutable tag, and complete English and Simplified Chinese notes. Run `npm run release:check` and the checks required for the change. Documentation-only edits do not require a new software release.
+
 ### License
 
 [MIT](LICENSE). Prism Desk is an independent project. Provider names and trademarks belong to their respective owners.
@@ -181,6 +207,12 @@ For an issue report, include the app and CLI versions, reproduction steps and a 
 由林拾汐创作。[认识作者 → shixilin.com](https://shixilin.com/)
 
 棱镜是一款面向订阅 CLI 的 Windows 桌面工作台。一个账号额度用完，可以把任务交给另一个账号，不必手动重建对话、重新整理进度。切换后仍使用原项目目录。
+
+### 版本与下载
+
+**[最新发布版本](https://github.com/shixi-11/prism-desk/releases/latest)** · **[安装指南](#安装)**
+
+棱镜目前提供 **Windows 源码安装**，尚未发布可直接安装的 `.exe` 或 `.msi` 客户端。GitHub 的“Source code”下载包含源码，需要按安装指南构建并启动桌面应用。每个稳定版本对应一个版本标签和一个发布页面，页面内包含完整的英文与简体中文更新说明。
 
 ### 可以做什么
 
@@ -195,6 +227,24 @@ For an issue report, include the app and CLI versions, reproduction steps and a 
 | 在本机保存工作 | 指定固定会话目录、补充进度备注，并将对话导出为 Markdown。 |
 | 选择语言与主题 | 支持九种界面语言、阿拉伯语从右到左布局，以及日间和夜间的大漠主题。 |
 
+### 安装
+
+以下命令安装稳定版 **v0.1.4**。[最新发布页](https://github.com/shixi-11/prism-desk/releases/latest)提供版本号与中英文更新内容。
+
+需要 Windows、Git、Node.js 22.12 或更新版本、npm，以及准备使用的官方 CLI。各 CLI 需分别完成登录。
+
+```powershell
+git clone --branch v0.1.4 https://github.com/shixi-11/prism-desk.git
+cd prism-desk
+npm install
+npm run build
+npm run build:desktop
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts/build-host.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts/start.ps1
+```
+
+构建脚本使用 Windows 自带的 .NET Framework 编译器生成进程宿主，用于一起停止 CLI 及其子进程。
+
 ### 首次使用前
 
 先安装准备使用的官方 CLI，并在 CLI 中完成登录。仅登录网页或桌面客户端，不等于棱镜已经接入账号。
@@ -203,7 +253,7 @@ For an issue report, include the app and CLI versions, reproduction steps and a 
 - **Claude：**安装 [Claude Code](https://code.claude.com/docs/en/setup)，按[登录说明](https://code.claude.com/docs/en/authentication)使用支持的 Claude 订阅账号登录。执行前会检查订阅登录和额外用量设置，额外付费用量需关闭。
 - **Grok：**安装官方 Grok CLI，使用订阅账号登录。
 
-在 `.local/config.json` 中填写程序路径和登录时使用的账号目录。配置修改后重启棱镜，选择账号并刷新状态；未登录或检查失败的账号需先处理对应问题，再执行任务。
+在**账号 → 接入账号**中选择 Codex、Claude 或 Grok，填写名称，再点**保存并继续 → 获取登录链接 → 复制登录链接**。将链接粘贴到浏览器地址栏；若 Claude 显示授权码，回到棱镜的**授权码**输入框粘贴完整内容，再点**提交授权码**。授权码仅交给正在等待的官方 CLI，提交后清空输入框。授权完成后，棱镜会自动检查订阅登录，账号无需重启即可进入执行列表。也可检查已有登录、取消登录或重新复制链接、改名，以及停用或启用账号；停用保留历史任务与本机凭据。高级设置支持选择官方 CLI 程序，或使用已有的独立账号目录；已有账号的平台和登录目录保持固定。本机缺少 CLI 时会提供官方安装说明，后续平台通过独立适配器接入。
 
 ### 怎么使用
 
@@ -216,6 +266,52 @@ For an issue report, include the app and CLI versions, reproduction steps and a 
 
 换号时，新账号读取已保存的对话、进度备注和工具记录。提供方内部的模型状态不随任务转移。
 
+### 消息、设置与预览
+
+#### 目标与计划
+
+输入框上方的紧凑目标条显示目标、执行状态和累计执行用时，可直接修改、暂停、继续或删除目标；展开后查看完整目标、计划和执行详情。暂停会停止当前执行并拦住排队消息；删除会等待执行停止，再移除目标并将排队消息留待核对，保留聊天和工作区文件。计时不包含暂停、空闲和应用关闭的时间。官方返回额度耗尽时显示「额度已用完」，自动换账号期间显示「额度已用完，正在接续」；网络或登录失败显示对应原因。
+
+在 Codex 中要求设置或修改目标时，模型可通过棱镜的真实工具保存；其他入口可提出目标建议，由用户在界面采用。聊天里自称「已设置」不会改动真实目标。「先制订计划」以只读权限生成待核对步骤，输入框会明确提示当前消息仅讨论计划；点击「确认计划并执行」后才按已设置权限开始实施。目标和计划持久保存，并进入本地交接记录。
+
+#### 模型与接续
+
+同账号更换模型或思考等级后，可点击「切换并继续」。实际执行开始后会显示生效配置，并在切换时留下提示。「自动接续偏好」在独立窗口中拖动账号排序，点击每行设置按钮修改模型和思考等级，改动自动保存并用于当前任务。列表标明无法满足当前写入权限的账号，实际接续也会核对图片支持情况。
+
+#### 账号与窗口
+
+账号卡片显示「备注名」和铅笔按钮，回车保存、Esc 取消；修改备注名不改变登录身份。原生 Codex 提问及符合格式的文字选项提供可点击按钮和自行填写入口。窗口右上角 × 将棱镜收进通知区，后台任务继续运行；右键托盘图标选择「退出棱镜」，才会停止执行并退出。
+
+#### 任务整理
+
+右键任务可重命名、置顶、标记未读、归档、按项目或分区整理、分享、复制、分叉、打开工作目录或对话文档、在新窗口中打开，以及删除任务。侧栏“归档与已删除”可恢复任务；删除保留工作目录和对话文件。选择项目会改变后续执行的工作目录，已有文件留在原处。分叉复制对话和附件，并建立新的 CLI 会话；独立工作区选项使用新的空白文件夹。“分享”先预览本地 Markdown 文档，支持复制或保存，不生成托管的公开链接。多个窗口会同步任务变更。
+
+#### 视图与额度
+
+顶部提供视图设置、底部执行记录和右侧账号栏开关，并记住开关状态。账号页的**一键查询全部**会查询所有已配置账号，展示剩余额度、恢复时间、Codex 重置卡数量与到期时间。单个账号查询失败不影响其他账号。
+
+#### 图片
+
+支持粘贴截图、拖入图片或点击图片按钮，每条最多 5 张、每张不超过 10 MB。Codex 使用原生图片输入；Claude 在订阅检查通过后使用原生图片消息，目前尚未完成已登录账号的图片实测。Grok 在 CLI 声明支持时使用直接图片输入，否则由原生 Read 工具查看附件；已用真实订阅账号验证读图。
+
+#### 消息与草稿
+
+执行中可继续发送，消息依次排队，也可取消。设置中可选择 Enter 或 Ctrl/⌘+Enter 发送，以及排队或实时引导；实时引导使用 Codex 当前轮次，其他入口转为排队。失败或中断后，后续消息暂停等待核对。应用打开期间，切换任务会保留各自的输入草稿。
+
+#### 文件预览
+
+点击预览按钮或对话中的文件链接，可查看图片、PDF、Markdown、代码和文本；文本支持编辑保存，并检查文件是否已被外部修改。HTML 可直接预览独立页面，交互项目可填写已启动的 HTTP 地址。部分网站禁止嵌入。思考与执行面板显示 CLI 实际返回的思考摘要、计划和执行状态。
+
+### 自动更新
+
+1. **检查更新**：提示“发现新版本”或“已是最新版本”，不会下载或重启。
+2. **下载并准备**：完成后提示“更新已准备好”，可继续使用当前版本。
+3. **更新并重启**：点击后才重启；新版成功启动后提示一次“已升级至 vX.X.X”。普通启动和回滚不会显示升级成功。
+
+侧栏的**检查更新**只跟随正式稳定的 [GitHub Releases](https://github.com/shixi-11/prism-desk/releases)，先显示当前版本、新版本和更新内容；点击**稍后**可继续使用当前版本。普通代码提交不会反复提醒升级。默认在启动后及每四小时自动检查一次。侧栏提供常驻的**检查更新**入口，点击即可检查并打开结果面板。有新版时，该入口旁显示常亮蓝点，右上角也会出现更新入口，检查不会自行下载、安装或重启。方便时点击**下载并准备 → 更新并重启**，更新到当前版本后蓝点消失。重启前保存各窗口的草稿；任务、待发送消息、账号操作、编辑对话框和预览面板尚未处理完时，会阻止重启。
+
+更新沿用账号配置、会话存储和用户数据目录，保留原始源码目录及上一版安装。下载或构建失败时继续使用当前版本；新版未完成启动时，再次打开棱镜会恢复上一版。有本地源码修改时暂停更新，准备新版至少需要 2 GB 可用空间。Git 需保持可用；桌面构建已包含后续构建所需的 Node 运行时和 npm。尚未包含更新功能的旧安装，需要先手动拉取一次代码并按上述命令重新构建。
+
 ### 白天与黑夜
 
 点击顶部的太阳或月亮按钮切换日间、夜间主题。
@@ -226,31 +322,9 @@ For an issue report, include the app and CLI versions, reproduction steps and a 
 
 *以上为应用使用的主题背景。*
 
-### 安装
-
-以下命令安装稳定版 **v0.1.3**。[最新发布页](https://github.com/shixi-11/prism-desk/releases/latest)提供版本号与中英文更新内容。
-
-需要 Windows、Git、Node.js 22.12 或更新版本、npm，以及准备使用的官方 CLI。各 CLI 需分别完成登录。
-
-```powershell
-git clone --branch v0.1.3 https://github.com/shixi-11/prism-desk.git
-cd prism-desk
-npm install
-npm run build
-npm run build:desktop
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts/build-host.ps1
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts/start.ps1
-```
-
-构建脚本使用 Windows 自带的 .NET Framework 编译器生成进程宿主，用于一起停止 CLI 及其子进程。
-
-### 自动更新
-
-侧栏的**检查更新**只跟随正式稳定的 [GitHub Releases](https://github.com/shixi-11/prism-desk/releases)，先显示当前版本、新版本和更新内容；点击**稍后**可继续使用当前版本。普通代码提交不会反复提醒升级。默认在启动后及每四小时自动检查一次。侧栏提供常驻的**检查更新**入口，点击即可检查并打开结果面板。有新版时，该入口旁显示常亮蓝点，右上角也会出现更新入口，检查不会自行下载、安装或重启。方便时点击**下载并准备 → 更新并重启**，更新到当前版本后蓝点消失。重启前保存各窗口的草稿；任务、待发送消息、账号操作、编辑对话框和预览面板尚未处理完时，会阻止重启。
-
-更新沿用账号配置、会话存储和用户数据目录，保留原始源码目录及上一版安装。下载或构建失败时继续使用当前版本；新版未完成启动时，再次打开棱镜会恢复上一版。有本地源码修改时暂停更新，准备新版至少需要 2 GB 可用空间。Git 需保持可用；桌面构建已包含后续构建所需的 Node 运行时和 npm。尚未包含更新功能的旧安装，需要先手动拉取一次代码并按上述命令重新构建。
-
 ### 配置
+
+通常可直接通过**账号 → 接入账号**完成设置。以下配置文件适用于需要手动配置的用户；复制示例前，请先备份已有配置。
 
 ```powershell
 New-Item -ItemType Directory -Force .local
@@ -318,33 +392,10 @@ npm run build:desktop
 
 提交问题时，请附上应用与 CLI 版本、复现步骤和脱敏后的错误信息。发布前移除凭据、账号信息与私人对话内容。
 
+### 贡献者发布规则
+
+发布前请读取 [AGENTS.md](AGENTS.md) 和 [RELEASING.md](RELEASING.md)。每次软件发布使用新的版本号、一个不可变标签及完整的英文和简体中文更新说明，并运行 `npm run release:check` 与变更所需检查。仅整理文档不另发软件版本。
+
 ### 许可证
 
 采用 [MIT 许可证](LICENSE)。棱镜是独立项目，各提供方名称与商标归其所有者所有。
-
-### 消息、设置与预览
-
-输入框上方的紧凑目标条显示目标、执行状态和累计执行用时，可直接修改、暂停、继续或删除目标；展开后查看完整目标、计划和执行详情。暂停会停止当前执行并拦住排队消息；删除会等待执行停止，再移除目标并将排队消息留待核对，保留聊天和工作区文件。计时不包含暂停、空闲和应用关闭的时间。官方返回额度耗尽时显示「额度已用完」，自动换账号期间显示「额度已用完，正在接续」；网络或登录失败显示对应原因。
-
-在 Codex 中要求设置或修改目标时，模型可通过棱镜的真实工具保存；其他入口可提出目标建议，由用户在界面采用。聊天里自称「已设置」不会改动真实目标。「先制订计划」以只读权限生成待核对步骤，输入框会明确提示当前消息仅讨论计划；点击「确认计划并执行」后才按已设置权限开始实施。目标和计划持久保存，并进入本地交接记录。
-
-同账号更换模型或思考等级后，可点击「切换并继续」。实际执行开始后会显示生效配置，并在切换时留下提示。「自动接续偏好」在独立窗口中拖动账号排序，点击每行设置按钮修改模型和思考等级，改动自动保存并用于当前任务。列表标明无法满足当前写入权限的账号，实际接续也会核对图片支持情况。
-
-账号卡片显示「备注名」和铅笔按钮，回车保存、Esc 取消；修改备注名不改变登录身份。原生 Codex 提问及符合格式的文字选项提供可点击按钮和自行填写入口。窗口右上角 × 将棱镜收进通知区，后台任务继续运行；右键托盘图标选择「退出棱镜」，才会停止执行并退出。
-
-右键任务可重命名、置顶、标记未读、归档、按项目或分区整理、分享、复制、分叉、打开工作目录或对话文档、在新窗口中打开，以及删除任务。侧栏“归档与已删除”可恢复任务；删除保留工作目录和对话文件。选择项目会改变后续执行的工作目录，已有文件留在原处。分叉复制对话和附件，并建立新的 CLI 会话；独立工作区选项使用新的空白文件夹。“分享”先预览本地 Markdown 文档，支持复制或保存，不生成托管的公开链接。多个窗口会同步任务变更。
-
-顶部提供视图设置、底部执行记录和右侧账号栏开关，并记住开关状态。账号页的**一键查询全部**会查询所有已配置账号，展示剩余额度、恢复时间、Codex 重置卡数量与到期时间。单个账号查询失败不影响其他账号。
-
-支持粘贴截图、拖入图片或点击图片按钮，每条最多 5 张、每张不超过 10 MB。Codex 使用原生图片输入；Claude 在订阅检查通过后使用原生图片消息，目前尚未完成已登录账号的图片实测。Grok 在 CLI 声明支持时使用直接图片输入，否则由原生 Read 工具查看附件；已用真实订阅账号验证读图。
-
-执行中可继续发送，消息依次排队，也可取消。设置中可选择 Enter 或 Ctrl/⌘+Enter 发送，以及排队或实时引导；实时引导使用 Codex 当前轮次，其他入口转为排队。失败或中断后，后续消息暂停等待核对。应用打开期间，切换任务会保留各自的输入草稿。
-
-点击预览按钮或对话中的文件链接，可查看图片、PDF、Markdown、代码和文本；文本支持编辑保存，并检查文件是否已被外部修改。HTML 可直接预览独立页面，交互项目可填写已启动的 HTTP 地址。部分网站禁止嵌入。思考与执行面板显示 CLI 实际返回的思考摘要、计划和执行状态。
-在**账号 → 接入账号**中选择 Codex、Claude 或 Grok，填写名称，再点**保存并继续 → 获取登录链接 → 复制登录链接**。将链接粘贴到浏览器地址栏；若 Claude 显示授权码，回到棱镜的**授权码**输入框粘贴完整内容，再点**提交授权码**。授权码仅交给正在等待的官方 CLI，提交后清空输入框。授权完成后，棱镜会自动检查订阅登录，账号无需重启即可进入执行列表。也可检查已有登录、取消登录或重新复制链接、改名，以及停用或启用账号；停用保留历史任务与本机凭据。高级设置支持选择官方 CLI 程序，或使用已有的独立账号目录；已有账号的平台和登录目录保持固定。本机缺少 CLI 时会提供官方安装说明，后续平台通过独立适配器接入。
-
-## Contributor release rules / 贡献者发布规则
-
-Agents and contributors: read [AGENTS.md](AGENTS.md) and [RELEASING.md](RELEASING.md) before publishing. Run `npm run release:check` to validate the version and release notes.
-
-后续 agent 与贡献者发布前请读取 [AGENTS.md](AGENTS.md) 和 [RELEASING.md](RELEASING.md)，运行 `npm run release:check` 核对版本号和更新说明。

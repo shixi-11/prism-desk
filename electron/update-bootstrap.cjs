@@ -31,5 +31,5 @@ function bootstrap(app,appRoot){
  }else if(state.pending){state.attempted=state.attempted||Date.now();state.attempts=state.attempts||1;state.bootPid=process.pid;write(file,state);}
  }catch(error){return '更新状态无法读取，暂时使用当前版本：'+error.message;}
 }
-function healthy(appRoot){const root=installation(appRoot),file=path.join(root,'.local','updates','active.json'),state=read(file);if(state.current&&canonical(versionPath(root,state.current))===canonical(appRoot)&&state.pending){state.pending=false;state.healthyAt=new Date().toISOString();delete state.error;write(file,state);}}
+function healthy(appRoot){const root=installation(appRoot),file=path.join(root,'.local','updates','active.json'),state=read(file);if(state.current&&canonical(versionPath(root,state.current))===canonical(appRoot)&&state.pending){state.pending=false;state.healthyAt=new Date().toISOString();delete state.error;write(file,state);const version=read(path.join(appRoot,'package.json')).version;return typeof version==='string'&&/^\d+\.\d+\.\d+$/.test(version)?{version}:null;}return null;}
 module.exports={read,write,SHA,installation,versionPath,validVersion,bootstrap,healthy};
