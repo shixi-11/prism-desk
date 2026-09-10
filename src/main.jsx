@@ -824,8 +824,6 @@ function App() {
         <footer>
           <button onClick={() => setModal("accounts")}>
             <UsersRound size={18} />{tr("账号")}</button>
-          <button onClick={() => setModal("capabilities")}>
-            <BookOpen size={18} />{tr("共享能力")}</button>
           <button onClick={()=>setTaskDialog({action:'history'})}><Archive size={18}/>{tr('归档')}</button>
           <button aria-label={tr('设置')} onClick={()=>setModal("settings")}><Settings2 size={18}/>{tr("设置")}</button>
           <button aria-label={tr('检查更新')} onClick={()=>setModal("updates")}><span className="settings-icon"><Download size={18}/>{hasAppUpdate&&<i className="update-dot" aria-hidden="true"/>}</span>{tr("检查更新")}{hasAppUpdate&&<small className="update-label">{tr('有更新')}</small>}</button>

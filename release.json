@@ -1,14 +1,16 @@
 {
-  "version": "0.1.19",
+  "version": "0.1.20",
   "date": "2026-09-11",
   "notes": {
     "en": [
-      "Projects can now be renamed using the pencil button in the sidebar. Display names are saved in app settings and shared by conversations in the same project; working folders stay unchanged.",
-      "Adjusted sidebar typography so Pinned, Projects, Recent and project names are larger than conversation titles."
+      "Pinned, Projects and Recent default to collapsed when no preference is saved. Each section remembers whether you last expanded or collapsed it and restores that state when Prism reopens.",
+      "Right-click a project heading to edit its display name, alongside the existing pencil button.",
+      "Removed the duplicate Shared Capabilities entry from the left sidebar while retaining the right-hand entry. Sidebar utility labels and icons are smaller, with comfortable click targets."
     ],
     "zh": [
-      "项目名称旁加入铅笔按钮，可直接修改、保存或取消。显示名称保存在应用设置中，同一项目的会话共用该名称，工作目录保持原样。",
-      "调整侧栏字号层级：置顶、项目、最近及项目名称更大，会话名称更小。"
+      "“置顶、项目、最近”在没有保存偏好时默认折叠；展开或收起后记住各分区状态，下次打开棱镜恢复上次的使用习惯。",
+      "在项目名称上点击右键即可编辑显示名称，同时保留原有铅笔按钮。",
+      "移除左侧重复的“共享能力”入口，保留右侧入口；缩小侧栏底部辅助操作的文字和图标，同时保留足够的点击范围。"
     ]
   }
 }

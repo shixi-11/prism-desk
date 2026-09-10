@@ -131,15 +131,16 @@ nav button.selected {
   border-bottom: 1px solid #e9d1ab40;
   border-radius: 0;
   justify-content: flex-start;
-  padding: 15px 7px;
-  font: 400 18px var(--font-title);
+  padding: 12px 7px;
+  min-height: 44px;
+  font: 400 14px var(--font-title);
   color: #f1dfbf;
   text-shadow: 0 1px 4px #312111;
   gap: 15px;
 }
 .sidebar > footer button svg {
-  width: 22px;
-  height: 22px;
+  width: 18px;
+  height: 18px;
 }
 .topbar {
   padding: 32px 44px 18px;
