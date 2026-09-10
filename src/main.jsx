@@ -48,6 +48,8 @@ import "./typography.css";
 import "./capabilities.css";
 import {tr,setLanguage,locale,languages} from './i18n.js';
 
+import {NewEntry,NewProject} from './ProjectCreation.jsx';
+import {sidebarGroups} from './sidebar-groups.js';
 import SidebarTasks from './SidebarTasks.jsx';
 import {conversationMessages} from './conversation-messages.js';
 import ProjectAccess from './ProjectAccess.jsx';
@@ -169,20 +171,22 @@ function PermissionControl({task,profile,defaultMode,onChange,onDefault}){
   </div>
  </details>;
 }
-function NewTask({ onClose, onCreate }) {
-  const [title, setTitle] = useState(tr("新任务"));
-  const [cwd, setCwd] = useState("");
+function NewTask({ onClose, onCreate, initialCwd="", projects=[], projectNames={} }) {
+  const [title, setTitle] = useState(tr("新对话"));
+  const [busy,setBusy]=useState(false);
+  const [cwd, setCwd] = useState(initialCwd);
   const [error, setError] = useState("");
   const submit = async (e) => {
     e.preventDefault();
+    if(busy)return;setBusy(true);
     try {
       await onCreate({ title, cwd });
     } catch (e) {
       setError(e.message);
-    }
+    }finally{setBusy(false);}
   };
   return (
-    <Modal title={tr("从一个任务开始")} onClose={onClose}>
+    <Modal title={tr("新对话")} onClose={onClose} dismissible={!busy}>
       <form onSubmit={submit}>
         <p className="muted">{tr("可以直接开始对话，也可以选择项目文件夹。")}</p>
         <label>{tr("任务名称")}<input
@@ -193,6 +197,7 @@ function NewTask({ onClose, onCreate }) {
             required
           />
         </label>
+        {projects.length>0&&<label>{tr("选择项目")}<select aria-label={tr("选择项目")} value={projects.some(p=>p.path===cwd)?cwd:""} onChange={e=>setCwd(e.target.value)}><option value="">{tr("无项目")}</option>{projects.map(p=><option key={p.key} value={p.path}>{projectNames[p.key.slice(8)]||p.label}</option>)}</select></label>}
         <label>{tr("工作目录（可选）")}<div className="field-row">
             <input
               value={cwd}
@@ -204,8 +209,8 @@ function NewTask({ onClose, onCreate }) {
               className="outline"
               aria-label={tr("浏览工作目录")}
               onClick={async () => {
-                const p = await api.pickDirectory();
-                if (p) setCwd(p);
+                try{const p = await api.pickDirectory();
+                if (p) setCwd(p);}catch(e){setError(e.message);}
               }}
             >
               <FolderOpen size={18} />
@@ -218,8 +223,8 @@ function NewTask({ onClose, onCreate }) {
           </p>
         )}
         <footer>
-          <button type="button" className="quiet" onClick={onClose}>{tr("取消")}</button>
-          <button className="primary" type="submit">{tr("创建任务")}<ArrowUpRight size={17} />
+          <button type="button" className="quiet" disabled={busy} onClick={onClose}>{tr("取消")}</button>
+          <button className="primary" type="submit" disabled={busy||!title.trim()}>{tr(busy?"正在保存…":"创建任务")}<ArrowUpRight size={17} />
           </button>
         </footer>
       </form>
@@ -551,6 +556,8 @@ function App() {
   const [task, setTask] = useState(null);
   const [events, setEvents] = useState([]);
   const [modal, setModal] = useState("");
+  const [newTaskCwd,setNewTaskCwd]=useState(""),[revealedProject,setRevealedProject]=useState(null);
+  const newConversation=(cwd="")=>{setNewTaskCwd(cwd);setModal("new");};
   const [preview,setPreview]=useState(null);
   const [taskDialog,setTaskDialog]=useState(null),[sectionName,setSectionName]=useState('');
   const [view,setView]=useState(()=>{try{return {...{log:false,inspector:true},...JSON.parse(localStorage.getItem('prism-view')||'{}')};}catch{return {log:false,inspector:true};}});
@@ -614,6 +621,7 @@ function App() {
       })
       .catch(fail);
     return api.subscribe(({ type, value }) => {
+      if(type==='projects'){setInit(old=>old?{...old,settings:{...old.settings,...value}}:old);return;}
       if(type==='app-update'){setAppUpdate(value);return;}
       if(type==='accounts'){setInit(old=>old?{...old,profiles:value}:old);if(!current.current)setDraftAccount(old=>value.some(p=>p.id===old&&!p.disabled)?old:value.find(p=>!p.disabled)?.id||'');return;}
       if(type==='account-login'){setAccountLogins(old=>({...old,[value.id]:value}));return;}
@@ -746,7 +754,7 @@ function App() {
   };
   const send = async () => {
     if (!task) {
-      setModal("new");
+      newConversation();
       return;
     }
     try {
@@ -761,7 +769,7 @@ function App() {
     } finally {setSending(false);}
   };
   const savePreferences=async update=>{try{const settings=await api.preferences(update);setInit(old=>({...old,settings}));}catch(e){fail(e);}};
-  const addImages=async files=>{if(attachmentUpload.current)return;if(!task){if(files){const list=Array.from(files);if(list.length>5){fail(Error(tr("每条消息最多添加 5 个附件")));return;}if(list.some(file=>file.size>(/\.(png|jpe?g|webp|gif|bmp|ico)$/i.test(file.name)?10:50)*1024*1024)){fail(Error(tr("图片不能超过 10 MB，其他文件不能超过 50 MB")));return;}pendingImageFiles.current=list;}setModal("new");return;}const taskId=task.id;attachmentUpload.current=true;setUploading(true);try{let inputs=null;if(files){const list=Array.from(files);if(!list.length)return;if(images.length+list.length>5)throw Error(tr("每条消息最多添加 5 个附件"));inputs=await Promise.all(list.map(async file=>{if(file.size>(/\.(png|jpe?g|webp|gif|bmp|ico)$/i.test(file.name)?10:50)*1024*1024)throw Error(tr("图片不能超过 10 MB，其他文件不能超过 50 MB"));const bytes=new Uint8Array(await file.arrayBuffer());let binary="";for(let i=0;i<bytes.length;i+=32768)binary+=String.fromCharCode(...bytes.subarray(i,i+32768));return{name:file.name,data:btoa(binary)};}));}const added=await api.addImages(taskId,inputs);if(images.length+added.length>5)throw Error(tr("每条消息最多添加 5 个附件"));if(current.current===taskId)setImages(old=>[...old,...added].slice(0,5));else drafts.current[taskId]={...drafts.current[taskId],images:[...(drafts.current[taskId]?.images||[]),...added].slice(0,5)};}catch(e){fail(e);}finally{attachmentUpload.current=false;setUploading(false);}};
+  const addImages=async files=>{if(attachmentUpload.current)return;if(!task){if(files){const list=Array.from(files);if(list.length>5){fail(Error(tr("每条消息最多添加 5 个附件")));return;}if(list.some(file=>file.size>(/\.(png|jpe?g|webp|gif|bmp|ico)$/i.test(file.name)?10:50)*1024*1024)){fail(Error(tr("图片不能超过 10 MB，其他文件不能超过 50 MB")));return;}pendingImageFiles.current=list;}newConversation();return;}const taskId=task.id;attachmentUpload.current=true;setUploading(true);try{let inputs=null;if(files){const list=Array.from(files);if(!list.length)return;if(images.length+list.length>5)throw Error(tr("每条消息最多添加 5 个附件"));inputs=await Promise.all(list.map(async file=>{if(file.size>(/\.(png|jpe?g|webp|gif|bmp|ico)$/i.test(file.name)?10:50)*1024*1024)throw Error(tr("图片不能超过 10 MB，其他文件不能超过 50 MB"));const bytes=new Uint8Array(await file.arrayBuffer());let binary="";for(let i=0;i<bytes.length;i+=32768)binary+=String.fromCharCode(...bytes.subarray(i,i+32768));return{name:file.name,data:btoa(binary)};}));}const added=await api.addImages(taskId,inputs);if(images.length+added.length>5)throw Error(tr("每条消息最多添加 5 个附件"));if(current.current===taskId)setImages(old=>[...old,...added].slice(0,5));else drafts.current[taskId]={...drafts.current[taskId],images:[...(drafts.current[taskId]?.images||[]),...added].slice(0,5)};}catch(e){fail(e);}finally{attachmentUpload.current=false;setUploading(false);}};
   const refresh = async (id,model) => {
     setChecking(old=>[...old,id]);
     try {
@@ -814,8 +822,7 @@ function App() {
           <PrismMark />
           <div className="wordmark">{tr("棱镜")}</div>
         </button>
-        <button className="primary new-task" onClick={() => setModal("new")}>
-          <Plus size={18} />{tr("新建任务")}</button>
+        <NewEntry onConversation={()=>newConversation()} onProject={()=>setModal("project")}/>
         <div className="task-caption">{tr("任务")}<span>
             {init.tasks.length
               ? String(init.tasks.length).padStart(2, "0")
@@ -823,7 +830,7 @@ function App() {
           </span>
         </div>
         <nav aria-label={tr("任务列表")}>
-          <SidebarTasks onMoveTask={async(id,cwd)=>{const result=await api.taskAction(id,'project-move',cwd);setInit(old=>({...old,tasks:old.tasks.map(t=>t.id===id?result.task:t)}));setTask(old=>old?.id===id?result.task:old);}} tasks={init.tasks} projectNames={init.settings.projectNames||{}} onRenameProject={async(cwd,name)=>{const settings=await api.renameProject(cwd,name);setInit(old=>({...old,settings}));}} renderTask={t=><TaskEntry key={t.id} item={t} selected={task?.id===t.id} onSelect={()=>changeTask(t.id)} onAction={taskAction} onRename={async(id,title)=>{try{const updated=await api.update(id,{title});setInit(old=>({...old,tasks:old.tasks.map(t=>t.id===id?updated:t)}));setTask(old=>old?.id===id?updated:old);}catch(error){fail(error);throw error;}}}/>}/>
+          <SidebarTasks savedProjects={init.settings.projects||[]} revealedProject={revealedProject} onNewConversation={newConversation} onNewProject={()=>setModal("project")} onMoveTask={async(id,cwd)=>{const result=await api.taskAction(id,'project-move',cwd);setInit(old=>({...old,tasks:old.tasks.map(t=>t.id===id?result.task:t)}));setTask(old=>old?.id===id?result.task:old);}} tasks={init.tasks} projectNames={init.settings.projectNames||{}} onRenameProject={async(cwd,name)=>{const settings=await api.renameProject(cwd,name);setInit(old=>({...old,settings}));}} renderTask={t=><TaskEntry key={t.id} item={t} selected={task?.id===t.id} onSelect={()=>changeTask(t.id)} onAction={taskAction} onRename={async(id,title)=>{try{const updated=await api.update(id,{title});setInit(old=>({...old,tasks:old.tasks.map(t=>t.id===id?updated:t)}));setTask(old=>old?.id===id?updated:old);}catch(error){fail(error);throw error;}}}/>}/>
           {!init.tasks.length && (
             <p className="no-tasks">{tr("你的任务会留在这里。")}</p>
           )}
@@ -854,7 +861,7 @@ function App() {
           activity={activity}
           awaitingApproval={approvals.some(a=>a.taskId===task?.id)}
           onPreview={target=>setPreview({id:Date.now(),target,task})}
-          onNew={() => setModal("new")}
+          onNew={() => newConversation()}
         />
         <div className="bottom-area">
           {task?.state === "unknown" && (
@@ -898,7 +905,7 @@ function App() {
                 onClick={() =>
                   task
                     ? api.openWorkspace(task.id).catch(fail)
-                    : setModal("new")
+                    : newConversation()
                 }
               >
                 <FolderOpen size={19} />
@@ -908,7 +915,7 @@ function App() {
               </button>
               <span className="separator" />
               {task && <PermissionControl task={task} profile={init.profiles.find(p=>p.id===task.profile)} defaultMode={init.settings.defaultMode||'workspace-write'} onChange={changeMode} onDefault={async mode=>{try{await api.defaultMode(mode);setInit(old=>({...old,settings:{...old.settings,defaultMode:mode}}));}catch(e){fail(e);}}}/>}
-              {task&&<ProjectAccess key={task.id} task={task} tasks={init.tasks} projectNames={init.settings.projectNames||{}} onSave={async roots=>{const updated=await api.update(task.id,{linkedProjects:roots});if(current.current===updated.id)setTask(updated);}}/>}
+              {task&&<ProjectAccess savedProjects={init.settings.projects||[]} key={task.id} task={task} tasks={init.tasks} projectNames={init.settings.projectNames||{}} onSave={async roots=>{const updated=await api.update(task.id,{linkedProjects:roots});if(current.current===updated.id)setTask(updated);}}/>}
               {task?.pendingMode&&<small className="permission-pending">{tr("下次执行生效")}</small>}
               <button title={tr("添加附件")} aria-label={tr("添加附件")} disabled={uploading||images.length>=5} onClick={()=>addImages(null)}><Paperclip size={19}/></button>
               <span className="compose-spacer" />
@@ -950,7 +957,7 @@ function App() {
         storage={init.taskStorage}
         onHandoff={async id=>{try{await api.stopAndContinue(task.id,id);}catch(e){fail(e);}}}
         onDraftAccount={setDraftAccount}
-        onNew={()=>setModal('new')}
+        onNew={()=>newConversation()}
         disabled={busy || task?.state === "unknown"}
       />}
       {preview&&<PreviewPanel task={preview.task} request={preview} onClose={()=>setPreview(null)}/>}
@@ -969,8 +976,9 @@ function App() {
       {modal === "updates" && <Modal title={tr("软件更新")} onClose={()=>setModal("")}><div className="general-settings"><UpdateSettings checkOnOpen standalone onLater={()=>setModal("")}/></div></Modal>}
       {modal === "settings" && <Modal title={tr("设置")} onClose={()=>setModal("")}><GeneralSettings settings={{...init.settings,theme}} onSave={savePreferences} storage={init.taskStorage} onAccounts={()=>setModal("accounts")} onDefault={async mode=>{try{await api.defaultMode(mode);setInit(old=>({...old,settings:{...old.settings,defaultMode:mode}}));}catch(e){fail(e);}}} onAppearance={setAppearance} languageControl={<label>{tr("界面语言")}<select value={language} onChange={async e=>{try{await api.language(e.target.value);setLanguage(e.target.value);changeLanguage(e.target.value);}catch(error){fail(error);}}}>{languages.map(l=><option key={l.id} value={l.id}>{l.name}</option>)}</select></label>}/></Modal>}
       {modal === "new" && (
-        <NewTask onClose={() => setModal("")} onCreate={create} />
+        <NewTask initialCwd={newTaskCwd} projects={sidebarGroups(init.tasks,init.settings.projects||[])[1].groups} projectNames={init.settings.projectNames||{}} onClose={() => setModal("")} onCreate={create} />
       )}{" "}
+      {modal === "project"&&<NewProject Modal={Modal} onClose={()=>setModal("")} onCreate={async input=>{const result=await api.createProject(input);setInit(old=>({...old,settings:{...old.settings,projects:result.projects,projectNames:result.projectNames}}));setRevealedProject({cwd:result.project.cwd});setModal("");}}/>}
       {modal === "capabilities" && (
         <CapabilityDialog
           data={init.capabilities}

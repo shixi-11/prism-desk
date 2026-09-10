@@ -60,7 +60,7 @@ Open **Accounts → Connect account**, choose Codex, Claude or Grok, and name th
 
 ### A typical task
 
-1. Click **New task** and give it a name. The project folder is optional; leaving it blank creates a separate, persistent task workspace.
+1. Click **New → New conversation** and enter a name. Leave the working folder empty for a separate, persistent workspace, or select a saved project. **New → New project** can create a folder or save an existing folder without moving its files. Empty projects stay in the sidebar; click **+** beside a project to start a conversation in that folder. Multiple conversations can share a project.
 2. Select an execution account, model and reasoning effort. Use **Read only** for review, or **Edit project** for editing.
 3. Enter your request and send it with **Ctrl + Enter**. Follow the conversation and execution log as work progresses.
 4. Add important decisions or remaining work to the progress notes. To change accounts, select the next account and use the handoff control; stop the current execution first when required.

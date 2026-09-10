@@ -62,7 +62,7 @@ Abre **Cuentas → Conectar cuenta**, elige Codex, Claude o Grok y asigna un nom
 
 ### Una tarea habitual
 
-1. Haz clic en **Nueva tarea** y asígnale un nombre. La carpeta del proyecto es opcional; si la dejas en blanco, se crea un espacio de trabajo separado y persistente para la tarea.
+1. Haz clic en **Nuevo → Nueva conversación** e introduce un nombre. Deja la carpeta vacía para usar un espacio independiente y persistente, o elige un proyecto guardado. **Nuevo → Nuevo proyecto** permite crear una carpeta o guardar una existente sin mover sus archivos. Los proyectos vacíos permanecen en la barra lateral; pulsa **+** junto a un proyecto para iniciar una conversación en esa carpeta. Varias conversaciones pueden compartir un proyecto.
 2. Selecciona una cuenta de ejecución, un modelo y el esfuerzo de razonamiento. Usa **Solo lectura** para revisar o **Editar el proyecto** para realizar modificaciones.
 3. Escribe tu solicitud y envíala con **Ctrl + Enter**. Sigue la conversación y el registro de ejecución a medida que avanza el trabajo.
 4. Añade las decisiones importantes o el trabajo pendiente a las notas de progreso. Para cambiar de cuenta, selecciona la siguiente y usa el control de transferencia; detén primero la ejecución actual cuando sea necesario.

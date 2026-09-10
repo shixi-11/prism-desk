@@ -62,7 +62,7 @@ Ouvrez **Comptes → Ajouter un compte**, choisissez Codex, Claude ou Grok et do
 
 ### Une tâche type
 
-1. Cliquez sur **Nouvelle tâche** et donnez-lui un nom. Le dossier du projet est facultatif ; si vous laissez ce champ vide, un espace de travail distinct et persistant est créé pour la tâche.
+1. Cliquez sur **Nouveau → Nouvelle conversation** et saisissez un nom. Laissez le dossier vide pour utiliser un espace indépendant et persistant, ou sélectionnez un projet enregistré. **Nouveau → Nouveau projet** permet de créer un dossier ou d’enregistrer un dossier existant sans déplacer ses fichiers. Les projets vides restent dans la barre latérale ; cliquez sur **+** à côté d’un projet pour commencer une conversation dans ce dossier. Plusieurs conversations peuvent partager un projet.
 2. Sélectionnez un compte d’exécution, un modèle et un effort de raisonnement. Utilisez **Lecture seule** pour une revue ou **Modifier le projet** pour effectuer des modifications.
 3. Saisissez votre demande et envoyez-la avec **Ctrl + Enter**. Suivez la conversation et le journal d’exécution à mesure que le travail avance.
 4. Ajoutez les décisions importantes ou le travail restant aux notes de progression. Pour changer de compte, sélectionnez le compte suivant et utilisez la commande de transfert ; arrêtez d’abord l’exécution en cours si nécessaire.

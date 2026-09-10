@@ -1,8 +1,8 @@
-function taskMenuTemplate(task,tasks,tr,choose,busy=false){
+function taskMenuTemplate(task,tasks,tr,choose,busy=false,savedProjects=[]){
  const item=(label,action,extra={})=>({label:tr(label),click:()=>choose(action),...extra});
  const divider={type:'separator'};
  const sections=[...new Set(tasks.map(t=>t.section).filter(Boolean))];
- const projects=[...new Set(tasks.filter(t=>t.projectGroup||t.workspaceKind==='project').map(t=>t.cwd))];
+ const projects=[...new Map([...savedProjects.map(p=>p.cwd),...tasks.filter(t=>t.projectGroup||t.workspaceKind==='project').map(t=>t.cwd)].map(cwd=>[require('./project-access.cjs').key(cwd),cwd])).values()];
  return [item('重命名',{action:'rename'},{accelerator:'Alt+Ctrl+R'}),item(task.pinned?'取消置顶':'置顶',{action:'pin'},{accelerator:'Alt+Ctrl+P'}),item('标记为未读',{action:'unread'},{accelerator:'Ctrl+Shift+U'}),item('归档',{action:'archive'},{accelerator:'Ctrl+Shift+A',enabled:!busy}),divider,
  {label:tr('项目'),submenu:[item('选择项目文件夹…',{action:'project-pick'},{enabled:!busy}),item('按当前工作目录分组',{action:'project',value:task.cwd},{enabled:!busy}),...projects.map(cwd=>({label:cwd,enabled:!busy,click:()=>choose({action:'project',value:cwd})})),item('移出项目分组',{action:'project',value:null},{enabled:!busy})]},
  {label:tr('分区'),submenu:[item('新建分区…',{action:'section-new'}),...sections.map(section=>({label:section,click:()=>choose({action:'section',value:section})})),item('移出分区',{action:'section',value:''})]},divider,

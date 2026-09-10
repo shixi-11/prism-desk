@@ -224,7 +224,7 @@ app.whenReady().then(() => {
   handle('submitAccountLoginCode',async(id,code)=>{const login=accountLogins.get(id);if(!login)throw Error('当前登录已结束或尚未就绪，请重新获取登录链接。');const result=await login.submitCode(code);if(accountLogins.get(id)===login&&accountLoginStates.get(id)?.phase==='waiting')loginState(id,{phase:'waiting',hasUrl:!!login.url,codeSubmitted:true});return result;});
   handle('cancelAccountLogin',async id=>{await accountLogins.get(id)?.cancel();});
   handle("task", (id) => {const task=runner.active?.task.id===id?runner.active.task:store.get(id);if(task.unread){task.unread=false;store.save(task);broadcastTasks();}return {task,events:store.events(id)};});
-  handle('taskMenu',id=>new Promise(resolve=>{const task=store.get(id);let chosen=null;Menu.buildFromTemplate(require('./task-menu.cjs').taskMenuTemplate(task,store.list(),key=>translate(settings().language,key),action=>{chosen=action;},runner.active?.task.id===id||['running','stopping','unknown'].includes(task.state))).popup({window:owner(),callback:()=>resolve(chosen)});}));
+  handle('taskMenu',id=>new Promise(resolve=>{const task=store.get(id);let chosen=null;Menu.buildFromTemplate(require('./task-menu.cjs').taskMenuTemplate(task,store.list(),key=>translate(settings().language,key),action=>{chosen=action;},runner.active?.task.id===id||['running','stopping','unknown'].includes(task.state),settings().projects||[])).popup({window:owner(),callback:()=>resolve(chosen)});}));
   handle('taskAction',async(id,action,value)=>{
     const {manageTask,forkTask,conversationText}=require('./task-actions.cjs');
     if(['pin','unread','archive','delete','restore','project','project-move','section'].includes(action)){const task=manageTask(store,runner,messageQueue,id,action,value);broadcastTasks();return {task};}
@@ -242,6 +242,10 @@ app.whenReady().then(() => {
   handle('cancelQueued',id=>messageQueue.cancel(id));
   handle('sendQueued',id=>messageQueue.send(id));
   handle('retryQueued',id=>messageQueue.retry(id));
+  handle('createProject',input=>{
+    const result=require('./projects.cjs').addProject(settings(),input,next=>atomic(path.join(dataPath(),'settings.json'),next));
+    emit('projects',{projects:result.projects,projectNames:result.projectNames});return result;
+  });
   handle('renameProject',(cwd,name)=>{const next=require('./project-labels.cjs').renameProject(settings(),cwd,name);atomic(path.join(dataPath(),'settings.json'),next);return next;});
   handle('preferences',update=>{
     const allowed={sendShortcut:['enter','ctrl-enter'],busySend:['queue','steer']};

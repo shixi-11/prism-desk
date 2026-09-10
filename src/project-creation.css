@@ -1,0 +1,21 @@
+.new-entry { position:relative; z-index:8; margin-bottom:44px; }
+.new-entry>.new-task { width:100%; margin-bottom:0; }
+.new-entry>.new-task>span { flex:1; text-align:start; }
+.new-entry-menu { position:absolute; inset-inline:0; top:calc(100% + 7px); padding:6px; background:var(--surface); border:1px solid var(--line); border-radius:12px; box-shadow:var(--shadow); }
+.new-entry-menu>button { display:flex; align-items:center; justify-content:flex-start; gap:10px; width:100%; padding:12px 9px; border:0; border-radius:7px; background:transparent; color:var(--text); text-align:start; }
+.new-entry-menu>button:hover,.new-entry-menu>button:focus-visible { background:var(--surface-hover); }
+.new-entry-menu svg { flex:none; color:var(--accent); }
+.new-entry-menu span { min-width:0; display:grid; gap:5px; }
+.new-entry-menu strong { font-size:15px; font-weight:500; }
+.new-entry-menu small { font-size:11px; line-height:1.5; color:var(--muted); }
+.project-kind { display:flex; gap:14px; margin:18px 0; padding:12px; border:1px solid var(--line); border-radius:9px; }
+.project-kind legend { font-size:13px; color:var(--muted); padding:0 4px; }
+.modal .project-kind label { display:flex; flex:1; align-items:center; gap:8px; margin:0; min-width:0; font-size:14px; }
+.modal .project-kind label>input { flex:0 0 16px; width:16px; height:16px; margin:0; padding:0; accent-color:var(--accent); }
+.project-destination { font-size:12px; line-height:1.7; overflow-wrap:anywhere; min-height:21px; }
+.project-destination span { display:block; }
+.sidebar nav .project-create-button { flex:none; display:grid; place-items:center; width:27px; height:28px; padding:4px; margin:0; background:transparent; color:var(--muted); border:0; }
+.sidebar nav .project-create-button:hover { color:var(--text); background:var(--surface-hover); }
+.sidebar-section-toggle { min-width:0; }
+.modal .new-project-form { font-size:14px; }
+.new-project-form>label { margin-top:16px; }

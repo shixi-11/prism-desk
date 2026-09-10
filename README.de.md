@@ -62,7 +62,7 @@ Installieren Sie für jeden gewünschten Anbieter das offizielle CLI und melden 
 
 ### Eine typische Aufgabe
 
-1. Klicken Sie auf **Neue Aufgabe** und geben Sie ihr einen Namen. Der Projektordner ist optional; bleibt das Feld leer, wird ein separater, dauerhafter Arbeitsbereich für die Aufgabe erstellt.
+1. Klicken Sie auf **Neu → Neue Unterhaltung** und geben Sie einen Namen ein. Lassen Sie den Arbeitsordner leer, um einen separaten, dauerhaften Arbeitsbereich zu nutzen, oder wählen Sie ein gespeichertes Projekt. Mit **Neu → Neues Projekt** erstellen Sie einen Ordner oder speichern einen vorhandenen Ordner, ohne Dateien zu verschieben. Leere Projekte bleiben in der Seitenleiste. Klicken Sie auf **+** neben einem Projekt, um darin eine Unterhaltung zu starten. Mehrere Unterhaltungen können dasselbe Projekt nutzen.
 2. Wählen Sie ein Ausführungskonto, ein Modell und den Denkaufwand. Verwenden Sie **Nur lesen** für eine Prüfung oder **Projekt bearbeiten** für Änderungen.
 3. Geben Sie Ihre Anfrage ein und senden Sie sie mit **Ctrl + Enter**. Verfolgen Sie während der Arbeit den Gesprächsverlauf und das Ausführungsprotokoll.
 4. Ergänzen Sie wichtige Entscheidungen oder noch ausstehende Arbeiten in den Fortschrittsnotizen. Um das Konto zu wechseln, wählen Sie das nächste Konto und verwenden Sie die Übergabefunktion; beenden Sie bei Bedarf zuerst die laufende Ausführung.

@@ -1,20 +1,16 @@
 {
-  "version": "0.1.21",
+  "version": "0.1.22",
   "date": "2026-09-11",
   "notes": {
     "en": [
-      "Drag an idle conversation onto another project to change its working directory while preserving history and drafts. The source project remains available; existing files stay in place.",
-      "Add linked project directories beside the permission control. Codex and Claude inherit the task’s current permissions for these directories; restricted tasks do not silently relay to unsupported providers.",
-      "Group Claude progress across tool calls and keep successful final answers separate, including compatible grouping of historical progress messages.",
-      "Move the compact Fast switch beside Send, refine the composer layout, make the Prism logo return to the home screen with drafts preserved, and remove the redundant top-bar view-settings button.",
-      "Build the background process host without a console window, hide child startup windows explicitly, and share simultaneous model-list queries to avoid duplicate CLI launches."
+      "The New menu now offers New conversation and New project. Create a project folder or register an existing folder without moving its files.",
+      "Saved projects persist even when empty. Start a conversation from the + beside a project, or choose a saved project in the new-conversation dialog.",
+      "Include saved empty projects in linked-directory choices and native task menus; synchronize project creation across windows and validate folder names and collisions."
     ],
     "zh": [
-      "将未在执行的对话拖到另一个项目，即可更换工作目录并保留历史和草稿；原项目入口继续保留，已有文件留在原处。",
-      "在权限旁添加关联项目目录。Codex 和 Claude 对关联目录沿用任务现有权限；受限任务不会自动交给不支持关联目录的入口。",
-      "合并 Claude 跨工具调用的过程说明，将成功执行的最终答复单独显示，同时兼容整理历史进度消息。",
-      "将紧凑的 Fast 开关移到发送按钮旁，调整输入区排版；点击棱镜 Logo 返回主页并保留草稿，移除顶部重复的视图设置按钮。",
-      "后台进程宿主改为不创建控制台窗口，明确隐藏子进程启动窗口；同时请求模型列表时共用一次查询，避免重复启动 CLI。"
+      "“新建”菜单提供“新对话”和“新项目”。支持创建项目文件夹或使用已有文件夹，现有文件留在原处。",
+      "已保存的空项目持续保留在侧栏。点击项目旁的“＋”可新建对话，也可在新对话窗口选择已保存的项目。",
+      "关联项目和任务右键菜单纳入已保存的空项目；项目创建同步到其他窗口，并校验文件夹名称和重名冲突。"
     ]
   }
 }
