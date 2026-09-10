@@ -12,7 +12,8 @@ h2, h3, .modal h2, .modal h3, .task-plan h2, .relay-preferences h2 { font-family
 .new-task, .sidebar > footer button { font: 500 15px/1.5 var(--font-body); }
 .sidebar > footer button { padding-block: 12px; gap: 12px; }
 .sidebar > footer button svg { width: 19px; height: 19px; flex-shrink: 0; }
-.task-caption, .section-title h2 { font: 500 15px/1.5 var(--font-body); }
+.task-caption { font: 500 16px/1.5 var(--font-body); }
+.section-title h2 { font: 500 15px/1.5 var(--font-body); }
 nav button { font-size: 14px; line-height: 1.5; }
 .topbar p, .empty p { font: 400 15px/1.8 var(--font-body); }
 .empty h1 { letter-spacing: 0; }

@@ -1,16 +1,12 @@
 {
-  "version": "0.1.22",
+  "version": "0.1.23",
   "date": "2026-09-11",
   "notes": {
     "en": [
-      "The New menu now offers New conversation and New project. Create a project folder or register an existing folder without moving its files.",
-      "Saved projects persist even when empty. Start a conversation from the + beside a project, or choose a saved project in the new-conversation dialog.",
-      "Include saved empty projects in linked-directory choices and native task menus; synchronize project creation across windows and validate folder names and collisions."
+      "Refine the sidebar hierarchy: make the Tasks heading slightly larger, reduce section labels and project names, and tighten section spacing."
     ],
     "zh": [
-      "“新建”菜单提供“新对话”和“新项目”。支持创建项目文件夹或使用已有文件夹，现有文件留在原处。",
-      "已保存的空项目持续保留在侧栏。点击项目旁的“＋”可新建对话，也可在新对话窗口选择已保存的项目。",
-      "关联项目和任务右键菜单纳入已保存的空项目；项目创建同步到其他窗口，并校验文件夹名称和重名冲突。"
+      "调整侧栏文字层级：“任务”标题略大，缩小分组标签与项目名称，并收紧分组间距。"
     ]
   }
 }
