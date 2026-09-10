@@ -601,5 +601,8 @@
   "快速模式": "Mode rapide",
   "更快响应，会增加额度消耗": "Des réponses plus rapides consomment plus de crédits",
   "当前模型未提供快速模式": "Le mode rapide est indisponible pour ce modèle",
-  "当前模型不支持所选速度模式": "Ce modèle ne prend pas en charge le mode de vitesse sélectionné"
+  "当前模型不支持所选速度模式": "Ce modèle ne prend pas en charge le mode de vitesse sélectionné",
+  "最近": "Récents",
+  "消息已开始发送": "Ce message est déjà en cours d’envoi",
+  "请先继续目标或核对任务状态": "Reprenez l’objectif ou vérifiez d’abord l’état de la tâche"
 }

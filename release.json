@@ -1,14 +1,14 @@
 {
-  "version": "0.1.16",
+  "version": "0.1.17",
   "date": "2026-09-10",
   "notes": {
     "en": [
-      "Added a Codex Fast switch next to model and reasoning controls, using the service tier advertised by the current CLI model catalog. Fast mode is off by default and the interface explains its increased credit use.",
-      "Speed is saved per account within each task and applies to the next execution, including resumed sessions. Turning Fast off explicitly restores Standard speed without changing reasoning effort. Unsupported models disable the switch."
+      "Added a Send button to each queued message. It attempts immediate steering when supported; otherwise the message remains queued. In-flight sends are protected against duplicate clicks, cancellation and automatic replay after an uncertain delivery.",
+      "Organized the sidebar into collapsible Pinned, Projects and Recent sections. Project folders expand individually, custom sections remain available, and collapse preferences survive reopening."
     ],
     "zh": [
-      "在模型与思考等级设置旁加入 Codex Fast 开关，按当前 CLI 模型目录提供的服务档位执行。默认关闭，并提示开启后会增加额度消耗。",
-      "速度设置按任务内的账号保存，从下一次执行生效，续接会话同样适用。关闭 Fast 会明确恢复标准速度，不改变思考等级；不支持的模型会禁用开关。"
+      "为每条待发送消息补上“发送”按钮。支持实时引导时立即提交，否则保留排队；发送过程中防止重复点击、取消及结果不明确时自动重发。",
+      "侧栏改为可折叠的“置顶、项目、最近”分区，项目文件夹可单独展开，保留自定义分区，并记住折叠状态。"
     ]
   }
 }

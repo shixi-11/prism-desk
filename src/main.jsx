@@ -48,15 +48,8 @@ import "./typography.css";
 import "./capabilities.css";
 import {tr,setLanguage,locale,languages} from './i18n.js';
 
+import SidebarTasks from './SidebarTasks.jsx';
 const api = window.prism;
-function taskGroups(tasks){
-  const groups=new Map();
-  for(const task of tasks){const key=task.pinned?'pinned':task.section?'section:'+task.section:task.projectGroup?'project:'+task.cwd:'tasks';
-    if(!groups.has(key))groups.set(key,{key,label:task.pinned?tr('置顶'):task.section||(task.projectGroup?task.cwd.split(/[\\/]/).filter(Boolean).pop():tr('任务')),path:task.projectGroup?task.cwd:undefined,tasks:[]});
-    groups.get(key).tasks.push(task);
-  }
-  return [...groups.values()];
-}
 function TaskEntry({item,selected,onSelect,onRename,onAction}){
   const [editing,setEditing]=useState(false),[name,setName]=useState(item.title),[saving,setSaving]=useState(false);
   const begin=()=>{setName(item.title);setEditing(true);};
@@ -823,7 +816,7 @@ function App() {
           </span>
         </div>
         <nav aria-label={tr("任务列表")}>
-          {taskGroups(init.tasks).map(group=><React.Fragment key={group.key}><div className="task-group" title={group.path}>{group.label}</div>{group.tasks.map(t=><TaskEntry key={t.id} item={t} selected={task?.id===t.id} onSelect={()=>changeTask(t.id)} onAction={taskAction} onRename={async(id,title)=>{try{const updated=await api.update(id,{title});setInit(old=>({...old,tasks:old.tasks.map(t=>t.id===id?updated:t)}));setTask(old=>old?.id===id?updated:old);}catch(error){fail(error);throw error;}}}/>)}</React.Fragment>)}
+          <SidebarTasks tasks={init.tasks} renderTask={t=><TaskEntry key={t.id} item={t} selected={task?.id===t.id} onSelect={()=>changeTask(t.id)} onAction={taskAction} onRename={async(id,title)=>{try{const updated=await api.update(id,{title});setInit(old=>({...old,tasks:old.tasks.map(t=>t.id===id?updated:t)}));setTask(old=>old?.id===id?updated:old);}catch(error){fail(error);throw error;}}}/>}/>
           {!init.tasks.length && (
             <p className="no-tasks">{tr("你的任务会留在这里。")}</p>
           )}
@@ -875,7 +868,7 @@ function App() {
             </div>
           )}
           {task&&<GoalBar key={task.id} task={task} events={events} thinking={thinking} activity={activity} Modal={Modal} onSave={async input=>{const updated=await api.savePlan(task.id,input);if(current.current===updated.id)setTask(updated);return updated;}} onPlanAction={async(action,revision)=>{const id=task.id;await api.planAction(id,action,revision??task.workPlan?.revision);if(current.current===id)await load(id);}} onGoalAction={async(action,revision)=>{const updated=await api.goalAction(task.id,action,revision);if(current.current===updated.id)setTask(updated);return updated;}}/>}
-          <QueuedMessages items={queue.filter(item=>item.taskId===task?.id&&item.status!=="sending")} onCancel={id=>api.cancelQueued(id).catch(fail)} onRetry={id=>api.retryQueued(id).catch(fail)}/>
+          <QueuedMessages items={queue.filter(item=>item.taskId===task?.id&&item.status!=="sending")} onCancel={id=>api.cancelQueued(id).catch(fail)} onRetry={id=>api.retryQueued(id).catch(fail)} onSend={async id=>{try{const result=await api.sendQueued(id);if(result.queued)setToast(tr('当前无法实时引导，消息已排队'));}catch(error){fail(error);}}}/>
           <div className="composer">
             {task?.goalLifecycle?.status==='paused'?<p className="plan-mode-note">{tr('目标已暂停，请先继续目标。')}</p>:task?.planReviewRequired&&<p className="plan-mode-note">{tr('计划待确认，当前消息仅用于讨论计划。')}<button disabled={anyBusy||!task.workPlan?.steps?.length} onClick={async()=>{try{await api.planAction(task.id,'execute',task.workPlan?.revision);}catch(e){fail(e);}}}>{tr('确认计划并执行')}</button></p>}
             <ImageAttachments taskId={task?.id} images={images} onRemove={id=>setImages(old=>old.filter(image=>image.id!==id))} onPreview={image=>image.path&&setPreview({id:Date.now(),target:image.path,task})}/>

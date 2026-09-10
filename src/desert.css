@@ -568,6 +568,16 @@ html:not([lang^="zh"]) .empty h1 { font-size:clamp(26px,3vw,44px); }
 .queued-messages>div { display:flex; align-items:center; gap:10px; padding-top:8px; flex-wrap:wrap; }
 .queued-messages span { min-width:0; flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 .queued-messages small { flex-basis:100%; color:var(--muted); }
+.queued-messages .queued-send { display:inline-flex; align-items:center; gap:4px; flex:none; padding:5px 8px; border:1px solid var(--line); border-radius:5px; }
+.sidebar-section { margin-bottom:12px; }
+.sidebar-section.nested { margin:3px 0; }
+.sidebar nav .sidebar-section-toggle { display:flex; align-items:center; gap:7px; width:100%; padding:8px 4px; margin:0; border:0; background:transparent; color:var(--muted); font-size:12px; text-align:start; }
+.sidebar-section-toggle>span { flex:1; min-width:0; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; }
+.sidebar-section-toggle>small { font-size:10px; opacity:.7; }
+.sidebar-section-toggle>svg { flex:none; transition:transform .15s; }
+.sidebar-section-toggle>svg.folded { transform:rotate(-90deg); }
+.sidebar-section.nested>.sidebar-section-content { padding-inline-start:10px; }
+.sidebar-empty { margin:6px 0 10px; padding-inline-start:24px; font-size:11px; color:var(--muted); opacity:.7; }
 .activity-panel { background:var(--writing-bg); border:1px solid var(--line); margin-bottom:8px; padding:9px 13px; font-size:12px; }
 .activity-panel summary { display:flex; align-items:center; gap:8px; cursor:pointer; }
 .activity-panel summary svg { margin-inline-start:auto; }

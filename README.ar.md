@@ -34,12 +34,12 @@ Prism Desk هو مساحة عمل على Windows لواجهات CLI التي ت�
 
 ### التثبيت
 
-تثبّت هذه الأوامر الإصدار المستقر **v0.1.16**. راجع [أحدث إصدار](https://github.com/shixi-11/prism-desk/releases/latest) لمعرفة رقمه وملاحظات تغييراته باللغتين.
+تثبّت هذه الأوامر الإصدار المستقر **v0.1.17**. راجع [أحدث إصدار](https://github.com/shixi-11/prism-desk/releases/latest) لمعرفة رقمه وملاحظات تغييراته باللغتين.
 
 ستحتاج إلى Windows وGit وNode.js 22.12 أو أحدث وnpm، بالإضافة إلى واجهات CLI الرسمية للمزوّدين الذين تختارهم. سجّل الدخول إلى كل CLI على حدة.
 
 ```powershell
-git clone --branch v0.1.16 https://github.com/shixi-11/prism-desk.git
+git clone --branch v0.1.17 https://github.com/shixi-11/prism-desk.git
 cd prism-desk
 npm install
 npm run build

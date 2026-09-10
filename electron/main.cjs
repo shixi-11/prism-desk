@@ -240,6 +240,7 @@ app.whenReady().then(() => {
     throw Error('Unsupported task action');
   });
   handle('cancelQueued',id=>messageQueue.cancel(id));
+  handle('sendQueued',id=>messageQueue.send(id));
   handle('retryQueued',id=>messageQueue.retry(id));
   handle('preferences',update=>{
     const allowed={sendShortcut:['enter','ctrl-enter'],busySend:['queue','steer']};

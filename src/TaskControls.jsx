@@ -1,5 +1,5 @@
 import React,{useEffect,useState} from 'react';
-import {X,FileText,ImagePlus,Settings2,ChevronDown} from 'lucide-react';
+import {X,ArrowUp,FileText,ImagePlus,Settings2,ChevronDown} from 'lucide-react';
 import {tr,locale} from './i18n.js';
 import UpdateSettings from './UpdateSettings.jsx';
 export function AccountQuota({profile,quota}){
@@ -14,9 +14,9 @@ export function ImageAttachments({taskId,images,onRemove,onPreview}){
  useEffect(()=>{let live=true;for(const image of images||[])if(image.kind!=='file'&&!image.thumbnail)window.prism.imageThumbnail(taskId,image.id).then(src=>{if(live)setThumbs(old=>({...old,[image.id]:src}));}).catch(()=>{});return()=>{live=false;};},[taskId,images]);
  return images?.length?<div className="image-attachments">{images.map(image=><div key={image.id}><button className={image.kind==='file'?'image-preview file-attachment':'image-preview'} title={image.name} onClick={()=>onPreview?.(image)}>{image.kind==='file'?<><FileText size={22}/><span>{image.name}</span></>:<img alt={image.name} src={image.thumbnail||thumbs[image.id]}/>}</button>{onRemove&&<button className="remove-image" aria-label={tr('移除附件')} onClick={()=>onRemove(image.id)}><X size={13}/></button>}</div>)}</div>:null;
 }
-export function QueuedMessages({items,onCancel,onRetry}){
+export function QueuedMessages({items,onCancel,onRetry,onSend}){
  if(!items.length)return null;
- return <div className="queued-messages" aria-label={tr('待发送消息')}><strong>{tr('待发送消息')} · {items.length}</strong>{items.map(item=><div key={item.id}><span>{item.images?.length?`▧ ${item.images.length} · `:''}{item.text}</span>{item.error&&<small>{tr(item.error)}</small>}{item.status==='held'&&<button onClick={()=>onRetry(item.id)}>{tr('重试')}</button>}<button aria-label={tr('取消排队')} onClick={()=>onCancel(item.id)}><X size={14}/></button></div>)}</div>;
+ return <div className="queued-messages" aria-label={tr('待发送消息')}><strong>{tr('待发送消息')} · {items.length}</strong>{items.map(item=><div key={item.id}><span>{item.images?.length?`▧ ${item.images.length} · `:''}{item.text}</span>{item.error&&<small>{tr(item.error)}</small>}<button className="queued-send" aria-label={tr('发送')} title={tr('发送')} disabled={item.status==='dispatching'} onClick={()=>onSend(item.id)}><ArrowUp size={14}/>{tr('发送')}</button>{item.status==='held'&&<button onClick={()=>onRetry(item.id)}>{tr('重试')}</button>}<button disabled={item.status==='dispatching'} aria-label={tr('取消排队')} onClick={()=>onCancel(item.id)}><X size={14}/></button></div>)}</div>;
 }
 export function ActivityPanel({task,events,thinking,activity}){
  const summaries=events.filter(e=>e.type==='reasoning').slice(-6),plans=events.filter(e=>e.type==='plan').slice(-1);
