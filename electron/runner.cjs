@@ -132,6 +132,7 @@ class Runner extends EventEmitter {
         instruction='继续这条任务尚未完成的工作。先读取持久工作记录和当前项目文件，核对前序账号实际完成的部分；已有成功操作不得重复执行，部分写入先核实再续做。不要要求用户重新描述任务。';
       }
     } finally {
+      try {
       if(this.active?.quotaExhausted)task.stopReason='quota_exhausted';
       delete task.relaySource;
       require('./task-plan.cjs').suggest(task,this.store.events(id),planRevision);
@@ -140,9 +141,14 @@ class Runner extends EventEmitter {
       delete task.execution;
       delete task.activeQuestionIds;
       this.store.save(task);
-      this.active = null;
       this.store.context(task);
+      }catch(error){
+        task.state='unknown';delete task.requestedHandoff;
+        throw error;
+      }finally{
+      this.active = null;
       this.emit("idle", task);
+      }
     }
     const next = task.requestedHandoff;
     if(next && ['idle','paused'].includes(task.state)) {
@@ -371,10 +377,13 @@ class Runner extends EventEmitter {
     let buffer = "";
     let result = null;
     let errorText = "";
+    let streamError = null;
     this.active.started = true;
     proc.stdout.setEncoding("utf8");
     proc.stderr.setEncoding("utf8");
     proc.stdout.on("data", (data) => {
+      if(streamError)return;
+      try {
       buffer += data;
       let i;
       while ((i = buffer.indexOf("\n")) >= 0) {
@@ -391,7 +400,7 @@ class Runner extends EventEmitter {
           if(msg.rate_limit_info?.isUsingOverage)this.active.quotaExhausted=false;
         }
         if ((msg.type==='system'&&msg.subtype==='init')||msg.type==='assistant') this.confirmExecution(task,profile,msg.model||msg.message?.model);
-        if (msg.session_id) {
+        if (msg.session_id && task.sessions[profile.id]!==msg.session_id) {
           task.sessions[profile.id] = msg.session_id;
           this.store.save(task);
         }
@@ -424,6 +433,14 @@ class Runner extends EventEmitter {
               });
         if (msg.type === "result") result = msg;
       }
+      }catch(error){
+        streamError=error;
+        // EventEmitter callbacks cannot propagate to run()'s async catch.
+        // Stop the isolated process before reporting an uncertain execution.
+        this.active.quotaExhausted=false;
+        if(proc.requestStop)this.active.stopSignal=Promise.resolve().then(()=>proc.requestStop()).catch(()=>{proc.kill();});
+        else proc.kill();
+      }
     });
     proc.stderr.on("data", (data) => {
       errorText = (errorText + data).slice(-4000);
@@ -434,6 +451,7 @@ class Runner extends EventEmitter {
       proc.on("error", reject);
     });
     if(this.active.stopSignal)await this.active.stopSignal.catch(()=>{});
+    if(streamError)throw streamError;
     if(this.active.cancelRequested && this.active.stopAcknowledged && code===1223){
       this.event(task.id,'notice',{text:'Claude 执行及其子进程已停止；交接时将核对可能的部分写入。'});
       delete task.sessions[profile.id];

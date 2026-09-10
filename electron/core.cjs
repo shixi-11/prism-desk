@@ -9,12 +9,7 @@ const TAICHU = CONFIG.assistant.path;
 const SKILLS = CONFIG.skillsPath;
 const PROFILES = CONFIG.profiles;
 const hash = (text) => crypto.createHash("sha256").update(text).digest("hex");
-function atomic(file, data) {
-  fs.mkdirSync(path.dirname(file), { recursive: true });
-  const temp = file + ".tmp";
-  fs.writeFileSync(temp, JSON.stringify(data, null, 2));
-  fs.renameSync(temp, file);
-}
+const {atomic}=require('./atomic-file.cjs');
 function profileFor(id) {
   const p = PROFILES.find((p) => p.id === id);
   if (!p) throw Error("请选择已接入的订阅账号。");

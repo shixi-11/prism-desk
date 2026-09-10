@@ -34,12 +34,12 @@ Actualmente, Prism se distribuye mediante una **instalación desde el código fu
 
 ### Instalación
 
-Estos comandos instalan la versión estable **v0.1.17**. Consulta la [última versión publicada](https://github.com/shixi-11/prism-desk/releases/latest) para conocer su número y leer las notas de cambios bilingües.
+Estos comandos instalan la versión estable **v0.1.18**. Consulta la [última versión publicada](https://github.com/shixi-11/prism-desk/releases/latest) para conocer su número y leer las notas de cambios bilingües.
 
 Necesitarás Windows, Git, Node.js 22.12 o posterior, npm y las CLI oficiales de los proveedores que elijas. Inicia sesión en cada CLI por separado.
 
 ```powershell
-git clone --branch v0.1.17 https://github.com/shixi-11/prism-desk.git
+git clone --branch v0.1.18 https://github.com/shixi-11/prism-desk.git
 cd prism-desk
 npm install
 npm run build

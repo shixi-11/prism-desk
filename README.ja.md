@@ -34,12 +34,12 @@ Prism は現在、**Windows でのソースからのインストール**に対�
 
 ### インストール
 
-以下のコマンドで安定版 **v0.1.17** をインストールします。[最新リリース](https://github.com/shixi-11/prism-desk/releases/latest)で、バージョンと二言語の変更履歴を確認してください。
+以下のコマンドで安定版 **v0.1.18** をインストールします。[最新リリース](https://github.com/shixi-11/prism-desk/releases/latest)で、バージョンと二言語の変更履歴を確認してください。
 
 Windows、Git、Node.js 22.12 以降、npm、および利用するプロバイダーの公式 CLI が必要です。各 CLI に個別にサインインしてください。
 
 ```powershell
-git clone --branch v0.1.17 https://github.com/shixi-11/prism-desk.git
+git clone --branch v0.1.18 https://github.com/shixi-11/prism-desk.git
 cd prism-desk
 npm install
 npm run build
