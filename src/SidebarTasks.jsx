@@ -1,12 +1,14 @@
 import React,{useState} from 'react';
-import {ChevronDown,FolderOpen} from 'lucide-react';
+import {ChevronDown,FolderOpen,Pencil,Check,X} from 'lucide-react';
 import {tr} from './i18n.js';
 import {sidebarGroups} from './sidebar-groups.js';
-export default function SidebarTasks({tasks,renderTask}){
+export default function SidebarTasks({tasks,renderTask,projectNames={},onRenameProject}){
+ const [editing,setEditing]=useState(null),[name,setName]=useState(''),[saving,setSaving]=useState(false),[error,setError]=useState('');
+ async function save(e){e.preventDefault();if(!name.trim()||saving)return;setSaving(true);try{await onRenameProject(editing.path,name.trim());setEditing(null);setError('');}catch(e){setError(e.message);}finally{setSaving(false);}}
  const [collapsed,setCollapsed]=useState(()=>{try{return JSON.parse(localStorage.getItem('prism-sidebar-folds')||'{}')||{};}catch{return {};}});
  const toggle=key=>setCollapsed(old=>{const next={...old,[key]:!old[key]};try{localStorage.setItem('prism-sidebar-folds',JSON.stringify(next));}catch{}return next;});
- function section(group,nested=false){const count=group.tasks.length+(group.groups||[]).reduce((n,g)=>n+g.tasks.length,0);return <section className={`sidebar-section${nested?' nested':''}`} key={group.key}>
-  <button className="sidebar-section-toggle" aria-expanded={!collapsed[group.key]} title={group.path} onClick={()=>toggle(group.key)}><ChevronDown size={13} className={collapsed[group.key]?'folded':''}/>{group.path&&<FolderOpen size={14}/>}<span>{nested?group.label:tr(group.label)}</span><small>{count}</small></button>
+ function section(group,nested=false){const label=group.path?(projectNames[group.key.slice(8)]||group.label):nested?group.label:tr(group.label);const count=group.tasks.length+(group.groups||[]).reduce((n,g)=>n+g.tasks.length,0);return <section className={`sidebar-section${nested?' nested':''}`} key={group.key}>
+  {editing?.key===group.key?<form className="task-rename project-rename" onSubmit={save}><input autoFocus aria-label={tr('项目名称')} value={name} maxLength={100} disabled={saving} onChange={e=>setName(e.target.value)} onKeyDown={e=>{if(e.key==='Escape'&&!saving){setEditing(null);setError('');}}}/><button aria-label={tr('保存名称')} disabled={saving||!name.trim()}><Check size={14}/></button><button type="button" aria-label={tr('取消')} disabled={saving} onClick={()=>{setEditing(null);setError('');}}><X size={14}/></button>{error&&<small role="alert">{error}</small>}</form>:<div className="sidebar-section-heading"><button className="sidebar-section-toggle" aria-expanded={!collapsed[group.key]} title={group.path} onClick={()=>toggle(group.key)}><ChevronDown size={13} className={collapsed[group.key]?'folded':''}/>{group.path&&<FolderOpen size={14}/>}<span>{label}</span><small>{count}</small></button>{group.path&&<button className="project-rename-button" aria-label={tr('重命名项目')+' '+label} title={tr('重命名项目')} onClick={()=>{setEditing(group);setName(label);setError('');}}><Pencil size={14}/></button>}</div>}
   {!collapsed[group.key]&&<div className="sidebar-section-content">{group.tasks.map(renderTask)}{group.groups?.map(g=>section(g,true))}{!count&&<p className="sidebar-empty">{tr('暂无任务')}</p>}</div>}
  </section>;}
  return sidebarGroups(tasks).map(group=>section(group));

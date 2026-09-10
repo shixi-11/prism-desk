@@ -1,14 +1,14 @@
 {
-  "version": "0.1.18",
+  "version": "0.1.19",
   "date": "2026-09-11",
   "notes": {
     "en": [
-      "Fixed an uncaught Claude stream error when Windows temporarily blocks replacing a task record. Task saves now retry transient file locks for a bounded period and use unique temporary files.",
-      "Avoided repeated writes for unchanged Claude session IDs. Persistent stream-processing failures stop the isolated process and report an uncertain task state; failed replacements preserve the original file and a recovery copy."
+      "Projects can now be renamed using the pencil button in the sidebar. Display names are saved in app settings and shared by conversations in the same project; working folders stay unchanged.",
+      "Adjusted sidebar typography so Pinned, Projects, Recent and project names are larger than conversation titles."
     ],
     "zh": [
-      "修复 Windows 暂时阻止替换任务记录时，Claude 消息流触发未捕获主进程异常的问题。保存记录改用独立临时文件，并对短暂占用进行有限重试。",
-      "Claude 会话编号未变化时不再重复写盘。消息流处理持续失败时受控停止独立进程，并报告待核对状态；替换失败会保留原文件和待保存副本。"
+      "项目名称旁加入铅笔按钮，可直接修改、保存或取消。显示名称保存在应用设置中，同一项目的会话共用该名称，工作目录保持原样。",
+      "调整侧栏字号层级：置顶、项目、最近及项目名称更大，会话名称更小。"
     ]
   }
 }

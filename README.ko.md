@@ -34,12 +34,12 @@ Prism은 현재 **Windows 소스 설치** 방식으로 제공됩니다. 독립�
 
 ### 설치
 
-다음 명령은 안정 버전 **v0.1.18**을 설치합니다. [최신 릴리스](https://github.com/shixi-11/prism-desk/releases/latest)에서 버전과 두 언어로 제공되는 변경 사항을 확인하세요.
+다음 명령은 안정 버전 **v0.1.19**을 설치합니다. [최신 릴리스](https://github.com/shixi-11/prism-desk/releases/latest)에서 버전과 두 언어로 제공되는 변경 사항을 확인하세요.
 
 Windows, Git, Node.js 22.12 이상, npm, 그리고 선택한 공급자의 공식 CLI가 필요합니다. 각 CLI에 별도로 로그인하세요.
 
 ```powershell
-git clone --branch v0.1.18 https://github.com/shixi-11/prism-desk.git
+git clone --branch v0.1.19 https://github.com/shixi-11/prism-desk.git
 cd prism-desk
 npm install
 npm run build

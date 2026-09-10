@@ -578,6 +578,14 @@ html:not([lang^="zh"]) .empty h1 { font-size:clamp(26px,3vw,44px); }
 .sidebar-section-toggle>svg.folded { transform:rotate(-90deg); }
 .sidebar-section.nested>.sidebar-section-content { padding-inline-start:10px; }
 .sidebar-empty { margin:6px 0 10px; padding-inline-start:24px; font-size:11px; color:var(--muted); opacity:.7; }
+.sidebar-section-heading { display:flex; align-items:center; min-width:0; }
+.sidebar nav .sidebar-section-toggle { font-size:16px; color:var(--text); }
+.sidebar nav .task-entry .task-select { font-size:13px; padding-block:10px; }
+.sidebar nav .project-rename-button { flex:none; width:25px; padding:4px; margin:0; background:transparent; color:var(--muted); }
+.sidebar nav .project-rename button { flex:none; width:25px; padding:4px; margin:0; background:transparent; }
+.project-rename { flex-wrap:wrap; }
+.project-rename input { width:0; flex:1; font-size:14px; }
+.project-rename small { width:100%; }
 .activity-panel { background:var(--writing-bg); border:1px solid var(--line); margin-bottom:8px; padding:9px 13px; font-size:12px; }
 .activity-panel summary { display:flex; align-items:center; gap:8px; cursor:pointer; }
 .activity-panel summary svg { margin-inline-start:auto; }

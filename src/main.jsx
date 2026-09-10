@@ -816,7 +816,7 @@ function App() {
           </span>
         </div>
         <nav aria-label={tr("任务列表")}>
-          <SidebarTasks tasks={init.tasks} renderTask={t=><TaskEntry key={t.id} item={t} selected={task?.id===t.id} onSelect={()=>changeTask(t.id)} onAction={taskAction} onRename={async(id,title)=>{try{const updated=await api.update(id,{title});setInit(old=>({...old,tasks:old.tasks.map(t=>t.id===id?updated:t)}));setTask(old=>old?.id===id?updated:old);}catch(error){fail(error);throw error;}}}/>}/>
+          <SidebarTasks tasks={init.tasks} projectNames={init.settings.projectNames||{}} onRenameProject={async(cwd,name)=>{const settings=await api.renameProject(cwd,name);setInit(old=>({...old,settings}));}} renderTask={t=><TaskEntry key={t.id} item={t} selected={task?.id===t.id} onSelect={()=>changeTask(t.id)} onAction={taskAction} onRename={async(id,title)=>{try{const updated=await api.update(id,{title});setInit(old=>({...old,tasks:old.tasks.map(t=>t.id===id?updated:t)}));setTask(old=>old?.id===id?updated:old);}catch(error){fail(error);throw error;}}}/>}/>
           {!init.tasks.length && (
             <p className="no-tasks">{tr("你的任务会留在这里。")}</p>
           )}

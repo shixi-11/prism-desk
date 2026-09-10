@@ -604,5 +604,7 @@
   "当前模型不支持所选速度模式": "Dieses Modell unterstützt den gewählten Geschwindigkeitsmodus nicht",
   "最近": "Zuletzt",
   "消息已开始发送": "Diese Nachricht wird bereits gesendet",
-  "请先继续目标或核对任务状态": "Setzen Sie zuerst das Ziel fort oder prüfen Sie den Aufgabenstatus"
+  "请先继续目标或核对任务状态": "Setzen Sie zuerst das Ziel fort oder prüfen Sie den Aufgabenstatus",
+  "项目名称": "Projektname",
+  "重命名项目": "Projekt umbenennen"
 }

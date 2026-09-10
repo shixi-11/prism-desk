@@ -242,6 +242,7 @@ app.whenReady().then(() => {
   handle('cancelQueued',id=>messageQueue.cancel(id));
   handle('sendQueued',id=>messageQueue.send(id));
   handle('retryQueued',id=>messageQueue.retry(id));
+  handle('renameProject',(cwd,name)=>{const next=require('./project-labels.cjs').renameProject(settings(),cwd,name);atomic(path.join(dataPath(),'settings.json'),next);return next;});
   handle('preferences',update=>{
     const allowed={sendShortcut:['enter','ctrl-enter'],busySend:['queue','steer']};
     for(const [key,value]of Object.entries(update))if(!allowed[key]?.includes(value))throw Error('Invalid preference');

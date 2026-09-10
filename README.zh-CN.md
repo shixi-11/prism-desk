@@ -32,12 +32,12 @@
 
 ### 安装
 
-以下命令安装稳定版 **v0.1.18**。[最新发布页](https://github.com/shixi-11/prism-desk/releases/latest)提供版本号与中英文更新内容。
+以下命令安装稳定版 **v0.1.19**。[最新发布页](https://github.com/shixi-11/prism-desk/releases/latest)提供版本号与中英文更新内容。
 
 需要 Windows、Git、Node.js 22.12 或更新版本、npm，以及准备使用的官方 CLI。各 CLI 需分别完成登录。
 
 ```powershell
-git clone --branch v0.1.18 https://github.com/shixi-11/prism-desk.git
+git clone --branch v0.1.19 https://github.com/shixi-11/prism-desk.git
 cd prism-desk
 npm install
 npm run build

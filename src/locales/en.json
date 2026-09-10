@@ -604,5 +604,7 @@
   "当前模型不支持所选速度模式": "This model does not support the selected speed mode",
   "最近": "Recent",
   "消息已开始发送": "This message is already being sent",
-  "请先继续目标或核对任务状态": "Resume the goal or check the task status first"
+  "请先继续目标或核对任务状态": "Resume the goal or check the task status first",
+  "项目名称": "Project name",
+  "重命名项目": "Rename project"
 }
