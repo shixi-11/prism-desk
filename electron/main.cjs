@@ -263,8 +263,8 @@ app.whenReady().then(() => {
   handle('savePreview',async(file,text,version)=>{if(!previewFiles.has(file))throw Error('请先打开文件');return require('./preview.cjs').savePreview(file,text,version);});
   handle("create", async input => {
     input={...input,mode:input.mode??require('./task-settings.cjs').newTaskMode(settings(),PROFILES.find(p=>p.id===(input.profile||PROFILES.find(p=>!p.disabled)?.id)))};
-    if(input.executionOptions){const list=await require('./models.cjs').modelOptions(input.profile,app.getAppPath());const m=list.models.find(m=>m.id===input.executionOptions.model);if(!m?.efforts.includes(input.executionOptions.effort))throw Error('模型或思考等级无效');}
-    const task=store.create(input);if(input.executionOptions){task.modelSettings={[task.profile]:{model:input.executionOptions.model,effort:input.executionOptions.effort}};store.save(task);}broadcastTasks();return task;
+    const executionOptions=input.executionOptions?await require('./models.cjs').validateSelection(input.profile,app.getAppPath(),input.executionOptions):null;
+    const task=store.create(input);if(executionOptions){task.modelSettings={[task.profile]:executionOptions};store.save(task);}broadcastTasks();return task;
   });
   handle("pickDirectory", async () => {
     const result = await dialog.showOpenDialog(owner(), directoryDialog(settings().language));

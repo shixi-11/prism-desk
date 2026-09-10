@@ -1,16 +1,14 @@
 {
-  "version": "0.1.15",
+  "version": "0.1.16",
   "date": "2026-09-10",
   "notes": {
     "en": [
-      "Removed the blanket prohibition on sending, publishing and payment from CLI execution instructions. Actions follow the user’s task authorization; subscription authentication and API-key isolation remain in place.",
-      "The execution log now starts collapsed when its panel is opened. Click the header to expand or collapse the records.",
-      "All nine README languages now include a support link that opens the matching language on the author’s website."
+      "Added a Codex Fast switch next to model and reasoning controls, using the service tier advertised by the current CLI model catalog. Fast mode is off by default and the interface explains its increased credit use.",
+      "Speed is saved per account within each task and applies to the next execution, including resumed sessions. Turning Fast off explicitly restores Standard speed without changing reasoning effort. Unsupported models disable the switch."
     ],
     "zh": [
-      "取消 CLI 执行提示中“不发送、不发布、不付费”的统一限制，相关操作按用户对任务的授权执行；保留订阅认证与 API Key 隔离。",
-      "执行记录面板打开时默认收起，点击标题即可展开或收起记录。",
-      "九种语言的 README 均加入打赏链接，打开作者网站时对应显示该语言。"
+      "在模型与思考等级设置旁加入 Codex Fast 开关，按当前 CLI 模型目录提供的服务档位执行。默认关闭，并提示开启后会增加额度消耗。",
+      "速度设置按任务内的账号保存，从下一次执行生效，续接会话同样适用。关闭 Fast 会明确恢复标准速度，不改变思考等级；不支持的模型会禁用开关。"
     ]
   }
 }

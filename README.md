@@ -23,6 +23,7 @@ Prism currently ships as a **Windows source installation**. No standalone `.exe`
 | Continue the same task | Keep the original request, conversation, progress notes and recorded tool results together when handing work to another account. |
 | Choose an execution account | Select a configured Codex, Claude or Grok CLI profile. Each uses its own login directory. Remove unused accounts from the account panel; task history and local login folders are kept. |
 | Change model and reasoning | Adjust either setting during a task. Changes apply to the next execution and are saved per account within that task. |
+| Codex Fast mode | Enable faster responses for supported models at increased credit use. Off by default; saved per account in each task and applied to the next execution without changing reasoning effort. |
 | Check allowance | View available provider-reported percentages, allowance windows and reset times. Codex reset credits include their individual expiry dates when returned. |
 | Hand off after exhaustion | Enable automatic handoff, or select the next account yourself. Prism waits for the previous execution to finish before continuing. |
 | Use local skills and tools | Point Prism to assistant instructions, a skills folder and installed applications. Check discovered entry points and supported application operations. |
@@ -31,12 +32,12 @@ Prism currently ships as a **Windows source installation**. No standalone `.exe`
 
 ### Install
 
-These commands install stable version **v0.1.15**. Check the [latest Release](https://github.com/shixi-11/prism-desk/releases/latest) for its version and bilingual change notes.
+These commands install stable version **v0.1.16**. Check the [latest Release](https://github.com/shixi-11/prism-desk/releases/latest) for its version and bilingual change notes.
 
 You will need Windows, Git, Node.js 22.12 or later, npm, and the official CLIs for your chosen providers. Sign in to each CLI separately.
 
 ```powershell
-git clone --branch v0.1.15 https://github.com/shixi-11/prism-desk.git
+git clone --branch v0.1.16 https://github.com/shixi-11/prism-desk.git
 cd prism-desk
 npm install
 npm run build

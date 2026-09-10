@@ -93,6 +93,8 @@ class Rpc extends EventEmitter {
         'model_provider="openai"',
         "-c",
         'forced_login_method="chatgpt"',
+        "-c",
+        'features.fast_mode=true',
       ]),
       cwd,
     );

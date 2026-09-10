@@ -23,6 +23,7 @@ Prism wird derzeit als **Installation aus dem Quellcode für Windows** bereitges
 | Dieselbe Aufgabe fortsetzen | Halten Sie die ursprüngliche Anfrage, den Gesprächsverlauf, die Fortschrittsnotizen und die aufgezeichneten Werkzeugergebnisse zusammen, wenn Sie die Arbeit an ein anderes Konto übergeben. |
 | Ein Ausführungskonto auswählen | Wählen Sie ein konfiguriertes CLI-Profil für Codex, Claude oder Grok. Jedes verwendet ein eigenes Anmeldeverzeichnis. Entfernen Sie ungenutzte Konten im Kontenbereich; der Aufgabenverlauf und die lokalen Anmeldeordner bleiben erhalten. |
 | Modell und Denkaufwand ändern | Passen Sie beide Einstellungen während einer Aufgabe an. Änderungen gelten für die nächste Ausführung und werden innerhalb der Aufgabe für jedes Konto gespeichert. |
+| Codex-Fast-Modus | Beschleunigt Antworten unterstützter Modelle bei höherem Credit-Verbrauch. Standardmäßig deaktiviert; wird pro Konto innerhalb jeder Aufgabe gespeichert und gilt ab der nächsten Ausführung, ohne die Denkstufe zu ändern. |
 | Kontingent prüfen | Sehen Sie die vom Anbieter gemeldeten verfügbaren Prozentwerte, Kontingentzeiträume und Rücksetzzeitpunkte ein. Bei Codex-Reset-Guthaben werden die jeweiligen Ablaufdaten angezeigt, sofern sie zurückgegeben werden. |
 | Nach Erschöpfung des Kontingents übergeben | Aktivieren Sie die automatische Übergabe oder wählen Sie das nächste Konto selbst. Prism wartet auf das Ende der vorherigen Ausführung, bevor es fortfährt. |
 | Lokale Skills und Werkzeuge verwenden | Geben Sie in Prism Assistentenanweisungen, einen Skills-Ordner und installierte Anwendungen an. Prüfen Sie erkannte Einstiegspunkte und unterstützte Anwendungsoperationen. |
@@ -33,12 +34,12 @@ Prism wird derzeit als **Installation aus dem Quellcode für Windows** bereitges
 
 ### Installation
 
-Diese Befehle installieren die stabile Version **v0.1.15**. Den aktuellen Versionsstand und die zweisprachigen Änderungshinweise finden Sie in der [neuesten Veröffentlichung](https://github.com/shixi-11/prism-desk/releases/latest).
+Diese Befehle installieren die stabile Version **v0.1.16**. Den aktuellen Versionsstand und die zweisprachigen Änderungshinweise finden Sie in der [neuesten Veröffentlichung](https://github.com/shixi-11/prism-desk/releases/latest).
 
 Sie benötigen Windows, Git, Node.js 22.12 oder neuer, npm und die offiziellen CLIs der gewählten Anbieter. Melden Sie sich bei jedem CLI separat an.
 
 ```powershell
-git clone --branch v0.1.15 https://github.com/shixi-11/prism-desk.git
+git clone --branch v0.1.16 https://github.com/shixi-11/prism-desk.git
 cd prism-desk
 npm install
 npm run build

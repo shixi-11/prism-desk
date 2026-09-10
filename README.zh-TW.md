@@ -23,6 +23,7 @@ Prism 目前以 **Windows 原始碼安裝**方式提供。尚未發布獨立的 
 | 接續同一個任務 | 將工作移交給另一個帳號時，一併保留原始要求、對話、進度筆記與已記錄的工具結果。 |
 | 選擇執行帳號 | 選擇已設定的 Codex、Claude 或 Grok CLI 設定檔。每個設定檔使用獨立的登入目錄。可從帳號面板移除不再使用的帳號；任務歷程與本機登入資料夾仍會保留。 |
 | 變更模型與推理設定 | 可在任務進行中調整任一設定。變更會套用至下一次執行，並在該任務內依帳號分別儲存。 |
+| Codex Fast 模式 | 為支援的模型開啟更快回應，同時增加額度消耗。預設關閉，按任務內的帳號儲存，下次執行生效，不改變思考等級。 |
 | 查詢額度 | 查看供應商回報的可用百分比、額度期間與重設時間。若回應提供相關資料，Codex 重置卡也會顯示各張到期日。 |
 | 額度用盡後移交 | 啟用自動移交，或自行選擇下一個帳號。Prism 會等到上一次執行結束後才繼續。 |
 | 使用本機技能與工具 | 指定助理指示、技能資料夾與已安裝的應用程式供 Prism 使用。查看偵測到的入口與支援的應用程式操作。 |
@@ -33,12 +34,12 @@ Prism 目前以 **Windows 原始碼安裝**方式提供。尚未發布獨立的 
 
 ### 安裝
 
-以下指令會安裝穩定版本 **v0.1.15**。請查看[最新發布版本](https://github.com/shixi-11/prism-desk/releases/latest)，確認其版本與雙語變更說明。
+以下指令會安裝穩定版本 **v0.1.16**。請查看[最新發布版本](https://github.com/shixi-11/prism-desk/releases/latest)，確認其版本與雙語變更說明。
 
 你需要 Windows、Git、Node.js 22.12 或更新版本、npm，以及所選供應商的官方 CLI。請分別登入各個 CLI。
 
 ```powershell
-git clone --branch v0.1.15 https://github.com/shixi-11/prism-desk.git
+git clone --branch v0.1.16 https://github.com/shixi-11/prism-desk.git
 cd prism-desk
 npm install
 npm run build

@@ -237,15 +237,17 @@ function ModelControls({task,profile,disabled,onSave}) {
   const model=catalog?.models.find(m=>m.id===current);
   const effort=saved?.effort||(profile.provider==='Codex'?'xhigh':profile.provider==='Gemini'?'auto':'high');
   const labels={auto:tr("模型自动管理"),low:tr("低"),medium:tr("中"),high:tr("高"),xhigh:tr("更高"),max:tr("最高"),ultra:tr("极高"),minimal:tr("最少"),none:tr("无")};
-  async function save(model,effort){setBusy(true);setError('');try{await onSave({model,effort});}catch(e){setError(e.message);}finally{setBusy(false);}}
+  const serviceTier=saved?.serviceTier||'default';
+  async function save(model,effort,tier=serviceTier){setBusy(true);setError('');try{await onSave({model,effort,...(profile.provider==='Codex'?{serviceTier:tier}:{})});}catch(e){setError(e.message);}finally{setBusy(false);}}
   return <div className="model-controls">
-    <label>{tr("模型")}<select aria-label={tr("模型")} value={current} disabled={disabled||busy||!catalog} onChange={e=>{const next=catalog.models.find(m=>m.id===e.target.value);save(next.id,next.efforts.includes(effort)?effort:next.defaultEffort);}}>
+    <label>{tr("模型")}<select aria-label={tr("模型")} value={current} disabled={disabled||busy||!catalog} onChange={e=>{const next=catalog.models.find(m=>m.id===e.target.value);save(next.id,next.efforts.includes(effort)?effort:next.defaultEffort,serviceTier!=='default'&&next.fastServiceTier?next.fastServiceTier:'default');}}>
       {!model&&<option value={current}>{current}</option>}{catalog?.models.map(m=><option key={m.id} value={m.id}>{m.name}</option>)}
     </select></label>
     <label>{tr("思考等级")}<select aria-label={tr("思考等级")} value={effort} disabled={disabled||busy||!model} onChange={e=>save(current,e.target.value)}>
       {!model?.efforts.includes(effort)&&<option value={effort}>{labels[effort]||effort}</option>}{model?.efforts.map(v=><option key={v} value={v}>{labels[v]||v} · {v}</option>)}
     </select></label>
-    <small>{error||(!catalog?tr("正在读取模型选项…"):busy?tr("正在保存…"):tr(!saved?"设置用于此账号的下一次执行":task.execution?.confirmed&&task.execution.profile===profile.id&&task.execution.model===current&&task.execution.effort===effort?"当前已生效":task.execution?"设置已保存，下次执行生效":"设置已保存，发送消息或切换并继续后生效"))}</small>
+    {profile.provider==='Codex'&&<div className="fast-mode-control"><label><span>Fast</span><input type="checkbox" role="switch" aria-label={tr("快速模式")} checked={serviceTier!=='default'} disabled={disabled||busy||!model||(serviceTier==='default'&&!model.fastServiceTier)} onChange={e=>save(current,effort,e.target.checked?model.fastServiceTier:'default')}/></label><p>{tr(model?.fastServiceTier?"更快响应，会增加额度消耗":"当前模型未提供快速模式")}</p></div>}
+    <small>{error||(!catalog?tr("正在读取模型选项…"):busy?tr("正在保存…"):tr(!saved?"设置用于此账号的下一次执行":task.execution?.confirmed&&task.execution.profile===profile.id&&task.execution.model===current&&task.execution.effort===effort&&(task.execution.serviceTier||'default')===serviceTier?"当前已生效":task.execution?"设置已保存，下次执行生效":"设置已保存，发送消息或切换并继续后生效"))}</small>
     {catalog&&<span className="model-source" title={tr(catalog.note)} aria-label={tr(catalog.note)}>ⓘ</span>}
   </div>;
 }
@@ -279,7 +281,7 @@ function Inspector({
   const quota = quotas[target];
   const selectedConfig=task?.modelSettings?.[target];
   const activeConfig=task?.execution||task?.lastExecution;
-  const changedModel=!!selectedConfig&&(!activeConfig||activeConfig.model!==selectedConfig?.model||activeConfig.effort!==selectedConfig?.effort);
+  const changedModel=!!selectedConfig&&(!activeConfig||activeConfig.model!==selectedConfig?.model||activeConfig.effort!==selectedConfig?.effort||(activeConfig.serviceTier||'default')!==(selectedConfig.serviceTier||'default'));
 
   const running = task?.state === "running";
   const canStop = running && ["Codex","Claude","Grok"].includes(profiles.find(p=>p.id===task.profile)?.provider);
@@ -313,7 +315,7 @@ function Inspector({
         </div>
         {selected&&<ModelControls key={(task?.id||'draft')+target} task={task||{modelSettings:draftSettings}} profile={selected} disabled={!!selected.disabled} onSave={value=>onModelSettings(value,target)}/>}
         <div className="execution-status" role="status"><span className="status-dot" />{tr(labels[task?.state]||"就绪")}</div>
-        {activeConfig&&<p className="active-config" role="status">{tr(task?.execution?(task.execution.confirmed?'当前已生效':'正在启动'):'上次已生效')} · {activeConfig.reportedModel||activeConfig.model} · {activeConfig.effort}</p>}
+        {activeConfig&&<p className="active-config" role="status">{tr(task?.execution?(task.execution.confirmed?'当前已生效':'正在启动'):'上次已生效')} · {activeConfig.reportedModel||activeConfig.model} · {activeConfig.effort}{activeConfig.serviceTier&&activeConfig.serviceTier!=='default'?' · Fast':''}</p>}
                 <button
           className="relay outline"
           disabled={disabled || selected?.disabled || !selected || !!task && target === task.profile && !changedModel}
@@ -458,7 +460,7 @@ function Conversation({ task, events, streaming, thinking, activity, awaitingApp
         ["handoff","notice"].includes(e.type) ? (
           <div key={e.id} className="handoff">
             <ArrowRightLeft size={14} />
-            <div><p>{e.executionStatus?`${tr(e.executionStatus)} · ${e.provider} / ${tr(e.accountName)} · ${e.execution.reportedModel||e.execution.model} · ${e.execution.effort}`:tr(e.text)}</p>{e.progress&&<details className="handoff-progress"><summary>{tr("交接进度")}</summary>
+            <div><p>{e.executionStatus?`${tr(e.executionStatus)} · ${e.provider} / ${tr(e.accountName)} · ${e.execution.reportedModel||e.execution.model} · ${e.execution.effort}${e.execution.serviceTier&&e.execution.serviceTier!=='default'?' · Fast':''}`:tr(e.text)}</p>{e.progress&&<details className="handoff-progress"><summary>{tr("交接进度")}</summary>
             <strong>{tr("任务要求")}</strong><p>{e.progress.request||tr("尚无记录")}</p>
             <strong>{tr("进度备注")}</strong><p>{e.progress.checkpoint||tr("尚无记录")}</p>
             <strong>{tr("上轮报告（需结合文件核对）")}</strong><div className="prose"><Markdown>{e.progress.report||tr("尚无报告")}</Markdown></div>

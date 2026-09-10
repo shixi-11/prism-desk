@@ -971,6 +971,14 @@ nav button.selected:before {
 .model-controls label { font-size:12px; min-width:0; }
 .model-controls select { display:block; width:100%; padding:8px 4px; margin-top:6px; color:var(--text); background:transparent; border:1px solid var(--line); }
 .model-controls small { grid-column:1 / -1; color:var(--muted); font-size:10px; }
+.fast-mode-control { grid-column:1 / -1; padding:9px 0; border-top:1px solid var(--line); }
+.fast-mode-control label { display:flex; align-items:center; justify-content:space-between; gap:12px; cursor:pointer; }
+.fast-mode-control input { appearance:none; flex:none; box-sizing:border-box; width:30px; height:18px; min-height:0; padding:0; margin:0; border:1px solid var(--line); border-radius:12px; background:var(--line); cursor:pointer; }
+.fast-mode-control input::before { content:''; display:block; width:12px; height:12px; margin:2px; border-radius:50%; background:var(--text); transition:transform .15s; }
+.fast-mode-control input:checked { background:var(--accent); }
+.fast-mode-control input:checked::before { transform:translateX(12px); }
+.fast-mode-control input:disabled { opacity:.4; cursor:default; }
+.fast-mode-control p { margin:6px 0 0; color:var(--muted); font-size:10px; line-height:1.5; }
 .reset-credit { border-top:1px solid var(--line); margin-top:12px; padding-top:10px; font-size:12px; }
 .reset-credit > div { display:flex; justify-content:space-between; }
 .reset-credit small { display:block; color:var(--muted); font-size:10px; margin:6px 0; overflow-wrap:anywhere; }

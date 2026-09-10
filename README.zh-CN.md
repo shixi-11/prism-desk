@@ -23,6 +23,7 @@
 | 同一任务接续 | 切换账号时保留原始要求、对话、进度备注和已记录的工具结果，供下一次执行读取。 |
 | 选择执行账号 | 在已配置的 Codex、Claude、Grok CLI 入口之间选择，各账号使用独立登录目录。可在账号面板移除不再使用的账号，保留任务记录和本机登录目录。 |
 | 切换模型与思考等级 | 任务过程中即可调整，从下一次执行生效；设置按任务内的不同账号分别保存。 |
+| Codex Fast 模式 | 对支持的模型开启更快响应，同时增加额度消耗。默认关闭，按任务内的账号保存，下次执行生效，不改变思考等级。 |
 | 查看额度 | 展示提供方可返回的剩余百分比、限制周期和恢复时间；Codex 重置卡按返回结果逐张列出到期日。 |
 | 额度耗尽后换号 | 可开启自动接续，也可手动选择下一个账号。前一次执行结束后，才开始下一次执行。 |
 | 使用技能与本机工具 | 配置助手指令、技能目录和应用路径，查看已发现的入口，并验证受支持的应用操作。 |
@@ -31,12 +32,12 @@
 
 ### 安装
 
-以下命令安装稳定版 **v0.1.15**。[最新发布页](https://github.com/shixi-11/prism-desk/releases/latest)提供版本号与中英文更新内容。
+以下命令安装稳定版 **v0.1.16**。[最新发布页](https://github.com/shixi-11/prism-desk/releases/latest)提供版本号与中英文更新内容。
 
 需要 Windows、Git、Node.js 22.12 或更新版本、npm，以及准备使用的官方 CLI。各 CLI 需分别完成登录。
 
 ```powershell
-git clone --branch v0.1.15 https://github.com/shixi-11/prism-desk.git
+git clone --branch v0.1.16 https://github.com/shixi-11/prism-desk.git
 cd prism-desk
 npm install
 npm run build

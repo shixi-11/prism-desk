@@ -597,5 +597,9 @@
   "文件不能超过 50 MB": "Los archivos no pueden superar 50 MB",
   "图片不能超过 10 MB，其他文件不能超过 50 MB": "Imágenes: hasta 10 MB; otros archivos: hasta 50 MB",
   "附件无效": "Adjunto no válido",
-  "请查看这些附件。": "Revisa estos archivos adjuntos."
+  "请查看这些附件。": "Revisa estos archivos adjuntos.",
+  "快速模式": "Modo rápido",
+  "更快响应，会增加额度消耗": "Las respuestas más rápidas consumen más créditos",
+  "当前模型未提供快速模式": "El modo rápido no está disponible para este modelo",
+  "当前模型不支持所选速度模式": "Este modelo no admite el modo de velocidad seleccionado"
 }

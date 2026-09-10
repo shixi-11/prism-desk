@@ -23,6 +23,7 @@ Actualmente, Prism se distribuye mediante una **instalación desde el código fu
 | Continuar la misma tarea | Mantén juntos la solicitud original, la conversación, las notas de progreso y los resultados de herramientas registrados al transferir el trabajo a otra cuenta. |
 | Elegir una cuenta de ejecución | Selecciona un perfil de CLI de Codex, Claude o Grok configurado. Cada uno usa su propio directorio de inicio de sesión. Elimina las cuentas que no uses desde el panel de cuentas; se conservan el historial de tareas y las carpetas locales de inicio de sesión. |
 | Cambiar el modelo y el razonamiento | Ajusta cualquiera de estos parámetros durante una tarea. Los cambios se aplican a la siguiente ejecución y se guardan por cuenta dentro de esa tarea. |
+| Modo Fast de Codex | Acelera las respuestas de los modelos compatibles con un mayor consumo de créditos. Está desactivado por defecto, se guarda por cuenta dentro de cada tarea y se aplica a la siguiente ejecución sin cambiar el nivel de razonamiento. |
 | Consultar la cuota | Consulta los porcentajes disponibles, los periodos de cuota y las horas de restablecimiento que comunique el proveedor. Los créditos de restablecimiento de Codex incluyen sus respectivas fechas de caducidad cuando se proporcionan. |
 | Transferir al agotarse la cuota | Activa la transferencia automática o selecciona tú mismo la siguiente cuenta. Prism espera a que termine la ejecución anterior antes de continuar. |
 | Usar habilidades y herramientas locales | Indica a Prism las instrucciones del asistente, una carpeta de habilidades y las aplicaciones instaladas. Comprueba los puntos de entrada detectados y las operaciones que admiten las aplicaciones. |
@@ -33,12 +34,12 @@ Actualmente, Prism se distribuye mediante una **instalación desde el código fu
 
 ### Instalación
 
-Estos comandos instalan la versión estable **v0.1.15**. Consulta la [última versión publicada](https://github.com/shixi-11/prism-desk/releases/latest) para conocer su número y leer las notas de cambios bilingües.
+Estos comandos instalan la versión estable **v0.1.16**. Consulta la [última versión publicada](https://github.com/shixi-11/prism-desk/releases/latest) para conocer su número y leer las notas de cambios bilingües.
 
 Necesitarás Windows, Git, Node.js 22.12 o posterior, npm y las CLI oficiales de los proveedores que elijas. Inicia sesión en cada CLI por separado.
 
 ```powershell
-git clone --branch v0.1.15 https://github.com/shixi-11/prism-desk.git
+git clone --branch v0.1.16 https://github.com/shixi-11/prism-desk.git
 cd prism-desk
 npm install
 npm run build

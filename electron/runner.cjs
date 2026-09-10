@@ -40,7 +40,7 @@ class Runner extends EventEmitter {
     if(reportedModel)task.execution.reportedModel=reportedModel;
     const previous=task.lastExecution;
     task.lastExecution={...task.execution,confirmedAt:new Date().toISOString()};
-    const changed=previous&&(previous.profile!==profile.id||previous.model!==profile.model||previous.effort!==profile.effort);
+    const changed=previous&&(previous.profile!==profile.id||previous.model!==profile.model||previous.effort!==profile.effort||(previous.serviceTier||'default')!==(profile.serviceTier||'default'));
     this.event(task.id,'notice',{text:`${changed?'已切换':'已开始执行'} · ${profile.provider} / ${profile.name} · ${reportedModel||profile.model} · ${profile.effort}`,executionStatus:changed?'已切换':'已开始执行',accountName:profile.name,provider:profile.provider,execution:task.lastExecution});
     this.store.save(task);this.emit('state',task);
   }
@@ -104,7 +104,7 @@ class Runner extends EventEmitter {
         if(task.pendingModelRefresh?.[profile.id]){delete task.sessions[profile.id];delete task.pendingModelRefresh[profile.id];this.store.save(task);}
         attempted.add(profile.id);
         Object.assign(this.active,{profile,questions:new Map(),confirmed:false,started:false,quotaExhausted:false,quotaByWindow:{},rpc:null,proc:null,turnId:null,grok:false,sessionId:null});
-        task.execution = {profile:profile.id, model:profile.model, effort:profile.effort, mode:options.planning?'read-only':task.mode};
+        task.execution = {profile:profile.id, model:profile.model, effort:profile.effort, ...(profile.provider==='Codex'?{serviceTier:profile.serviceTier||'default'}:{}), mode:options.planning?'read-only':task.mode};
         const record=this.store.context(task);
         const instructions=environmentPrompt({...task,mode:task.execution.mode},capabilities(),record)+(options.planning?'\n本轮只制订计划，禁止实施。读取必要材料后给出可核对的步骤与验收条件，等待用户确认。最后用 JSON 代码块返回 {"steps":[{"text":"步骤及验收条件"}]}，供界面展示待确认步骤。':'');
         this.state(task,'running');
@@ -253,6 +253,7 @@ class Runner extends EventEmitter {
         cwd: task.cwd,
         model: profile.model,
         modelProvider: "openai",
+        serviceTier: profile.serviceTier || "default",
         approvalPolicy: require('./task-settings.cjs').codexPermissions((task.execution?.mode||task.mode)).approvalPolicy,
         sandbox: require('./task-settings.cjs').codexPermissions((task.execution?.mode||task.mode)).sandbox,
         developerInstructions: instructions,
@@ -277,6 +278,7 @@ class Runner extends EventEmitter {
         input: require('./attachments.cjs').codexInput(text,this.active.images),
         model: profile.model,
         effort: profile.effort || "xhigh",
+        serviceTier: profile.serviceTier || "default",
         summary:'auto',
         sandboxPolicy:
           (task.execution?.mode||task.mode) === "full-access" ? { type: "dangerFullAccess" } : (task.execution?.mode||task.mode) === "read-only"
