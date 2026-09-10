@@ -1,12 +1,16 @@
 {
-  "version": "0.1.23",
+  "version": "0.1.24",
   "date": "2026-09-11",
   "notes": {
     "en": [
-      "Refine the sidebar hierarchy: make the Tasks heading slightly larger, reduce section labels and project names, and tighten section spacing."
+      "Add one-click registration of installed Codex plugins and import skill references from their actual installed versions.",
+      "Automatically check for new or updated plugins at startup, when returning to Prism, and every five minutes; honor manual removals and disabled or uninstalled plugins.",
+      "Show skill-reference availability separately from unverified tool connections and unsupported desktop tools. Sign-ins and permissions remain separate."
     ],
     "zh": [
-      "调整侧栏文字层级：“任务”标题略大，缩小分组标签与项目名称，并收紧分组间距。"
+      "新增“一键接入本机已安装插件”，按实际安装版本登记插件并接入技能资料。",
+      "启动、返回窗口及每五分钟自动检查新增或更新插件，保留手动移除选择，排除停用和已卸载插件。",
+      "分别展示技能资料、待核验的工具连接与暂不支持的桌面工具；账号登录和工具权限仍独立管理。"
     ]
   }
 }

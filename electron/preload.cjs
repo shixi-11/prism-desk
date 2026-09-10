@@ -1,5 +1,5 @@
 const { contextBridge, ipcRenderer } = require('electron');
-const capabilityMethods = ['inspectCapabilities', 'syncCapabilities', 'addCapabilitySource', 'removeCapabilitySource', 'openCapabilitySource'];
+const capabilityMethods = ['inspectCapabilities', 'syncCapabilities', 'importInstalledPlugins', 'automaticPlugins', 'addCapabilitySource', 'removeCapabilitySource', 'openCapabilitySource'];
 const methods = ['goalAction','answerQuestion','removeAccount','renameProject','createProject','renameAccount','savePlan','planAction','relayPreferences','authorHomepage','projectRepository','accounts','saveAccount','enableAccount','verifyAccount','accountInstall','pickAccountFile','startAccountLogin','copyAccountLogin','submitAccountLoginCode','cancelAccountLogin','taskMenu','taskAction','preferences','cancelQueued','sendQueued','retryQueued','addImages','imageThumbnail','preview','savePreview','defaultMode','validateApps','loginGemini','openTaskStorage','stopAndContinue','language','resetCredit','models','modelSettings','init','task','create','pickDirectory','theme','scan','quota','run','switch','stop','approve','update','reconcile','openWorkspace','export'];
 contextBridge.exposeInMainWorld('prism', {
   ...Object.fromEntries(capabilityMethods.map(method => [method, (...args) => ipcRenderer.invoke('prism:' + method, ...args)])),

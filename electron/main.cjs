@@ -284,8 +284,16 @@ app.whenReady().then(() => {
   handle('defaultMode',mode=>{if(!require('./task-settings.cjs').MODES.includes(mode))throw Error('Invalid permission mode');atomic(path.join(dataPath(),'settings.json'),{...settings(),defaultMode:mode});return mode;});
   handle("scan", () => require('./diagnostics.cjs').verifyCapabilities());
   const shared = require('./shared-capabilities.cjs').manager();
-  handle('inspectCapabilities', () => { shared.view({ check: true }); return capabilities(); });
-  handle('syncCapabilities', (token, pluginId) => { shared.sync(token, pluginId); return capabilities(); });
+  handle('inspectCapabilities', async () => { await shared.refreshInstalled({ force: true }); return capabilities(); });
+  handle('syncCapabilities', (token, pluginId) => { shared.sync(token, pluginId); const result=capabilities(); emit('capabilities',result); return result; });
+  handle('importInstalledPlugins', token => { shared.syncInstalled(token); const result=capabilities(); emit('capabilities',result); return result; });
+  handle('automaticPlugins', (enabled, token) => { shared.setAutomaticPlugins(enabled,token); const result=capabilities(); emit('capabilities',result); return result; });
+  const refreshPlugins = async () => {
+    if(updateInstalling || quitting)return;
+    try { await shared.refreshInstalled(); emit('capabilities',capabilities()); }
+    catch { /* Keep the existing catalog; an explicit check reports the failure. */ }
+  };
+  if(!process.env.PRISM_TEST_DATA){setTimeout(refreshPlugins,5000).unref();setInterval(refreshPlugins,5*60000).unref();}
   handle('addCapabilitySource', async kind => {
     if (!['skills', 'assistant'].includes(kind)) throw Error('来源类型无效。');
     const selected = await dialog.showOpenDialog(owner(), { ...directoryDialog(settings().language), title: translate(settings().language, kind === 'assistant' ? '选择助手目录' : '添加技能目录') });
@@ -293,7 +301,7 @@ app.whenReady().then(() => {
     shared.addSource(selected.filePaths[0], kind);
     return capabilities();
   });
-  handle('removeCapabilitySource', (id, token) => { shared.removeSource(id, token); return capabilities(); });
+  handle('removeCapabilitySource', (id, token) => { shared.removeSource(id, token); const result=capabilities(); emit('capabilities',result); return result; });
   handle('openCapabilitySource', async (id, token) => {
     const view = shared.assertToken(token);
     const source = [...view.sources, ...view.plugins].find(item => item.id === id);
@@ -435,6 +443,7 @@ app.whenReady().then(() => {
     },
   });
   windows.add(window);
+  if(!process.env.PRISM_TEST_DATA)window.on('focus',refreshPlugins);
   if(process.platform==='win32'&&!process.env.PRISM_TEST_DATA){try{desktopIdentity.register(app,shell,updater.root);}catch(error){console.warn(error.message);}}
   window.draftKey=restore?.key||(taskId?require('node:crypto').randomUUID():'primary');
   if(restore?.bounds&&[restore.bounds.x,restore.bounds.y,restore.bounds.width,restore.bounds.height].every(Number.isFinite))window.setBounds(restore.bounds);

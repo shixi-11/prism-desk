@@ -621,6 +621,7 @@ function App() {
       })
       .catch(fail);
     return api.subscribe(({ type, value }) => {
+      if(type==='capabilities'){setInit(old=>old?{...old,capabilities:value}:old);return;}
       if(type==='projects'){setInit(old=>old?{...old,settings:{...old.settings,...value}}:old);return;}
       if(type==='app-update'){setAppUpdate(value);return;}
       if(type==='accounts'){setInit(old=>old?{...old,profiles:value}:old);if(!current.current)setDraftAccount(old=>value.some(p=>p.id===old&&!p.disabled)?old:value.find(p=>!p.disabled)?.id||'');return;}

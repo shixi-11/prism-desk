@@ -4,6 +4,7 @@ import { tr, locale } from './i18n.js';
 
 const sourceLabel = { user: '用户技能', system: '系统技能', plugin: '插件技能', extra: '添加的技能' };
 const changeLabel = { added: '新增', changed: '有更新', removed: '已失效' };
+const toolLabel = { 'skills-only': '技能资料', 'connection-required': '连接与授权待核验', unsupported: '工具暂不支持' };
 const timestamp = value => value ? new Date(value).toLocaleString(locale(), { month: 'numeric', day: 'numeric', hour: 'numeric', minute: '2-digit' }) : tr('尚未检查');
 
 export default function CapabilityDialog({ data, onClose, onUpdate, Modal, api }) {
@@ -12,6 +13,7 @@ export default function CapabilityDialog({ data, onClose, onUpdate, Modal, api }
   const [busy, setBusy] = useState('');
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
+  const [showCached, setShowCached] = useState(false);
   const sync = data.sync || {};
   const run = async (name, action, message = '') => {
     setBusy(name); setError(''); setNotice('');
@@ -29,7 +31,10 @@ export default function CapabilityDialog({ data, onClose, onUpdate, Modal, api }
   const open = id => run('open', () => api.openCapabilitySource(id, sync.token));
   const items = data.skills.filter(s => `${s.name} ${s.description} ${s.sourceName || ''}`.toLowerCase().includes(query.toLowerCase()));
   const apps = data.apps.filter(a => `${a.name} ${a.category}`.toLowerCase().includes(query.toLowerCase()));
-  const plugins = (sync.plugins || []).filter(p => `${p.name} ${p.displayName || ''} ${p.marketplace || ''}`.toLowerCase().includes(query.toLowerCase()));
+  const plugins = (sync.plugins || []).filter(p => (showCached || p.installed) && `${p.name} ${p.displayName || ''} ${p.marketplace || ''}`.toLowerCase().includes(query.toLowerCase()));
+  const installed = (sync.plugins || []).filter(p => p.installed);
+  const installationReady = sync.installation?.status === 'ready';
+  const importInstalled = () => run('plugins', () => api.importInstalledPlugins(sync.token), '已接入已安装插件资料，并开启后续自动同步。工具连接状态单独核验。');
   return <Modal title={tr('共享能力')} wide onClose={onClose}>
     <div className="capability-center">
       <p className="muted">{tr('同步本机当前内容，下一轮任务即可按需读取。插件工具和软件授权单独验证。')}</p>
@@ -55,7 +60,7 @@ export default function CapabilityDialog({ data, onClose, onUpdate, Modal, api }
         {!sync.pending && !(sync.errors || []).length && <p className="capability-notice">{tr('当前已选择的来源没有待同步变化。')}</p>}
         {(sync.errors || []).length > 0 && <div className="capability-issues" role="status"><strong>{tr('需要处理')}</strong>{sync.errors.map((issue, index) => <p key={index}>{tr(issue.name)} · {tr(issue.reason)}</p>)}</div>}
         {!!sync.pending && <details className="capability-changes"><summary>{tr('查看待同步变化')} ({sync.pending})</summary><div>{sync.assistantChanged && <p><span>{tr('太初')}</span><small>{tr('入口记录有变化')}</small></p>}{(sync.changes || []).map(item => <p key={item.id}><span>{item.name}</span><small>{tr(changeLabel[item.change])} · {tr(sourceLabel[item.source] || item.sourceName)}</small></p>)}</div></details>}
-        <div className="capability-next"><div><strong>{tr('插件资料也可以接入')}</strong><p>{tr('在来源与接入中选择插件。接入的是技能资料，不会复制登录信息或自动启用工具。')}</p></div><button className="outline" onClick={() => selectTab('sources')}>{tr('查看来源')}</button></div>
+        <div className="capability-next"><div><strong>{tr('已安装插件')} · {installed.length}</strong><p>{tr('按实际安装版本批量接入技能资料，登录信息和工具权限保持独立。')}</p></div><div className="capability-actions"><button className="primary" disabled={!!busy||!installationReady||!installed.some(p=>p.enabled)} onClick={importInstalled}>{tr(busy==='plugins'?'正在同步…':'接入本机已安装插件')}</button><button className="outline" onClick={() => selectTab('sources')}>{tr('查看来源')}</button></div></div>
       </>}
       {tab === 'skills' && <>
         <input placeholder={tr('搜索技能名称与说明')} value={query} onChange={e => setQuery(e.target.value)} aria-label={tr('搜索技能')} />
@@ -71,10 +76,16 @@ export default function CapabilityDialog({ data, onClose, onUpdate, Modal, api }
       {tab === 'sources' && <>
         <div className="capability-next"><p>{tr('添加目录后检查并同步。原文件保留在来源位置，移除来源只停止引用。')}</p><button className="outline" disabled={!!busy} onClick={() => run('source', () => api.addCapabilitySource('skills'))}><Plus size={16} />{tr('添加技能目录')}</button></div>
         <div className="capability-sources">{(sync.sources || []).map(source => <div key={source.id}><div><strong>{source.kind === 'extra' ? source.name : tr(source.name)}</strong><small>{tr(source.exists ? '来源可读' : '路径失效')}</small><code>{source.path}</code></div><button className="quiet" aria-label={tr('打开来源') + ' ' + source.name} disabled={!!busy || !source.exists} onClick={() => open(source.id)}><FolderOpen size={17} /></button>{source.kind === 'extra' && <button className="quiet" disabled={!!busy} onClick={() => run('remove', () => api.removeCapabilitySource(source.id, sync.token))}>{tr('移除来源')}</button>}</div>)}</div>
-        <h3>{tr('本机插件资料')}<span className="mono">{(sync.plugins || []).length}</span></h3>
-        <p className="muted">{tr('列出缓存中的最新可识别版本，不代表插件已安装、已授权或为线上最新版。')}</p>
+        <h3>{tr('已安装插件')}<span className="mono">{installed.length}</span></h3>
+        <p className="muted">{tr('按实际安装版本批量接入技能资料，登录信息和工具权限保持独立。')}</p>
+        {sync.installation?.error&&<p className="capability-issues" role="status">{tr(sync.installation.error)}</p>}
+        {!installationReady&&<p className="muted">{tr('安装状态尚未确认，缓存资料不会自动接入。')}</p>}
+        <div className="capability-actions"><button className="primary" disabled={!!busy||!installationReady||!installed.some(p=>p.enabled)} onClick={importInstalled}><Plus size={16}/>{tr(busy==='plugins'?'正在同步…':'接入本机已安装插件')}</button><small>{tr('安装状态检查')} · {timestamp(sync.installation?.checkedAt)}</small></div>
+        <label className="plugin-auto"><input type="checkbox" checked={!!sync.autoPlugins} disabled={!!busy||(!sync.autoPlugins&&!installationReady)} onChange={e=>run('automatic',()=>api.automaticPlugins(e.target.checked,sync.token))}/><span>{tr('自动同步已安装插件资料')}</span></label>
+        <p className="capability-scope">{tr('启动、返回窗口或每五分钟检查新增插件。停用、卸载或手动移除的插件不会自动补回。')}</p>
+        <label className="plugin-auto"><input type="checkbox" checked={showCached} onChange={e=>setShowCached(e.target.checked)}/><span>{tr('显示仅缓存的插件')}</span></label>
         <input value={query} onChange={e => setQuery(e.target.value)} placeholder={tr('搜索插件')} aria-label={tr('搜索插件')} />
-        <div className="capability-plugins">{plugins.map(plugin => <div className="capability-plugin" key={plugin.id}><div><strong>{plugin.displayName || plugin.name}</strong><small>{plugin.marketplace} · v{plugin.version} · {plugin.count} {tr('个入口')}</small><p>{tr(plugin.selected ? '技能资料已选择' : '技能资料待接入')}{plugin.dependencies ? ' · ' + tr('工具授权待接通') : ''}</p></div><div className="capability-plugin-actions"><button className="quiet" aria-label={tr('打开来源') + ' ' + plugin.name} disabled={!!busy} onClick={() => open(plugin.id)}><FolderOpen size={16} /></button>{plugin.selected ? <button className="outline" disabled={!!busy} onClick={() => run('remove', () => api.removeCapabilitySource(plugin.id, sync.token))}>{tr('移除来源')}</button> : <button className="outline" disabled={!!busy || !plugin.count} onClick={() => run('plugin', () => api.syncCapabilities(sync.token, plugin.id), '技能资料已接入，工具权限未改变。')}>{tr('接入技能资料')}</button>}</div></div>)}{!plugins.length && <p className="muted">{tr('未找到匹配的插件资料。')}</p>}</div>
+        <div className="capability-plugins">{plugins.map(plugin => <div className="capability-plugin" key={plugin.id}><div><strong>{plugin.displayName || plugin.name}</strong><small>{plugin.marketplace} · v{plugin.version} · {plugin.count} {tr('个入口')}</small><p>{tr(!plugin.installed?'仅缓存，未确认安装':plugin.enabled===false?'已停用':plugin.missing?'安装版本资料不可读':plugin.selected?(plugin.count?'技能资料已接入':'已登记，无技能资料'):plugin.excluded?'已手动移除':'技能资料待接入')}{plugin.installed&&plugin.enabled!==false&&<> · {tr(toolLabel[plugin.toolState]||'连接与授权待核验')}</>}</p></div><div className="capability-plugin-actions"><button className="quiet" aria-label={tr('打开来源') + ' ' + plugin.name} disabled={!!busy||!plugin.path} onClick={() => open(plugin.id)}><FolderOpen size={16} /></button>{plugin.selected ? <button className="outline" disabled={!!busy} onClick={() => run('remove', () => api.removeCapabilitySource(plugin.id, sync.token))}>{tr('移除来源')}</button> : <button className="outline" disabled={!!busy || !plugin.installed || plugin.enabled===false || !installationReady} onClick={() => run('plugin', () => api.syncCapabilities(sync.token, plugin.id), '技能资料已接入，工具权限未改变。')}>{tr(plugin.count ? '接入技能资料' : '登记插件')}</button>}</div></div>)}{!plugins.length && <p className="muted">{tr('未找到匹配的插件资料。')}</p>}</div>
         <details className="capability-help"><summary>{tr('怎样接通插件工具？')}</summary><p>{tr('先在原应用更新插件并完成授权，再回来检查并同步资料。桌面插件的授权不会自动传给棱镜账号。')}</p><p>{tr('Codex 的 MCP 连接需在该账号的独立 CLI 中配置并验证。Claude、Grok、Gemini 当前执行通道未开放外部 MCP，接入技能资料不会改变这一限制。')}</p><p>{tr('本机应用可到本机应用页检测和验证；验证通过的范围会逐项显示。')}</p></details>
       </>}
     </div>
