@@ -49,6 +49,9 @@ import "./capabilities.css";
 import {tr,setLanguage,locale,languages} from './i18n.js';
 
 import SidebarTasks from './SidebarTasks.jsx';
+import {conversationMessages} from './conversation-messages.js';
+import ProjectAccess from './ProjectAccess.jsx';
+import FastControl from './FastControl.jsx';
 const api = window.prism;
 function TaskEntry({item,selected,onSelect,onRename,onAction}){
   const [editing,setEditing]=useState(false),[name,setName]=useState(item.title),[saving,setSaving]=useState(false);
@@ -56,7 +59,7 @@ function TaskEntry({item,selected,onSelect,onRename,onAction}){
   async function save(e){e.preventDefault();if(!name.trim()||saving)return;setSaving(true);try{await onRename(item.id,name.trim());setEditing(false);}catch{}finally{setSaving(false);}}
   const act=choice=>{if(choice?.action==='rename')begin();else if(choice)onAction(item.id,choice.action,choice.value);};
   useEffect(()=>{if(!selected||editing)return;const handler=e=>{const k=e.key.toLowerCase();const action=e.ctrlKey&&e.altKey&&k==='r'?'rename':e.ctrlKey&&e.altKey&&k==='p'?'pin':e.ctrlKey&&e.shiftKey&&k==='u'?'unread':e.ctrlKey&&e.shiftKey&&k==='a'?'archive':null;if(action&&!e.defaultPrevented){e.preventDefault();act({action});}};window.addEventListener('keydown',handler);return()=>window.removeEventListener('keydown',handler);},[selected,editing,item.id,onAction]);
-  return <div className="task-entry" onContextMenu={async e=>{e.preventDefault();try{act(await api.taskMenu(item.id));}catch(error){onAction(item.id,'error',error);}}}>
+  return <div className="task-entry" draggable={!editing&&!['running','stopping','unknown'].includes(item.state)} onDragStart={e=>{e.dataTransfer.setData('application/x-prism-task',item.id);e.dataTransfer.effectAllowed='move';}} onContextMenu={async e=>{e.preventDefault();try{act(await api.taskMenu(item.id));}catch(error){onAction(item.id,'error',error);}}}>
     {editing?<form className="task-rename" onSubmit={save}>
       <input autoFocus dir="auto" aria-label={tr("任务名称")} maxLength={100} value={name} disabled={saving} onFocus={e=>e.target.select()} onChange={e=>setName(e.target.value)} onKeyDown={e=>{if(e.key==='Escape'&&!saving)setEditing(false);}}/>
       <button type="submit" aria-label={tr("保存名称")} disabled={saving||!name.trim()}><Check size={15}/></button>
@@ -239,7 +242,7 @@ function ModelControls({task,profile,disabled,onSave}) {
     <label>{tr("思考等级")}<select aria-label={tr("思考等级")} value={effort} disabled={disabled||busy||!model} onChange={e=>save(current,e.target.value)}>
       {!model?.efforts.includes(effort)&&<option value={effort}>{labels[effort]||effort}</option>}{model?.efforts.map(v=><option key={v} value={v}>{labels[v]||v} · {v}</option>)}
     </select></label>
-    {profile.provider==='Codex'&&<div className="fast-mode-control"><label><span>Fast</span><input type="checkbox" role="switch" aria-label={tr("快速模式")} checked={serviceTier!=='default'} disabled={disabled||busy||!model||(serviceTier==='default'&&!model.fastServiceTier)} onChange={e=>save(current,effort,e.target.checked?model.fastServiceTier:'default')}/></label><p>{tr(model?.fastServiceTier?"更快响应，会增加额度消耗":"当前模型未提供快速模式")}</p></div>}
+
     <small>{error||(!catalog?tr("正在读取模型选项…"):busy?tr("正在保存…"):tr(!saved?"设置用于此账号的下一次执行":task.execution?.confirmed&&task.execution.profile===profile.id&&task.execution.model===current&&task.execution.effort===effort&&(task.execution.serviceTier||'default')===serviceTier?"当前已生效":task.execution?"设置已保存，下次执行生效":"设置已保存，发送消息或切换并继续后生效"))}</small>
     {catalog&&<span className="model-source" title={tr(catalog.note)} aria-label={tr(catalog.note)}>ⓘ</span>}
   </div>;
@@ -429,9 +432,7 @@ function Conversation({ task, events, streaming, thinking, activity, awaitingApp
   useEffect(() => {
     end.current?.scrollIntoView({ block: "end", behavior: "instant" });
   }, [events.length, streaming, task?.state]);
-  const messages = events.filter((e) =>
-    ["user", "assistant", "handoff", "notice", "question"].includes(e.type),
-  );
+  const messages = conversationMessages(events);
   if (!messages.length && (!task || task.state==='idle'))
     return (
       <div className="empty">
@@ -450,7 +451,7 @@ function Conversation({ task, events, streaming, thinking, activity, awaitingApp
   return (
     <div className="messages" aria-label={tr("任务对话")}>
       {messages.map((e) =>
-        ["handoff","notice"].includes(e.type) ? (
+        e.type==='progress'?<details key={e.id} className="assistant-progress" open={task.state==='running'}><summary>{tr('执行进度')} · {e.parts.length}</summary><div className="prose">{e.parts.map(part=><div key={part.id}><LinkedMarkdown onPreview={onPreview}>{part.text}</LinkedMarkdown></div>)}</div></details>:["handoff","notice"].includes(e.type) ? (
           <div key={e.id} className="handoff">
             <ArrowRightLeft size={14} />
             <div><p>{e.executionStatus?`${tr(e.executionStatus)} · ${e.provider} / ${tr(e.accountName)} · ${e.execution.reportedModel||e.execution.model} · ${e.execution.effort}${e.execution.serviceTier&&e.execution.serviceTier!=='default'?' · Fast':''}`:tr(e.text)}</p>{e.progress&&<details className="handoff-progress"><summary>{tr("交接进度")}</summary>
@@ -573,6 +574,11 @@ function App() {
   const [checkpoint, setCheckpoint] = useState("");
   const current = useRef(null);
   const fail = (error) => setToast(error.message || String(error));
+  const goHome=()=>{
+    drafts.current[current.current||'_new']={text,images};++loadSequence.current;current.current=null;
+    setTask(null);setEvents([]);setStreaming('');setThinking('');setActivity('');setCheckpoint('');
+    setText(drafts.current._new?.text||'');setImages(drafts.current._new?.images||[]);setPreview(null);
+  };
   const load = async (id) => {
     if(init||current.current)drafts.current[current.current||'_new']={text,images};
     const sequence=++loadSequence.current;
@@ -602,7 +608,8 @@ function App() {
         setLanguage(data.settings.language||'zh');changeLanguage(data.settings.language||'zh');
         setApprovals(data.approvals || []);
         const requested=new URLSearchParams(location.search).get('task');
-        if (data.tasks.length) load(data.tasks.find(t=>t.id===(requested||drafts.current._selected))?.id||data.tasks[0].id);
+        if (data.tasks.length&&(requested||drafts.current._selected!==null)) load(data.tasks.find(t=>t.id===(requested||drafts.current._selected))?.id||data.tasks[0].id);
+        else {setText(drafts.current._new?.text||'');setImages(drafts.current._new?.images||[]);}
         api.updateHealthy().then(result=>{if(result?.version)setToast(tr('已升级至 v{version}',{version:result.version}));}).catch(fail);
       })
       .catch(fail);
@@ -803,10 +810,10 @@ function App() {
   return (
     <div className={`workbench ${events.length?"has-conversation":""} ${view.inspector?'':'inspector-hidden'}`}>
       <aside className="sidebar">
-        <div className="brand">
+        <button className="brand" aria-label={tr("返回主页")} onClick={goHome}>
           <PrismMark />
           <div className="wordmark">{tr("棱镜")}</div>
-        </div>
+        </button>
         <button className="primary new-task" onClick={() => setModal("new")}>
           <Plus size={18} />{tr("新建任务")}</button>
         <div className="task-caption">{tr("任务")}<span>
@@ -816,7 +823,7 @@ function App() {
           </span>
         </div>
         <nav aria-label={tr("任务列表")}>
-          <SidebarTasks tasks={init.tasks} projectNames={init.settings.projectNames||{}} onRenameProject={async(cwd,name)=>{const settings=await api.renameProject(cwd,name);setInit(old=>({...old,settings}));}} renderTask={t=><TaskEntry key={t.id} item={t} selected={task?.id===t.id} onSelect={()=>changeTask(t.id)} onAction={taskAction} onRename={async(id,title)=>{try{const updated=await api.update(id,{title});setInit(old=>({...old,tasks:old.tasks.map(t=>t.id===id?updated:t)}));setTask(old=>old?.id===id?updated:old);}catch(error){fail(error);throw error;}}}/>}/>
+          <SidebarTasks onMoveTask={async(id,cwd)=>{const result=await api.taskAction(id,'project-move',cwd);setInit(old=>({...old,tasks:old.tasks.map(t=>t.id===id?result.task:t)}));setTask(old=>old?.id===id?result.task:old);}} tasks={init.tasks} projectNames={init.settings.projectNames||{}} onRenameProject={async(cwd,name)=>{const settings=await api.renameProject(cwd,name);setInit(old=>({...old,settings}));}} renderTask={t=><TaskEntry key={t.id} item={t} selected={task?.id===t.id} onSelect={()=>changeTask(t.id)} onAction={taskAction} onRename={async(id,title)=>{try{const updated=await api.update(id,{title});setInit(old=>({...old,tasks:old.tasks.map(t=>t.id===id?updated:t)}));setTask(old=>old?.id===id?updated:old);}catch(error){fail(error);throw error;}}}/>}/>
           {!init.tasks.length && (
             <p className="no-tasks">{tr("你的任务会留在这里。")}</p>
           )}
@@ -836,7 +843,7 @@ function App() {
             <h2>{task?.title || tr("新任务")}</h2>
             <p>{tr("一个任务，持续向前。")}</p>
           </div>
-          <div className="appearance-controls">{hasAppUpdate&&<button className="update-indicator" aria-label={tr("发现新版本")} title={tr("发现新版本")} onClick={()=>setModal("updates")}><Download size={18}/><i className="update-dot" aria-hidden="true"/></button>}<div className="view-controls"><button aria-label={tr("视图设置")} title={tr("视图设置")} onClick={()=>setModal("view")}><Settings2 size={19}/></button><button aria-label={tr("底部执行记录")} title={tr("底部执行记录")} aria-pressed={view.log} onClick={()=>changeView({log:!view.log})}><PanelBottom size={19}/></button><button aria-label={tr("右侧账号栏")} title={tr("右侧账号栏")} aria-pressed={view.inspector} onClick={()=>changeView({inspector:!view.inspector})}><PanelRight size={19}/></button></div><button title={tr("画布与预览")} disabled={!task} onClick={()=>setPreview({id:Date.now(),target:null,task})}><PanelRightOpen size={18}/></button><label className="language-control"><Languages size={18} aria-hidden="true"/><select className="language-toggle" aria-label="Switch language" title={tr("界面语言")} value={language} onChange={async e=>{const next=e.target.value;try{await api.language(next);setLanguage(next);changeLanguage(next);}catch(e){fail(e);}}}>{languages.map(l=><option key={l.id} value={l.id} lang={l.id}>{l.name}</option>)}</select></label><ThemeSwitch value={theme} onChange={setAppearance} /></div>
+          <div className="appearance-controls">{hasAppUpdate&&<button className="update-indicator" aria-label={tr("发现新版本")} title={tr("发现新版本")} onClick={()=>setModal("updates")}><Download size={18}/><i className="update-dot" aria-hidden="true"/></button>}<div className="view-controls"><button aria-label={tr("底部执行记录")} title={tr("底部执行记录")} aria-pressed={view.log} onClick={()=>changeView({log:!view.log})}><PanelBottom size={19}/></button><button aria-label={tr("右侧账号栏")} title={tr("右侧账号栏")} aria-pressed={view.inspector} onClick={()=>changeView({inspector:!view.inspector})}><PanelRight size={19}/></button></div><button title={tr("画布与预览")} disabled={!task} onClick={()=>setPreview({id:Date.now(),target:null,task})}><PanelRightOpen size={18}/></button><label className="language-control"><Languages size={18} aria-hidden="true"/><select className="language-toggle" aria-label="Switch language" title={tr("界面语言")} value={language} onChange={async e=>{const next=e.target.value;try{await api.language(next);setLanguage(next);changeLanguage(next);}catch(e){fail(e);}}}>{languages.map(l=><option key={l.id} value={l.id} lang={l.id}>{l.name}</option>)}</select></label><ThemeSwitch value={theme} onChange={setAppearance} /></div>
         </header>
         <Conversation
           task={task}
@@ -901,9 +908,11 @@ function App() {
               </button>
               <span className="separator" />
               {task && <PermissionControl task={task} profile={init.profiles.find(p=>p.id===task.profile)} defaultMode={init.settings.defaultMode||'workspace-write'} onChange={changeMode} onDefault={async mode=>{try{await api.defaultMode(mode);setInit(old=>({...old,settings:{...old.settings,defaultMode:mode}}));}catch(e){fail(e);}}}/>}
+              {task&&<ProjectAccess key={task.id} task={task} tasks={init.tasks} projectNames={init.settings.projectNames||{}} onSave={async roots=>{const updated=await api.update(task.id,{linkedProjects:roots});if(current.current===updated.id)setTask(updated);}}/>}
               {task?.pendingMode&&<small className="permission-pending">{tr("下次执行生效")}</small>}
               <button title={tr("添加附件")} aria-label={tr("添加附件")} disabled={uploading||images.length>=5} onClick={()=>addImages(null)}><Paperclip size={19}/></button>
               <span className="compose-spacer" />
+              <FastControl task={task} profile={init.profiles.find(p=>p.id===(task?.profile||draftAccount))} draftSettings={draftSettings} onSave={async(value,id)=>{if(task){const updated=await api.modelSettings(task.id,value,id);if(current.current===updated.id)setTask(updated);}else setDraftSettings(old=>({...old,[id]:value}));}}/>
               <ComposerSubmit key={task?.id||'draft'} busy={busy} stopping={task?.state==='stopping'} hasDraft={!!text.trim()||!!images.length} onSend={send} onStop={()=>api.stop().catch(fail)} sendLabel={anyBusy?(init.settings.busySend==='steer'?'引导':'排队'):'发送'} disabled={(!text.trim()&&!images.length) || sending || uploading || task?.goalLifecycle?.status==='paused' || task?.state === "unknown" || !!task&&(!init.profiles.find(p=>p.id===task.profile)||init.profiles.find(p=>p.id===task.profile)?.disabled) || Object.values(accountLogins).some(s=>['starting','waiting','verifying'].includes(s.phase))}/>
             </div>
           </div>

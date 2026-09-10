@@ -1,16 +1,20 @@
 {
-  "version": "0.1.20",
+  "version": "0.1.21",
   "date": "2026-09-11",
   "notes": {
     "en": [
-      "Pinned, Projects and Recent default to collapsed when no preference is saved. Each section remembers whether you last expanded or collapsed it and restores that state when Prism reopens.",
-      "Right-click a project heading to edit its display name, alongside the existing pencil button.",
-      "Removed the duplicate Shared Capabilities entry from the left sidebar while retaining the right-hand entry. Sidebar utility labels and icons are smaller, with comfortable click targets."
+      "Drag an idle conversation onto another project to change its working directory while preserving history and drafts. The source project remains available; existing files stay in place.",
+      "Add linked project directories beside the permission control. Codex and Claude inherit the task’s current permissions for these directories; restricted tasks do not silently relay to unsupported providers.",
+      "Group Claude progress across tool calls and keep successful final answers separate, including compatible grouping of historical progress messages.",
+      "Move the compact Fast switch beside Send, refine the composer layout, make the Prism logo return to the home screen with drafts preserved, and remove the redundant top-bar view-settings button.",
+      "Build the background process host without a console window, hide child startup windows explicitly, and share simultaneous model-list queries to avoid duplicate CLI launches."
     ],
     "zh": [
-      "“置顶、项目、最近”在没有保存偏好时默认折叠；展开或收起后记住各分区状态，下次打开棱镜恢复上次的使用习惯。",
-      "在项目名称上点击右键即可编辑显示名称，同时保留原有铅笔按钮。",
-      "移除左侧重复的“共享能力”入口，保留右侧入口；缩小侧栏底部辅助操作的文字和图标，同时保留足够的点击范围。"
+      "将未在执行的对话拖到另一个项目，即可更换工作目录并保留历史和草稿；原项目入口继续保留，已有文件留在原处。",
+      "在权限旁添加关联项目目录。Codex 和 Claude 对关联目录沿用任务现有权限；受限任务不会自动交给不支持关联目录的入口。",
+      "合并 Claude 跨工具调用的过程说明，将成功执行的最终答复单独显示，同时兼容整理历史进度消息。",
+      "将紧凑的 Fast 开关移到发送按钮旁，调整输入区排版；点击棱镜 Logo 返回主页并保留草稿，移除顶部重复的视图设置按钮。",
+      "后台进程宿主改为不创建控制台窗口，明确隐藏子进程启动窗口；同时请求模型列表时共用一次查询，避免重复启动 CLI。"
     ]
   }
 }

@@ -227,7 +227,7 @@ app.whenReady().then(() => {
   handle('taskMenu',id=>new Promise(resolve=>{const task=store.get(id);let chosen=null;Menu.buildFromTemplate(require('./task-menu.cjs').taskMenuTemplate(task,store.list(),key=>translate(settings().language,key),action=>{chosen=action;},runner.active?.task.id===id||['running','stopping','unknown'].includes(task.state))).popup({window:owner(),callback:()=>resolve(chosen)});}));
   handle('taskAction',async(id,action,value)=>{
     const {manageTask,forkTask,conversationText}=require('./task-actions.cjs');
-    if(['pin','unread','archive','delete','restore','project','section'].includes(action)){const task=manageTask(store,runner,messageQueue,id,action,value);broadcastTasks();return {task};}
+    if(['pin','unread','archive','delete','restore','project','project-move','section'].includes(action)){const task=manageTask(store,runner,messageQueue,id,action,value);broadcastTasks();return {task};}
     const task=store.get(id);
     if(action==='project-pick'){const selected=await dialog.showOpenDialog(owner(),{properties:['openDirectory']});if(selected.canceled)return {};const next=manageTask(store,runner,messageQueue,id,'project',selected.filePaths[0]);broadcastTasks();return {task:next};}
     if(action==='fork'){const fork=await forkTask(store,runner,id,!!value);broadcastTasks();return {selectId:fork.id};}
@@ -355,7 +355,7 @@ app.whenReady().then(() => {
   handle("stop", () => runner.stop());
   handle("approve", (id, decision) => runner.approve(id, decision));
   handle("update", (id, update) => {
-    if(update && Object.keys(update).length===1 && ('title' in update || 'mode' in update)){const result=require('./task-settings.cjs').updateTaskSetting(store,runner,id,update);broadcastTasks();return result;}
+    if(update && Object.keys(update).length===1 && ('title' in update || 'mode' in update || 'linkedProjects' in update)){const result=require('./task-settings.cjs').updateTaskSetting(store,runner,id,update);broadcastTasks();return result;}
     const task = store.get(id);
     runner.assertIdle(task);
     if (

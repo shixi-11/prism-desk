@@ -606,5 +606,12 @@
   "消息已开始发送": "Diese Nachricht wird bereits gesendet",
   "请先继续目标或核对任务状态": "Setzen Sie zuerst das Ziel fort oder prüfen Sie den Aufgabenstatus",
   "项目名称": "Projektname",
-  "重命名项目": "Projekt umbenennen"
+  "重命名项目": "Projekt umbenennen",
+  "关联项目": "Verknüpfte Projekte",
+  "关联目录沿用当前文件权限，下次执行生效。": "Verknüpfte Ordner verwenden ab der nächsten Ausführung die aktuellen Dateiberechtigungen.",
+  "受限目录访问支持 Codex 和 Claude；其他入口需要完全访问。": "Eingeschränkter Ordnerzugriff wird für Codex und Claude unterstützt; andere Anbieter benötigen Vollzugriff.",
+  "选择项目": "Projekt auswählen",
+  "选择其他目录": "Anderen Ordner auswählen",
+  "返回主页": "Zur Startseite",
+  "执行进度": "Fortschritt"
 }

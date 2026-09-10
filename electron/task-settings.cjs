@@ -25,6 +25,10 @@ function updateTaskSetting(store,runner,id,update){
     if(task.state==='unknown')throw Error('请先核对工作目录。');
     if(active){if(update.mode===task.mode)delete task.pendingMode;else task.pendingMode=update.mode;}
     else {task.mode=update.mode;delete task.pendingMode;task.sessions={};}
+  }else if('linkedProjects' in update){
+    if(active||['running','stopping','unknown'].includes(task.state))throw Error('请先停止任务或核对执行状态。');
+    task.linkedProjects=require('./project-access.cjs').normalizeRoots(task.cwd,update.linkedProjects);
+    task.sessions={};
   }else throw Error('Unsupported task setting');
   return store.save(task);
 }

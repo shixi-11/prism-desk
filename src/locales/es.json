@@ -606,5 +606,12 @@
   "消息已开始发送": "Este mensaje ya se está enviando",
   "请先继续目标或核对任务状态": "Primero reanuda el objetivo o comprueba el estado de la tarea",
   "项目名称": "Nombre del proyecto",
-  "重命名项目": "Renombrar proyecto"
+  "重命名项目": "Renombrar proyecto",
+  "关联项目": "Proyectos vinculados",
+  "关联目录沿用当前文件权限，下次执行生效。": "Las carpetas vinculadas usan los permisos actuales y se aplican en la siguiente ejecución.",
+  "受限目录访问支持 Codex 和 Claude；其他入口需要完全访问。": "El acceso restringido a carpetas admite Codex y Claude; los demás proveedores requieren acceso completo.",
+  "选择项目": "Elegir proyecto",
+  "选择其他目录": "Elegir otra carpeta",
+  "返回主页": "Ir al inicio",
+  "执行进度": "Progreso"
 }

@@ -34,12 +34,12 @@ Prism wird derzeit als **Installation aus dem Quellcode für Windows** bereitges
 
 ### Installation
 
-Diese Befehle installieren die stabile Version **v0.1.20**. Den aktuellen Versionsstand und die zweisprachigen Änderungshinweise finden Sie in der [neuesten Veröffentlichung](https://github.com/shixi-11/prism-desk/releases/latest).
+Diese Befehle installieren die stabile Version **v0.1.21**. Den aktuellen Versionsstand und die zweisprachigen Änderungshinweise finden Sie in der [neuesten Veröffentlichung](https://github.com/shixi-11/prism-desk/releases/latest).
 
 Sie benötigen Windows, Git, Node.js 22.12 oder neuer, npm und die offiziellen CLIs der gewählten Anbieter. Melden Sie sich bei jedem CLI separat an.
 
 ```powershell
-git clone --branch v0.1.20 https://github.com/shixi-11/prism-desk.git
+git clone --branch v0.1.21 https://github.com/shixi-11/prism-desk.git
 cd prism-desk
 npm install
 npm run build
@@ -91,9 +91,13 @@ Jede Kontokarte hat einen bearbeitbaren **Anzeigename** mit einer Stiftschaltfl�
 
 Klicken Sie mit der rechten Maustaste auf eine Aufgabe, um sie umzubenennen, anzuheften, als ungelesen zu markieren, zu archivieren, nach Projekt oder Abschnitt zu gruppieren, zu teilen, zu kopieren, abzuzweigen, ihren Ordner oder Gesprächsverlauf zu öffnen, ein weiteres Fenster zu öffnen oder sie zu löschen. Über **Archiviert und gelöscht** in der Seitenleiste können Sie ausgeblendete Aufgaben wiederherstellen. Beim Löschen einer Aufgabe bleiben ihr Arbeitsbereich und ihre Gesprächsdateien erhalten. Die Projektauswahl ändert, wo künftige Arbeiten ausgeführt werden; vorhandene Dateien bleiben in ihrem ursprünglichen Ordner. Beim Abzweigen werden neue CLI-Sitzungen gestartet und Gesprächsanhänge kopiert; die Option für einen separaten Arbeitsbereich beginnt mit einem leeren Ordner. Beim Teilen wird eine Vorschau eines lokalen Markdown-Dokuments zum Kopieren oder Speichern angezeigt; es entsteht kein gehosteter öffentlicher Link. Aufgabenänderungen werden zwischen geöffneten Fenstern synchronisiert.
 
+Ziehen Sie eine inaktive Unterhaltung auf den Namen eines anderen Projekts, um ihr Arbeitsverzeichnis zu ändern und Verlauf sowie Entwurf zu behalten. Vorhandene Dateien bleiben an ihrem bisherigen Ort. **Verknüpfte Projekte** neben den Dateiberechtigungen fügt Ordner für die nächste Ausführung mit den aktuellen Berechtigungen hinzu. Eingeschränkter Zugriff auf mehrere Ordner wird für Codex und Claude unterstützt; andere Anbieter benötigen Vollzugriff. Andere Unterhaltungen werden nicht zusammengeführt.
+
+Der **Fast**-Schalter befindet sich neben Senden. Ein Klick auf das Prism-Logo führt zur Startseite ohne ausgewählte Unterhaltung; Entwürfe und laufende Arbeit bleiben erhalten. Claude-Fortschrittsmeldungen werden getrennt von der abschließenden Antwort einer erfolgreichen Ausführung gruppiert. Der Hintergrund-Prozesshost erstellt keine Konsolenfenster, und gleichzeitige Anfragen zur Modellliste teilen sich eine CLI-Abfrage.
+
 #### Ansichten und Kontingent
 
-Die obere Leiste enthält Ansichtseinstellungen sowie Schalter für das Ausführungsprotokoll am unteren Rand und die Konten-Seitenleiste. Ihr Zustand wird lokal gespeichert. Unter Konten fragt **Alle Konten prüfen** jedes konfigurierte Profil ab und zeigt das verfügbare Kontingent, Rücksetzzeitpunkte, Codex-Reset-Guthaben und deren Ablaufdaten an. Eine fehlgeschlagene Abfrage hält die Prüfung der übrigen Konten nicht auf.
+Die obere Leiste enthält Schalter für das Ausführungsprotokoll am unteren Rand und die Konten-Seitenleiste. Ihr Zustand wird lokal gespeichert. Unter Konten fragt **Alle Konten prüfen** jedes konfigurierte Profil ab und zeigt das verfügbare Kontingent, Rücksetzzeitpunkte, Codex-Reset-Guthaben und deren Ablaufdaten an. Eine fehlgeschlagene Abfrage hält die Prüfung der übrigen Konten nicht auf.
 
 #### Bilder
 

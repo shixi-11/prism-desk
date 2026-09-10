@@ -64,7 +64,7 @@ class PrismProcess {
       int size = Marshal.SizeOf(limits); IntPtr ptr = Marshal.AllocHGlobal(size);
       try { Marshal.StructureToPtr(limits, ptr, false); if(!SetInformationJobObject(job, 9, ptr, (uint)size)) throw new Exception("SetInformationJobObject failed"); }
       finally { Marshal.FreeHGlobal(ptr); }
-      var startup = new STARTUPINFO(); startup.cb = Marshal.SizeOf(startup); startup.flags = 0x100;
+      var startup = new STARTUPINFO(); startup.cb = Marshal.SizeOf(startup); startup.flags = 0x101; startup.show = 0; // STARTF_USESTDHANDLES | STARTF_USESHOWWINDOW, SW_HIDE
       startup.input = GetStdHandle(-10); startup.output = GetStdHandle(-11); startup.error = GetStdHandle(-12);
       var command = new StringBuilder(Quote(args[0])); foreach(string arg in argv) command.Append(' ').Append(Quote(arg));
       if(!CreateProcess(args[0], command, IntPtr.Zero, IntPtr.Zero, true, 0x08000004, IntPtr.Zero, null, ref startup, out process)) throw new Exception("CreateProcess failed: " + Marshal.GetLastWin32Error());

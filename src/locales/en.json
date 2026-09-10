@@ -606,5 +606,12 @@
   "消息已开始发送": "This message is already being sent",
   "请先继续目标或核对任务状态": "Resume the goal or check the task status first",
   "项目名称": "Project name",
-  "重命名项目": "Rename project"
+  "重命名项目": "Rename project",
+  "关联项目": "Linked projects",
+  "关联目录沿用当前文件权限，下次执行生效。": "Linked directories use the current file permissions and apply on the next run.",
+  "受限目录访问支持 Codex 和 Claude；其他入口需要完全访问。": "Restricted directory access supports Codex and Claude; other providers require full access.",
+  "选择项目": "Choose a project",
+  "选择其他目录": "Choose another folder",
+  "返回主页": "Go to home",
+  "执行进度": "Progress"
 }

@@ -34,12 +34,12 @@ Prism est actuellement distribué sous forme d’**installation à partir des so
 
 ### Installation
 
-Ces commandes installent la version stable **v0.1.20**. Consultez la [dernière version publiée](https://github.com/shixi-11/prism-desk/releases/latest) pour connaître son numéro et lire ses notes de modification bilingues.
+Ces commandes installent la version stable **v0.1.21**. Consultez la [dernière version publiée](https://github.com/shixi-11/prism-desk/releases/latest) pour connaître son numéro et lire ses notes de modification bilingues.
 
 Vous aurez besoin de Windows, de Git, de Node.js 22.12 ou ultérieur, de npm et des CLI officiels des fournisseurs de votre choix. Connectez-vous séparément à chaque CLI.
 
 ```powershell
-git clone --branch v0.1.20 https://github.com/shixi-11/prism-desk.git
+git clone --branch v0.1.21 https://github.com/shixi-11/prism-desk.git
 cd prism-desk
 npm install
 npm run build
@@ -91,9 +91,13 @@ Chaque fiche de compte comporte un **Alias** modifiable à l’aide d’un bouto
 
 Faites un clic droit sur une tâche pour la renommer, l’épingler, la marquer comme non lue, l’archiver, la regrouper par projet ou par section, la partager, la copier, créer une tâche dérivée, ouvrir son dossier ou sa conversation, ouvrir une autre fenêtre ou la supprimer. **Archivées et supprimées** dans la barre latérale permet de restaurer les tâches masquées. La suppression d’une tâche conserve son espace de travail et ses fichiers de conversation. Le choix du projet modifie l’emplacement des travaux futurs ; les fichiers existants restent dans leur dossier d’origine. La création d’une tâche dérivée démarre de nouvelles sessions CLI et copie les pièces jointes de la conversation ; l’option d’espace de travail distinct démarre avec un dossier vide. Le partage affiche l’aperçu d’un document Markdown local à copier ou à enregistrer ; il ne crée pas de lien public hébergé. Les modifications des tâches sont synchronisées entre les fenêtres ouvertes.
 
+Faites glisser une conversation inactive sur le nom d’un autre projet pour changer son dossier de travail tout en conservant l’historique et le brouillon. Les fichiers existants restent à leur emplacement. **Projets liés**, près des autorisations de fichiers, ajoute des dossiers pour la prochaine exécution avec les autorisations actuelles. L’accès restreint à plusieurs dossiers prend en charge Codex et Claude ; les autres fournisseurs nécessitent un accès complet. Les autres conversations ne sont pas fusionnées.
+
+Le bouton **Fast** se trouve à côté d’Envoyer. Cliquez sur le logo Prism pour revenir à l’accueil sans conversation sélectionnée, en conservant les brouillons et le travail en cours. Les messages de progression de Claude sont regroupés séparément de la réponse finale d’une exécution réussie. Le processus hôte en arrière-plan ne crée pas de fenêtre de console et les demandes simultanées de modèles partagent une seule requête CLI.
+
 #### Affichage et quota
 
-La barre supérieure contient les paramètres d’affichage ainsi que les commandes permettant d’afficher ou de masquer le journal d’exécution inférieur et la barre latérale des comptes. Leur état est enregistré localement. Dans Comptes, **Vérifier tous les comptes** interroge chaque profil configuré et affiche le quota disponible, les heures de réinitialisation, les crédits de réinitialisation Codex et leurs dates d’expiration. L’échec d’une requête n’interrompt pas la vérification des autres comptes.
+La barre supérieure contient les commandes permettant d’afficher ou de masquer le journal d’exécution inférieur et la barre latérale des comptes. Leur état est enregistré localement. Dans Comptes, **Vérifier tous les comptes** interroge chaque profil configuré et affiche le quota disponible, les heures de réinitialisation, les crédits de réinitialisation Codex et leurs dates d’expiration. L’échec d’une requête n’interrompt pas la vérification des autres comptes.
 
 #### Images
 

@@ -32,12 +32,12 @@ Prism currently ships as a **Windows source installation**. No standalone `.exe`
 
 ### Install
 
-These commands install stable version **v0.1.20**. Check the [latest Release](https://github.com/shixi-11/prism-desk/releases/latest) for its version and bilingual change notes.
+These commands install stable version **v0.1.21**. Check the [latest Release](https://github.com/shixi-11/prism-desk/releases/latest) for its version and bilingual change notes.
 
 You will need Windows, Git, Node.js 22.12 or later, npm, and the official CLIs for your chosen providers. Sign in to each CLI separately.
 
 ```powershell
-git clone --branch v0.1.20 https://github.com/shixi-11/prism-desk.git
+git clone --branch v0.1.21 https://github.com/shixi-11/prism-desk.git
 cd prism-desk
 npm install
 npm run build
@@ -89,9 +89,13 @@ Each account card has an editable **Nickname** with a pencil button. This change
 
 Right-click a task to rename, pin, mark unread, archive, group by project or section, share, copy, fork, open its folder or conversation, open another window, or delete it. **Archived and deleted** in the sidebar restores hidden tasks. Deleting a task preserves its workspace and conversation files. Project selection changes where future work runs; existing files stay in their original folder. Forking starts fresh CLI sessions and copies conversation attachments; the separate-workspace option starts with an empty folder. Share previews a local Markdown document for copying or saving; it does not create a hosted public link. Task changes are synchronized across open windows.
 
+Drag an idle conversation onto another project heading to change its working directory while keeping its history and draft. Existing project files stay in place. **Linked projects** beside the file-permission control adds directories for the next execution and keeps the current permission level. Restricted multi-directory access supports Codex and Claude; other providers require full access. Linking directories does not merge other conversations.
+
+The **Fast** switch is beside Send. Click the Prism logo to return home without selecting a conversation; existing drafts and running work are retained. Claude progress messages are grouped separately from a successful final answer. Background process hosting avoids console windows, and simultaneous model-list requests share one CLI query.
+
 #### Views and allowance
 
-The top bar has view settings and toggles for the bottom execution log and account sidebar. Their state is saved locally. In Accounts, **Check all accounts** queries every configured profile and displays available allowance, reset times, Codex reset credits and credit expiry dates. A failed query does not stop the remaining accounts.
+The top bar has toggles for the bottom execution log and account sidebar. Their state is saved locally. In Accounts, **Check all accounts** queries every configured profile and displays available allowance, reset times, Codex reset credits and credit expiry dates. A failed query does not stop the remaining accounts.
 
 #### Images
 

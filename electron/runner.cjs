@@ -55,6 +55,7 @@ class Runner extends EventEmitter {
       throw Error("请等待当前执行结束；状态未知时需先核对工作目录。");
     require('./task-settings.cjs').applyPendingMode(task);
     const nextProfile=profileFor(profile);
+    require('./project-access.cjs').validateAccess(task,nextProfile);
     if(nextProfile.disabled)throw Error('账号尚未启用，请先登录或选择其他账号。');
     require('./task-settings.cjs').validateMode(task.mode,nextProfile);
     if (task.profile === profile) return this.store.save(task);
@@ -89,6 +90,7 @@ class Runner extends EventEmitter {
     require('./task-settings.cjs').applyPendingMode(task);
     let profile = require('./models.cjs').selection(task,profileFor(task.profile));
     if(profile.disabled)throw Error('账号尚未启用，请先登录或选择其他账号。');
+    require('./project-access.cjs').validateAccess(task,profile);
     require('./task-settings.cjs').validateMode(options.planning?'read-only':task.mode,profile);
     if(images.some(image=>image.kind!=='file')&&!['Codex','Claude','Grok'].includes(profile.provider))throw Error('当前入口暂不支持图片，请选择 Codex、Claude 或 Grok');
     this.event(id, "user", { text: text.trim(), images, profile: profile.id });
@@ -122,7 +124,7 @@ class Runner extends EventEmitter {
         if(task.autoSwitch===false || this.active.cancelRequested || !this.active.quotaExhausted || task.state!=='failed')break;
         require('./task-settings.cjs').applyPendingMode(task);
         const ordered=[...(task.relayOrder||[]).map(id=>PROFILES.find(p=>p.id===id)).filter(Boolean),...PROFILES.filter(p=>!(task.relayOrder||[]).includes(p.id))];
-        const next=ordered.find(p=>!p.disabled&&!attempted.has(p.id) && (!this.active.images.some(image=>image.kind!=='file')||['Codex','Claude','Grok'].includes(p.provider)) && (task.execution.mode==='read-only'||p.write&&['Codex','Claude','Grok'].includes(p.provider)));
+        const next=ordered.find(p=>!p.disabled&&!attempted.has(p.id) && (!task.linkedProjects?.length||task.execution.mode==='full-access'||['Codex','Claude'].includes(p.provider)) && (!this.active.images.some(image=>image.kind!=='file')||['Codex','Claude','Grok'].includes(p.provider)) && (task.execution.mode==='read-only'||p.write&&['Codex','Claude','Grok'].includes(p.provider)));
         if(!next){this.event(id,'notice',{text:'已尝试所有符合当前权限的入口；没有自动重复调用。'});break;}
         this.active.pending.clear();
         this.emit('approval-reset',{taskId:task.id});
@@ -214,6 +216,7 @@ class Runner extends EventEmitter {
         if (item?.type === "agentMessage")
           this.event(task.id, "assistant", {
             text: item.text,
+            phase: item.phase,
             profile: profile.id,
           });
         else if(item?.type==='reasoning'&&item.summary?.length)this.event(task.id,'reasoning',{text:item.summary.join('\n'),profile:profile.id});
@@ -286,14 +289,7 @@ class Runner extends EventEmitter {
         effort: profile.effort || "xhigh",
         serviceTier: profile.serviceTier || "default",
         summary:'auto',
-        sandboxPolicy:
-          (task.execution?.mode||task.mode) === "full-access" ? { type: "dangerFullAccess" } : (task.execution?.mode||task.mode) === "read-only"
-            ? { type: "readOnly" }
-            : {
-                type: "workspaceWrite",
-                writableRoots: [task.cwd],
-                networkAccess: true,
-              },
+        sandboxPolicy: require('./project-access.cjs').codexSandbox(task),
       });
       this.active.turnId = started.turn.id;
       this.confirmExecution(task,profile);
@@ -367,6 +363,7 @@ class Runner extends EventEmitter {
         : "Read,Glob,Grep,Edit,Write,Bash",
     ];
     if((task.execution?.mode||task.mode) === "full-access")args.push("--dangerously-skip-permissions");
+    for(const root of require('./project-access.cjs').normalizeRoots(task.cwd,task.linkedProjects||[]))args.push('--add-dir',root);
     if(this.active.images?.length)args.push('--input-format','stream-json');
     if (task.sessions[profile.id])
       args.push("--resume", task.sessions[profile.id]);
@@ -378,6 +375,7 @@ class Runner extends EventEmitter {
     let result = null;
     let errorText = "";
     let streamError = null;
+    let lastAnswer=null;
     this.active.started = true;
     proc.stdout.setEncoding("utf8");
     proc.stderr.setEncoding("utf8");
@@ -412,7 +410,8 @@ class Runner extends EventEmitter {
         if (msg.type === "assistant")
           for (const part of msg.message?.content || []) {
             if (part.type === "text")
-              this.event(task.id, "assistant", {
+              lastAnswer=this.event(task.id, "assistant", {
+                phase: "commentary",
                 text: part.text,
                 profile: profile.id,
               });
@@ -431,7 +430,13 @@ class Runner extends EventEmitter {
                 data: part,
                 profile: profile.id,
               });
-        if (msg.type === "result") result = msg;
+        if (msg.type === "result") {
+          result = msg;
+          if(!msg.is_error&&msg.subtype==='success'&&msg.result){
+            if(lastAnswer?.text===msg.result)this.event(task.id,'assistant-final',{messageId:lastAnswer.id});
+            else this.event(task.id,'assistant',{text:msg.result,profile:profile.id,phase:'final'});
+          }
+        }
       }
       }catch(error){
         streamError=error;

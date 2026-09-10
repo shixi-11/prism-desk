@@ -34,12 +34,12 @@ Actualmente, Prism se distribuye mediante una **instalación desde el código fu
 
 ### Instalación
 
-Estos comandos instalan la versión estable **v0.1.20**. Consulta la [última versión publicada](https://github.com/shixi-11/prism-desk/releases/latest) para conocer su número y leer las notas de cambios bilingües.
+Estos comandos instalan la versión estable **v0.1.21**. Consulta la [última versión publicada](https://github.com/shixi-11/prism-desk/releases/latest) para conocer su número y leer las notas de cambios bilingües.
 
 Necesitarás Windows, Git, Node.js 22.12 o posterior, npm y las CLI oficiales de los proveedores que elijas. Inicia sesión en cada CLI por separado.
 
 ```powershell
-git clone --branch v0.1.20 https://github.com/shixi-11/prism-desk.git
+git clone --branch v0.1.21 https://github.com/shixi-11/prism-desk.git
 cd prism-desk
 npm install
 npm run build
@@ -91,9 +91,13 @@ Cada tarjeta de cuenta tiene un **Alias** editable con un botón de lápiz. Esto
 
 Haz clic con el botón derecho en una tarea para cambiarle el nombre, fijarla, marcarla como no leída, archivarla, agruparla por proyecto o sección, compartirla, copiarla, crear una tarea derivada, abrir su carpeta o conversación, abrir otra ventana o eliminarla. **Archivadas y eliminadas** en la barra lateral permite restaurar las tareas ocultas. Al eliminar una tarea, se conservan su espacio de trabajo y sus archivos de conversación. La selección del proyecto cambia dónde se ejecutará el trabajo futuro; los archivos existentes permanecen en su carpeta original. Al crear una tarea derivada, se inician nuevas sesiones de CLI y se copian los adjuntos de la conversación; la opción de espacio de trabajo separado comienza con una carpeta vacía. Compartir muestra una vista previa de un documento Markdown local para copiarlo o guardarlo; no crea un enlace público alojado. Los cambios de las tareas se sincronizan entre las ventanas abiertas.
 
+Arrastra una conversación inactiva al nombre de otro proyecto para cambiar su carpeta de trabajo y conservar el historial y el borrador. Los archivos existentes permanecen en su ubicación original. **Proyectos vinculados**, junto a los permisos de archivos, añade carpetas para la siguiente ejecución con los permisos actuales. El acceso restringido a varias carpetas admite Codex y Claude; los demás proveedores requieren acceso completo. Vincular carpetas no combina otras conversaciones.
+
+El interruptor **Fast** está junto a Enviar. Haz clic en el logotipo de Prism para volver al inicio sin seleccionar una conversación y conservar los borradores y el trabajo en curso. Los mensajes de progreso de Claude se agrupan por separado de la respuesta final de una ejecución correcta. El proceso anfitrión en segundo plano no crea ventanas de consola y las solicitudes simultáneas de modelos comparten una consulta a la CLI.
+
 #### Vistas y cuota
 
-La barra superior contiene ajustes de visualización y controles para mostrar u ocultar el registro de ejecución inferior y la barra lateral de cuentas. Su estado se guarda localmente. En Cuentas, **Consultar todas las cuentas** consulta cada perfil configurado y muestra la cuota disponible, las horas de restablecimiento, los créditos de restablecimiento de Codex y sus fechas de caducidad. Si una consulta falla, no se detiene la comprobación de las demás cuentas.
+La barra superior contiene controles para mostrar u ocultar el registro de ejecución inferior y la barra lateral de cuentas. Su estado se guarda localmente. En Cuentas, **Consultar todas las cuentas** consulta cada perfil configurado y muestra la cuota disponible, las horas de restablecimiento, los créditos de restablecimiento de Codex y sus fechas de caducidad. Si una consulta falla, no se detiene la comprobación de las demás cuentas.
 
 #### Imágenes
 
