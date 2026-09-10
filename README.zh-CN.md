@@ -8,6 +8,8 @@
 
 棱镜是一款面向订阅 CLI 的 Windows 桌面工作台。一个账号额度用完，可以把任务交给另一个账号，不必手动重建对话、重新整理进度。切换后仍使用原项目目录。
 
+如果棱镜帮你省下了时间，欢迎[支持后续开发](https://shixilin.com/support?lang=zh)。
+
 ### 版本与下载
 
 **[最新发布版本](https://github.com/shixi-11/prism-desk/releases/latest)** · **[安装指南](#安装)**
@@ -29,12 +31,12 @@
 
 ### 安装
 
-以下命令安装稳定版 **v0.1.14**。[最新发布页](https://github.com/shixi-11/prism-desk/releases/latest)提供版本号与中英文更新内容。
+以下命令安装稳定版 **v0.1.15**。[最新发布页](https://github.com/shixi-11/prism-desk/releases/latest)提供版本号与中英文更新内容。
 
 需要 Windows、Git、Node.js 22.12 或更新版本、npm，以及准备使用的官方 CLI。各 CLI 需分别完成登录。
 
 ```powershell
-git clone --branch v0.1.14 https://github.com/shixi-11/prism-desk.git
+git clone --branch v0.1.15 https://github.com/shixi-11/prism-desk.git
 cd prism-desk
 npm install
 npm run build

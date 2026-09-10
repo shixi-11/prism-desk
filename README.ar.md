@@ -8,6 +8,8 @@
 
 Prism Desk هو مساحة عمل على Windows لواجهات CLI التي تعمل بالاشتراك. عندما تنفد حصة الاستخدام في أحد الحسابات، يمكنك نقل المهمة إلى حساب آخر دون إعادة تجميع محادثتها وملاحظات تقدمها يدويًا. ويظل مجلد المشروع كما هو.
 
+إذا ساعدك Prism على توفير الوقت، يمكنك [دعم مواصلة تطويره](https://shixilin.com/support?lang=ar).
+
 ### الإصدارات والتنزيلات
 
 **[أحدث إصدار](https://github.com/shixi-11/prism-desk/releases/latest)** · **[دليل التثبيت](#install)**
@@ -31,12 +33,12 @@ Prism Desk هو مساحة عمل على Windows لواجهات CLI التي ت�
 
 ### التثبيت
 
-تثبّت هذه الأوامر الإصدار المستقر **v0.1.14**. راجع [أحدث إصدار](https://github.com/shixi-11/prism-desk/releases/latest) لمعرفة رقمه وملاحظات تغييراته باللغتين.
+تثبّت هذه الأوامر الإصدار المستقر **v0.1.15**. راجع [أحدث إصدار](https://github.com/shixi-11/prism-desk/releases/latest) لمعرفة رقمه وملاحظات تغييراته باللغتين.
 
 ستحتاج إلى Windows وGit وNode.js 22.12 أو أحدث وnpm، بالإضافة إلى واجهات CLI الرسمية للمزوّدين الذين تختارهم. سجّل الدخول إلى كل CLI على حدة.
 
 ```powershell
-git clone --branch v0.1.14 https://github.com/shixi-11/prism-desk.git
+git clone --branch v0.1.15 https://github.com/shixi-11/prism-desk.git
 cd prism-desk
 npm install
 npm run build

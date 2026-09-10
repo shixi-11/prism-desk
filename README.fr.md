@@ -8,6 +8,8 @@ Créé par [Shixi Lin](https://shixilin.com/).
 
 Prism Desk est un espace de travail Windows pour les CLI accessibles par abonnement. Lorsqu’un compte épuise son quota, vous pouvez transférer la tâche à un autre compte sans reconstituer manuellement la conversation et les notes de progression. Le dossier du projet reste le même.
 
+Si Prism vous fait gagner du temps, vous pouvez [soutenir la suite de son développement](https://shixilin.com/support?lang=fr).
+
 ### Versions et téléchargements
 
 **[Dernière version](https://github.com/shixi-11/prism-desk/releases/latest)** · **[Guide d’installation](#install)**
@@ -31,12 +33,12 @@ Prism est actuellement distribué sous forme d’**installation à partir des so
 
 ### Installation
 
-Ces commandes installent la version stable **v0.1.14**. Consultez la [dernière version publiée](https://github.com/shixi-11/prism-desk/releases/latest) pour connaître son numéro et lire ses notes de modification bilingues.
+Ces commandes installent la version stable **v0.1.15**. Consultez la [dernière version publiée](https://github.com/shixi-11/prism-desk/releases/latest) pour connaître son numéro et lire ses notes de modification bilingues.
 
 Vous aurez besoin de Windows, de Git, de Node.js 22.12 ou ultérieur, de npm et des CLI officiels des fournisseurs de votre choix. Connectez-vous séparément à chaque CLI.
 
 ```powershell
-git clone --branch v0.1.14 https://github.com/shixi-11/prism-desk.git
+git clone --branch v0.1.15 https://github.com/shixi-11/prism-desk.git
 cd prism-desk
 npm install
 npm run build

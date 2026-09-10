@@ -503,7 +503,7 @@ function Conversation({ task, events, streaming, thinking, activity, awaitingApp
   );
 }
 function ExecutionLog({ events }) {
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(false);
   const records = events.filter((e) =>
     ["tool", "notice", "diff", "plan"].includes(e.type),
   );

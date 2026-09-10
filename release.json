@@ -1,12 +1,16 @@
 {
-  "version": "0.1.14",
+  "version": "0.1.15",
   "date": "2026-09-10",
   "notes": {
     "en": [
-      "The transient “Thinking” indicator appears during an active turn when no reply, tool activity or confirmation is being shown. It disappears when the turn stops or ends; it does not require reasoning text from the CLI. No permanent ended-status label remains below the conversation."
+      "Removed the blanket prohibition on sending, publishing and payment from CLI execution instructions. Actions follow the user’s task authorization; subscription authentication and API-key isolation remain in place.",
+      "The execution log now starts collapsed when its panel is opened. Click the header to expand or collapse the records.",
+      "All nine README languages now include a support link that opens the matching language on the author’s website."
     ],
     "zh": [
-      "“正在思考”是临时提示：本轮运行中，未在显示回复、工具活动或等待确认时出现；停止或结束后隐藏，不要求 CLI 先传回思考文本。会话底部不再常驻“本轮已结束”等状态文字。"
+      "取消 CLI 执行提示中“不发送、不发布、不付费”的统一限制，相关操作按用户对任务的授权执行；保留订阅认证与 API Key 隔离。",
+      "执行记录面板打开时默认收起，点击标题即可展开或收起记录。",
+      "九种语言的 README 均加入打赏链接，打开作者网站时对应显示该语言。"
     ]
   }
 }

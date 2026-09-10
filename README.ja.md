@@ -8,6 +8,8 @@
 
 Prism Desk は、サブスクリプション型 CLI 向けの Windows ワークスペースです。あるアカウントの利用枠を使い切ったら、会話や進捗メモを手作業で再構成することなく、別のアカウントにタスクを引き継げます。プロジェクトフォルダーは変わりません。
 
+Prism が作業時間の節約に役立ったら、[今後の開発をご支援いただけるとうれしいです](https://shixilin.com/support?lang=ja)。
+
 ### バージョンとダウンロード
 
 **[最新リリース](https://github.com/shixi-11/prism-desk/releases/latest)** · **[インストールガイド](#install)**
@@ -31,12 +33,12 @@ Prism は現在、**Windows でのソースからのインストール**に対�
 
 ### インストール
 
-以下のコマンドで安定版 **v0.1.14** をインストールします。[最新リリース](https://github.com/shixi-11/prism-desk/releases/latest)で、バージョンと二言語の変更履歴を確認してください。
+以下のコマンドで安定版 **v0.1.15** をインストールします。[最新リリース](https://github.com/shixi-11/prism-desk/releases/latest)で、バージョンと二言語の変更履歴を確認してください。
 
 Windows、Git、Node.js 22.12 以降、npm、および利用するプロバイダーの公式 CLI が必要です。各 CLI に個別にサインインしてください。
 
 ```powershell
-git clone --branch v0.1.14 https://github.com/shixi-11/prism-desk.git
+git clone --branch v0.1.15 https://github.com/shixi-11/prism-desk.git
 cd prism-desk
 npm install
 npm run build
