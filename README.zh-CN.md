@@ -30,14 +30,18 @@
 | 在本机保存工作 | 指定固定会话目录、补充进度备注，并将对话导出为 Markdown。 |
 | 选择语言与主题 | 支持九种界面语言、阿拉伯语从右到左布局，以及日间和夜间的大漠主题。 |
 
+不同会话可以同时运行；工作目录重叠且涉及写入的任务依次执行。停止或引导只作用于对应会话，空闲会话选择账号后立即保存为实际执行账号。
+
+右键项目可置顶、编辑名称、选择分区、创建永久 Git 工作树、全部标为已读、归档聊天或移除项目。移除项目保留文件与会话，工作树从当前 Git 提交创建。
+
 ### 安装
 
-以下命令安装稳定版 **v0.1.21**。[最新发布页](https://github.com/shixi-11/prism-desk/releases/latest)提供版本号与中英文更新内容。
+以下命令安装稳定版 **v0.1.26**。[最新发布页](https://github.com/shixi-11/prism-desk/releases/latest)提供版本号与中英文更新内容。
 
 需要 Windows、Git、Node.js 22.12 或更新版本、npm，以及准备使用的官方 CLI。各 CLI 需分别完成登录。
 
 ```powershell
-git clone --branch v0.1.21 https://github.com/shixi-11/prism-desk.git
+git clone --branch v0.1.26 https://github.com/shixi-11/prism-desk.git
 cd prism-desk
 npm install
 npm run build
@@ -53,7 +57,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File scripts/start.ps1
 先安装准备使用的官方 CLI，并在 CLI 中完成登录。仅登录网页或桌面客户端，不等于棱镜已经接入账号。
 
 - **Codex**：按[官方安装说明](https://developers.openai.com/codex/cli/)安装 Codex CLI，使用 ChatGPT 账号登录。
-- **Claude**：安装 [Claude Code](https://code.claude.com/docs/en/setup)，按[登录说明](https://code.claude.com/docs/en/authentication)使用支持的 Claude 订阅账号登录。执行前会检查订阅登录和额外用量设置，额外付费用量需关闭。
+- **Claude**：安装 [Claude Code](https://code.claude.com/docs/en/setup)，按[登录说明](https://code.claude.com/docs/en/authentication)使用支持的 Claude 订阅账号登录。执行前检查订阅登录；额外用量设置不作为执行门槛。
 - **Grok**：安装官方 Grok CLI，使用订阅账号登录。
 
 在**账号 → 接入账号**中选择 Codex、Claude 或 Grok，填写名称，再点**保存并继续 → 获取登录链接 → 复制登录链接**。将链接粘贴到浏览器地址栏；若 Claude 显示授权码，回到棱镜的**授权码**输入框粘贴完整内容，再点**提交授权码**。授权码仅交给正在等待的官方 CLI，提交后清空输入框。授权完成后，棱镜会自动检查订阅登录，账号无需重启即可进入执行列表。也可检查已有登录、取消登录或重新复制链接、改名，以及停用或启用账号；停用保留历史任务与本机凭据。高级设置支持选择官方 CLI 程序，或使用已有的独立账号目录；已有账号的平台和登录目录保持固定。本机缺少 CLI 时会提供官方安装说明，后续平台通过独立适配器接入。
@@ -183,7 +187,7 @@ Codex、Claude 和 Grok 适配器支持文件修改任务。Grok 按任务权限
 
 账号页的邮箱默认遮罩显示，点击眼睛图标可展开或隐藏。查询记录仅保存在本机；重启后显示原查询日期和时间，并标明需要刷新。历史记录不用于执行授权或重置卡操作。
 
-棱镜不回退到 API Key 计费，也不购买额度。所有账号的额外用量、自动充值与额度查询仅作提示，不据此拦截执行；能否使用由平台实际返回结果决定，消费限额由用户在平台管理。使用已有的 Codex 重置卡，需要针对所选账号单独确认。 任务运行时也可使用重置卡，当前任务继续运行；仍需手动确认，并保留重复请求保护。已经结束的那一轮不会自动重启。 其他任务运行时，空闲任务仍可选择账号、模型和思考等级；切换并继续沿用现有队列，不中断正在运行的任务。 Claude 额外用量仅作提示，不再阻止棱镜执行；是否可用及如何计费由 Claude 账号或团队设置决定，可能消耗团队余额或产生额外费用。
+棱镜不回退到 API Key 计费，也不购买额度。额度查询结果不拦截执行，额外用量提示框已移除；实际可用性与计费按平台账号设置处理。使用已有的 Codex 重置卡仍需针对该账号单独确认，不中断正在运行的会话，也不会自动重启已结束的执行。
 
 圆形发送箭头在当前任务运行时切换为停止按钮；追加内容仍可引导或排队，不加入语音控件。
 

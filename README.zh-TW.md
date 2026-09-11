@@ -30,16 +30,20 @@ Prism 目前以 **Windows 原始碼安裝**方式提供。尚未發布獨立的 
 | 將工作保留在本機 | 選擇永久的任務儲存資料夾、新增進度筆記，並匯出 Markdown 對話記錄。 |
 | 使用你的語言工作 | 從九種介面語言中選擇，包括由右至左顯示的阿拉伯文，並可切換淺色與深色沙漠佈景主題。 |
 
+不同會話可同時執行；工作目錄重疊且涉及寫入的任務依序執行。停止或引導只作用於對應會話，閒置會話選擇帳號後立即儲存為實際執行帳號。
+
+右鍵專案可釘選、編輯名稱、選擇分區、建立永久 Git 工作樹、全部標為已讀、封存聊天或移除專案。移除專案保留檔案與會話，工作樹從目前 Git 提交建立。
+
 <a id="install"></a>
 
 ### 安裝
 
-以下指令會安裝穩定版本 **v0.1.21**。請查看[最新發布版本](https://github.com/shixi-11/prism-desk/releases/latest)，確認其版本與雙語變更說明。
+以下指令會安裝穩定版本 **v0.1.26**。請查看[最新發布版本](https://github.com/shixi-11/prism-desk/releases/latest)，確認其版本與雙語變更說明。
 
 你需要 Windows、Git、Node.js 22.12 或更新版本、npm，以及所選供應商的官方 CLI。請分別登入各個 CLI。
 
 ```powershell
-git clone --branch v0.1.21 https://github.com/shixi-11/prism-desk.git
+git clone --branch v0.1.26 https://github.com/shixi-11/prism-desk.git
 cd prism-desk
 npm install
 npm run build
@@ -55,7 +59,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File scripts/start.ps1
 為每個要使用的供應商安裝官方 CLI，然後透過該 CLI 登入。僅登入網站或桌面應用程式，並不會完成 Prism 的設定。
 
 - **Codex**：依照 [CLI 安裝指南](https://developers.openai.com/codex/cli/)操作，並使用你的 ChatGPT 帳號登入。
-- **Claude**：安裝 [Claude Code](https://code.claude.com/docs/en/setup)，然後使用受支援的 Claude 訂閱[登入](https://code.claude.com/docs/en/authentication)。Prism 會在執行前檢查訂閱登入狀態與額外用量設定；額外用量必須停用。
+- **Claude**：安裝 [Claude Code](https://code.claude.com/docs/en/setup)，然後使用受支援的 Claude 訂閱[登入](https://code.claude.com/docs/en/authentication)。執行前檢查訂閱登入；額外用量設定不作為執行門檻。
 - **Grok**：安裝官方 Grok CLI，並使用你的訂閱帳號登入。
 
 開啟**帳號 → 連接帳號**，選擇 Codex、Claude 或 Grok，並為帳號命名。依序選擇**儲存並繼續 → 取得登入連結 → 複製登入連結**，即可開始官方 CLI 授權流程。將連結貼到瀏覽器的網址列。若 Claude 顯示授權碼，請將完整代碼貼到**授權碼**欄位，再選擇**提交授權碼**。代碼只會傳送給正在等候的官方 CLI，之後便會從輸入欄位清除。完成授權後，Prism 會驗證訂閱登入狀態，無須重新啟動即可使用該帳號。此頁面也支援檢查既有登入狀態、取消授權或再次複製連結、重新命名設定檔，以及停用或啟用帳號。停用帳號會保留過去的任務與憑證。進階設定可讓你選擇官方 CLI 執行檔，或匯入既有的獨立登入目錄；已建立的帳號目錄與平台身分無法變更。缺少 CLI 時，介面會提供官方安裝說明連結。未來新增的平台需要各自的供應商與執行介接器。
@@ -185,7 +189,7 @@ Codex、Claude 與 Grok 介接器支援檔案編輯任務。Grok 會遵循所選
 
 帳號電子郵件地址預設會遮蔽；可使用眼睛按鈕顯示或隱藏。查詢歷程保留在此裝置上。重新啟動後，記錄會保留原始日期與時間，並標示為需要重新整理。歷史查詢值絕不會用來授權執行或使用重置卡。
 
-Prism 不會改用 API 金鑰計費，也不會購買點數。所有帳號的額外用量、自動儲值與額度查詢僅作提示，不據此攔截執行；能否使用由平台實際回應決定，消費限額由使用者在平台管理。使用既有的 Codex 重置卡時，必須針對所選帳號另外確認。 任務執行期間也可使用重置卡，當前任務會繼續執行；仍須手動確認，並保留重複請求保護。已結束的回合不會自動重新啟動。 其他任務執行時，閒置任務仍可選擇帳號、模型與思考等級；切換並繼續會沿用現有佇列，不會中斷執行中的任務。 Claude 額外用量僅作提示，不再阻止 Prism 執行；是否可用及如何計費由 Claude 帳號或團隊設定決定，可能消耗團隊餘額或產生額外費用。
+Prism 不會退回 API Key 計費，也不購買額度。額度查詢不攔截執行，額外用量提示已移除；實際可用性與計費依平台帳號設定處理。使用既有 Codex 重置卡仍須針對該帳號單獨確認，不中斷正在執行的會話，也不自動重新啟動已結束的執行。
 
 圓形傳送箭頭在目前任務執行時切換為停止按鈕；追加內容仍可引導或排隊，不加入語音控制項。
 

@@ -660,5 +660,16 @@
   "消息已排队，等待此任务开始执行": "Queued until this task starts",
   "当前执行正在停止，消息已保留": "Execution is stopping; message retained",
   "当前实际执行入口不支持实时引导，消息已排队": "The active provider does not support live guidance; message queued",
-  "消息已保留，Codex 轮次就绪后自动发送": "Message retained; sends automatically when the Codex turn is ready"
+  "消息已保留，Codex 轮次就绪后自动发送": "Message retained; sends automatically when the Codex turn is ready",
+  "创建永久工作树": "Create permanent worktree",
+  "全部标为已读": "Mark all as read",
+  "归档聊天": "Archive chats",
+  "移除项目": "Remove project",
+  "排队中": "Queued",
+  "消息已排队，等待同一工作目录的任务结束": "Queued until the task in the same workspace finishes",
+  "同一工作目录仍有任务执行，请等待完成。": "Another task is using this workspace. Wait for it to finish.",
+  "此项目没有可用的 Git 提交。": "This project has no available Git commit.",
+  "请选择工作树保存位置。": "Choose where to save the worktree.",
+  "工作树目录已存在，请选择新目录。": "The worktree directory already exists. Choose a new directory.",
+  "工作树必须保存在原项目目录之外。": "Save the worktree outside the original project directory."
 }

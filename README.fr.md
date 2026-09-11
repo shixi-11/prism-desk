@@ -30,16 +30,20 @@ Prism est actuellement distribué sous forme d’**installation à partir des so
 | Conserver votre travail localement | Choisissez un dossier permanent de stockage des tâches, ajoutez des notes de progression et exportez un compte rendu de la conversation au format Markdown. |
 | Travailler dans votre langue | Choisissez parmi neuf langues d’interface, dont l’arabe avec affichage de droite à gauche, et alternez entre les thèmes désert clair et sombre. |
 
+Des conversations indépendantes peuvent s’exécuter simultanément. Les tâches qui écrivent dans des dossiers communs attendent leur tour. Arrêter ou guider une conversation ne concerne que celle-ci. Le compte choisi pour une conversation inactive est enregistré immédiatement.
+
+Un clic droit sur un projet permet de l’épingler, modifier son nom, choisir une section, créer un arbre Git permanent, marquer les discussions comme lues, les archiver ou retirer le projet. Le retrait conserve fichiers et conversations. L’arbre de travail part du commit actuel.
+
 <a id="install"></a>
 
 ### Installation
 
-Ces commandes installent la version stable **v0.1.21**. Consultez la [dernière version publiée](https://github.com/shixi-11/prism-desk/releases/latest) pour connaître son numéro et lire ses notes de modification bilingues.
+Ces commandes installent la version stable **v0.1.26**. Consultez la [dernière version publiée](https://github.com/shixi-11/prism-desk/releases/latest) pour connaître son numéro et lire ses notes de modification bilingues.
 
 Vous aurez besoin de Windows, de Git, de Node.js 22.12 ou ultérieur, de npm et des CLI officiels des fournisseurs de votre choix. Connectez-vous séparément à chaque CLI.
 
 ```powershell
-git clone --branch v0.1.21 https://github.com/shixi-11/prism-desk.git
+git clone --branch v0.1.26 https://github.com/shixi-11/prism-desk.git
 cd prism-desk
 npm install
 npm run build
@@ -55,7 +59,7 @@ Le script compile l’hôte de processus Windows qui permet d’arrêter ensembl
 Installez le CLI officiel de chaque fournisseur que vous souhaitez utiliser, puis connectez-vous par son intermédiaire. Une connexion à un site web ou à une application de bureau ne suffit pas à configurer Prism.
 
 - **Codex :** suivez le [guide d’installation du CLI](https://developers.openai.com/codex/cli/) et connectez-vous avec votre compte ChatGPT.
-- **Claude :** installez [Claude Code](https://code.claude.com/docs/en/setup), puis [connectez-vous](https://code.claude.com/docs/en/authentication) avec un abonnement Claude pris en charge. Prism vérifie la connexion à l’abonnement et les paramètres d’utilisation supplémentaire avant l’exécution ; l’utilisation supplémentaire doit être désactivée.
+- **Claude :** installez [Claude Code](https://code.claude.com/docs/en/setup), puis [connectez-vous](https://code.claude.com/docs/en/authentication) avec un abonnement Claude pris en charge. Prism vérifie la connexion à l’abonnement avant l’exécution. L’utilisation supplémentaire ne bloque pas l’exécution.
 - **Grok :** installez le CLI officiel Grok et connectez-vous avec votre compte abonné.
 
 Ouvrez **Comptes → Ajouter un compte**, choisissez Codex, Claude ou Grok et donnez un nom au compte. **Enregistrer et continuer → Obtenir le lien de connexion → Copier le lien de connexion** lance la procédure d’autorisation du CLI officiel. Collez le lien dans la barre d’adresse de votre navigateur. Si Claude affiche un code d’autorisation, collez le code complet dans **Code d’autorisation** et choisissez **Envoyer le code**. Le code est transmis uniquement au CLI officiel en attente, puis effacé du champ de saisie. Après votre autorisation, Prism vérifie la connexion à l’abonnement et rend le compte disponible sans redémarrage. Cette page permet également de vérifier une connexion existante, d’annuler l’autorisation ou de recopier le lien, de renommer les profils et de désactiver ou réactiver les comptes. La désactivation conserve les tâches antérieures et les identifiants de connexion. Les paramètres avancés permettent de sélectionner l’exécutable du CLI officiel ou d’importer un répertoire de connexion indépendant existant ; les répertoires de compte et les identités de plateforme déjà établis ne peuvent pas être modifiés. Si un CLI manque, un lien mène aux instructions d’installation officielles. Les futures plateformes nécessiteront leurs propres adaptateurs de fournisseur et d’exécution.
@@ -185,7 +189,7 @@ Le panneau de quota affiche les informations renvoyées par le fournisseur. Pour
 
 Les adresses e-mail des comptes sont masquées par défaut ; utilisez le bouton en forme d’œil pour les afficher ou les masquer. L’historique des vérifications reste sur cet appareil. Après un redémarrage, les enregistrements conservent leur date et leur heure d’origine et sont marqués comme devant être actualisés. Les relevés historiques n’autorisent jamais l’exécution ni l’utilisation de crédits de réinitialisation.
 
-Prism ne bascule pas vers une facturation par clé API et n’achète pas de crédits. Pour tous les comptes, l’utilisation supplémentaire, la recharge automatique et les relevés de quota sont informatifs et ne bloquent pas l’exécution. Le fournisseur décide de la disponibilité et l’utilisateur gère ses plafonds de dépenses sur sa plateforme. L’utilisation d’un crédit de réinitialisation Codex existant nécessite une confirmation distincte pour le compte sélectionné. Vous pouvez utiliser un crédit de réinitialisation pendant une tâche ; celle-ci continue de s’exécuter. La confirmation et la protection contre les demandes en double restent en place. Un tour déjà terminé ne redémarre pas automatiquement. Une tâche inactive peut choisir son compte, son modèle et son niveau de raisonnement pendant qu’une autre s’exécute. Le changement suivi de la reprise passe par la file d’attente existante, sans interrompre la tâche en cours. L’utilisation supplémentaire de Claude est indiquée à titre informatif et ne bloque pas l’exécution dans Prism. Sa disponibilité et sa facturation dépendent des paramètres du compte ou de l’organisation Claude ; elle peut consommer des crédits d’équipe ou entraîner des frais supplémentaires.
+Prism ne passe pas à la facturation par clé API et n’achète pas de crédits. Les quotas affichés ne bloquent pas l’exécution et la bannière d’utilisation supplémentaire a été supprimée. Disponibilité et facturation suivent les paramètres du fournisseur. Utiliser un crédit de réinitialisation Codex nécessite une confirmation pour ce compte, sans interrompre les conversations actives ni relancer une exécution terminée.
 
 La flèche ronde devient un bouton d’arrêt pendant la tâche. Les instructions supplémentaires et la file d’attente restent disponibles, sans commande vocale.
 

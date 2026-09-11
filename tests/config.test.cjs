@@ -55,7 +55,7 @@ test('fresh installation can create tasks without personal profiles or assistant
   const root=fixture(t),file=path.join(root,'config.json');
   fs.writeFileSync(file,'{}');
   const corePath=path.resolve(__dirname,'../electron/core.cjs');
-  const script=`const assert=require('node:assert/strict'); const c=require(${JSON.stringify(corePath)}); const s=new c.TaskStore(${JSON.stringify(path.join(root,'tasks'))}); const task=s.create({title:'Example',cwd:${JSON.stringify(root)}}); assert.equal(task.profile,'codex-personal-1'); const p=c.environmentPrompt(task,{apps:[]},{path:'record.md',hash:'example',bytes:0}); assert.ok(!p.includes('SKILL.md')); assert.ok(!p.includes('太初')); assert.ok(!p.includes('小主人'));`;
+  const script=`const assert=require('node:assert/strict'); const c=require(${JSON.stringify(corePath)}); const s=new c.TaskStore(${JSON.stringify(path.join(root,'tasks'))}); const task=s.create({title:'Example',cwd:${JSON.stringify(root)}}); assert.equal(task.profile,'codex-personal-1'); const p=c.environmentPrompt(task,{apps:[]},{path:${JSON.stringify(path.join(root,'record.md'))},hash:'example',bytes:0}); assert.ok(!p.includes('按需读取用户配置的助手入口')); assert.ok(!p.includes('太初')); assert.ok(!p.includes('小主人'));`;
   require('node:child_process').execFileSync(process.execPath,['-e',script],{env:{...process.env,PRISM_CONFIG:file},windowsHide:true});
 });
 

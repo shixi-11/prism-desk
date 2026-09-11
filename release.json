@@ -1,16 +1,20 @@
 {
-  "version": "0.1.25",
+  "version": "0.1.26",
   "date": "2026-09-11",
   "notes": {
     "zh": [
-      "修复 Codex 轮次暂未就绪时实时引导退回队列后不再送入的问题；保留发送意图，就绪后自动投递，未确认成功的消息不会重复重试。",
-      "移除输入框里的关联项目入口。",
-      "Codex 默认使用 GPT-6-Astra 和低（low）思考等级，自动接续采用相同默认值。"
+      "支持不同会话独立同时执行，停止、审批和实时引导按会话隔离；工作目录重叠且涉及写入的任务依次执行。",
+      "空闲会话选择执行账号后立即保存，修复选择 Grok 或 Claude 后实际账号仍停留在 Codex 的情况。",
+      "缩小侧栏会话名称字号，移除项目与会话旁的铅笔按钮，通过右键改名。",
+      "项目右键菜单新增置顶、编辑、分区、永久 Git 工作树、全部已读、归档聊天与移除项目；移除项目保留文件和会话。",
+      "移除额外用量提示框，订阅额度和额外用量状态不作为执行门槛。"
     ],
     "en": [
-      "Preserve live-guidance requests while a Codex turn is starting and deliver them when ready. Messages with uncertain delivery remain held instead of being replayed.",
-      "Remove the linked-project control from the composer.",
-      "Default Codex and automatic continuation to GPT-6-Astra with low reasoning effort."
+      "Run independent conversations concurrently with task-scoped stop, approval and live guidance. Tasks with overlapping writable workspaces run in sequence.",
+      "Apply account selection immediately to idle conversations so selecting Grok or Claude updates the actual execution account.",
+      "Reduce sidebar conversation text size and remove project and conversation pencil buttons; rename through context menus.",
+      "Add project context actions for pinning, editing, sections, permanent Git worktrees, read status, archiving and removal. Removing a project preserves files and conversations.",
+      "Remove the extra-usage banner; allowance and extra-usage readings do not gate execution."
     ]
   }
 }

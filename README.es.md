@@ -30,16 +30,20 @@ Actualmente, Prism se distribuye mediante una **instalación desde el código fu
 | Conservar tu trabajo localmente | Elige una carpeta permanente para almacenar las tareas, añade notas de progreso y exporta un registro de la conversación en Markdown. |
 | Trabajar en tu idioma | Elige uno de los nueve idiomas de la interfaz, incluido el árabe de derecha a izquierda, y alterna entre los temas de desierto claro y oscuro. |
 
+Las conversaciones independientes pueden ejecutarse a la vez. Las tareas con escritura en directorios superpuestos esperan su turno. Detener o guiar una conversación solo afecta a esa conversación. La cuenta elegida para una conversación inactiva se guarda inmediatamente.
+
+Haz clic derecho en un proyecto para fijarlo, editar su nombre, elegir una sección, crear un árbol de trabajo Git permanente, marcar chats como leídos, archivarlos o quitar el proyecto. Quitar un proyecto conserva archivos y conversaciones. El árbol de trabajo parte del commit actual.
+
 <a id="install"></a>
 
 ### Instalación
 
-Estos comandos instalan la versión estable **v0.1.21**. Consulta la [última versión publicada](https://github.com/shixi-11/prism-desk/releases/latest) para conocer su número y leer las notas de cambios bilingües.
+Estos comandos instalan la versión estable **v0.1.26**. Consulta la [última versión publicada](https://github.com/shixi-11/prism-desk/releases/latest) para conocer su número y leer las notas de cambios bilingües.
 
 Necesitarás Windows, Git, Node.js 22.12 o posterior, npm y las CLI oficiales de los proveedores que elijas. Inicia sesión en cada CLI por separado.
 
 ```powershell
-git clone --branch v0.1.21 https://github.com/shixi-11/prism-desk.git
+git clone --branch v0.1.26 https://github.com/shixi-11/prism-desk.git
 cd prism-desk
 npm install
 npm run build
@@ -55,7 +59,7 @@ El script compila el host de procesos de Windows que se usa para detener conjunt
 Instala la CLI oficial de cada proveedor que quieras usar y, después, inicia sesión a través de ella. Iniciar sesión únicamente en un sitio web o en una aplicación de escritorio no configura Prism.
 
 - **Codex:** sigue la [guía de instalación de la CLI](https://developers.openai.com/codex/cli/) e inicia sesión con tu cuenta de ChatGPT.
-- **Claude:** instala [Claude Code](https://code.claude.com/docs/en/setup) y, después, [inicia sesión](https://code.claude.com/docs/en/authentication) con una suscripción de Claude compatible. Prism comprueba el inicio de sesión con suscripción y la configuración de uso adicional antes de ejecutar; el uso adicional debe estar desactivado.
+- **Claude:** instala [Claude Code](https://code.claude.com/docs/en/setup) y, después, [inicia sesión](https://code.claude.com/docs/en/authentication) con una suscripción de Claude compatible. Prism verifica el inicio de sesión con suscripción antes de ejecutar. El uso adicional no bloquea la ejecución.
 - **Grok:** instala la CLI oficial de Grok e inicia sesión con tu cuenta de suscripción.
 
 Abre **Cuentas → Conectar cuenta**, elige Codex, Claude o Grok y asigna un nombre a la cuenta. **Guardar y continuar → Obtener enlace de inicio de sesión → Copiar enlace de inicio de sesión** inicia el proceso de autorización de la CLI oficial. Pega el enlace en la barra de direcciones del navegador. Si Claude muestra un código de autorización, pega el código completo en **Código de autorización** y elige **Enviar código**. El código se envía únicamente a la CLI oficial que está esperando y, después, se borra del campo de entrada. Tras tu autorización, Prism verifica el inicio de sesión con suscripción y habilita la cuenta sin reiniciar. La página también permite comprobar un inicio de sesión existente, cancelar la autorización o volver a copiar el enlace, cambiar el nombre de los perfiles y desactivar o activar cuentas. Al desactivar una cuenta, se conservan las tareas anteriores y las credenciales. La configuración avanzada permite seleccionar el ejecutable de la CLI oficial o importar un directorio de inicio de sesión independiente existente; los directorios de cuenta y las identidades de plataforma ya establecidos no se pueden cambiar. Si falta una CLI, se ofrecen enlaces a las instrucciones oficiales de instalación. Las futuras plataformas necesitarán sus propios adaptadores de proveedor y de ejecución.
@@ -185,7 +189,7 @@ El panel de cuota muestra la información que devuelve el proveedor. En los peri
 
 Las direcciones de correo de las cuentas se ocultan parcialmente de forma predeterminada; usa el botón con forma de ojo para mostrarlas u ocultarlas. El historial de consultas permanece en este dispositivo. Después de reiniciar, los registros conservan su fecha y hora originales y se marcan para actualizarse. Las lecturas históricas nunca autorizan la ejecución ni el uso de créditos de restablecimiento.
 
-Prism no recurre a la facturación mediante claves API ni compra créditos. El uso adicional, la recarga automática y las consultas de cuota son informativos para todas las cuentas y no bloquean la ejecución. El proveedor decide la disponibilidad y el usuario gestiona los límites de gasto en su plataforma. Usar un crédito de restablecimiento de Codex existente requiere una confirmación independiente para la cuenta seleccionada. Puedes usar un crédito de restablecimiento mientras se ejecuta una tarea; la tarea continúa. Se mantienen la confirmación y la protección contra solicitudes duplicadas. Un turno que ya haya finalizado no se reinicia automáticamente. Una tarea inactiva puede seleccionar su cuenta, modelo y nivel de razonamiento mientras se ejecuta otra. Cambiar y continuar utiliza la cola existente sin interrumpir la tarea en ejecución. El uso adicional de Claude es informativo y no bloquea la ejecución en Prism. Su disponibilidad y facturación dependen de la configuración de la cuenta u organización de Claude; puede consumir créditos del equipo o generar cargos adicionales.
+Prism no recurre a la facturación mediante claves API ni compra créditos. Las lecturas de cuota no bloquean la ejecución y se ha eliminado el aviso de uso adicional. La disponibilidad y facturación dependen de la cuenta del proveedor. Usar un crédito de restablecimiento de Codex requiere confirmación para esa cuenta, sin interrumpir conversaciones activas ni reiniciar ejecuciones terminadas.
 
 La flecha de envío se convierte en un botón de parada durante la tarea. Se mantienen las instrucciones adicionales y la cola, sin control de voz.
 

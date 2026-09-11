@@ -12,7 +12,7 @@ const {
   accountStatus,
   atomic,
 } = require("./core.cjs");
-const { Runner } = require("./runner.cjs");
+const { RunnerPool } = require("./runner-pool.cjs");
 const { isSupportedLanguage, translate, directoryDialog, resetCreditDialog } = require('./localization.cjs');
 app.setName("棱镜");
 const desktopIdentity=require('./desktop-identity.cjs');
@@ -35,11 +35,7 @@ let updater,updateInstalling=false,operations=0;
 async function quitPrism(){
  if(quitPending)return;quitPending=true;if(messageQueue)messageQueue.paused=true;
  try{
-   if(runner?.active){
-     const idle=new Promise((resolve,reject)=>{const timer=setTimeout(()=>{runner.off('idle',done);reject(Error('任务尚未停止，请稍后再退出'));},30000);const done=()=>{clearTimeout(timer);resolve();};runner.once('idle',done);});
-     idle.catch(()=>{});delete runner.active.requestedHandoff;
-     await runner.stop();await idle;
-   }
+   if(runner?.active)await runner.stopAll();
    await Promise.allSettled([...accountLogins.values()].map(login=>login.cancel()));
    quitting=true;tray?.destroy();app.quit();
  }catch(e){quitPending=false;if(messageQueue)messageQueue.paused=false;showWindow();emit('error',e.message);}
@@ -98,7 +94,7 @@ app.whenReady().then(() => {
       updateBootstrap.write(draftFile(win),value);event.returnValue=true;
     }catch(error){event.returnValue={error:error.message};}
   });
-  runner = new Runner(store);
+  runner = new RunnerPool(store);
   updater=new (require('./updater.cjs').Updater)(app.getAppPath(),process.env.PRISM_TEST_DATA?{root:path.join(dataPath(),'installation')}:{ });
   updater.on('change',value=>emit('app-update',value));
   if(bootstrapError){updater.state.status='error';updater.state.error=bootstrapError;}
@@ -124,14 +120,12 @@ app.whenReady().then(() => {
     queue:messageQueue.items,
     taskStorage:store.root,
     capabilities: capabilities(),
-    approvals: runner.active
-      ? [...runner.active.pending.values()].map((m) => ({
-          taskId: runner.active.task.id,
+    approvals: runner.activeRuns().flatMap(active=>[...active.pending.values()].map((m) => ({
+          taskId: active.task.id,
           id: String(m.id),
           method: m.method,
           params: m.params,
-        }))
-      : [],
+        }))),
   }));
   const broadcastTasks=()=>emit('task-list',{tasks:store.list(),archivedTasks:store.list('archived'),deletedTasks:store.list('deleted')});
   const updateBusy=()=>runner.active||messageQueue.running||messageQueue.items.some(i=>['waiting','sending'].includes(i.status))||accountOperation||accountQueries||resetInProgress||accountLogins.size||geminiLogin||validatingApps||quitPending||store.list().some(t=>['running','stopping','unknown'].includes(t.state));
@@ -175,14 +169,14 @@ app.whenReady().then(() => {
     const result=require('./accounts.cjs').removeAccount(id,revision);
     quotaDisplay.clear(id);accountLoginStates.delete(id);broadcastAccounts();return result;
   });
-  handle('answerQuestion',(id,requestId,answers)=>require('./questions.cjs').answer(runner,id,requestId,answers));
+  handle('answerQuestion',(id,requestId,answers)=>require('./questions.cjs').answer(runner.forTask(id),id,requestId,answers));
   handle('renameAccount',(id,name)=>{const result=require('./accounts.cjs').renameAccount(id,name);broadcastAccounts();return result;});
-  handle('savePlan',(id,input)=>require('./task-plan.cjs').save(store,runner,id,input));
+  handle('savePlan',(id,input)=>require('./task-plan.cjs').save(store,runner.forTask(id),id,input));
   handle('goalAction',(id,action,revision)=>{
     if(action==='resume'&&(accountOperation||validatingApps||resetInProgress))throw Error('请等待账号或应用操作结束。');
-    return require('./goal-actions.cjs').act(store,runner,messageQueue,id,action,revision);
+    return require('./goal-actions.cjs').act(store,runner.forTask(id),messageQueue,id,action,revision);
   });
-  handle('relayPreferences',(id,order)=>{if(!Array.isArray(order)||new Set(order).size!==order.length||order.some(id=>!PROFILES.some(p=>p.id===id)))throw Error('接续顺序无效');const task=runner.active?.task.id===id?runner.active.task:store.get(id);task.relayOrder=order;store.save(task);emit('state',task);return task;});
+  handle('relayPreferences',(id,order)=>{if(!Array.isArray(order)||new Set(order).size!==order.length||order.some(id=>!PROFILES.some(p=>p.id===id)))throw Error('接续顺序无效');const task=runner.activeFor(id)?.task||store.get(id);task.relayOrder=order;store.save(task);emit('state',task);return task;});
   handle('planAction',(id,action,revision)=>{
     const task=store.get(id);runner.assertIdle(task);
     if(task.goalLifecycle?.status==='paused')throw Error('目标已暂停，请先继续目标。');
@@ -225,14 +219,14 @@ app.whenReady().then(() => {
   handle('copyAccountLogin',id=>{const login=accountLogins.get(id);const profile=PROFILES.find(p=>p.id===id);const url=profile&&login?.url&&require('./account-providers.cjs').officialLoginUrl(profile.provider,login.url);if(!url)throw Error('登录链接尚未准备好，请稍候。');clipboard.writeText(url);return {copied:true};});
   handle('submitAccountLoginCode',async(id,code)=>{const login=accountLogins.get(id);if(!login)throw Error('当前登录已结束或尚未就绪，请重新获取登录链接。');const result=await login.submitCode(code);if(accountLogins.get(id)===login&&accountLoginStates.get(id)?.phase==='waiting')loginState(id,{phase:'waiting',hasUrl:!!login.url,codeSubmitted:true});return result;});
   handle('cancelAccountLogin',async id=>{await accountLogins.get(id)?.cancel();});
-  handle("task", (id) => {const task=runner.active?.task.id===id?runner.active.task:store.get(id);if(task.unread){task.unread=false;store.save(task);broadcastTasks();}return {task,events:store.events(id)};});
-  handle('taskMenu',id=>new Promise(resolve=>{const task=store.get(id);let chosen=null;Menu.buildFromTemplate(require('./task-menu.cjs').taskMenuTemplate(task,store.list(),key=>translate(settings().language,key),action=>{chosen=action;},runner.active?.task.id===id||['running','stopping','unknown'].includes(task.state),settings().projects||[])).popup({window:owner(),callback:()=>resolve(chosen)});}));
+  handle("task", (id) => {const task=runner.activeFor(id)?.task||store.get(id);if(task.unread){task.unread=false;store.save(task);broadcastTasks();}return {task,events:store.events(id)};});
+  handle('taskMenu',id=>new Promise(resolve=>{const task=store.get(id);let chosen=null;Menu.buildFromTemplate(require('./task-menu.cjs').taskMenuTemplate(task,store.list(),key=>translate(settings().language,key),action=>{chosen=action;},runner.activeFor(id)||['running','stopping','unknown'].includes(task.state),settings().projects||[])).popup({window:owner(),callback:()=>resolve(chosen)});}));
   handle('taskAction',async(id,action,value)=>{
     const {manageTask,forkTask,conversationText}=require('./task-actions.cjs');
-    if(['pin','unread','archive','delete','restore','project','project-move','section'].includes(action)){const task=manageTask(store,runner,messageQueue,id,action,value);broadcastTasks();return {task};}
+    if(['pin','unread','archive','delete','restore','project','project-move','section'].includes(action)){const task=manageTask(store,runner.forTask(id),messageQueue,id,action,value);broadcastTasks();return {task};}
     const task=store.get(id);
-    if(action==='project-pick'){const selected=await dialog.showOpenDialog(owner(),{properties:['openDirectory']});if(selected.canceled)return {};const next=manageTask(store,runner,messageQueue,id,'project',selected.filePaths[0]);broadcastTasks();return {task:next};}
-    if(action==='fork'){const fork=await forkTask(store,runner,id,!!value);broadcastTasks();return {selectId:fork.id};}
+    if(action==='project-pick'){const selected=await dialog.showOpenDialog(owner(),{properties:['openDirectory']});if(selected.canceled)return {};const next=manageTask(store,runner.forTask(id),messageQueue,id,'project',selected.filePaths[0]);broadcastTasks();return {task:next};}
+    if(action==='fork'){const fork=await forkTask(store,runner.forTask(id),id,!!value);broadcastTasks();return {selectId:fork.id};}
     if(action==='share'||action==='preview-conversation')return {text:conversationText(store,id),title:task.title};
     if(action==='save-conversation'){const result=await dialog.showSaveDialog(owner(),{defaultPath:task.title.replace(/[<>:"/\\|?*]/g,'_')+'.md',filters:[{name:'Markdown',extensions:['md']}]});if(!result.canceled)fs.writeFileSync(result.filePath,conversationText(store,id));return {};}
     if(action.startsWith('copy-')){const values={'copy-conversation':()=>conversationText(store,id),'copy-title':()=>task.title,'copy-id':()=>id,'copy-path':()=>task.cwd};if(!values[action])throw Error('Unsupported copy action');clipboard.writeText(values[action]());return {};}
@@ -246,7 +240,26 @@ app.whenReady().then(() => {
   handle('retryQueued',id=>messageQueue.retry(id));
   handle('createProject',input=>{
     const result=require('./projects.cjs').addProject(settings(),input,next=>atomic(path.join(dataPath(),'settings.json'),next));
-    emit('projects',{projects:result.projects,projectNames:result.projectNames});return result;
+    emit('projects',{projects:result.projects,projectNames:result.projectNames,projectPreferences:result.projectPreferences});return result;
+  });
+  handle('projectMenu',async cwd=>{
+    const {projectMenuTemplate,projectTasks}=require('./project-menu.cjs');const tasks=store.list();
+    const busy=projectTasks(tasks,cwd).some(t=>runner.activeFor(t.id)||['running','stopping','unknown'].includes(t.state));
+    const git=!!await require('./project-worktree.cjs').repository(cwd);
+    return new Promise(resolve=>{let chosen=null;Menu.buildFromTemplate(projectMenuTemplate(cwd,settings(),tasks,key=>translate(settings().language,key),choice=>{chosen=choice;},{busy,git})).popup({window:owner(),callback:()=>resolve(chosen)});});
+  });
+  handle('projectAction',async(cwd,action,value)=>{
+    let next;
+    if(action==='worktree'){
+      const result=await dialog.showSaveDialog(owner(),{title:translate(settings().language,'创建永久工作树'),defaultPath:path.join(path.dirname(cwd),path.basename(cwd)+'-worktree'),buttonLabel:translate(settings().language,'创建')});
+      if(result.canceled)return {};
+      const worktree=await require('./project-worktree.cjs').createWorktree(cwd,result.filePath);
+      require('./projects.cjs').addProject(settings(),{kind:'existing',cwd:worktree.cwd,name:path.basename(worktree.cwd)},updated=>{next=updated;atomic(path.join(dataPath(),'settings.json'),updated);});
+    }else{
+      next=require('./project-menu.cjs').manageProject(settings(),store,runner,messageQueue,cwd,action,value);
+      atomic(path.join(dataPath(),'settings.json'),next);
+    }
+    emit('projects',{projects:next.projects,projectNames:next.projectNames,projectPreferences:next.projectPreferences});broadcastTasks();return {settings:next};
   });
   handle('renameProject',(cwd,name)=>{const next=require('./project-labels.cjs').renameProject(settings(),cwd,name);atomic(path.join(dataPath(),'settings.json'),next);return next;});
   handle('preferences',update=>{
@@ -325,7 +338,7 @@ app.whenReady().then(() => {
   handle('loginGemini',async()=>{
     if(geminiLogin)throw Error('Google 登录窗口已打开，请完成当前授权');
     const profile=PROFILES.find(p=>p.provider==='Gemini');
-    if(runner.active?.profile.provider==='Gemini')throw Error('请等待 Gemini 当前执行结束');
+    if(runner.activeRuns().some(a=>a.profile.provider==='Gemini'))throw Error('请等待 Gemini 当前执行结束');
     const proc=require('node:child_process').spawn(profile.executable,[path.join(app.getAppPath(),'scripts','gemini-login.cjs')],{cwd:app.getAppPath(),windowsHide:true,stdio:['ignore','pipe','pipe']});
     geminiLogin=proc;
     proc.stdout.on('data',()=>{});proc.stderr.on('data',()=>{});
@@ -343,7 +356,7 @@ app.whenReady().then(() => {
     }finally{resetInProgress=false;}
   });
   handle('models',id=>{if(accountOperation)throw Error('请等待账号操作结束。');return require('./models.cjs').modelOptions(id,app.getAppPath());});
-  handle('modelSettings',(id,input,profileId)=>{if(accountOperation)throw Error('请等待账号操作结束。');return require('./models.cjs').updateSelectionForRunner(store,runner,id,input,profileId);});
+  handle('modelSettings',(id,input,profileId)=>{if(accountOperation)throw Error('请等待账号操作结束。');return require('./models.cjs').updateSelectionForRunner(store,runner.forTask(id),id,input,profileId);});
   handle("run", async (id, text, imageIds=[], choiceEventId) => {
     if(accountOperation)throw Error('请先完成或取消账号登录。');
     if(validatingApps)throw Error('请等待本机应用验证结束');
@@ -358,18 +371,18 @@ app.whenReady().then(() => {
     text=text.trim()||(images.length?'请查看这些附件。':'');if(!text||text.length>60000)throw Error('请输入 1–60000 字的指令。');
     if(images.some(image=>image.kind!=='file')&&!['Codex','Claude','Grok'].includes(PROFILES.find(p=>p.id===task.profile)?.provider))throw Error('当前入口暂不支持图片，请选择 Codex、Claude 或 Grok');
     if(settings().busySend==='steer'&&await runner.steer(id,text,images)){if(choiceEventId)runner.event(id,'notice',{choiceEventId,text:'已提交选择 · '+text});return {steered:true};}
-    const busy=!!runner.active||messageQueue.running;
+    const busy=messageQueue.isBusy(id);
     const item=messageQueue.enqueue(id,text,images,{planning:!!task.planReviewRequired,steer:settings().busySend==='steer'});
     if(choiceEventId)runner.event(id,'notice',{choiceEventId,text:'已提交选择 · '+text});
     return {started:!busy,queued:busy,id:item.id,...(busy?{reason:runner.guidanceReason(id)}:{})};
   });
-  handle("switch", (id, profile) => runner.switch(id, profile));
+  handle("switch", (id, profile) => {const task=runner.switch(id, profile);broadcastTasks();emit('state',task);return task;});
   handle('stopAndContinue', (id, profile) => runner.stopAndContinue(id, profile));
   handle('openTaskStorage', () => shell.openPath(store.root));
-  handle("stop", () => runner.stop());
-  handle("approve", (id, decision) => runner.approve(id, decision));
+  handle("stop", id => runner.stop(id));
+  handle("approve", (id, decision, taskId) => runner.approve(id, decision, taskId));
   handle("update", (id, update) => {
-    if(update && Object.keys(update).length===1 && ('title' in update || 'mode' in update || 'linkedProjects' in update)){const result=require('./task-settings.cjs').updateTaskSetting(store,runner,id,update);broadcastTasks();return result;}
+    if(update && Object.keys(update).length===1 && ('title' in update || 'mode' in update || 'linkedProjects' in update)){const result=require('./task-settings.cjs').updateTaskSetting(store,runner.forTask(id),id,update);broadcastTasks();return result;}
     const task = store.get(id);
     runner.assertIdle(task);
     if (
@@ -392,7 +405,7 @@ app.whenReady().then(() => {
     return store.save(task);
   });
   handle("reconcile", (id) => {
-    if (runner.active) throw Error("仍有执行在进行。");
+    if (runner.activeFor(id)) throw Error("仍有执行在进行。");
     const task = store.get(id);
     if (task.activePid) {
       let live = false;

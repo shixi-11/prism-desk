@@ -69,7 +69,6 @@ function TaskEntry({item,selected,onSelect,onRename,onAction}){
       <button className={`task-select ${selected?'selected':''} ${item.unread?'unread':''}`} onClick={onSelect} onDoubleClick={begin} onKeyDown={e=>{const k=e.key.toLowerCase();const action=e.key==='F2'||(e.ctrlKey&&e.altKey&&k==='r')?'rename':e.ctrlKey&&e.altKey&&k==='p'?'pin':e.ctrlKey&&e.shiftKey&&k==='u'?'unread':e.ctrlKey&&e.shiftKey&&k==='a'?'archive':e.key==='Delete'?'delete':null;if(action){e.preventDefault();act({action});}}} title={item.title}>
         <CircleDot size={11}/><span dir="auto">{item.pinned?'⌖ ':''}{item.title}</span>{(item.state==='running'||item.unread)&&<span className="status-dot"/>}
       </button>
-      <button className="task-rename-button" title={tr("重命名")} aria-label={`${tr("重命名")} ${item.title}`} onClick={begin}><Pencil size={14}/></button>
     </>}
   </div>;
 }
@@ -259,6 +258,8 @@ function Inspector({
   checking,
   onRefresh,
   onSwitch,
+  onSelectAccount,
+  waiting,
   onCapabilities,
   onModelSettings,
   onNew,
@@ -301,7 +302,7 @@ function Inspector({
           <select
             aria-label={tr("执行账号")}
             value={target || ""}
-            onChange={(e) => {const id=e.target.value;setTarget(id);if(!task)onDraftAccount(id);const q=quotas[id];if(!checking.includes(id)&&(!q?.checkedAt||Date.now()-new Date(q.checkedAt).getTime()>300000))onRefresh(id);}}
+            onChange={async(e) => {const id=e.target.value;setTarget(id);if(!task)onDraftAccount(id);else if(!['running','stopping','unknown'].includes(task.state)){try{await onSelectAccount(id);}catch{setTarget(task.profile);return;}}const q=quotas[id];if(!checking.includes(id)&&(!q?.checkedAt||Date.now()-new Date(q.checkedAt).getTime()>300000))onRefresh(id);}}
             disabled={disabled && !canStop}
           >
             {!selected&&<option value="" disabled>{tr("待登录")}</option>}
@@ -314,7 +315,7 @@ function Inspector({
           <ChevronDown size={15} />
         </div>
         {selected&&<ModelControls key={(task?.id||'draft')+target} task={task||{modelSettings:draftSettings}} profile={selected} disabled={!!selected.disabled} onSave={value=>onModelSettings(value,target)}/>}
-        <div className="execution-status" role="status"><span className="status-dot" />{tr(labels[task?.state]||"就绪")}</div>
+        <div className="execution-status" role="status"><span className="status-dot" />{tr(waiting?"排队中":labels[task?.state]||"就绪")}</div>
         {activeConfig&&<p className="active-config" role="status">{tr(task?.execution?(task.execution.confirmed?'当前已生效':'正在启动'):'上次已生效')} · {activeConfig.reportedModel||activeConfig.model} · {activeConfig.effort}{activeConfig.serviceTier&&activeConfig.serviceTier!=='default'?' · Fast':''}</p>}
                 <button
           className="relay outline"
@@ -393,7 +394,6 @@ function Inspector({
             />{tr("刷新")}</button>
         </div>
         {quota?.status && <p className="account-status">{tr(quota.status)}</p>}
-        {quota?.extraUsageEnabled===true&&<p className="quota-notice">{tr("此账号已启用额外用量或自动充值；请在对应平台管理消费限额，棱镜仅提醒、不拦截。")}</p>}
         {selected?.provider==='Gemini'&&<><p className="account-status">{tr("Gemini 当前提供只读接续；登录后仍需执行验证。")}</p><button className="outline" disabled={loginBusy||disabled} onClick={async()=>{setLoginBusy(true);setLoginMessage(tr("请在当前浏览器完成 Google 授权"));try{const result=await api.loginGemini();setLoginMessage(tr(result.ok?"Google 授权已完成；尚未验证模型执行":"登录未完成，请核对浏览器提示后重试"));await onRefresh(target);}catch(e){setLoginMessage(e.message);}finally{setLoginBusy(false);}}}>{tr(loginBusy?"等待浏览器授权…":"登录 Google")}</button><p className="account-status" role="status">{loginMessage}</p></>}
         {quota?.remaining===0&&!stale&&<p className="quota-notice" role="status">{tr("额度已用完，可换账号继续或等待恢复；重置卡需手动使用。")}</p>}
       </section>
@@ -564,6 +564,7 @@ function App() {
   const [theme, setTheme] = useState("system");
   const [language,changeLanguage]=useState('zh');
   const [draftSettings,setDraftSettings]=useState({}),[draftAccount,setDraftAccount]=useState('');
+  const [changingAccount,setChangingAccount]=useState(false);
   const [text, setText] = useState("");
   const [images,setImages]=useState([]),[uploading,setUploading]=useState(false),[sending,setSending]=useState(false),[queue,setQueue]=useState([]),[thinking,setThinking]=useState(""),[activity,setActivity]=useState("");
   const drafts=useRef({}),loadSequence=useRef(0),pendingImageFiles=useRef([]),attachmentUpload=useRef(false);
@@ -830,7 +831,7 @@ function App() {
           </span>
         </div>
         <nav aria-label={tr("任务列表")}>
-          <SidebarTasks savedProjects={init.settings.projects||[]} revealedProject={revealedProject} onNewConversation={newConversation} onNewProject={()=>setModal("project")} onMoveTask={async(id,cwd)=>{const result=await api.taskAction(id,'project-move',cwd);setInit(old=>({...old,tasks:old.tasks.map(t=>t.id===id?result.task:t)}));setTask(old=>old?.id===id?result.task:old);}} tasks={init.tasks} projectNames={init.settings.projectNames||{}} onRenameProject={async(cwd,name)=>{const settings=await api.renameProject(cwd,name);setInit(old=>({...old,settings}));}} renderTask={t=><TaskEntry key={t.id} item={t} selected={task?.id===t.id} onSelect={()=>changeTask(t.id)} onAction={taskAction} onRename={async(id,title)=>{try{const updated=await api.update(id,{title});setInit(old=>({...old,tasks:old.tasks.map(t=>t.id===id?updated:t)}));setTask(old=>old?.id===id?updated:old);}catch(error){fail(error);throw error;}}}/>}/>
+          <SidebarTasks projectPreferences={init.settings.projectPreferences||{}} onProjectMenu={cwd=>api.projectMenu(cwd)} onProjectAction={async(cwd,action,value)=>{const result=await api.projectAction(cwd,action,value);if(result.settings)setInit(old=>({...old,settings:result.settings}));}} savedProjects={init.settings.projects||[]} revealedProject={revealedProject} onNewConversation={newConversation} onNewProject={()=>setModal("project")} onMoveTask={async(id,cwd)=>{const result=await api.taskAction(id,'project-move',cwd);setInit(old=>({...old,tasks:old.tasks.map(t=>t.id===id?result.task:t)}));setTask(old=>old?.id===id?result.task:old);}} tasks={init.tasks} projectNames={init.settings.projectNames||{}} onRenameProject={async(cwd,name)=>{const settings=await api.renameProject(cwd,name);setInit(old=>({...old,settings}));}} renderTask={t=><TaskEntry key={t.id} item={t} selected={task?.id===t.id} onSelect={()=>changeTask(t.id)} onAction={taskAction} onRename={async(id,title)=>{try{const updated=await api.update(id,{title});setInit(old=>({...old,tasks:old.tasks.map(t=>t.id===id?updated:t)}));setTask(old=>old?.id===id?updated:old);}catch(error){fail(error);throw error;}}}/>}/>
           {!init.tasks.length && (
             <p className="no-tasks">{tr("你的任务会留在这里。")}</p>
           )}
@@ -882,7 +883,7 @@ function App() {
           {task&&<GoalBar key={task.id} task={task} events={events} thinking={thinking} activity={activity} Modal={Modal} onSave={async input=>{const updated=await api.savePlan(task.id,input);if(current.current===updated.id)setTask(updated);return updated;}} onPlanAction={async(action,revision)=>{const id=task.id;await api.planAction(id,action,revision??task.workPlan?.revision);if(current.current===id)await load(id);}} onGoalAction={async(action,revision)=>{const updated=await api.goalAction(task.id,action,revision);if(current.current===updated.id)setTask(updated);return updated;}}/>}
           <QueuedMessages items={queue.filter(item=>item.taskId===task?.id&&item.status!=="sending")} onCancel={id=>api.cancelQueued(id).catch(fail)} onRetry={id=>api.retryQueued(id).catch(fail)} onSend={async id=>{try{const result=await api.sendQueued(id);if(result.queued)setToast(tr(result.reason||'当前无法实时引导，消息已排队'));}catch(error){fail(error);}}}/>
           <div className="composer">
-            {task?.goalLifecycle?.status==='paused'?<p className="plan-mode-note">{tr('目标已暂停，请先继续目标。')}</p>:task?.planReviewRequired&&<p className="plan-mode-note">{tr('计划待确认，当前消息仅用于讨论计划。')}<button disabled={anyBusy||!task.workPlan?.steps?.length} onClick={async()=>{try{await api.planAction(task.id,'execute',task.workPlan?.revision);}catch(e){fail(e);}}}>{tr('确认计划并执行')}</button></p>}
+            {task?.goalLifecycle?.status==='paused'?<p className="plan-mode-note">{tr('目标已暂停，请先继续目标。')}</p>:task?.planReviewRequired&&<p className="plan-mode-note">{tr('计划待确认，当前消息仅用于讨论计划。')}<button disabled={busy||!task.workPlan?.steps?.length} onClick={async()=>{try{await api.planAction(task.id,'execute',task.workPlan?.revision);}catch(e){fail(e);}}}>{tr('确认计划并执行')}</button></p>}
             <ImageAttachments taskId={task?.id} images={images} onRemove={id=>setImages(old=>old.filter(image=>image.id!==id))} onPreview={image=>image.path&&setPreview({id:Date.now(),target:image.path,task})}/>
             <textarea dir="auto"
               aria-label={tr("任务指令")}
@@ -919,12 +920,12 @@ function App() {
               <button title={tr("添加附件")} aria-label={tr("添加附件")} disabled={uploading||images.length>=5} onClick={()=>addImages(null)}><Paperclip size={19}/></button>
               <span className="compose-spacer" />
               <FastControl task={task} profile={init.profiles.find(p=>p.id===(task?.profile||draftAccount))} draftSettings={draftSettings} onSave={async(value,id)=>{if(task){const updated=await api.modelSettings(task.id,value,id);if(current.current===updated.id)setTask(updated);}else setDraftSettings(old=>({...old,[id]:value}));}}/>
-              <ComposerSubmit key={task?.id||'draft'} busy={busy} stopping={task?.state==='stopping'} hasDraft={!!text.trim()||!!images.length} onSend={send} onStop={()=>api.stop().catch(fail)} sendLabel={anyBusy?(init.settings.busySend==='steer'?'引导':'排队'):'发送'} disabled={(!text.trim()&&!images.length) || sending || uploading || task?.goalLifecycle?.status==='paused' || task?.state === "unknown" || !!task&&(!init.profiles.find(p=>p.id===task.profile)||init.profiles.find(p=>p.id===task.profile)?.disabled) || Object.values(accountLogins).some(s=>['starting','waiting','verifying'].includes(s.phase))}/>
+              <ComposerSubmit key={task?.id||'draft'} busy={busy} stopping={task?.state==='stopping'} hasDraft={!!text.trim()||!!images.length} onSend={send} onStop={()=>api.stop(task.id).catch(fail)} sendLabel={busy?(init.settings.busySend==='steer'?'引导':'排队'):'发送'} disabled={(!text.trim()&&!images.length) || sending || uploading || changingAccount || task?.goalLifecycle?.status==='paused' || task?.state === "unknown" || !!task&&(!init.profiles.find(p=>p.id===task.profile)||init.profiles.find(p=>p.id===task.profile)?.disabled) || Object.values(accountLogins).some(s=>['starting','waiting','verifying'].includes(s.phase))}/>
             </div>
           </div>
           <div className="task-tools">
             <span>{task ? tr(labels[task.state]) : tr("等待开始")}</span>
-            {task && <label className="auto-relay"><input type="checkbox" checked={task.autoSwitch!==false} disabled={anyBusy} onChange={async e=>{const previous=task;const autoSwitch=e.target.checked;setTask({...task,autoSwitch});try{setTask(await api.update(task.id,{autoSwitch}));}catch(error){setTask(previous);fail(error);}}}/>{tr("额度耗尽后自动接续")}</label>}
+            {task && <label className="auto-relay"><input type="checkbox" checked={task.autoSwitch!==false} disabled={busy} onChange={async e=>{const previous=task;const autoSwitch=e.target.checked;setTask({...task,autoSwitch});try{setTask(await api.update(task.id,{autoSwitch}));}catch(error){setTask(previous);fail(error);}}}/>{tr("额度耗尽后自动接续")}</label>}
             <span className="mono">{init.settings.sendShortcut==='enter'?'ENTER':'CTRL / ⌘ + ENTER'}</span>
             {task && (
               <>
@@ -950,6 +951,8 @@ function App() {
         onRefresh={refresh}
         onRelayPreferences={async order=>{const updated=await api.relayPreferences(task.id,order);if(current.current===updated.id)setTask(updated);return updated;}}
         onSwitch={changeProfile}
+        waiting={queue.some(i=>i.taskId===task?.id&&i.status==='waiting')&&!busy}
+        onSelectAccount={async target=>{setChangingAccount(true);try{const updated=await api.switch(task.id,target);if(current.current===updated.id)setTask(updated);setInit(old=>({...old,tasks:old.tasks.map(t=>t.id===updated.id?updated:t)}));}catch(error){fail(error);throw error;}finally{setChangingAccount(false);}}}
         onCapabilities={() => setModal("capabilities")}
         onModelSettings={async(settings,id)=>{if(task){const updated=await api.modelSettings(task.id,settings,id);if(current.current===updated.id)setTask(updated);}else setDraftSettings(old=>({...old,[id]:settings}));if(init.profiles.find(p=>p.id===id)?.provider==='Claude')await refresh(id,settings.model);}}
         draftSettings={draftSettings}
@@ -957,7 +960,7 @@ function App() {
         onHandoff={async id=>{try{await api.stopAndContinue(task.id,id);}catch(e){fail(e);}}}
         onDraftAccount={setDraftAccount}
         onNew={()=>newConversation()}
-        disabled={busy || task?.state === "unknown"}
+        disabled={busy || changingAccount || task?.state === "unknown"}
       />}
       {preview&&<PreviewPanel task={preview.task} request={preview} onClose={()=>setPreview(null)}/>}
       {modal==='view'&&<Modal title={tr('视图设置')} onClose={()=>setModal('')}><div className="view-options"><label><input type="checkbox" checked={view.log} onChange={e=>changeView({log:e.target.checked})}/>{tr('底部执行记录')}</label><label><input type="checkbox" checked={view.inspector} onChange={e=>changeView({inspector:e.target.checked})}/>{tr('右侧账号栏')}</label></div></Modal>}
@@ -1036,7 +1039,7 @@ function App() {
               className="outline"
               onClick={async () => {
                 try {
-                  await api.approve(approval.id, "decline");
+                  await api.approve(approval.id, "decline",approval.taskId);
                   finishApproval();
                 } catch (error) {
                   fail(error);
@@ -1047,7 +1050,7 @@ function App() {
               className="primary"
               onClick={async () => {
                 try {
-                  await api.approve(approval.id, "accept");
+                  await api.approve(approval.id, "accept",approval.taskId);
                   finishApproval();
                 } catch (error) {
                   fail(error);

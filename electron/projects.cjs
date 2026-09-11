@@ -18,8 +18,8 @@ function addProject(settings,input,persist){
  }else cwd=directory(input.cwd);
  const existing=(settings.projects||[]).find(p=>key(p.cwd)===key(cwd));
  const project=existing||{cwd,createdAt:new Date().toISOString()};
- const next={...settings,projects:existing?settings.projects:[...(settings.projects||[]),project],projectNames:{...settings.projectNames,[key(cwd)]:name}};
+ const next={...settings,projectPreferences:{...settings.projectPreferences,[key(cwd)]:{...settings.projectPreferences?.[key(cwd)],hidden:false}},projects:existing?settings.projects:[...(settings.projects||[]),project],projectNames:{...settings.projectNames,[key(cwd)]:name}};
  try{persist(next);}catch(error){if(created){try{fs.rmdirSync(cwd);}catch{}}throw error;}
- return {project,projects:next.projects,projectNames:next.projectNames};
+ return {project,projects:next.projects,projectNames:next.projectNames,projectPreferences:next.projectPreferences};
 }
 module.exports={addProject};

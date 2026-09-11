@@ -30,16 +30,20 @@ Prism wird derzeit als **Installation aus dem Quellcode für Windows** bereitges
 | Ihre Arbeit lokal aufbewahren | Wählen Sie einen dauerhaften Ordner zur Aufgabenspeicherung, fügen Sie Fortschrittsnotizen hinzu und exportieren Sie ein Gesprächsprotokoll als Markdown. |
 | In Ihrer Sprache arbeiten | Wählen Sie eine von neun Oberflächensprachen, darunter Arabisch mit Darstellung von rechts nach links, und wechseln Sie zwischen dem hellen und dunklen Wüstendesign. |
 
+Unabhängige Unterhaltungen können gleichzeitig laufen. Aufgaben mit Schreibzugriff auf überlappende Arbeitsverzeichnisse warten aufeinander. Stoppen und Anweisen betrifft nur die jeweilige Unterhaltung. Das Konto einer inaktiven Unterhaltung wird bei der Auswahl sofort gespeichert.
+
+Per Rechtsklick können Sie ein Projekt anheften, umbenennen, einem Bereich zuordnen, einen permanenten Git-Worktree erstellen, Chats als gelesen markieren, archivieren oder das Projekt entfernen. Dateien und Unterhaltungen bleiben erhalten. Worktrees beginnen beim aktuellen Git-Commit.
+
 <a id="install"></a>
 
 ### Installation
 
-Diese Befehle installieren die stabile Version **v0.1.21**. Den aktuellen Versionsstand und die zweisprachigen Änderungshinweise finden Sie in der [neuesten Veröffentlichung](https://github.com/shixi-11/prism-desk/releases/latest).
+Diese Befehle installieren die stabile Version **v0.1.26**. Den aktuellen Versionsstand und die zweisprachigen Änderungshinweise finden Sie in der [neuesten Veröffentlichung](https://github.com/shixi-11/prism-desk/releases/latest).
 
 Sie benötigen Windows, Git, Node.js 22.12 oder neuer, npm und die offiziellen CLIs der gewählten Anbieter. Melden Sie sich bei jedem CLI separat an.
 
 ```powershell
-git clone --branch v0.1.21 https://github.com/shixi-11/prism-desk.git
+git clone --branch v0.1.26 https://github.com/shixi-11/prism-desk.git
 cd prism-desk
 npm install
 npm run build
@@ -55,7 +59,7 @@ Das Build-Skript kompiliert den Windows-Prozesshost, mit dem CLI-Unterprozesse g
 Installieren Sie für jeden gewünschten Anbieter das offizielle CLI und melden Sie sich anschließend darüber an. Eine Anmeldung auf einer Website oder in einer Desktop-App allein richtet Prism nicht ein.
 
 - **Codex:** Folgen Sie der [CLI-Installationsanleitung](https://developers.openai.com/codex/cli/) und melden Sie sich mit Ihrem ChatGPT-Konto an.
-- **Claude:** Installieren Sie [Claude Code](https://code.claude.com/docs/en/setup) und [melden Sie sich anschließend an](https://code.claude.com/docs/en/authentication) mit einem unterstützten Claude-Abonnement. Prism prüft vor der Ausführung die Abonnement-Anmeldung und die Einstellungen zur Zusatznutzung; die Zusatznutzung muss deaktiviert sein.
+- **Claude:** Installieren Sie [Claude Code](https://code.claude.com/docs/en/setup) und [melden Sie sich anschließend an](https://code.claude.com/docs/en/authentication) mit einem unterstützten Claude-Abonnement. Prism prüft vor der Ausführung die Abonnement-Anmeldung. Zusatznutzung blockiert die Ausführung nicht.
 - **Grok:** Installieren Sie das offizielle Grok CLI und melden Sie sich mit Ihrem Abonnementkonto an.
 
 Öffnen Sie **Konten → Konto verbinden**, wählen Sie Codex, Claude oder Grok und geben Sie dem Konto einen Namen. **Speichern und weiter → Anmeldelink anfordern → Anmeldelink kopieren** startet den Autorisierungsvorgang des offiziellen CLI. Fügen Sie den Link in die Adressleiste Ihres Browsers ein. Falls Claude einen Autorisierungscode anzeigt, fügen Sie den vollständigen Code in **Autorisierungscode** ein und wählen Sie **Code senden**. Der Code wird ausschließlich an das wartende offizielle CLI gesendet und danach aus dem Eingabefeld gelöscht. Nach Ihrer Autorisierung prüft Prism die Abonnement-Anmeldung und stellt das Konto ohne Neustart bereit. Auf der Seite können Sie außerdem eine vorhandene Anmeldung prüfen, die Autorisierung abbrechen oder den Link erneut kopieren, Profile umbenennen und Konten deaktivieren oder aktivieren. Beim Deaktivieren bleiben frühere Aufgaben und Anmeldedaten erhalten. In den erweiterten Einstellungen können Sie die ausführbare Datei des offiziellen CLI auswählen oder ein bestehendes unabhängiges Anmeldeverzeichnis importieren; bereits eingerichtete Kontoverzeichnisse und Plattformidentitäten lassen sich nicht ändern. Bei fehlenden CLIs führen Links zu den offiziellen Installationsanleitungen. Künftige Plattformen benötigen eigene Anbieter- und Ausführungsadapter.
@@ -185,7 +189,7 @@ Der Kontingentbereich zeigt die vom Anbieter zurückgegebenen Informationen an. 
 
 E-Mail-Adressen der Konten sind standardmäßig maskiert; mit der Augenschaltfläche können Sie sie ein- oder ausblenden. Der Abfrageverlauf bleibt auf diesem Gerät. Nach einem Neustart behalten die Einträge ihr ursprüngliches Datum und ihre ursprüngliche Uhrzeit und werden zur Aktualisierung markiert. Historische Abfragewerte autorisieren niemals eine Ausführung oder die Nutzung von Reset-Guthaben.
 
-Prism weicht nicht auf eine Abrechnung per API-Schlüssel aus und kauft keine Guthaben. Zusätzliche Nutzung, automatisches Aufladen und Kontingentabfragen sind für alle Konten rein informativ und blockieren die Ausführung nicht. Der Anbieter entscheidet über die Verfügbarkeit; Ausgabenlimits verwalten Nutzer auf dessen Plattform. Die Nutzung eines vorhandenen Codex-Reset-Guthabens erfordert eine separate Bestätigung für das ausgewählte Konto. Ein Zurücksetzungsguthaben kann auch während einer laufenden Aufgabe verwendet werden; die Aufgabe läuft weiter. Die Bestätigung und der Schutz vor doppelten Anfragen bleiben bestehen. Ein bereits beendeter Durchlauf wird nicht automatisch neu gestartet. Für eine inaktive Aufgabe lassen sich Konto, Modell und Denkaufwand auswählen, während eine andere Aufgabe läuft. Wechseln und Fortsetzen nutzt die bestehende Warteschlange und unterbricht die laufende Aufgabe nicht. Die zusätzliche Nutzung von Claude wird nur als Information angezeigt und blockiert die Ausführung in Prism nicht. Verfügbarkeit und Abrechnung richten sich nach den Einstellungen des Claude-Kontos oder der Organisation; dabei können Teamguthaben verbraucht oder zusätzliche Kosten verursacht werden.
+Prism wechselt nicht zur API-Schlüssel-Abrechnung und kauft keine Credits. Kontingentanzeigen blockieren keine Ausführung; der Hinweis zur Zusatznutzung wurde entfernt. Verfügbarkeit und Abrechnung richten sich nach den Kontoeinstellungen beim Anbieter. Ein vorhandener Codex-Reset-Credit erfordert weiterhin die Bestätigung für dieses Konto. Laufende Unterhaltungen werden nicht unterbrochen und beendete Ausführungen nicht neu gestartet.
 
 Der runde Sendepfeil wird während der Aufgabe zur Stopptaste. Zusätzliche Anweisungen und die Warteschlange bleiben verfügbar, ohne Sprachsteuerung.
 

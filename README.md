@@ -30,14 +30,18 @@ Prism currently ships as a **Windows source installation**. No standalone `.exe`
 | Keep your work locally | Choose a permanent task-storage folder, add progress notes and export a Markdown conversation record. |
 | Work in your language | Choose one of nine interface languages, including right-to-left Arabic, and switch between light and dark desert themes. |
 
+Independent conversations can run at the same time. Tasks with overlapping writable workspaces wait for one another; stopping or guiding a conversation affects only that conversation. Selecting an account for an idle conversation applies it immediately.
+
+Right-click a project to pin it, edit its name, choose a section, create a permanent Git worktree, mark chats as read, archive its chats, or remove it from the sidebar. Removing a project keeps its files and conversations. Worktrees start from the current Git commit.
+
 ### Install
 
-These commands install stable version **v0.1.21**. Check the [latest Release](https://github.com/shixi-11/prism-desk/releases/latest) for its version and bilingual change notes.
+These commands install stable version **v0.1.26**. Check the [latest Release](https://github.com/shixi-11/prism-desk/releases/latest) for its version and bilingual change notes.
 
 You will need Windows, Git, Node.js 22.12 or later, npm, and the official CLIs for your chosen providers. Sign in to each CLI separately.
 
 ```powershell
-git clone --branch v0.1.21 https://github.com/shixi-11/prism-desk.git
+git clone --branch v0.1.26 https://github.com/shixi-11/prism-desk.git
 cd prism-desk
 npm install
 npm run build
@@ -53,7 +57,7 @@ The build script compiles the Windows process host used to stop CLI subprocesses
 Install the official CLI for each provider you want to use, then sign in through that CLI. Signing in to a website or desktop app alone does not configure Prism.
 
 - **Codex:** follow the [CLI installation guide](https://developers.openai.com/codex/cli/) and sign in with your ChatGPT account.
-- **Claude:** install [Claude Code](https://code.claude.com/docs/en/setup), then [sign in](https://code.claude.com/docs/en/authentication) with a supported Claude subscription. Prism checks subscription login and extra-usage settings before execution; extra usage must be disabled.
+- **Claude:** install [Claude Code](https://code.claude.com/docs/en/setup), then [sign in](https://code.claude.com/docs/en/authentication) with a supported Claude subscription. Prism checks subscription login before execution. Extra-usage settings do not block execution.
 - **Grok:** install and sign in to the official Grok CLI with your subscription account.
 
 Open **Accounts → Connect account**, choose Codex, Claude or Grok, and name the account. **Save and continue → Get sign-in link → Copy sign-in link** starts the official CLI authorization flow. Paste the link into your browser’s address bar. If Claude displays an authorization code, paste the complete code into **Authorization code** and choose **Submit code**. The code is sent only to the waiting official CLI, then cleared from the input. After you authorize, Prism verifies the subscription login and makes the account available without restarting. The page also supports checking an existing login, cancelling authorization or copying the link again, renaming profiles, and disabling or enabling accounts. Disabling preserves past tasks and credentials. Advanced settings let you select the official CLI executable or import an existing independent login directory; established account directories and platform identities cannot be changed. Missing CLIs link to official installation instructions. Future platforms require their own provider and execution adapters.
@@ -183,7 +187,7 @@ The allowance panel shows information returned by the provider. For valid unifie
 
 Account emails are masked by default; use the eye button to reveal or hide them. Query history stays on this device. After restart, records retain their original date and time and are marked for refresh. Historical readings never authorize execution or reset-credit use.
 
-Prism does not fall back to API-key billing or purchase credits. Extra usage, auto top-up and allowance readings are informational for all accounts. Prism does not block execution based on these readings; the provider decides availability and users manage spending limits on its platform. Using an existing Codex reset credit requires a separate confirmation for the selected account. You can use a reset credit while a task is running; the task keeps running. Confirmation and duplicate-request protection still apply. A turn that has already ended is not restarted automatically. An idle task can select its account, model and reasoning effort while another task runs. Switching and continuing uses the existing queue and does not interrupt the running task. Claude extra usage is informational and does not block execution in Prism. Availability and charges follow the Claude account or organization settings; extra usage may consume team credits or incur additional charges.
+Prism does not fall back to API-key billing or purchase credits. Provider allowance readings do not block execution, and the extra-usage banner has been removed. Availability and billing follow the provider account settings. Redeeming an existing Codex reset credit still requires confirmation for that account and does not interrupt active conversations or restart an ended turn.
 
 The round send arrow becomes a stop button while the selected task runs; additional drafts can still be steered or queued. Voice controls are not included.
 

@@ -660,5 +660,16 @@
   "消息已排队，等待此任务开始执行": "En attente du démarrage de cette tâche",
   "当前执行正在停止，消息已保留": "Arrêt en cours ; message conservé",
   "当前实际执行入口不支持实时引导，消息已排队": "Le fournisseur actif ne prend pas en charge les instructions en direct ; message en attente",
-  "消息已保留，Codex 轮次就绪后自动发送": "Message conservé ; envoi automatique dès que le tour Codex est prêt"
+  "消息已保留，Codex 轮次就绪后自动发送": "Message conservé ; envoi automatique dès que le tour Codex est prêt",
+  "创建永久工作树": "Créer un arbre de travail permanent",
+  "全部标为已读": "Tout marquer comme lu",
+  "归档聊天": "Archiver les discussions",
+  "移除项目": "Retirer le projet",
+  "排队中": "En attente",
+  "消息已排队，等待同一工作目录的任务结束": "En attente de la fin de la tâche dans le même dossier",
+  "同一工作目录仍有任务执行，请等待完成。": "Une tâche utilise ce dossier. Attendez sa fin.",
+  "此项目没有可用的 Git 提交。": "Ce projet ne contient aucun commit Git disponible.",
+  "请选择工作树保存位置。": "Choisissez où enregistrer l’arbre de travail.",
+  "工作树目录已存在，请选择新目录。": "Le dossier existe déjà. Choisissez un nouveau dossier.",
+  "工作树必须保存在原项目目录之外。": "Enregistrez l’arbre hors du dossier d’origine."
 }
