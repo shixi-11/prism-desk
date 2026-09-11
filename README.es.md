@@ -4,22 +4,30 @@
 
 [English](README.md) · [简体中文](README.zh-CN.md) · [繁體中文](README.zh-TW.md) · [日本語](README.ja.md) · [한국어](README.ko.md) · [Español](README.es.md) · [Français](README.fr.md) · [Deutsch](README.de.md) · [العربية](README.ar.md)
 
-Creado por [Shixi Lin](https://shixilin.com/).
+**Una tarea. Sigue avanzando.**
 
-Prism Desk es un espacio de trabajo para Windows que permite usar CLI con suscripción. Cuando una cuenta agota su cuota, puedes transferir la tarea a otra sin reconstruir a mano la conversación y las notas de progreso. La carpeta del proyecto sigue siendo la misma.
+Un escritorio local de Windows para **Codex, Claude Code y Grok**. Reúne tus cuentas de suscripción, carpetas de proyecto y conversaciones en un solo lugar, y sigue trabajando cuando necesites cambiar de cuenta.
 
-Si Prism te ahorra tiempo, puedes [apoyar su desarrollo](https://shixilin.com/support?lang=es).
-
-### Versiones y descargas
+Para quienes desarrollan productos, diseñan sitios o crean proyectos con varios CLI de programación con IA y quieren dedicar menos tiempo a cambiar de terminal y repetir el contexto.
 
 **[Última versión](https://github.com/shixi-11/prism-desk/releases/latest)** · **[Guía de instalación](#install)**
 
-Actualmente, Prism se distribuye mediante una **instalación desde el código fuente para Windows**. No se publica ningún instalador independiente `.exe` o `.msi`. Las descargas «Source code» de GitHub contienen archivos de código fuente; sigue la guía de instalación para compilar e iniciar la aplicación de escritorio. Cada versión estable tiene una única etiqueta de versión y una única página con las notas de cambios completas en inglés y chino simplificado.
+[![Prism con conversaciones de proyecto, una tarea de diseño, controles de Claude y preferencias de relevo automático](output/20260912_prism-en-dark.png)](output/20260912_prism-en-dark.png)
+
+*Capturas de la aplicación de escritorio real con conversaciones y nombres de cuenta de ejemplo. No se muestran datos privados de cuentas.*
+
+### ¿Por qué Prism?
+
+- **Cambia de cuenta y continúa.** La solicitud original, la conversación, las notas de progreso y los resultados de herramientas registrados acompañan a la misma tarea. Los archivos del proyecto permanecen en su sitio.
+- **Avanza en varias partes de un proyecto.** Separa implementación, revisión e investigación en conversaciones que pueden ejecutarse a la vez, incluso en la misma carpeta.
+- **Añade instrucciones sobre la marcha.** Envía mensajes mientras Codex, Claude o Grok trabajan. Elige instrucciones en directo o una cola, y controla las paradas y aprobaciones por conversación.
 
 ### Qué puedes hacer
 
 | Función | En la práctica |
 | --- | --- |
+| Conversaciones en paralelo | Ejecuta varias conversaciones a la vez, incluso en carpetas iguales o anidadas. Detén o guía cada conversación por separado. |
+| Instrucciones durante la ejecución | Envía requisitos a la conversación nativa activa de Codex, Claude o Grok. El CLI puede procesarlos tras la generación o el paso de herramienta actual. |
 | Continuar la misma tarea | Mantén juntos la solicitud original, la conversación, las notas de progreso y los resultados de herramientas registrados al transferir el trabajo a otra cuenta. |
 | Elegir una cuenta de ejecución | Selecciona un perfil de CLI de Codex, Claude o Grok configurado. Cada uno usa su propio directorio de inicio de sesión. Elimina las cuentas que no uses desde el panel de cuentas; se conservan el historial de tareas y las carpetas locales de inicio de sesión. |
 | Cambiar el modelo y el razonamiento | Ajusta cualquiera de estos parámetros durante una tarea. Los cambios se aplican a la siguiente ejecución y se guardan por cuenta dentro de esa tarea. |
@@ -33,6 +41,14 @@ Actualmente, Prism se distribuye mediante una **instalación desde el código fu
 Las conversaciones pueden ejecutarse simultáneamente en directorios iguales o superpuestos, incluso con permiso de escritura. Los mensajes de una misma conversación conservan su orden. Detener o guiar solo afecta a la conversación correspondiente. La cuenta seleccionada para una conversación inactiva se aplica de inmediato.
 
 Haz clic derecho en un proyecto para fijarlo, editar su nombre, elegir una sección, crear un árbol de trabajo Git permanente, marcar chats como leídos, archivarlos o quitar el proyecto. Quitar un proyecto conserva archivos y conversaciones. El árbol de trabajo parte del commit actual.
+
+### Versiones y descargas
+
+**[Última versión](https://github.com/shixi-11/prism-desk/releases/latest)** · **[Guía de instalación](#install)**
+
+Actualmente, Prism se distribuye mediante una **instalación desde el código fuente para Windows**. No se publica ningún instalador independiente `.exe` o `.msi`. Las descargas «Source code» de GitHub contienen archivos de código fuente; sigue la guía de instalación para compilar e iniciar la aplicación de escritorio. Cada versión estable tiene una única etiqueta de versión y una única página con las notas de cambios completas en inglés y chino simplificado.
+
+Creado por [Shixi Lin](https://shixilin.com/). Si Prism te ayuda a seguir creando, [apoya su desarrollo](https://shixilin.com/support?lang=es).
 
 <a id="install"></a>
 
@@ -70,7 +86,7 @@ Abre **Cuentas → Conectar cuenta**, elige Codex, Claude o Grok y asigna un nom
 2. Selecciona una cuenta de ejecución, un modelo y el esfuerzo de razonamiento. Usa **Solo lectura** para revisar o **Editar el proyecto** para realizar modificaciones.
 3. Escribe tu solicitud y envíala con **Ctrl + Enter**. Sigue la conversación y el registro de ejecución a medida que avanza el trabajo.
 4. Añade las decisiones importantes o el trabajo pendiente a las notas de progreso. Para cambiar de cuenta, selecciona la siguiente y usa el control de transferencia; detén primero la ejecución actual cuando sea necesario.
-5. Cambia el nombre de una tarea con su botón de lápiz, haciendo doble clic o con **F2**. Pulsa **Enter** para guardar o **Esc** para cancelar.
+5. Cambia el nombre desde el menú contextual de la tarea, con doble clic o con **F2**. Pulsa **Enter** para guardar o **Esc** para cancelar.
 6. Continúa en la misma tarea. Exporta su registro cuando necesites una copia en Markdown o abre la carpeta de almacenamiento de tareas para encontrar los archivos locales.
 
 La siguiente cuenta recibe la conversación guardada, las notas de progreso y los registros de herramientas. El estado interno del modelo de un proveedor no se transfiere.
@@ -95,7 +111,7 @@ Cada tarjeta de cuenta tiene un **Alias** editable con un botón de lápiz. Esto
 
 Haz clic con el botón derecho en una tarea para cambiarle el nombre, fijarla, marcarla como no leída, archivarla, agruparla por proyecto o sección, compartirla, copiarla, crear una tarea derivada, abrir su carpeta o conversación, abrir otra ventana o eliminarla. **Archivadas y eliminadas** en la barra lateral permite restaurar las tareas ocultas. Al eliminar una tarea, se conservan su espacio de trabajo y sus archivos de conversación. La selección del proyecto cambia dónde se ejecutará el trabajo futuro; los archivos existentes permanecen en su carpeta original. Al crear una tarea derivada, se inician nuevas sesiones de CLI y se copian los adjuntos de la conversación; la opción de espacio de trabajo separado comienza con una carpeta vacía. Compartir muestra una vista previa de un documento Markdown local para copiarlo o guardarlo; no crea un enlace público alojado. Los cambios de las tareas se sincronizan entre las ventanas abiertas.
 
-Arrastra una conversación inactiva al nombre de otro proyecto para cambiar su carpeta de trabajo y conservar el historial y el borrador. Los archivos existentes permanecen en su ubicación original. **Proyectos vinculados**, junto a los permisos de archivos, añade carpetas para la siguiente ejecución con los permisos actuales. El acceso restringido a varias carpetas admite Codex y Claude; los demás proveedores requieren acceso completo. Vincular carpetas no combina otras conversaciones.
+Arrastra una conversación inactiva al nombre de otro proyecto para cambiar su carpeta de trabajo y conservar el historial y el borrador. Los archivos existentes permanecen en su ubicación original y las demás conversaciones no se combinan.
 
 El interruptor **Fast** está junto a Enviar. Haz clic en el logotipo de Prism para volver al inicio sin seleccionar una conversación y conservar los borradores y el trabajo en curso. Los mensajes de progreso de Claude se agrupan por separado de la respuesta final de una ejecución correcta. El proceso anfitrión en segundo plano no crea ventanas de consola y las solicitudes simultáneas de modelos comparten una consulta a la CLI.
 
@@ -125,15 +141,20 @@ Abre el panel de vista previa o haz clic en un enlace de archivo para ver imáge
 
 Las actualizaciones conservan la misma configuración de cuentas, el mismo almacenamiento de tareas y el mismo directorio de datos de usuario. La copia de trabajo original y la instalación anterior siguen disponibles. Si la descarga o la compilación fallan, la versión en ejecución permanece intacta; si la nueva aplicación no termina de iniciarse, volver a abrir Prism restaura la versión anterior. Los cambios locales en el código fuente bloquean las actualizaciones y la preparación requiere al menos 2 GB libres. Git debe permanecer instalado; la compilación de escritorio incluye el entorno de ejecución de Node y npm necesarios para futuras compilaciones. Las instalaciones anteriores a este sistema de actualización requieren, una sola vez, obtener manualmente los cambios y volver a compilar con los comandos de instalación anteriores.
 
-### Día y noche
+### El escritorio en acción
 
-Alterna entre los temas claro y oscuro desde la barra superior.
+El mismo espacio de trabajo con temas claro y oscuro. Haz clic en una imagen para verla a tamaño completo.
 
-| Día | Noche |
+| Tema claro · Inglés | Tema oscuro · Inglés |
 | --- | --- |
-| ![Ilustración del tema diurno](src/assets/desert-day.jpg) | ![Ilustración del tema nocturno](src/assets/desert-night.jpg) |
+| [![Tema claro · Inglés](output/20260912_prism-en-light.png)](output/20260912_prism-en-light.png) | [![Tema oscuro · Inglés](output/20260912_prism-en-dark.png)](output/20260912_prism-en-dark.png) |
 
-*Ilustraciones de los temas utilizadas por la aplicación.*
+<details>
+<summary>Interfaz en chino</summary>
+
+[![Interfaz en chino](output/20260912_prism-zh-dark.png)](output/20260912_prism-zh-dark.png)
+
+</details>
 
 ### Configuración
 

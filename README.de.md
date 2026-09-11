@@ -4,22 +4,30 @@
 
 [English](README.md) · [简体中文](README.zh-CN.md) · [繁體中文](README.zh-TW.md) · [日本語](README.ja.md) · [한국어](README.ko.md) · [Español](README.es.md) · [Français](README.fr.md) · [Deutsch](README.de.md) · [العربية](README.ar.md)
 
-Entwickelt von [Shixi Lin](https://shixilin.com/).
+**Eine Aufgabe. Immer weiter.**
 
-Prism Desk ist eine Windows-Arbeitsumgebung für CLIs mit Abonnement. Wenn das Kontingent eines Kontos aufgebraucht ist, können Sie die Aufgabe an ein anderes Konto übergeben, ohne den Gesprächsverlauf und die Fortschrittsnotizen von Hand rekonstruieren zu müssen. Der Projektordner bleibt derselbe.
+Ein lokaler Windows-Desktop für **Codex, Claude Code und Grok**. Bringen Sie Abonnementkonten, Projektordner und Unterhaltungen zusammen und arbeiten Sie auch nach einem Kontowechsel weiter.
 
-Wenn Prism dir Zeit spart, kannst du [die Weiterentwicklung unterstützen](https://shixilin.com/support?lang=de).
-
-### Versionen und Downloads
+Für Entwickler, Designer und unabhängige Kreative, die mehrere KI-Coding-CLIs nutzen und weniger Zeit mit Terminalwechseln und wiederholten Erklärungen verbringen möchten.
 
 **[Neueste Version](https://github.com/shixi-11/prism-desk/releases/latest)** · **[Installationsanleitung](#install)**
 
-Prism wird derzeit als **Installation aus dem Quellcode für Windows** bereitgestellt. Es gibt kein veröffentlichtes eigenständiges `.exe`- oder `.msi`-Installationsprogramm. Die „Source code“-Downloads auf GitHub enthalten Quelldateien; folgen Sie der Installationsanleitung, um die Desktop-App zu bauen und zu starten. Jede stabile Version hat genau ein Versions-Tag und eine Seite mit vollständigen Änderungshinweisen auf Englisch und in vereinfachtem Chinesisch.
+[![Prism mit Projektunterhaltungen, einer Designaufgabe, Claude-Modellwahl und Einstellungen zur automatischen Übergabe](output/20260912_prism-en-dark.png)](output/20260912_prism-en-dark.png)
+
+*Aufnahmen der tatsächlichen Desktop-App mit Beispielunterhaltungen und Beispielkonten. Private Kontodaten werden nicht angezeigt.*
+
+### Warum Prism?
+
+- **Konto wechseln, Arbeit fortsetzen.** Ursprüngliche Anfrage, Unterhaltung, Fortschrittsnotizen und aufgezeichnete Werkzeugergebnisse bleiben bei derselben Aufgabe. Die Projektdateien bleiben an ihrem Ort.
+- **Mehrere Teile eines Projekts voranbringen.** Umsetzung, Review und Recherche laufen in eigenen Unterhaltungen parallel – auch im selben Arbeitsordner.
+- **Während der Arbeit neue Anweisungen geben.** Senden Sie Ergänzungen an Codex, Claude oder Grok. Wählen Sie Live-Anweisungen oder Warteschlange; Stoppen und Freigaben gelten jeweils für die betreffende Unterhaltung.
 
 ### Was Sie tun können
 
 | Funktion | In der Praxis |
 | --- | --- |
+| Parallele Unterhaltungen | Führen Sie mehrere Unterhaltungen gleichzeitig aus, auch in identischen oder verschachtelten Ordnern. Stoppen und Anweisen bleibt unabhängig. |
+| Anweisungen während der Ausführung | Senden Sie neue Anforderungen in die aktive native Unterhaltung von Codex, Claude oder Grok. Die CLI kann sie nach der aktuellen Generierung oder dem Werkzeugschritt verarbeiten. |
 | Dieselbe Aufgabe fortsetzen | Halten Sie die ursprüngliche Anfrage, den Gesprächsverlauf, die Fortschrittsnotizen und die aufgezeichneten Werkzeugergebnisse zusammen, wenn Sie die Arbeit an ein anderes Konto übergeben. |
 | Ein Ausführungskonto auswählen | Wählen Sie ein konfiguriertes CLI-Profil für Codex, Claude oder Grok. Jedes verwendet ein eigenes Anmeldeverzeichnis. Entfernen Sie ungenutzte Konten im Kontenbereich; der Aufgabenverlauf und die lokalen Anmeldeordner bleiben erhalten. |
 | Modell und Denkaufwand ändern | Passen Sie beide Einstellungen während einer Aufgabe an. Änderungen gelten für die nächste Ausführung und werden innerhalb der Aufgabe für jedes Konto gespeichert. |
@@ -33,6 +41,14 @@ Prism wird derzeit als **Installation aus dem Quellcode für Windows** bereitges
 Verschiedene Unterhaltungen können auch mit Schreibzugriff gleichzeitig im selben oder in überlappenden Arbeitsverzeichnissen laufen. Nachrichten innerhalb einer Unterhaltung werden weiterhin der Reihe nach ausgeführt. Stoppen und Anweisen betrifft nur die jeweilige Unterhaltung. Das Konto einer inaktiven Unterhaltung wird bei der Auswahl sofort gespeichert.
 
 Per Rechtsklick können Sie ein Projekt anheften, umbenennen, einem Bereich zuordnen, einen permanenten Git-Worktree erstellen, Chats als gelesen markieren, archivieren oder das Projekt entfernen. Dateien und Unterhaltungen bleiben erhalten. Worktrees beginnen beim aktuellen Git-Commit.
+
+### Versionen und Downloads
+
+**[Neueste Version](https://github.com/shixi-11/prism-desk/releases/latest)** · **[Installationsanleitung](#install)**
+
+Prism wird derzeit als **Installation aus dem Quellcode für Windows** bereitgestellt. Es gibt kein veröffentlichtes eigenständiges `.exe`- oder `.msi`-Installationsprogramm. Die „Source code“-Downloads auf GitHub enthalten Quelldateien; folgen Sie der Installationsanleitung, um die Desktop-App zu bauen und zu starten. Jede stabile Version hat genau ein Versions-Tag und eine Seite mit vollständigen Änderungshinweisen auf Englisch und in vereinfachtem Chinesisch.
+
+Entwickelt von [Shixi Lin](https://shixilin.com/). Wenn Prism Ihre Arbeit erleichtert, [unterstützen Sie die Weiterentwicklung](https://shixilin.com/support?lang=de).
 
 <a id="install"></a>
 
@@ -70,7 +86,7 @@ Installieren Sie für jeden gewünschten Anbieter das offizielle CLI und melden 
 2. Wählen Sie ein Ausführungskonto, ein Modell und den Denkaufwand. Verwenden Sie **Nur lesen** für eine Prüfung oder **Projekt bearbeiten** für Änderungen.
 3. Geben Sie Ihre Anfrage ein und senden Sie sie mit **Ctrl + Enter**. Verfolgen Sie während der Arbeit den Gesprächsverlauf und das Ausführungsprotokoll.
 4. Ergänzen Sie wichtige Entscheidungen oder noch ausstehende Arbeiten in den Fortschrittsnotizen. Um das Konto zu wechseln, wählen Sie das nächste Konto und verwenden Sie die Übergabefunktion; beenden Sie bei Bedarf zuerst die laufende Ausführung.
-5. Benennen Sie eine Aufgabe über die Stiftschaltfläche, per Doppelklick oder mit **F2** um. Drücken Sie **Enter** zum Speichern oder **Esc** zum Abbrechen.
+5. Benennen Sie Aufgaben über das Kontextmenü, per Doppelklick oder mit **F2** um. **Enter** speichert, **Esc** bricht ab.
 6. Arbeiten Sie in derselben Aufgabe weiter. Exportieren Sie ihr Protokoll, wenn Sie eine Markdown-Kopie benötigen, oder öffnen Sie den Ordner zur Aufgabenspeicherung, um die lokalen Dateien zu finden.
 
 Das nächste Konto erhält den gespeicherten Gesprächsverlauf, die Fortschrittsnotizen und die Werkzeugprotokolle. Der interne Modellzustand eines Anbieters wird nicht übertragen.
@@ -95,7 +111,7 @@ Jede Kontokarte hat einen bearbeitbaren **Anzeigename** mit einer Stiftschaltfl�
 
 Klicken Sie mit der rechten Maustaste auf eine Aufgabe, um sie umzubenennen, anzuheften, als ungelesen zu markieren, zu archivieren, nach Projekt oder Abschnitt zu gruppieren, zu teilen, zu kopieren, abzuzweigen, ihren Ordner oder Gesprächsverlauf zu öffnen, ein weiteres Fenster zu öffnen oder sie zu löschen. Über **Archiviert und gelöscht** in der Seitenleiste können Sie ausgeblendete Aufgaben wiederherstellen. Beim Löschen einer Aufgabe bleiben ihr Arbeitsbereich und ihre Gesprächsdateien erhalten. Die Projektauswahl ändert, wo künftige Arbeiten ausgeführt werden; vorhandene Dateien bleiben in ihrem ursprünglichen Ordner. Beim Abzweigen werden neue CLI-Sitzungen gestartet und Gesprächsanhänge kopiert; die Option für einen separaten Arbeitsbereich beginnt mit einem leeren Ordner. Beim Teilen wird eine Vorschau eines lokalen Markdown-Dokuments zum Kopieren oder Speichern angezeigt; es entsteht kein gehosteter öffentlicher Link. Aufgabenänderungen werden zwischen geöffneten Fenstern synchronisiert.
 
-Ziehen Sie eine inaktive Unterhaltung auf den Namen eines anderen Projekts, um ihr Arbeitsverzeichnis zu ändern und Verlauf sowie Entwurf zu behalten. Vorhandene Dateien bleiben an ihrem bisherigen Ort. **Verknüpfte Projekte** neben den Dateiberechtigungen fügt Ordner für die nächste Ausführung mit den aktuellen Berechtigungen hinzu. Eingeschränkter Zugriff auf mehrere Ordner wird für Codex und Claude unterstützt; andere Anbieter benötigen Vollzugriff. Andere Unterhaltungen werden nicht zusammengeführt.
+Ziehen Sie eine inaktive Unterhaltung auf den Namen eines anderen Projekts, um ihr Arbeitsverzeichnis zu ändern und Verlauf sowie Entwurf zu behalten. Vorhandene Dateien bleiben an ihrem bisherigen Ort; andere Unterhaltungen werden nicht zusammengeführt.
 
 Der **Fast**-Schalter befindet sich neben Senden. Ein Klick auf das Prism-Logo führt zur Startseite ohne ausgewählte Unterhaltung; Entwürfe und laufende Arbeit bleiben erhalten. Claude-Fortschrittsmeldungen werden getrennt von der abschließenden Antwort einer erfolgreichen Ausführung gruppiert. Der Hintergrund-Prozesshost erstellt keine Konsolenfenster, und gleichzeitige Anfragen zur Modellliste teilen sich eine CLI-Abfrage.
 
@@ -125,15 +141,20 @@ Während der Ausführung können Sie weitere Nachrichten senden. Eingereihte Nac
 
 Updates behalten dieselbe Kontokonfiguration, denselben Aufgabenspeicher und dasselbe Benutzerdatenverzeichnis bei. Der ursprüngliche Checkout und die vorherige Installation bleiben verfügbar. Ein fehlgeschlagener Download oder Build lässt die laufende Version unverändert; wenn die neue App ihren Start nicht abschließen kann, stellt das erneute Öffnen von Prism die vorherige Version wieder her. Lokale Änderungen am Quellcode blockieren Updates, und die Vorbereitung erfordert mindestens 2 GB freien Speicherplatz. Git muss installiert bleiben; der Desktop-Build enthält die Node-Laufzeit und npm für künftige Builds. Bei Installationen aus der Zeit vor dieser Update-Funktion müssen die Änderungen einmal manuell abgerufen und die Anwendung mit den oben stehenden Installationsbefehlen neu gebaut werden.
 
-### Tag und Nacht
+### Ein Blick auf den Desktop
 
-Wechseln Sie über die obere Leiste zwischen dem hellen und dem dunklen Design.
+Derselbe Arbeitsbereich im hellen und dunklen Design. Klicken Sie auf ein Bild, um es in voller Größe zu öffnen.
 
-| Tag | Nacht |
+| Helles Design · Englisch | Dunkles Design · Englisch |
 | --- | --- |
-| ![Illustration des Tagdesigns](src/assets/desert-day.jpg) | ![Illustration des Nachtdesigns](src/assets/desert-night.jpg) |
+| [![Helles Design · Englisch](output/20260912_prism-en-light.png)](output/20260912_prism-en-light.png) | [![Dunkles Design · Englisch](output/20260912_prism-en-dark.png)](output/20260912_prism-en-dark.png) |
 
-*Von der App verwendete Designillustrationen.*
+<details>
+<summary>Chinesische Oberfläche</summary>
+
+[![Chinesische Oberfläche](output/20260912_prism-zh-dark.png)](output/20260912_prism-zh-dark.png)
+
+</details>
 
 ### Konfiguration
 

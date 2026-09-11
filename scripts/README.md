@@ -38,3 +38,7 @@ The older live UI checks require the capabilities they assert: two usable Codex 
 Application probes discover installed applications through the configured discovery module. For Resolve, `PRISM_RESOLVE_DIR`, `RESOLVE_SCRIPT_API`, and `PRISM_PYTHON` can override the installation directory, SDK root, and Python executable. Probes inspect existing interfaces; a connected SDK does not certify editing or rendering operations.
 
 Keep `.local`, runtime outputs, screenshots containing private information, and live account configuration out of source control. No source script needs to be removed from the repository; the optional live checks must remain excluded from unattended CI unless its environment is deliberately configured.
+
+## README screenshots
+
+After `npm run build`, run `node scripts/capture-readme.cjs` on Windows to capture the actual desktop renderer in English (dark and light) and Chinese (dark). You can pass `en-dark`, `en-light`, or `zh-dark` to capture one scene. Screenshots are written to the project’s `output` directory. The script uses isolated example conversations and empty account directories under `.local`; it does not launch a CLI, read real credentials, or change the running user workspace. Keep the example-data caption when publishing these images.

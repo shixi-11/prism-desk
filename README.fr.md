@@ -4,22 +4,30 @@
 
 [English](README.md) · [简体中文](README.zh-CN.md) · [繁體中文](README.zh-TW.md) · [日本語](README.ja.md) · [한국어](README.ko.md) · [Español](README.es.md) · [Français](README.fr.md) · [Deutsch](README.de.md) · [العربية](README.ar.md)
 
-Créé par [Shixi Lin](https://shixilin.com/).
+**Une tâche. Continuez à avancer.**
 
-Prism Desk est un espace de travail Windows pour les CLI accessibles par abonnement. Lorsqu’un compte épuise son quota, vous pouvez transférer la tâche à un autre compte sans reconstituer manuellement la conversation et les notes de progression. Le dossier du projet reste le même.
+Un bureau local Windows pour **Codex, Claude Code et Grok**. Réunissez vos comptes d’abonnement, dossiers de projet et conversations, puis poursuivez le travail lorsque vous changez de compte.
 
-Si Prism vous fait gagner du temps, vous pouvez [soutenir la suite de son développement](https://shixilin.com/support?lang=fr).
-
-### Versions et téléchargements
+Pour les développeurs, designers et créateurs indépendants qui utilisent plusieurs CLI de programmation avec IA et veulent passer moins de temps à changer de terminal ou à répéter le contexte.
 
 **[Dernière version](https://github.com/shixi-11/prism-desk/releases/latest)** · **[Guide d’installation](#install)**
 
-Prism est actuellement distribué sous forme d’**installation à partir des sources pour Windows**. Aucun programme d’installation autonome `.exe` ou `.msi` n’est publié. Les téléchargements « Source code » de GitHub contiennent les fichiers sources ; suivez le guide d’installation pour compiler et lancer l’application de bureau. Chaque version stable dispose d’une seule étiquette de version et d’une seule page contenant les notes de modification complètes en anglais et en chinois simplifié.
+[![Prism affichant des conversations de projet, une tâche de design, les modèles Claude et les préférences de relais automatique](output/20260912_prism-en-dark.png)](output/20260912_prism-en-dark.png)
+
+*Captures de l’application de bureau réelle avec des conversations et noms de comptes d’exemple. Aucune donnée privée de compte n’est affichée.*
+
+### Pourquoi Prism ?
+
+- **Changez de compte, poursuivez le travail.** La demande initiale, la conversation, les notes de progression et les résultats d’outils enregistrés accompagnent la même tâche. Les fichiers du projet restent en place.
+- **Avancez sur plusieurs fronts.** Séparez réalisation, revue et recherche en conversations indépendantes, exécutées simultanément, même dans le même dossier.
+- **Précisez vos attentes en cours de route.** Envoyez des consignes pendant que Codex, Claude ou Grok travaillent. Choisissez les instructions en direct ou la file d’attente ; arrêts et approbations restent propres à chaque conversation.
 
 ### Ce que vous pouvez faire
 
 | Fonctionnalité | En pratique |
 | --- | --- |
+| Conversations en parallèle | Exécutez plusieurs conversations à la fois, y compris dans des dossiers identiques ou imbriqués. Arrêtez ou guidez chacune indépendamment. |
+| Consignes pendant l’exécution | Envoyez des instructions à la conversation native active de Codex, Claude ou Grok. Le CLI peut les traiter après la génération ou l’étape d’outil en cours. |
 | Poursuivre la même tâche | Conservez ensemble la demande initiale, la conversation, les notes de progression et les résultats d’outils enregistrés lorsque vous transmettez le travail à un autre compte. |
 | Choisir un compte d’exécution | Sélectionnez un profil CLI Codex, Claude ou Grok configuré. Chacun utilise son propre répertoire de connexion. Supprimez les comptes inutilisés depuis le panneau des comptes ; l’historique des tâches et les dossiers de connexion locaux sont conservés. |
 | Changer de modèle et de niveau de raisonnement | Ajustez l’un ou l’autre de ces paramètres pendant une tâche. Les modifications s’appliquent à l’exécution suivante et sont enregistrées pour chaque compte au sein de cette tâche. |
@@ -33,6 +41,14 @@ Prism est actuellement distribué sous forme d’**installation à partir des so
 Les conversations peuvent fonctionner simultanément dans des répertoires identiques ou imbriqués, même avec un accès en écriture. Les messages d’une même conversation restent traités dans l’ordre. L’arrêt et les instructions concernent uniquement la conversation choisie. Le compte sélectionné pour une conversation inactive est appliqué immédiatement.
 
 Un clic droit sur un projet permet de l’épingler, modifier son nom, choisir une section, créer un arbre Git permanent, marquer les discussions comme lues, les archiver ou retirer le projet. Le retrait conserve fichiers et conversations. L’arbre de travail part du commit actuel.
+
+### Versions et téléchargements
+
+**[Dernière version](https://github.com/shixi-11/prism-desk/releases/latest)** · **[Guide d’installation](#install)**
+
+Prism est actuellement distribué sous forme d’**installation à partir des sources pour Windows**. Aucun programme d’installation autonome `.exe` ou `.msi` n’est publié. Les téléchargements « Source code » de GitHub contiennent les fichiers sources ; suivez le guide d’installation pour compiler et lancer l’application de bureau. Chaque version stable dispose d’une seule étiquette de version et d’une seule page contenant les notes de modification complètes en anglais et en chinois simplifié.
+
+Créé par [Shixi Lin](https://shixilin.com/). Si Prism vous aide à créer, [soutenez son développement](https://shixilin.com/support?lang=fr).
 
 <a id="install"></a>
 
@@ -70,7 +86,7 @@ Ouvrez **Comptes → Ajouter un compte**, choisissez Codex, Claude ou Grok et do
 2. Sélectionnez un compte d’exécution, un modèle et un effort de raisonnement. Utilisez **Lecture seule** pour une revue ou **Modifier le projet** pour effectuer des modifications.
 3. Saisissez votre demande et envoyez-la avec **Ctrl + Enter**. Suivez la conversation et le journal d’exécution à mesure que le travail avance.
 4. Ajoutez les décisions importantes ou le travail restant aux notes de progression. Pour changer de compte, sélectionnez le compte suivant et utilisez la commande de transfert ; arrêtez d’abord l’exécution en cours si nécessaire.
-5. Renommez une tâche avec son bouton crayon, un double-clic ou **F2**. Appuyez sur **Enter** pour enregistrer ou sur **Esc** pour annuler.
+5. Renommez une tâche depuis son menu contextuel, par double-clic ou avec **F2**. Appuyez sur **Enter** pour enregistrer ou sur **Esc** pour annuler.
 6. Poursuivez dans la même tâche. Exportez son compte rendu si vous avez besoin d’une copie Markdown, ou ouvrez le dossier de stockage des tâches pour retrouver les fichiers locaux.
 
 Le compte suivant reçoit la conversation enregistrée, les notes de progression et les enregistrements des outils. L’état interne du modèle d’un fournisseur n’est pas transféré.
@@ -95,7 +111,7 @@ Chaque fiche de compte comporte un **Alias** modifiable à l’aide d’un bouto
 
 Faites un clic droit sur une tâche pour la renommer, l’épingler, la marquer comme non lue, l’archiver, la regrouper par projet ou par section, la partager, la copier, créer une tâche dérivée, ouvrir son dossier ou sa conversation, ouvrir une autre fenêtre ou la supprimer. **Archivées et supprimées** dans la barre latérale permet de restaurer les tâches masquées. La suppression d’une tâche conserve son espace de travail et ses fichiers de conversation. Le choix du projet modifie l’emplacement des travaux futurs ; les fichiers existants restent dans leur dossier d’origine. La création d’une tâche dérivée démarre de nouvelles sessions CLI et copie les pièces jointes de la conversation ; l’option d’espace de travail distinct démarre avec un dossier vide. Le partage affiche l’aperçu d’un document Markdown local à copier ou à enregistrer ; il ne crée pas de lien public hébergé. Les modifications des tâches sont synchronisées entre les fenêtres ouvertes.
 
-Faites glisser une conversation inactive sur le nom d’un autre projet pour changer son dossier de travail tout en conservant l’historique et le brouillon. Les fichiers existants restent à leur emplacement. **Projets liés**, près des autorisations de fichiers, ajoute des dossiers pour la prochaine exécution avec les autorisations actuelles. L’accès restreint à plusieurs dossiers prend en charge Codex et Claude ; les autres fournisseurs nécessitent un accès complet. Les autres conversations ne sont pas fusionnées.
+Faites glisser une conversation inactive sur le nom d’un autre projet pour changer son dossier de travail tout en conservant l’historique et le brouillon. Les fichiers existants restent à leur emplacement et les autres conversations ne sont pas fusionnées.
 
 Le bouton **Fast** se trouve à côté d’Envoyer. Cliquez sur le logo Prism pour revenir à l’accueil sans conversation sélectionnée, en conservant les brouillons et le travail en cours. Les messages de progression de Claude sont regroupés séparément de la réponse finale d’une exécution réussie. Le processus hôte en arrière-plan ne crée pas de fenêtre de console et les demandes simultanées de modèles partagent une seule requête CLI.
 
@@ -125,15 +141,20 @@ Ouvrez le panneau d’aperçu ou cliquez sur un lien de fichier pour afficher de
 
 Les mises à jour conservent la même configuration des comptes, le même stockage des tâches et le même répertoire de données utilisateur. La copie de travail d’origine et l’installation précédente restent disponibles. Un échec de téléchargement ou de compilation laisse la version en cours d’exécution intacte ; si la nouvelle application ne termine pas son démarrage, rouvrir Prism restaure la version précédente. Les modifications locales du code source bloquent les mises à jour, et la préparation nécessite au moins 2 Go d’espace libre. Git doit rester installé ; la compilation de bureau inclut l’environnement d’exécution Node et npm nécessaires aux futures compilations. Les installations antérieures à ce mécanisme de mise à jour nécessitent une récupération manuelle des modifications et une recompilation à l’aide des commandes d’installation ci-dessus, une seule fois.
 
-### Jour et nuit
+### Le bureau en images
 
-Passez du thème clair au thème sombre depuis la barre supérieure.
+Le même espace de travail en thèmes clair et sombre. Cliquez sur une image pour la voir en taille réelle.
 
-| Jour | Nuit |
+| Thème clair · Anglais | Thème sombre · Anglais |
 | --- | --- |
-| ![Illustration du thème de jour](src/assets/desert-day.jpg) | ![Illustration du thème de nuit](src/assets/desert-night.jpg) |
+| [![Thème clair · Anglais](output/20260912_prism-en-light.png)](output/20260912_prism-en-light.png) | [![Thème sombre · Anglais](output/20260912_prism-en-dark.png)](output/20260912_prism-en-dark.png) |
 
-*Illustrations des thèmes utilisées par l’application.*
+<details>
+<summary>Interface en chinois</summary>
+
+[![Interface en chinois](output/20260912_prism-zh-dark.png)](output/20260912_prism-zh-dark.png)
+
+</details>
 
 ### Configuration
 

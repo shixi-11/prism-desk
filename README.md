@@ -4,22 +4,30 @@
 
 [English](README.md) · [简体中文](README.zh-CN.md) · [繁體中文](README.zh-TW.md) · [日本語](README.ja.md) · [한국어](README.ko.md) · [Español](README.es.md) · [Français](README.fr.md) · [Deutsch](README.de.md) · [العربية](README.ar.md)
 
-Created by [Shixi Lin](https://shixilin.com/).
+**One task. Keep moving forward.**
 
-Prism Desk is a Windows workspace for subscription CLIs. When one account runs out of allowance, you can move the task to another without rebuilding its conversation and progress notes by hand. The project folder stays the same.
+A local Windows desktop for **Codex, Claude Code, and Grok**. Bring your subscription accounts, project folders, and conversations into one place—and keep working when it is time to change accounts.
 
-If Prism saves you time, consider [supporting its continued development](https://shixilin.com/support?lang=en).
-
-### Versions and downloads
+Built for developers, designers, and independent makers who use more than one AI coding CLI and want less time lost to terminal juggling and repeated explanations.
 
 **[Latest release](https://github.com/shixi-11/prism-desk/releases/latest)** · **[Installation guide](#install)**
 
-Prism currently ships as a **Windows source installation**. No standalone `.exe` or `.msi` installer is published. GitHub’s “Source code” downloads contain source files; follow the installation guide to build and launch the desktop app. Each stable release has one version tag and one page containing complete English and Simplified Chinese change notes.
+[![Prism desktop with project conversations, a design task, Claude model controls, and automatic account handoff preferences](output/20260912_prism-en-dark.png)](output/20260912_prism-en-dark.png)
+
+*Real Prism desktop app, shown with example conversations and account names. No private account data is displayed.*
+
+### Why Prism?
+
+- **Carry the work forward.** Switch accounts with the original request, conversation, progress notes, and recorded tool results attached to the same task. Your project files stay where they are.
+- **Give each project room to grow.** Run independent conversations side by side, even in the same project folder. Keep implementation, review, and research in separate conversations.
+- **Stay in the conversation.** Send follow-up instructions while Codex, Claude, or Grok is working. Choose live guidance or a queue, and control stopping and approvals per conversation.
 
 ### What you can do
 
 | Feature | In practice |
 | --- | --- |
+| Parallel conversations | Work on several conversations at once, including in the same or nested project folders. Stop or guide each conversation independently. |
+| Follow up while work runs | Send new requirements into the active Codex, Claude or Grok conversation. The CLI may process them after the current generation or tool step. |
 | Continue the same task | Keep the original request, conversation, progress notes and recorded tool results together when handing work to another account. |
 | Choose an execution account | Select a configured Codex, Claude or Grok CLI profile. Each uses its own login directory. Remove unused accounts from the account panel; task history and local login folders are kept. |
 | Change model and reasoning | Adjust either setting during a task. Changes apply to the next execution and are saved per account within that task. |
@@ -33,6 +41,14 @@ Prism currently ships as a **Windows source installation**. No standalone `.exe`
 Different conversations can run concurrently in the same or overlapping working directories, including with write access. Messages within one conversation retain their order. Stopping or guiding a conversation affects only that conversation. Selecting an account for an idle conversation applies it immediately.
 
 Right-click a project to pin it, edit its name, choose a section, create a permanent Git worktree, mark chats as read, archive its chats, or remove it from the sidebar. Removing a project keeps its files and conversations. Worktrees start from the current Git commit.
+
+### Versions and downloads
+
+**[Latest release](https://github.com/shixi-11/prism-desk/releases/latest)** · **[Installation guide](#install)**
+
+Prism currently ships as a **Windows source installation**. No standalone `.exe` or `.msi` installer is published. GitHub’s “Source code” downloads contain source files; follow the installation guide to build and launch the desktop app. Each stable release has one version tag and one page containing complete English and Simplified Chinese change notes.
+
+Created by [Shixi Lin](https://shixilin.com/). If Prism helps you keep creating, [support its continued development](https://shixilin.com/support?lang=en).
 
 ### Install
 
@@ -68,7 +84,7 @@ Open **Accounts → Connect account**, choose Codex, Claude or Grok, and name th
 2. Select an execution account, model and reasoning effort. Use **Read only** for review, or **Edit project** for editing.
 3. Enter your request and send it with **Ctrl + Enter**. Follow the conversation and execution log as work progresses.
 4. Add important decisions or remaining work to the progress notes. To change accounts, select the next account and use the handoff control; stop the current execution first when required.
-5. Rename a task with its pencil button, a double-click or **F2**. Press **Enter** to save or **Esc** to cancel.
+5. Rename a task from its context menu, with a double-click, or with **F2**. Press **Enter** to save or **Esc** to cancel.
 6. Continue in the same task. Export its record when you need a Markdown copy, or open the task-storage folder to find the local files.
 
 The next account receives saved conversation, progress notes and tool records. A provider's internal model state is not transferred.
@@ -93,7 +109,7 @@ Each account card has an editable **Nickname** with a pencil button. This change
 
 Right-click a task to rename, pin, mark unread, archive, group by project or section, share, copy, fork, open its folder or conversation, open another window, or delete it. **Archived and deleted** in the sidebar restores hidden tasks. Deleting a task preserves its workspace and conversation files. Project selection changes where future work runs; existing files stay in their original folder. Forking starts fresh CLI sessions and copies conversation attachments; the separate-workspace option starts with an empty folder. Share previews a local Markdown document for copying or saving; it does not create a hosted public link. Task changes are synchronized across open windows.
 
-Drag an idle conversation onto another project heading to change its working directory while keeping its history and draft. Existing project files stay in place. **Linked projects** beside the file-permission control adds directories for the next execution and keeps the current permission level. Restricted multi-directory access supports Codex and Claude; other providers require full access. Linking directories does not merge other conversations.
+Drag an idle conversation onto another project heading to change its working directory while keeping its history and draft. Existing project files stay in place; other conversations are not merged.
 
 The **Fast** switch is beside Send. Click the Prism logo to return home without selecting a conversation; existing drafts and running work are retained. Claude progress messages are grouped separately from a successful final answer. Background process hosting avoids console windows, and simultaneous model-list requests share one CLI query.
 
@@ -123,15 +139,20 @@ Open the preview panel or click a file link to view images, PDFs, Markdown, code
 
 Updates keep the same account configuration, task storage and user-data directory. The original checkout and previous installation remain available. A failed download or build leaves the running version intact; if the new app fails to finish startup, opening Prism again restores the previous version. Local source changes block updates, and preparation requires at least 2 GB free. Git must remain installed; the desktop build includes the Node runtime and npm needed for future builds. Installations predating this updater need one manual pull and rebuild using the installation commands above.
 
-### Day and night
+### See the desktop in action
 
-Switch between light and dark themes from the top bar.
+The same workspace in light and dark themes. Click an image to inspect it at full size.
 
-| Day | Night |
+| Light theme · English | Dark theme · English |
 | --- | --- |
-| ![Day theme artwork](src/assets/desert-day.jpg) | ![Night theme artwork](src/assets/desert-night.jpg) |
+| [![Light theme · English](output/20260912_prism-en-light.png)](output/20260912_prism-en-light.png) | [![Dark theme · English](output/20260912_prism-en-dark.png)](output/20260912_prism-en-dark.png) |
 
-*Theme artwork used by the app.*
+<details>
+<summary>Chinese interface</summary>
+
+[![Chinese interface](output/20260912_prism-zh-dark.png)](output/20260912_prism-zh-dark.png)
+
+</details>
 
 ### Configure
 
