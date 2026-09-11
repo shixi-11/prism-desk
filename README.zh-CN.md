@@ -30,18 +30,18 @@
 | 在本机保存工作 | 指定固定会话目录、补充进度备注，并将对话导出为 Markdown。 |
 | 选择语言与主题 | 支持九种界面语言、阿拉伯语从右到左布局，以及日间和夜间的大漠主题。 |
 
-不同会话可以同时运行；工作目录重叠且涉及写入的任务依次执行。停止或引导只作用于对应会话，空闲会话选择账号后立即保存为实际执行账号。
+不同会话可以在相同或重叠的工作目录内同时运行，包括具有写入权限的会话；同一会话内的消息仍按顺序执行。停止或引导只作用于对应会话，空闲会话选择账号后立即保存为实际执行账号。
 
 右键项目可置顶、编辑名称、选择分区、创建永久 Git 工作树、全部标为已读、归档聊天或移除项目。移除项目保留文件与会话，工作树从当前 Git 提交创建。
 
 ### 安装
 
-以下命令安装稳定版 **v0.1.26**。[最新发布页](https://github.com/shixi-11/prism-desk/releases/latest)提供版本号与中英文更新内容。
+以下命令安装稳定版 **v0.1.27**。[最新发布页](https://github.com/shixi-11/prism-desk/releases/latest)提供版本号与中英文更新内容。
 
 需要 Windows、Git、Node.js 22.12 或更新版本、npm，以及准备使用的官方 CLI。各 CLI 需分别完成登录。
 
 ```powershell
-git clone --branch v0.1.26 https://github.com/shixi-11/prism-desk.git
+git clone --branch v0.1.27 https://github.com/shixi-11/prism-desk.git
 cd prism-desk
 npm install
 npm run build

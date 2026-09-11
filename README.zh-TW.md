@@ -30,7 +30,7 @@ Prism 目前以 **Windows 原始碼安裝**方式提供。尚未發布獨立的 
 | 將工作保留在本機 | 選擇永久的任務儲存資料夾、新增進度筆記，並匯出 Markdown 對話記錄。 |
 | 使用你的語言工作 | 從九種介面語言中選擇，包括由右至左顯示的阿拉伯文，並可切換淺色與深色沙漠佈景主題。 |
 
-不同會話可同時執行；工作目錄重疊且涉及寫入的任務依序執行。停止或引導只作用於對應會話，閒置會話選擇帳號後立即儲存為實際執行帳號。
+不同對話可以在相同或重疊的工作目錄內同時執行，包括具有寫入權限的對話；同一對話內的訊息仍依序執行。停止或引導只作用於對應對話，閒置對話選擇帳號後立即儲存為實際執行帳號。
 
 右鍵專案可釘選、編輯名稱、選擇分區、建立永久 Git 工作樹、全部標為已讀、封存聊天或移除專案。移除專案保留檔案與會話，工作樹從目前 Git 提交建立。
 
@@ -38,12 +38,12 @@ Prism 目前以 **Windows 原始碼安裝**方式提供。尚未發布獨立的 
 
 ### 安裝
 
-以下指令會安裝穩定版本 **v0.1.26**。請查看[最新發布版本](https://github.com/shixi-11/prism-desk/releases/latest)，確認其版本與雙語變更說明。
+以下指令會安裝穩定版本 **v0.1.27**。請查看[最新發布版本](https://github.com/shixi-11/prism-desk/releases/latest)，確認其版本與雙語變更說明。
 
 你需要 Windows、Git、Node.js 22.12 或更新版本、npm，以及所選供應商的官方 CLI。請分別登入各個 CLI。
 
 ```powershell
-git clone --branch v0.1.26 https://github.com/shixi-11/prism-desk.git
+git clone --branch v0.1.27 https://github.com/shixi-11/prism-desk.git
 cd prism-desk
 npm install
 npm run build

@@ -30,7 +30,7 @@ Prism wird derzeit als **Installation aus dem Quellcode für Windows** bereitges
 | Ihre Arbeit lokal aufbewahren | Wählen Sie einen dauerhaften Ordner zur Aufgabenspeicherung, fügen Sie Fortschrittsnotizen hinzu und exportieren Sie ein Gesprächsprotokoll als Markdown. |
 | In Ihrer Sprache arbeiten | Wählen Sie eine von neun Oberflächensprachen, darunter Arabisch mit Darstellung von rechts nach links, und wechseln Sie zwischen dem hellen und dunklen Wüstendesign. |
 
-Unabhängige Unterhaltungen können gleichzeitig laufen. Aufgaben mit Schreibzugriff auf überlappende Arbeitsverzeichnisse warten aufeinander. Stoppen und Anweisen betrifft nur die jeweilige Unterhaltung. Das Konto einer inaktiven Unterhaltung wird bei der Auswahl sofort gespeichert.
+Verschiedene Unterhaltungen können auch mit Schreibzugriff gleichzeitig im selben oder in überlappenden Arbeitsverzeichnissen laufen. Nachrichten innerhalb einer Unterhaltung werden weiterhin der Reihe nach ausgeführt. Stoppen und Anweisen betrifft nur die jeweilige Unterhaltung. Das Konto einer inaktiven Unterhaltung wird bei der Auswahl sofort gespeichert.
 
 Per Rechtsklick können Sie ein Projekt anheften, umbenennen, einem Bereich zuordnen, einen permanenten Git-Worktree erstellen, Chats als gelesen markieren, archivieren oder das Projekt entfernen. Dateien und Unterhaltungen bleiben erhalten. Worktrees beginnen beim aktuellen Git-Commit.
 
@@ -38,12 +38,12 @@ Per Rechtsklick können Sie ein Projekt anheften, umbenennen, einem Bereich zuor
 
 ### Installation
 
-Diese Befehle installieren die stabile Version **v0.1.26**. Den aktuellen Versionsstand und die zweisprachigen Änderungshinweise finden Sie in der [neuesten Veröffentlichung](https://github.com/shixi-11/prism-desk/releases/latest).
+Diese Befehle installieren die stabile Version **v0.1.27**. Den aktuellen Versionsstand und die zweisprachigen Änderungshinweise finden Sie in der [neuesten Veröffentlichung](https://github.com/shixi-11/prism-desk/releases/latest).
 
 Sie benötigen Windows, Git, Node.js 22.12 oder neuer, npm und die offiziellen CLIs der gewählten Anbieter. Melden Sie sich bei jedem CLI separat an.
 
 ```powershell
-git clone --branch v0.1.26 https://github.com/shixi-11/prism-desk.git
+git clone --branch v0.1.27 https://github.com/shixi-11/prism-desk.git
 cd prism-desk
 npm install
 npm run build

@@ -1,20 +1,14 @@
 {
-  "version": "0.1.26",
+  "version": "0.1.27",
   "date": "2026-09-11",
   "notes": {
-    "zh": [
-      "支持不同会话独立同时执行，停止、审批和实时引导按会话隔离；工作目录重叠且涉及写入的任务依次执行。",
-      "空闲会话选择执行账号后立即保存，修复选择 Grok 或 Claude 后实际账号仍停留在 Codex 的情况。",
-      "缩小侧栏会话名称字号，移除项目与会话旁的铅笔按钮，通过右键改名。",
-      "项目右键菜单新增置顶、编辑、分区、永久 Git 工作树、全部已读、归档聊天与移除项目；移除项目保留文件和会话。",
-      "移除额外用量提示框，订阅额度和额外用量状态不作为执行门槛。"
-    ],
     "en": [
-      "Run independent conversations concurrently with task-scoped stop, approval and live guidance. Tasks with overlapping writable workspaces run in sequence.",
-      "Apply account selection immediately to idle conversations so selecting Grok or Claude updates the actual execution account.",
-      "Reduce sidebar conversation text size and remove project and conversation pencil buttons; rename through context menus.",
-      "Add project context actions for pinning, editing, sections, permanent Git worktrees, read status, archiving and removal. Removing a project preserves files and conversations.",
-      "Remove the extra-usage banner; allowance and extra-usage readings do not gate execution."
+      "Allow different conversations to run concurrently in the same or overlapping working directories, including tasks with write access.",
+      "Keep message ordering within each conversation and isolate stop, approval and live guidance by conversation."
+    ],
+    "zh": [
+      "取消工作目录排队限制：不同会话在相同或重叠目录下均可同时执行，包括具有写入权限的会话。",
+      "保留同一会话内的消息顺序，停止、审批和实时引导仍按会话隔离。"
     ]
   }
 }

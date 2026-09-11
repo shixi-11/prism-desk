@@ -30,18 +30,18 @@ Prism currently ships as a **Windows source installation**. No standalone `.exe`
 | Keep your work locally | Choose a permanent task-storage folder, add progress notes and export a Markdown conversation record. |
 | Work in your language | Choose one of nine interface languages, including right-to-left Arabic, and switch between light and dark desert themes. |
 
-Independent conversations can run at the same time. Tasks with overlapping writable workspaces wait for one another; stopping or guiding a conversation affects only that conversation. Selecting an account for an idle conversation applies it immediately.
+Different conversations can run concurrently in the same or overlapping working directories, including with write access. Messages within one conversation retain their order. Stopping or guiding a conversation affects only that conversation. Selecting an account for an idle conversation applies it immediately.
 
 Right-click a project to pin it, edit its name, choose a section, create a permanent Git worktree, mark chats as read, archive its chats, or remove it from the sidebar. Removing a project keeps its files and conversations. Worktrees start from the current Git commit.
 
 ### Install
 
-These commands install stable version **v0.1.26**. Check the [latest Release](https://github.com/shixi-11/prism-desk/releases/latest) for its version and bilingual change notes.
+These commands install stable version **v0.1.27**. Check the [latest Release](https://github.com/shixi-11/prism-desk/releases/latest) for its version and bilingual change notes.
 
 You will need Windows, Git, Node.js 22.12 or later, npm, and the official CLIs for your chosen providers. Sign in to each CLI separately.
 
 ```powershell
-git clone --branch v0.1.26 https://github.com/shixi-11/prism-desk.git
+git clone --branch v0.1.27 https://github.com/shixi-11/prism-desk.git
 cd prism-desk
 npm install
 npm run build

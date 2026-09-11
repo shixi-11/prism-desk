@@ -30,7 +30,7 @@ Prism est actuellement distribué sous forme d’**installation à partir des so
 | Conserver votre travail localement | Choisissez un dossier permanent de stockage des tâches, ajoutez des notes de progression et exportez un compte rendu de la conversation au format Markdown. |
 | Travailler dans votre langue | Choisissez parmi neuf langues d’interface, dont l’arabe avec affichage de droite à gauche, et alternez entre les thèmes désert clair et sombre. |
 
-Des conversations indépendantes peuvent s’exécuter simultanément. Les tâches qui écrivent dans des dossiers communs attendent leur tour. Arrêter ou guider une conversation ne concerne que celle-ci. Le compte choisi pour une conversation inactive est enregistré immédiatement.
+Les conversations peuvent fonctionner simultanément dans des répertoires identiques ou imbriqués, même avec un accès en écriture. Les messages d’une même conversation restent traités dans l’ordre. L’arrêt et les instructions concernent uniquement la conversation choisie. Le compte sélectionné pour une conversation inactive est appliqué immédiatement.
 
 Un clic droit sur un projet permet de l’épingler, modifier son nom, choisir une section, créer un arbre Git permanent, marquer les discussions comme lues, les archiver ou retirer le projet. Le retrait conserve fichiers et conversations. L’arbre de travail part du commit actuel.
 
@@ -38,12 +38,12 @@ Un clic droit sur un projet permet de l’épingler, modifier son nom, choisir u
 
 ### Installation
 
-Ces commandes installent la version stable **v0.1.26**. Consultez la [dernière version publiée](https://github.com/shixi-11/prism-desk/releases/latest) pour connaître son numéro et lire ses notes de modification bilingues.
+Ces commandes installent la version stable **v0.1.27**. Consultez la [dernière version publiée](https://github.com/shixi-11/prism-desk/releases/latest) pour connaître son numéro et lire ses notes de modification bilingues.
 
 Vous aurez besoin de Windows, de Git, de Node.js 22.12 ou ultérieur, de npm et des CLI officiels des fournisseurs de votre choix. Connectez-vous séparément à chaque CLI.
 
 ```powershell
-git clone --branch v0.1.26 https://github.com/shixi-11/prism-desk.git
+git clone --branch v0.1.27 https://github.com/shixi-11/prism-desk.git
 cd prism-desk
 npm install
 npm run build

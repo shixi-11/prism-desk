@@ -30,7 +30,7 @@ Actualmente, Prism se distribuye mediante una **instalación desde el código fu
 | Conservar tu trabajo localmente | Elige una carpeta permanente para almacenar las tareas, añade notas de progreso y exporta un registro de la conversación en Markdown. |
 | Trabajar en tu idioma | Elige uno de los nueve idiomas de la interfaz, incluido el árabe de derecha a izquierda, y alterna entre los temas de desierto claro y oscuro. |
 
-Las conversaciones independientes pueden ejecutarse a la vez. Las tareas con escritura en directorios superpuestos esperan su turno. Detener o guiar una conversación solo afecta a esa conversación. La cuenta elegida para una conversación inactiva se guarda inmediatamente.
+Las conversaciones pueden ejecutarse simultáneamente en directorios iguales o superpuestos, incluso con permiso de escritura. Los mensajes de una misma conversación conservan su orden. Detener o guiar solo afecta a la conversación correspondiente. La cuenta seleccionada para una conversación inactiva se aplica de inmediato.
 
 Haz clic derecho en un proyecto para fijarlo, editar su nombre, elegir una sección, crear un árbol de trabajo Git permanente, marcar chats como leídos, archivarlos o quitar el proyecto. Quitar un proyecto conserva archivos y conversaciones. El árbol de trabajo parte del commit actual.
 
@@ -38,12 +38,12 @@ Haz clic derecho en un proyecto para fijarlo, editar su nombre, elegir una secci
 
 ### Instalación
 
-Estos comandos instalan la versión estable **v0.1.26**. Consulta la [última versión publicada](https://github.com/shixi-11/prism-desk/releases/latest) para conocer su número y leer las notas de cambios bilingües.
+Estos comandos instalan la versión estable **v0.1.27**. Consulta la [última versión publicada](https://github.com/shixi-11/prism-desk/releases/latest) para conocer su número y leer las notas de cambios bilingües.
 
 Necesitarás Windows, Git, Node.js 22.12 o posterior, npm y las CLI oficiales de los proveedores que elijas. Inicia sesión en cada CLI por separado.
 
 ```powershell
-git clone --branch v0.1.26 https://github.com/shixi-11/prism-desk.git
+git clone --branch v0.1.27 https://github.com/shixi-11/prism-desk.git
 cd prism-desk
 npm install
 npm run build

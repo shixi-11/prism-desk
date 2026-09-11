@@ -12,12 +12,12 @@ test('Codex, Claude and Grok conversations start concurrently; stopping one leav
  await pool.stop(tasks[1].id);await until(()=>!pool.activeFor(tasks[1].id));assert.equal(pool.activeRuns().length,2);assert.ok(pool.activeFor(tasks[0].id));assert.ok(pool.activeFor(tasks[2].id));
  release.get(tasks[0].id)();release.get(tasks[2].id)();await until(()=>!q.running);assert.equal(q.items.length,0);
 });
-test('overlapping writable workspaces serialize while a different workspace starts immediately',async()=>{
- const store=new TaskStore(path.join(root,'workspace-pool')),cwd=path.join(root,'shared');fs.mkdirSync(cwd);const calls=[],release=new Map();
+test('same and nested writable workspaces run concurrently; one conversation retains its own queue',async()=>{
+ const store=new TaskStore(path.join(root,'workspace-pool')),cwd=path.join(root,'shared');fs.mkdirSync(path.join(cwd,'nested'),{recursive:true});const calls=[],release=new Map();
  const pool=new RunnerPool(store,store=>{const r=new Runner(store);r.codex=async function(task){calls.push(task.id);await new Promise(resolve=>release.set(task.id,resolve));this.state(task,'idle');};return r;});
  const q=new MessageQueue(store,pool,path.join(root,'workspace-queue.json'));pool.on('idle',()=>queueMicrotask(()=>q.pump()));
- const a=store.create({title:'a',cwd,mode:'workspace-write'}),b=store.create({title:'b',cwd,mode:'workspace-write'}),c=store.create({title:'c',mode:'workspace-write'});
- q.enqueue(a.id,'a');q.enqueue(b.id,'b');q.enqueue(c.id,'c');await until(()=>calls.length===2);assert.deepEqual(calls,[a.id,c.id]);release.get(a.id)();await until(()=>calls.includes(b.id));release.get(b.id)();release.get(c.id)();await until(()=>!q.running);assert.equal(q.items.length,0);
+ const a=store.create({title:'a',cwd,mode:'workspace-write'}),b=store.create({title:'b',cwd,mode:'workspace-write'}),c=store.create({title:'c',cwd:path.join(cwd,'nested'),mode:'workspace-write'});
+ q.enqueue(a.id,'a');q.enqueue(b.id,'b');q.enqueue(c.id,'c');q.enqueue(a.id,'a again');await until(()=>calls.length===3);assert.deepEqual(calls,[a.id,b.id,c.id]);assert.equal(pool.activeRuns().length,3);assert.equal(pool.canRun(a),false);assert.throws(()=>pool.run(a.id,'duplicate'),/执行|运行|busy|active/i);assert.equal(q.items.filter(i=>i.status==='waiting').length,1);release.get(a.id)();await until(()=>calls.length===4);assert.equal(calls[3],a.id);release.get(a.id)();release.get(b.id)();release.get(c.id)();await until(()=>!q.running);assert.equal(q.items.length,0);
 });
 test('approval and steering route by task, even when request ids match',async()=>{
  const store=new TaskStore(path.join(root,'routing')),pool=new RunnerPool(store),a=store.create({title:'a'}),b=store.create({title:'b'}),calls=[];
