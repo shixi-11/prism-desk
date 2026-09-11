@@ -1,14 +1,16 @@
 {
-  "version": "0.1.27",
+  "version": "0.1.28",
   "date": "2026-09-11",
   "notes": {
     "en": [
-      "Allow different conversations to run concurrently in the same or overlapping working directories, including tasks with write access.",
-      "Keep message ordering within each conversation and isolate stop, approval and live guidance by conversation."
+      "Enable live follow-up messages for Claude and Grok in the same running native conversation, removing the Codex-only restriction. The CLI may process guidance after the current generation or tool step.",
+      "Keep native input connections open while follow-ups are pending, confirm delivery and retain uncertain sends for review.",
+      "Process live guidance independently across conversations so one provider awaiting acknowledgment does not block another."
     ],
     "zh": [
-      "取消工作目录排队限制：不同会话在相同或重叠目录下均可同时执行，包括具有写入权限的会话。",
-      "保留同一会话内的消息顺序，停止、审批和实时引导仍按会话隔离。"
+      "接通 Claude 和 Grok 运行中原生会话的补充消息，取消实时引导仅限 Codex 的限制；CLI 可能在当前生成或工具步骤结束后处理。",
+      "补充消息待处理时保持原生输入连接，确认送达；无法确认的消息保留等待核对。",
+      "各会话独立处理实时引导，一个入口等待确认不会阻塞其他会话。"
     ]
   }
 }

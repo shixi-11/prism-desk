@@ -38,12 +38,12 @@ Per Rechtsklick können Sie ein Projekt anheften, umbenennen, einem Bereich zuor
 
 ### Installation
 
-Diese Befehle installieren die stabile Version **v0.1.27**. Den aktuellen Versionsstand und die zweisprachigen Änderungshinweise finden Sie in der [neuesten Veröffentlichung](https://github.com/shixi-11/prism-desk/releases/latest).
+Diese Befehle installieren die stabile Version **v0.1.28**. Den aktuellen Versionsstand und die zweisprachigen Änderungshinweise finden Sie in der [neuesten Veröffentlichung](https://github.com/shixi-11/prism-desk/releases/latest).
 
 Sie benötigen Windows, Git, Node.js 22.12 oder neuer, npm und die offiziellen CLIs der gewählten Anbieter. Melden Sie sich bei jedem CLI separat an.
 
 ```powershell
-git clone --branch v0.1.27 https://github.com/shixi-11/prism-desk.git
+git clone --branch v0.1.28 https://github.com/shixi-11/prism-desk.git
 cd prism-desk
 npm install
 npm run build
@@ -109,7 +109,7 @@ Fügen Sie Screenshots ein, ziehen Sie Bilder in den Eingabebereich oder verwend
 
 #### Nachrichten und Entwürfe
 
-Senden Sie während der Ausführung weitere Nachrichten: Sie warten in ihrer Reihenfolge und können storniert werden. In den Einstellungen können Sie zwischen Enter und Ctrl/⌘+Enter sowie zwischen Warteschlange und direkter Steuerung wählen. Die direkte Steuerung nutzt den aktiven Turn von Codex; bei anderen Anbietern werden die Nachrichten in die Warteschlange gestellt. Bei fehlgeschlagenem oder unterbrochenem Senden werden nachfolgende Nachrichten zur Prüfung zurückgehalten. Entwürfe bleiben erhalten, wenn Sie in der geöffneten App zwischen Aufgaben wechseln.
+Während der Ausführung können Sie weitere Nachrichten senden. Eingereihte Nachrichten behalten ihre Reihenfolge und können abgebrochen werden. Die Einstellungen bieten Enter oder Ctrl/⌘+Enter sowie Warteschlange oder Live-Anweisungen. Codex, Claude und Grok nehmen zusätzliche Anweisungen in der aktiven nativen Unterhaltung entgegen. Die CLI kann diese nach der aktuellen Generierung oder dem Werkzeugschritt verarbeiten. Unbestätigte Sendungen bleiben zur Prüfung erhalten. Entwürfe bleiben beim Aufgabenwechsel in der App erhalten.
 
 #### Dateivorschauen
 

@@ -36,12 +36,12 @@ Right-click a project to pin it, edit its name, choose a section, create a perma
 
 ### Install
 
-These commands install stable version **v0.1.27**. Check the [latest Release](https://github.com/shixi-11/prism-desk/releases/latest) for its version and bilingual change notes.
+These commands install stable version **v0.1.28**. Check the [latest Release](https://github.com/shixi-11/prism-desk/releases/latest) for its version and bilingual change notes.
 
 You will need Windows, Git, Node.js 22.12 or later, npm, and the official CLIs for your chosen providers. Sign in to each CLI separately.
 
 ```powershell
-git clone --branch v0.1.27 https://github.com/shixi-11/prism-desk.git
+git clone --branch v0.1.28 https://github.com/shixi-11/prism-desk.git
 cd prism-desk
 npm install
 npm run build
@@ -107,7 +107,7 @@ Paste screenshots, drop images into the composer or use the image button (up to 
 
 #### Messages and drafts
 
-Send more messages while work runs: they wait in order and can be cancelled. Settings lets you choose Enter or Ctrl/⌘+Enter and queueing or live guidance. Live guidance uses Codex's active turn; other providers fall back to the queue. Failed or interrupted sends hold subsequent messages for review. Drafts are retained while switching tasks in the open app.
+Send more messages while work runs: queued messages wait in order and can be cancelled. Settings lets you choose Enter or Ctrl/⌘+Enter and queueing or live guidance. Codex, Claude and Grok support sending guidance into the active native conversation. The CLI may process it after the current generation or tool step. Unconfirmed sends remain held for review. Drafts are retained while switching tasks in the open app.
 
 #### File previews
 

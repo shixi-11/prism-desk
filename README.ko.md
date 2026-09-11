@@ -38,12 +38,12 @@ Prism은 현재 **Windows 소스 설치** 방식으로 제공됩니다. 독립�
 
 ### 설치
 
-다음 명령은 안정 버전 **v0.1.27**을 설치합니다. [최신 릴리스](https://github.com/shixi-11/prism-desk/releases/latest)에서 버전과 두 언어로 제공되는 변경 사항을 확인하세요.
+다음 명령은 안정 버전 **v0.1.28**을 설치합니다. [최신 릴리스](https://github.com/shixi-11/prism-desk/releases/latest)에서 버전과 두 언어로 제공되는 변경 사항을 확인하세요.
 
 Windows, Git, Node.js 22.12 이상, npm, 그리고 선택한 공급자의 공식 CLI가 필요합니다. 각 CLI에 별도로 로그인하세요.
 
 ```powershell
-git clone --branch v0.1.27 https://github.com/shixi-11/prism-desk.git
+git clone --branch v0.1.28 https://github.com/shixi-11/prism-desk.git
 cd prism-desk
 npm install
 npm run build
@@ -109,7 +109,7 @@ Codex에 목표 설정이나 변경을 요청하면 Prism의 내장 도구를 �
 
 #### 메시지와 초안
 
-작업 실행 중에도 메시지를 추가로 전송할 수 있습니다. 메시지는 순서대로 대기하며 취소할 수 있습니다. 설정에서 Enter 또는 Ctrl/⌘+Enter 전송 방식과 대기열 또는 실시간 지시 방식을 선택할 수 있습니다. 실시간 지시는 Codex의 진행 중인 턴을 사용하며, 다른 공급자는 대기열로 전환됩니다. 전송이 실패하거나 중단되면 이후 메시지는 검토를 위해 보류됩니다. 앱이 열린 상태에서 작업을 전환해도 초안은 유지됩니다.
+실행 중에도 메시지를 보낼 수 있습니다. 대기 메시지는 순서대로 처리되며 취소할 수 있습니다. 설정에서 Enter 또는 Ctrl/⌘+Enter와 대기열 또는 실시간 지시를 선택할 수 있습니다. Codex, Claude, Grok은 실행 중인 기본 대화에 추가 지시를 전달합니다. CLI는 현재 생성이나 도구 단계가 끝난 뒤 처리할 수 있습니다. 수신이 확인되지 않은 메시지는 검토를 위해 보관됩니다. 앱에서 작업을 전환해도 초안은 유지됩니다.
 
 #### 파일 미리 보기
 

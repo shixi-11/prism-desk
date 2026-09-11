@@ -36,12 +36,12 @@
 
 ### 安装
 
-以下命令安装稳定版 **v0.1.27**。[最新发布页](https://github.com/shixi-11/prism-desk/releases/latest)提供版本号与中英文更新内容。
+以下命令安装稳定版 **v0.1.28**。[最新发布页](https://github.com/shixi-11/prism-desk/releases/latest)提供版本号与中英文更新内容。
 
 需要 Windows、Git、Node.js 22.12 或更新版本、npm，以及准备使用的官方 CLI。各 CLI 需分别完成登录。
 
 ```powershell
-git clone --branch v0.1.27 https://github.com/shixi-11/prism-desk.git
+git clone --branch v0.1.28 https://github.com/shixi-11/prism-desk.git
 cd prism-desk
 npm install
 npm run build
@@ -107,7 +107,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File scripts/start.ps1
 
 #### 消息与草稿
 
-执行中可继续发送，消息依次排队，也可取消。设置中可选择 Enter 或 Ctrl/⌘+Enter 发送，以及排队或实时引导；实时引导使用 Codex 当前轮次，其他入口转为排队。失败或中断后，后续消息暂停等待核对。应用打开期间，切换任务会保留各自的输入草稿。
+执行中可继续发送，排队消息依次等待，也可取消。设置中可选择 Enter 或 Ctrl/⌘+Enter 发送，以及排队或实时引导。Codex、Claude 和 Grok 均可向正在运行的原生会话发送补充要求；CLI 可能在当前生成或工具步骤结束后处理。未确认送达的消息保留等待核对。应用打开期间，切换任务会保留各自的输入草稿。
 
 #### 文件预览
 

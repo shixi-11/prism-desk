@@ -19,7 +19,7 @@ function permissionOutcome(params,decision){
 async function runGrok(runner,task,profile,text,instructions) {
   const rpc=new Rpc(profile,task.cwd,grokArgs(task,profile,instructions));
   Object.assign(runner.active,{rpc,grok:true});task.activePid=rpc.proc.pid;runner.store.save(task);
-  let answer='';let sessionId;let terminal;
+  let answer='';let sessionId;let terminal;const guidance=new Set();let guidanceError;
   rpc.on('message',m=>{
     if(m.id!==undefined && m.method) {
       if(m.method==='session/request_permission'&&(task.execution?.mode||task.mode)!=='read-only'&&!runner.active.cancelRequested){
@@ -44,7 +44,17 @@ async function runGrok(runner,task,profile,text,instructions) {
     runner.event(task.id,'notice',{text:`已连接 Grok / ${profile.name}；${mode==='read-only'?'只读研究':mode==='full-access'?'完全访问':'项目内编辑'}模式。`});
     runner.active.started=true;
     if(runner.active.cancelRequested){runner.state(task,'paused');return;}
-    terminal=await rpc.call('session/prompt',{sessionId,prompt:[{type:'text',text:instructions},...require('./attachments.cjs').grokInput(text,runner.active.images,capabilities.agentCapabilities?.promptCapabilities?.image===true)]},1800000);
+    const initial=rpc.call('session/prompt',{sessionId,prompt:[{type:'text',text:instructions},...require('./attachments.cjs').grokInput(text,runner.active.images,capabilities.agentCapabilities?.promptCapabilities?.image===true)]},1800000);
+    runner.active.sendGuidance=(text,images)=>{
+      if(rpc.closed||runner.active.cancelRequested)return Promise.resolve(false);
+      const request=rpc.call('session/prompt',{sessionId,prompt:require('./attachments.cjs').grokInput(text,images,capabilities.agentCapabilities?.promptCapabilities?.image===true)},1800000).then(result=>{if(result.stopReason!=='end_turn')throw Error('Grok 未完成补充消息，请核对记录。');terminal=result;return true;});
+      guidance.add(request);request.then(()=>guidance.delete(request),error=>{guidanceError=error;guidance.delete(request);});return request;
+    };
+    runner.emit('steer-ready',{taskId:task.id});
+    terminal=await initial;
+    while(guidance.size)await Promise.all([...guidance]);
+    if(guidanceError)throw guidanceError;
+    runner.active.sendGuidance=null;
   } finally {
     await rpc.end();
     if(answer)runner.event(task.id,'assistant',{text:answer,profile:profile.id});

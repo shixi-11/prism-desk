@@ -659,7 +659,6 @@
   "登记插件": "Registrar plugin",
   "消息已排队，等待此任务开始执行": "En cola hasta que comience esta tarea",
   "当前执行正在停止，消息已保留": "La ejecución se está deteniendo; mensaje conservado",
-  "当前实际执行入口不支持实时引导，消息已排队": "El proveedor activo no admite instrucciones en directo; mensaje en cola",
   "消息已保留，Codex 轮次就绪后自动发送": "Mensaje conservado; se enviará cuando el turno de Codex esté listo",
   "创建永久工作树": "Crear árbol de trabajo permanente",
   "全部标为已读": "Marcar todo como leído",
@@ -671,5 +670,6 @@
   "此项目没有可用的 Git 提交。": "Este proyecto no tiene un commit de Git disponible.",
   "请选择工作树保存位置。": "Elige dónde guardar el árbol de trabajo.",
   "工作树目录已存在，请选择新目录。": "El directorio ya existe. Elige uno nuevo.",
-  "工作树必须保存在原项目目录之外。": "Guarda el árbol fuera del directorio original."
+  "工作树必须保存在原项目目录之外。": "Guarda el árbol fuera del directorio original.",
+  "消息已保留，执行入口就绪后自动发送": "Mensaje conservado; se enviará cuando la conexión esté lista"
 }

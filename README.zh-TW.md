@@ -38,12 +38,12 @@ Prism 目前以 **Windows 原始碼安裝**方式提供。尚未發布獨立的 
 
 ### 安裝
 
-以下指令會安裝穩定版本 **v0.1.27**。請查看[最新發布版本](https://github.com/shixi-11/prism-desk/releases/latest)，確認其版本與雙語變更說明。
+以下指令會安裝穩定版本 **v0.1.28**。請查看[最新發布版本](https://github.com/shixi-11/prism-desk/releases/latest)，確認其版本與雙語變更說明。
 
 你需要 Windows、Git、Node.js 22.12 或更新版本、npm，以及所選供應商的官方 CLI。請分別登入各個 CLI。
 
 ```powershell
-git clone --branch v0.1.27 https://github.com/shixi-11/prism-desk.git
+git clone --branch v0.1.28 https://github.com/shixi-11/prism-desk.git
 cd prism-desk
 npm install
 npm run build
@@ -109,7 +109,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File scripts/start.ps1
 
 #### 訊息與草稿
 
-工作執行期間仍可傳送更多訊息：這些訊息會依序等候，也可以取消。你可以在設定中選擇使用 Enter 或 Ctrl/⌘+Enter 傳送，以及使用佇列或即時引導。即時引導使用 Codex 目前進行中的回合；其他供應商則改用佇列。傳送失敗或中斷時，後續訊息會保留供你檢閱。在已開啟的應用程式中切換任務時，草稿會保留。
+執行中可繼續傳送，佇列訊息依序等候，也可取消。設定中可選擇 Enter 或 Ctrl/⌘+Enter 傳送，以及佇列或即時引導。Codex、Claude 和 Grok 均可向執行中的原生對話傳送補充要求；CLI 可能在目前生成或工具步驟結束後處理。未確認送達的訊息會保留等待核對。應用程式開啟期間，切換任務會保留各自的草稿。
 
 #### 檔案預覽
 

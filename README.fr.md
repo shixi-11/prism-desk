@@ -38,12 +38,12 @@ Un clic droit sur un projet permet de l’épingler, modifier son nom, choisir u
 
 ### Installation
 
-Ces commandes installent la version stable **v0.1.27**. Consultez la [dernière version publiée](https://github.com/shixi-11/prism-desk/releases/latest) pour connaître son numéro et lire ses notes de modification bilingues.
+Ces commandes installent la version stable **v0.1.28**. Consultez la [dernière version publiée](https://github.com/shixi-11/prism-desk/releases/latest) pour connaître son numéro et lire ses notes de modification bilingues.
 
 Vous aurez besoin de Windows, de Git, de Node.js 22.12 ou ultérieur, de npm et des CLI officiels des fournisseurs de votre choix. Connectez-vous séparément à chaque CLI.
 
 ```powershell
-git clone --branch v0.1.27 https://github.com/shixi-11/prism-desk.git
+git clone --branch v0.1.28 https://github.com/shixi-11/prism-desk.git
 cd prism-desk
 npm install
 npm run build
@@ -109,7 +109,7 @@ Collez des captures d’écran, déposez des images dans la zone de saisie ou ut
 
 #### Messages et brouillons
 
-Vous pouvez envoyer d’autres messages pendant l’exécution : ils attendent dans l’ordre et peuvent être annulés. Les paramètres permettent de choisir Enter ou Ctrl/⌘+Enter, ainsi que la mise en file d’attente ou les instructions en direct. Les instructions en direct utilisent le tour actif de Codex ; les autres fournisseurs recourent à la file d’attente. Les envois échoués ou interrompus retiennent les messages suivants pour vérification. Les brouillons sont conservés lorsque vous changez de tâche dans l’application ouverte.
+Vous pouvez envoyer des messages pendant l’exécution. Les messages en attente conservent leur ordre et peuvent être annulés. Les paramètres proposent Enter ou Ctrl/⌘+Enter, ainsi que la file d’attente ou les instructions en direct. Codex, Claude et Grok acceptent des instructions dans la conversation native active. Le CLI peut les traiter après la génération ou l’étape d’outil en cours. Les envois non confirmés restent disponibles pour vérification. Les brouillons sont conservés lors du changement de tâche dans l’application.
 
 #### Aperçus de fichiers
 

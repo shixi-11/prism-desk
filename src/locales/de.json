@@ -659,7 +659,6 @@
   "登记插件": "Plugin registrieren",
   "消息已排队，等待此任务开始执行": "Wartet auf den Start dieser Aufgabe",
   "当前执行正在停止，消息已保留": "Ausführung wird gestoppt; Nachricht gespeichert",
-  "当前实际执行入口不支持实时引导，消息已排队": "Der aktive Anbieter unterstützt keine Live-Anweisungen; Nachricht eingereiht",
   "消息已保留，Codex 轮次就绪后自动发送": "Nachricht gespeichert; Versand automatisch, sobald der Codex-Durchlauf bereit ist",
   "创建永久工作树": "Permanenten Worktree erstellen",
   "全部标为已读": "Alle als gelesen markieren",
@@ -671,5 +670,6 @@
   "此项目没有可用的 Git 提交。": "Dieses Projekt hat keinen verfügbaren Git-Commit.",
   "请选择工作树保存位置。": "Speicherort für den Worktree wählen.",
   "工作树目录已存在，请选择新目录。": "Das Verzeichnis existiert bereits. Wählen Sie ein neues.",
-  "工作树必须保存在原项目目录之外。": "Worktree außerhalb des ursprünglichen Projektordners speichern."
+  "工作树必须保存在原项目目录之外。": "Worktree außerhalb des ursprünglichen Projektordners speichern.",
+  "消息已保留，执行入口就绪后自动发送": "Nachricht gespeichert; Versand automatisch, sobald die Verbindung bereit ist"
 }

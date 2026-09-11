@@ -76,13 +76,15 @@ class Runner extends EventEmitter {
     const a=this.active;
     if(!a||a.task.id!==id)return '消息已排队，等待此任务开始执行';
     if(a.cancelRequested)return '当前执行正在停止，消息已保留';
-    if(a.profile.provider!=='Codex')return '当前实际执行入口不支持实时引导，消息已排队';
+    if(a.profile.provider!=='Codex')return '消息已保留，执行入口就绪后自动发送';
     return '消息已保留，Codex 轮次就绪后自动发送';
   }
   async steer(id,text,images=[]){
     const active=this.active;
-    if(!active||active.task.id!==id||active.profile.provider!=='Codex'||!active.rpc||!active.turnId||active.rpc.closed||active.cancelRequested)return false;
-    await active.rpc.call('turn/steer',{threadId:active.task.sessions[active.profile.id],expectedTurnId:active.turnId,input:require('./attachments.cjs').codexInput(text,images)});
+    if(!active||active.task.id!==id||active.cancelRequested)return false;
+    if(active.profile.provider!=='Codex'){if(!active.sendGuidance||!await active.sendGuidance(text,images))return false;}
+    else {if(!active.rpc||!active.turnId||active.rpc.closed)return false;
+    await active.rpc.call('turn/steer',{threadId:active.task.sessions[active.profile.id],expectedTurnId:active.turnId,input:require('./attachments.cjs').codexInput(text,images)});}
     this.event(id,'user',{text,images,profile:active.profile.id,steered:true});
     active.images=[...(active.images||[]),...images].slice(-5);
     this.store.context(active.task);return true;
@@ -112,7 +114,7 @@ class Runner extends EventEmitter {
       while(true) {
         if(task.pendingModelRefresh?.[profile.id]){delete task.sessions[profile.id];delete task.pendingModelRefresh[profile.id];this.store.save(task);}
         attempted.add(profile.id);
-        Object.assign(this.active,{profile,questions:new Map(),confirmed:false,started:false,quotaExhausted:false,quotaByWindow:{},rpc:null,proc:null,turnId:null,grok:false,sessionId:null});
+        Object.assign(this.active,{profile,questions:new Map(),confirmed:false,started:false,quotaExhausted:false,quotaByWindow:{},rpc:null,proc:null,turnId:null,grok:false,sessionId:null,sendGuidance:null});
         task.execution = {profile:profile.id, model:profile.model, effort:profile.effort, ...(profile.provider==='Codex'?{serviceTier:profile.serviceTier||'default'}:{}), mode:options.planning?'read-only':task.mode};
         const record=this.store.context(task);
         const instructions=environmentPrompt({...task,mode:task.execution.mode},capabilities(),record)+(options.planning?'\n本轮只制订计划，禁止实施。读取必要材料后给出可核对的步骤与验收条件，等待用户确认。最后用 JSON 代码块返回 {"steps":[{"text":"步骤及验收条件"}]}，供界面展示待确认步骤。':'');
@@ -373,13 +375,15 @@ class Runner extends EventEmitter {
     ];
     if((task.execution?.mode||task.mode) === "full-access")args.push("--dangerously-skip-permissions");
     for(const root of require('./project-access.cjs').normalizeRoots(task.cwd,task.linkedProjects||[]))args.push('--add-dir',root);
-    if(this.active.images?.length)args.push('--input-format','stream-json');
+    args.push('--input-format','stream-json','--replay-user-messages');
     if (task.sessions[profile.id])
       args.push("--resume", task.sessions[profile.id]);
     const proc = spawnCLI(profile, args, task.cwd);
     task.activePid = proc.pid;
     this.store.save(task);
     this.active.proc = proc;
+    const input=new (require('./claude-input.cjs').ClaudeInput)(proc);
+    this.active.sendGuidance=(text,images)=>input.write(text,images,true);
     let buffer = "";
     let result = null;
     let errorText = "";
@@ -402,6 +406,7 @@ class Runner extends EventEmitter {
         } catch {
           continue;
         }
+        input.receive(msg);
         if(msg.type==='rate_limit_event') {
           const q=recordClaude(profile.id,msg.rate_limit_info,profile.model);if(q){this.emit('quota',q);this.active.quotaByWindow[msg.rate_limit_info.rateLimitType||'unknown']=require('./quota.cjs').normalizeClaude(msg.rate_limit_info,Date.now(),profile.model);this.active.quotaExhausted=Object.values(this.active.quotaByWindow).some(w=>w?.exhausted);}
           if(msg.rate_limit_info?.isUsingOverage)this.active.quotaExhausted=false;
@@ -459,7 +464,8 @@ class Runner extends EventEmitter {
     proc.stderr.on("data", (data) => {
       errorText = (errorText + data).slice(-4000);
     });
-    proc.stdin.end(this.active.images?.length?require('./attachments.cjs').claudeInput(text,this.active.images):text.trim());
+    input.write(text,this.active.images);
+    this.emit('steer-ready',{taskId:task.id});
     const code = await new Promise((resolve, reject) => {
       proc.on("close", resolve);
       proc.on("error", reject);

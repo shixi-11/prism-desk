@@ -38,12 +38,12 @@ Haz clic derecho en un proyecto para fijarlo, editar su nombre, elegir una secci
 
 ### Instalación
 
-Estos comandos instalan la versión estable **v0.1.27**. Consulta la [última versión publicada](https://github.com/shixi-11/prism-desk/releases/latest) para conocer su número y leer las notas de cambios bilingües.
+Estos comandos instalan la versión estable **v0.1.28**. Consulta la [última versión publicada](https://github.com/shixi-11/prism-desk/releases/latest) para conocer su número y leer las notas de cambios bilingües.
 
 Necesitarás Windows, Git, Node.js 22.12 o posterior, npm y las CLI oficiales de los proveedores que elijas. Inicia sesión en cada CLI por separado.
 
 ```powershell
-git clone --branch v0.1.27 https://github.com/shixi-11/prism-desk.git
+git clone --branch v0.1.28 https://github.com/shixi-11/prism-desk.git
 cd prism-desk
 npm install
 npm run build
@@ -109,7 +109,7 @@ Pega capturas de pantalla, arrastra imágenes al cuadro de redacción o usa el b
 
 #### Mensajes y borradores
 
-Envía más mensajes mientras se ejecuta el trabajo: esperan en orden y se pueden cancelar. Los ajustes permiten elegir Enter o Ctrl/⌘+Enter, así como entre la cola y las indicaciones en directo. Las indicaciones en directo usan el turno activo de Codex; los demás proveedores recurren a la cola. Los envíos fallidos o interrumpidos retienen los mensajes posteriores para su revisión. Los borradores se conservan al cambiar de tarea mientras la aplicación permanece abierta.
+Puedes enviar mensajes durante la ejecución. Los mensajes en cola mantienen su orden y se pueden cancelar. En ajustes puedes elegir Enter o Ctrl/⌘+Enter y cola o instrucciones en directo. Codex, Claude y Grok permiten enviar instrucciones a la conversación nativa activa. El CLI puede procesarlas tras la generación o el paso de herramienta actual. Los envíos sin confirmar quedan retenidos para revisión. Los borradores se conservan al cambiar de tarea en la aplicación.
 
 #### Vistas previas de archivos
 

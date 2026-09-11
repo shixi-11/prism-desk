@@ -10,7 +10,7 @@ class MessageQueue extends EventEmitter{
   const task=this.store.get(item.taskId);if(task.goalLifecycle?.status==='paused'||task.state==='unknown')throw Error('请先继续目标或核对任务状态');
   item.options={...item.options,steer:true};item.status='dispatching';delete item.error;this.save();
   try{
-   if((!item.options?.planning||this.taskRunner(item.taskId).active?.planning)&&(!task.planReviewRequired||this.runner.active?.planning)&&await this.runner.steer(item.taskId,item.text,item.images)){
+   if((!item.options?.planning||this.taskRunner(item.taskId).active?.planning)&&(!task.planReviewRequired||this.taskRunner(item.taskId).active?.planning)&&await this.runner.steer(item.taskId,item.text,item.images)){
     this.items=this.items.filter(i=>i.id!==id);this.save();return {steered:true};
    }
    item.status='waiting';this.items=[item,...this.items.filter(i=>i.id!==id)];this.save();
@@ -22,17 +22,21 @@ class MessageQueue extends EventEmitter{
  taskRunner(id){return this.runner.forTask?this.runner.forTask(id):this.runner;}
  isBusy(id){return this.runner.canRun?!this.runner.canRun(this.store.get(id))||this.jobs.has(id):!!this.runner.active||this.running;}
  async flushGuidance(){
-  if(this.paused)return;if(this.guiding){this.guidancePending=true;return;}this.guiding=true;
-  try{
-   const activeRuns=this.runner.activeRuns?this.runner.activeRuns():[this.runner.active].filter(Boolean);
-   for(const active of activeRuns){
-    while(!this.paused&&this.taskRunner(active.task?.id).active===active){
-     const item=this.items.find(i=>i.taskId===active.task?.id&&i.status==='waiting'&&i.options?.steer);if(!item)break;
-     const task=this.store.get(item.taskId);if(task.goalLifecycle?.status==='paused'||task.state==='unknown'||active.cancelRequested)break;
-     const result=await this.send(item.id);if(!result.steered)break;
-    }
-   }
-  }catch(error){this.emit('failure',error);}finally{this.guiding=false;if(this.guidancePending){this.guidancePending=false;queueMicrotask(()=>this.flushGuidance());}}
+  if(this.paused)return;this.guidingTasks||=new Map();
+  const activeRuns=this.runner.activeRuns?this.runner.activeRuns():[this.runner.active].filter(Boolean);
+  await Promise.all(activeRuns.map(async active=>{
+   const id=active.task?.id;const existing=this.guidingTasks.get(id);if(existing){existing.again=true;return;}
+   const state={again:false};this.guidingTasks.set(id,state);
+   try{
+    do{state.again=false;
+     while(!this.paused&&this.taskRunner(id).active===active){
+      const item=this.items.find(i=>i.taskId===id&&i.status==='waiting'&&i.options?.steer);if(!item)break;
+      const task=this.store.get(id);if(task.goalLifecycle?.status==='paused'||task.state==='unknown'||active.cancelRequested)break;
+      const result=await this.send(item.id);if(!result.steered)break;
+     }
+    }while(state.again&&!this.paused&&this.taskRunner(id).active===active);
+   }catch(error){this.emit('failure',error);}finally{this.guidingTasks.delete(id);}
+  }));
  }
  async runItem(item){
   try{await this.runner.run(item.taskId,item.text,item.images,item.options||{});this.items=this.items.filter(i=>i.id!==item.id);const task=this.store.get(item.taskId);
