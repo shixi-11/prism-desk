@@ -72,9 +72,16 @@ class Runner extends EventEmitter {
     this.store.context(task);
     return this.store.save(task);
   }
+  guidanceReason(id){
+    const a=this.active;
+    if(!a||a.task.id!==id)return '消息已排队，等待此任务开始执行';
+    if(a.cancelRequested)return '当前执行正在停止，消息已保留';
+    if(a.profile.provider!=='Codex')return '当前实际执行入口不支持实时引导，消息已排队';
+    return '消息已保留，Codex 轮次就绪后自动发送';
+  }
   async steer(id,text,images=[]){
     const active=this.active;
-    if(!active||active.task.id!==id||active.profile.provider!=='Codex'||!active.rpc||!active.turnId||active.cancelRequested)return false;
+    if(!active||active.task.id!==id||active.profile.provider!=='Codex'||!active.rpc||!active.turnId||active.rpc.closed||active.cancelRequested)return false;
     await active.rpc.call('turn/steer',{threadId:active.task.sessions[active.profile.id],expectedTurnId:active.turnId,input:require('./attachments.cjs').codexInput(text,images)});
     this.event(id,'user',{text,images,profile:active.profile.id,steered:true});
     active.images=[...(active.images||[]),...images].slice(-5);
@@ -240,10 +247,12 @@ class Runner extends EventEmitter {
         this.event(task.id, "diff", { text: p.diff });
       if (message.method === "turn/completed") {
         terminal = p.turn;
+        this.active.turnId = null;
         resolveTurn();
       }
       if (message.method === "turn/started") {
         this.active.turnId = p.turn.id;
+        this.emit('steer-ready', {taskId:task.id});
         this.active.started = true;
         this.confirmExecution(task,profile);
       }
@@ -291,7 +300,7 @@ class Runner extends EventEmitter {
         summary:'auto',
         sandboxPolicy: require('./project-access.cjs').codexSandbox(task),
       });
-      this.active.turnId = started.turn.id;
+      if (!terminal) { this.active.turnId = started.turn.id; this.emit('steer-ready', {taskId:task.id}); }
       this.confirmExecution(task,profile);
       this.active.started = true;
       if(this.active.cancelRequested)await rpc.call('turn/interrupt',{threadId:task.sessions[profile.id],turnId:started.turn.id});

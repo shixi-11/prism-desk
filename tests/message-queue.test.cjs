@@ -34,3 +34,17 @@ test('unavailable steering keeps messages queued; failed steering holds them wit
 test('manual send starts an idle message and preserves planning restrictions',async t=>{
  const dir=fs.mkdtempSync(path.join(os.tmpdir(),'prism-manual-idle-'));t.after(()=>fs.rmSync(dir,{recursive:true,force:true}));let ran=0,steered=0;const runner={active:null,steer:async()=>{steered++;return false;},run:async(id,text,images,options)=>{ran++;assert.equal(options.planning,true);}},queue=new MessageQueue({get:()=>({state:'idle',planReviewRequired:true})},runner,path.join(dir,'queue.json'));queue.paused=true;const item=queue.enqueue('task','plan',[],{planning:true});queue.paused=false;assert.deepEqual(await queue.send(item.id),{queued:false});await until(()=>!queue.running);assert.equal(ran,1);assert.equal(steered,0);assert.equal(queue.items.length,0);
 });
+
+test('live guidance survives startup and drains once on turn readiness while plain queue messages remain waiting',async t=>{
+ const dir=fs.mkdtempSync(path.join(os.tmpdir(),'prism-ready-'));t.after(()=>fs.rmSync(dir,{recursive:true,force:true}));const store=new TaskStore(path.join(dir,'tasks')),task=store.create({title:'A',cwd:dir}),runner=new Runner(store),q=new MessageQueue(store,runner,path.join(dir,'queue.json'));let calls=0;
+ runner.active={task,profile:{id:task.profile,provider:'Codex'},rpc:{call:async()=>{calls++;}},turnId:null};task.sessions[task.profile]='thread';
+ q.enqueue(task.id,'queued deliberately');const live=q.enqueue(task.id,'correct direction',[],{steer:true});await until(()=>!q.guiding);assert.equal(q.items.length,2);assert.equal(calls,0);
+ runner.active.turnId='ready';await Promise.all([q.flushGuidance(),q.flushGuidance()]);assert.equal(calls,1);assert.equal(q.items.length,1);assert.equal(q.items[0].text,'queued deliberately');assert.ok(!q.items.some(x=>x.id===live.id));
+});
+test('manual live-send intent survives a gap and never replays uncertain delivery',async t=>{
+ const dir=fs.mkdtempSync(path.join(os.tmpdir(),'prism-ready-fail-'));t.after(()=>fs.rmSync(dir,{recursive:true,force:true}));let ready=false,calls=0;const runner={active:{task:{id:'a'}},steer:async()=>{if(!ready)return false;calls++;throw Error('uncertain');}},q=new MessageQueue({get:()=>({state:'running'})},runner,path.join(dir,'queue.json'));q.on('failure',()=>{});
+ const item=q.enqueue('a','manual');await q.send(item.id);assert.equal(item.options.steer,true);ready=true;await q.flushGuidance();await q.flushGuidance();assert.equal(calls,1);assert.equal(item.status,'held');
+});
+test('guidance does not cross tasks or stopped executions',async t=>{
+ const dir=fs.mkdtempSync(path.join(os.tmpdir(),'prism-ready-scope-'));t.after(()=>fs.rmSync(dir,{recursive:true,force:true}));let calls=0;const runner={active:{task:{id:'b'},cancelRequested:false},steer:async()=>{calls++;return true;}},q=new MessageQueue({get:()=>({state:'running'})},runner,path.join(dir,'queue.json'));q.enqueue('a','keep',[],{steer:true});await q.flushGuidance();runner.active={task:{id:'a'},cancelRequested:true};await q.flushGuidance();assert.equal(calls,0);assert.equal(q.items.length,1);
+});

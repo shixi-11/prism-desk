@@ -89,6 +89,7 @@ app.whenReady().then(() => {
   if(!primaryInstance)return;
   store = new TaskStore(require('./storage.cjs').taskRoot(app.getAppPath(),dataPath()));
   store.recover();
+  require('./model-preference-request.cjs').apply(store,PROFILES,path.join(dataPath(),'model-preference-request.json'));
   quotaDisplay=new (require('./quota-display.cjs').QuotaDisplay)(dataPath());
   const draftFile=win=>path.join(dataPath(),'drafts',win.draftKey+'.json');
   ipcMain.on('prism:saveDrafts',(event,value)=>{
@@ -108,6 +109,7 @@ app.whenReady().then(() => {
   // A plan may run directly outside the queue. Wake queued tasks afterwards;
   // defer until the runner has had a chance to begin a requested handoff.
   runner.on('idle',()=>queueMicrotask(()=>messageQueue.pump()));
+  runner.on('steer-ready',()=>queueMicrotask(()=>messageQueue.flushGuidance()));
   for (const type of ["event", "delta", "state", "idle", "approval", "quota", "approval-reset", "reasoning", "activity"])
     runner.on(type, (value) => emit(type, value));
   handle("init", () => ({
@@ -357,9 +359,9 @@ app.whenReady().then(() => {
     if(images.some(image=>image.kind!=='file')&&!['Codex','Claude','Grok'].includes(PROFILES.find(p=>p.id===task.profile)?.provider))throw Error('当前入口暂不支持图片，请选择 Codex、Claude 或 Grok');
     if(settings().busySend==='steer'&&await runner.steer(id,text,images)){if(choiceEventId)runner.event(id,'notice',{choiceEventId,text:'已提交选择 · '+text});return {steered:true};}
     const busy=!!runner.active||messageQueue.running;
-    const item=messageQueue.enqueue(id,text,images,{planning:!!task.planReviewRequired});
+    const item=messageQueue.enqueue(id,text,images,{planning:!!task.planReviewRequired,steer:settings().busySend==='steer'});
     if(choiceEventId)runner.event(id,'notice',{choiceEventId,text:'已提交选择 · '+text});
-    return {started:!busy,queued:busy,id:item.id};
+    return {started:!busy,queued:busy,id:item.id,...(busy?{reason:runner.guidanceReason(id)}:{})};
   });
   handle("switch", (id, profile) => runner.switch(id, profile));
   handle('stopAndContinue', (id, profile) => runner.stopAndContinue(id, profile));

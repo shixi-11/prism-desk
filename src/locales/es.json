@@ -656,5 +656,9 @@
   "未找到 Codex 插件安装来源，请先安装并登录 Codex。": "No se encontró la fuente de plugins de Codex. Instala Codex e inicia sesión.",
   "未能完整读取插件安装状态，请检查 Codex 登录与网络后重试。": "No se pudo leer todo el estado de instalación. Comprueba la sesión de Codex y la red, y vuelve a intentarlo.",
   "请先成功检查插件安装状态，再批量接入。": "Comprueba correctamente el estado de instalación antes de conectar en lote.",
-  "登记插件": "Registrar plugin"
+  "登记插件": "Registrar plugin",
+  "消息已排队，等待此任务开始执行": "En cola hasta que comience esta tarea",
+  "当前执行正在停止，消息已保留": "La ejecución se está deteniendo; mensaje conservado",
+  "当前实际执行入口不支持实时引导，消息已排队": "El proveedor activo no admite instrucciones en directo; mensaje en cola",
+  "消息已保留，Codex 轮次就绪后自动发送": "Mensaje conservado; se enviará cuando el turno de Codex esté listo"
 }

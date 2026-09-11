@@ -656,5 +656,9 @@
   "未找到 Codex 插件安装来源，请先安装并登录 Codex。": "Codex plugin installation source not found. Install Codex and sign in first.",
   "未能完整读取插件安装状态，请检查 Codex 登录与网络后重试。": "Plugin installation status could not be fully read. Check your Codex sign-in and network, then retry.",
   "请先成功检查插件安装状态，再批量接入。": "Check plugin installation status successfully before connecting in bulk.",
-  "登记插件": "Register plugin"
+  "登记插件": "Register plugin",
+  "消息已排队，等待此任务开始执行": "Queued until this task starts",
+  "当前执行正在停止，消息已保留": "Execution is stopping; message retained",
+  "当前实际执行入口不支持实时引导，消息已排队": "The active provider does not support live guidance; message queued",
+  "消息已保留，Codex 轮次就绪后自动发送": "Message retained; sends automatically when the Codex turn is ready"
 }

@@ -5,7 +5,7 @@ export default function RelayPreferences({task,profiles,onSaveOrder,onModelSetti
  const ids=[...(task.relayOrder||[]).filter(id=>profiles.some(p=>p.id===id)),...profiles.filter(p=>!(task.relayOrder||[]).includes(p.id)).map(p=>p.id)];
  const [open,setOpen]=useState(false),[order,setOrder]=useState(ids),[dragging,setDragging]=useState(null),[over,setOver]=useState(null),[editing,setEditing]=useState(null),[saving,setSaving]=useState(false),[notice,setNotice]=useState(''),[error,setError]=useState('');
  useEffect(()=>setOrder(ids),[ids.join('|')]);
- const describe=p=>{const c=task.modelSettings?.[p.id];return `${c?.model||p.model} · ${c?.effort||(p.provider==='Codex'?'xhigh':p.provider==='Gemini'?'auto':'high')}`;};
+ const describe=p=>{const c=task.modelSettings?.[p.id];return `${c?.model||(p.provider==='Codex'?'gpt-6-astra':p.model)} · ${c?.effort||(p.provider==='Codex'?'low':p.provider==='Gemini'?'auto':'high')}`;};
  const skipReason=p=>p.disabled?'已停用':(task.execution?.mode||task.mode)!=='read-only'&&!(p.write&&['Codex','Claude','Grok'].includes(p.provider))?'当前任务需要写入，此账号会被跳过':'';
  const move=async(from,to)=>{
   if(saving||from===to||!order.includes(from)||!order.includes(to))return;

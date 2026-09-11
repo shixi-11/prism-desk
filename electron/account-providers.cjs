@@ -1,7 +1,7 @@
 // Provider-specific login and installation details live here. A future platform
 // must supply a subscription verifier and runner adapter before it is enabled.
 const providers=Object.freeze({
- Codex:{provider:'Codex',executable:'codex.exe',model:'gpt-5.6-sol',write:true,installUrl:'https://developers.openai.com/codex/cli/',loginArgs:()=>['login','-c','forced_login_method="chatgpt"'],authHosts:['auth.openai.com'],authPath:/^\/oauth\/authorize$/},
+ Codex:{provider:'Codex',executable:'codex.exe',model:'gpt-6-astra',write:true,installUrl:'https://developers.openai.com/codex/cli/',loginArgs:()=>['login','-c','forced_login_method="chatgpt"'],authHosts:['auth.openai.com'],authPath:/^\/oauth\/authorize$/},
  Claude:{provider:'Claude',executable:'claude.exe',model:'opus',write:true,manualCode:true,installUrl:'https://code.claude.com/docs/en/setup',loginArgs:p=>['auth','login','--claudeai',...(p.email?['--email',p.email]:[])],authHosts:['claude.ai','claude.com'],authPath:/^\/(?:cai\/)?oauth\/authorize$/},
  Grok:{provider:'Grok',executable:'grok.exe',model:'grok-4.6',write:true,installUrl:'https://docs.x.ai/build/overview',loginArgs:()=>['login','--oauth'],authHosts:['auth.x.ai','accounts.x.ai'],authPath:/\/(?:authorize|auth|sign-in)(?:\/|$)/},
 });

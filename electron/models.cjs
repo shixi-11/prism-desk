@@ -16,7 +16,7 @@ async function readModelOptions(id,cwd){
  if(!models.length)throw Error('CLI 未返回可选择的模型');
  const value={models,note:p.provider==='Gemini'?'由 Gemini CLI 自动选模；暂不提供独立思考等级':p.provider==='Claude'?'官方模型别名；实际可用性由订阅与组织权限决定':p.provider==='Grok'?'来自当前 CLI；思考等级暂提供已验证的 high':'来自当前 CLI 模型目录；实际调用仍受账号权限限制'};return value;
 }
-function selection(task,profile){const saved=task.modelSettings?.[profile.id];return {...profile,model:saved?.model||profile.model,effort:saved?.effort||(profile.provider==='Codex'?'xhigh':profile.provider==='Gemini'?'auto':'high'),...(profile.provider==='Codex'?{serviceTier:saved?.serviceTier||'default'}:{})};}
+function selection(task,profile){const saved=task.modelSettings?.[profile.id];return {...profile,model:saved?.model||(profile.provider==='Codex'?'gpt-6-astra':profile.model),effort:saved?.effort||(profile.provider==='Codex'?'low':profile.provider==='Gemini'?'auto':'high'),...(profile.provider==='Codex'?{serviceTier:saved?.serviceTier||'default'}:{})};}
 async function validateSelection(profileId,cwd,input){
  if(!input||typeof input.model!=='string'||typeof input.effort!=='string')throw Error('模型设置无效');
  const profile=profileFor(profileId),list=await modelOptions(profileId,cwd),model=list.models.find(m=>m.id===input.model);

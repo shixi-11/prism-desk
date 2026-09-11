@@ -1,16 +1,16 @@
 {
-  "version": "0.1.24",
+  "version": "0.1.25",
   "date": "2026-09-11",
   "notes": {
-    "en": [
-      "Add one-click registration of installed Codex plugins and import skill references from their actual installed versions.",
-      "Automatically check for new or updated plugins at startup, when returning to Prism, and every five minutes; honor manual removals and disabled or uninstalled plugins.",
-      "Show skill-reference availability separately from unverified tool connections and unsupported desktop tools. Sign-ins and permissions remain separate."
-    ],
     "zh": [
-      "新增“一键接入本机已安装插件”，按实际安装版本登记插件并接入技能资料。",
-      "启动、返回窗口及每五分钟自动检查新增或更新插件，保留手动移除选择，排除停用和已卸载插件。",
-      "分别展示技能资料、待核验的工具连接与暂不支持的桌面工具；账号登录和工具权限仍独立管理。"
+      "修复 Codex 轮次暂未就绪时实时引导退回队列后不再送入的问题；保留发送意图，就绪后自动投递，未确认成功的消息不会重复重试。",
+      "移除输入框里的关联项目入口。",
+      "Codex 默认使用 GPT-6-Astra 和低（low）思考等级，自动接续采用相同默认值。"
+    ],
+    "en": [
+      "Preserve live-guidance requests while a Codex turn is starting and deliver them when ready. Messages with uncertain delivery remain held instead of being replayed.",
+      "Remove the linked-project control from the composer.",
+      "Default Codex and automatic continuation to GPT-6-Astra with low reasoning effort."
     ]
   }
 }

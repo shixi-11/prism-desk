@@ -52,7 +52,6 @@ import {NewEntry,NewProject} from './ProjectCreation.jsx';
 import {sidebarGroups} from './sidebar-groups.js';
 import SidebarTasks from './SidebarTasks.jsx';
 import {conversationMessages} from './conversation-messages.js';
-import ProjectAccess from './ProjectAccess.jsx';
 import FastControl from './FastControl.jsx';
 const api = window.prism;
 function TaskEntry({item,selected,onSelect,onRename,onAction}){
@@ -234,9 +233,9 @@ function NewTask({ onClose, onCreate, initialCwd="", projects=[], projectNames={
 function ModelControls({task,profile,disabled,onSave}) {
   const [catalog,setCatalog]=useState(null),[error,setError]=useState(''),[busy,setBusy]=useState(false);
   useEffect(()=>{let live=true;setCatalog(null);setError('');api.models(profile.id).then(v=>{if(live)setCatalog(v);}).catch(e=>{if(live)setError(e.message);});return()=>{live=false;};},[profile.id]);
-  const saved=task.modelSettings?.[profile.id];const current=saved?.model||profile.model;
+  const saved=task.modelSettings?.[profile.id];const current=saved?.model||(profile.provider==='Codex'?'gpt-6-astra':profile.model);
   const model=catalog?.models.find(m=>m.id===current);
-  const effort=saved?.effort||(profile.provider==='Codex'?'xhigh':profile.provider==='Gemini'?'auto':'high');
+  const effort=saved?.effort||(profile.provider==='Codex'?'low':profile.provider==='Gemini'?'auto':'high');
   const labels={auto:tr("模型自动管理"),low:tr("低"),medium:tr("中"),high:tr("高"),xhigh:tr("更高"),max:tr("最高"),ultra:tr("极高"),minimal:tr("最少"),none:tr("无")};
   const serviceTier=saved?.serviceTier||'default';
   async function save(model,effort,tier=serviceTier){setBusy(true);setError('');try{await onSave({model,effort,...(profile.provider==='Codex'?{serviceTier:tier}:{})});}catch(e){setError(e.message);}finally{setBusy(false);}}
@@ -764,7 +763,7 @@ function App() {
       const result=await api.run(sentId,sentText,sentImages.map(image=>image.id));
       drafts.current[sentId]={text:"",images:[]};
       if(current.current===sentId){setText(value=>value===sentText?"":value);setImages(value=>value.filter(image=>!sentImages.some(sent=>sent.id===image.id)));}
-      if(result.queued&&init.settings.busySend==='steer')setToast(tr('当前无法实时引导，消息已排队'));
+      if(result.queued&&init.settings.busySend==='steer')setToast(tr(result.reason||'当前无法实时引导，消息已排队'));
     } catch (e) {
       fail(e);
     } finally {setSending(false);}
@@ -881,7 +880,7 @@ function App() {
             </div>
           )}
           {task&&<GoalBar key={task.id} task={task} events={events} thinking={thinking} activity={activity} Modal={Modal} onSave={async input=>{const updated=await api.savePlan(task.id,input);if(current.current===updated.id)setTask(updated);return updated;}} onPlanAction={async(action,revision)=>{const id=task.id;await api.planAction(id,action,revision??task.workPlan?.revision);if(current.current===id)await load(id);}} onGoalAction={async(action,revision)=>{const updated=await api.goalAction(task.id,action,revision);if(current.current===updated.id)setTask(updated);return updated;}}/>}
-          <QueuedMessages items={queue.filter(item=>item.taskId===task?.id&&item.status!=="sending")} onCancel={id=>api.cancelQueued(id).catch(fail)} onRetry={id=>api.retryQueued(id).catch(fail)} onSend={async id=>{try{const result=await api.sendQueued(id);if(result.queued)setToast(tr('当前无法实时引导，消息已排队'));}catch(error){fail(error);}}}/>
+          <QueuedMessages items={queue.filter(item=>item.taskId===task?.id&&item.status!=="sending")} onCancel={id=>api.cancelQueued(id).catch(fail)} onRetry={id=>api.retryQueued(id).catch(fail)} onSend={async id=>{try{const result=await api.sendQueued(id);if(result.queued)setToast(tr(result.reason||'当前无法实时引导，消息已排队'));}catch(error){fail(error);}}}/>
           <div className="composer">
             {task?.goalLifecycle?.status==='paused'?<p className="plan-mode-note">{tr('目标已暂停，请先继续目标。')}</p>:task?.planReviewRequired&&<p className="plan-mode-note">{tr('计划待确认，当前消息仅用于讨论计划。')}<button disabled={anyBusy||!task.workPlan?.steps?.length} onClick={async()=>{try{await api.planAction(task.id,'execute',task.workPlan?.revision);}catch(e){fail(e);}}}>{tr('确认计划并执行')}</button></p>}
             <ImageAttachments taskId={task?.id} images={images} onRemove={id=>setImages(old=>old.filter(image=>image.id!==id))} onPreview={image=>image.path&&setPreview({id:Date.now(),target:image.path,task})}/>
@@ -916,7 +915,6 @@ function App() {
               </button>
               <span className="separator" />
               {task && <PermissionControl task={task} profile={init.profiles.find(p=>p.id===task.profile)} defaultMode={init.settings.defaultMode||'workspace-write'} onChange={changeMode} onDefault={async mode=>{try{await api.defaultMode(mode);setInit(old=>({...old,settings:{...old.settings,defaultMode:mode}}));}catch(e){fail(e);}}}/>}
-              {task&&<ProjectAccess savedProjects={init.settings.projects||[]} key={task.id} task={task} tasks={init.tasks} projectNames={init.settings.projectNames||{}} onSave={async roots=>{const updated=await api.update(task.id,{linkedProjects:roots});if(current.current===updated.id)setTask(updated);}}/>}
               {task?.pendingMode&&<small className="permission-pending">{tr("下次执行生效")}</small>}
               <button title={tr("添加附件")} aria-label={tr("添加附件")} disabled={uploading||images.length>=5} onClick={()=>addImages(null)}><Paperclip size={19}/></button>
               <span className="compose-spacer" />

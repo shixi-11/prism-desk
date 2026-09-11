@@ -10,7 +10,7 @@ function defaultConfig(env = process.env) {
   const local = env.LOCALAPPDATA || path.join(home, '.local', 'share');
   const accountRoot = path.join(local, 'Prism', 'accounts');
   const definitions = [
-    ['Codex', 'codex.exe', 'gpt-5.6-sol', true],
+    ['Codex', 'codex.exe', 'gpt-6-astra', true],
     ['Claude', 'claude.exe', 'opus', true],
     ['Grok', 'grok.exe', 'grok-4.6', true],
   ];
