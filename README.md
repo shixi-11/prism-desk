@@ -10,6 +10,8 @@ A local Windows desktop for **Codex, Claude Code, and Grok**. Bring your subscri
 
 Built for developers, designers, and independent makers who use more than one AI coding CLI and want less time lost to terminal juggling and repeated explanations.
 
+**For non-commercial use only.** Source is available under the [Prism Desk Non-Commercial License](LICENSE). Commercial use is prohibited unless separately authorized in writing by the copyright holders.
+
 **[Latest release](https://github.com/shixi-11/prism-desk/releases/latest)** · **[Installation guide](#install)**
 
 [![Prism desktop with project conversations, a design task, Claude model controls, and automatic account handoff preferences](output/20260912_prism-en-dark.png)](output/20260912_prism-en-dark.png)
@@ -52,12 +54,12 @@ Created by [Shixi Lin](https://shixilin.com/). If Prism helps you keep creating,
 
 ### Install
 
-These commands install stable version **v0.1.29**. Check the [latest Release](https://github.com/shixi-11/prism-desk/releases/latest) for its version and bilingual change notes.
+These commands install stable version **v0.1.30**. Check the [latest Release](https://github.com/shixi-11/prism-desk/releases/latest) for its version and bilingual change notes.
 
 You will need Windows, Git, Node.js 22.12 or later, npm, and the official CLIs for your chosen providers. Sign in to each CLI separately.
 
 ```powershell
-git clone --branch v0.1.29 https://github.com/shixi-11/prism-desk.git
+git clone --branch v0.1.30 https://github.com/shixi-11/prism-desk.git
 cd prism-desk
 npm install
 npm run build
@@ -238,7 +240,7 @@ Before publishing, read [AGENTS.md](AGENTS.md) and [RELEASING.md](RELEASING.md).
 
 ### License
 
-[MIT](LICENSE). Prism Desk is an independent project. Provider names and trademarks belong to their respective owners.
+**For non-commercial use only.** Source is available under the [Prism Desk Non-Commercial License](LICENSE). Commercial use is prohibited unless separately authorized in writing by the copyright holders. Prism Desk is an independent project. Provider names and trademarks belong to their respective owners.
 
 You can now drop files anywhere in the conversation or use the attachment button: up to five attachments per message, 10 MB per image and 50 MB per other file. Documents retain their original bytes and are passed to the selected CLI as local file references; reading and preview support depend on the file format and available tools. Active status text uses a gentle shimmer and respects reduced-motion preferences.
 

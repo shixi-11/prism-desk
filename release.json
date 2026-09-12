@@ -1,16 +1,14 @@
 {
-  "version": "0.1.29",
-  "date": "2026-09-12",
+  "version": "0.1.30",
+  "date": "2026-09-13",
   "notes": {
     "en": [
-      "Make standalone local paths in chat text and code blocks clickable, including Windows paths with spaces and Chinese characters. Folder links open File Explorer.",
-      "Add native application and folder actions for local files, including videos and formats without an inline preview. Executables and scripts are shown in their folder instead of being run.",
-      "Recognize file links with line-number fragments and report native opening errors."
+      "Distribute this version under the Prism Desk Non-Commercial License instead of MIT. Commercial use requires separate written authorization from the relevant copyright holders.",
+      "Make the non-commercial restriction visible in the introduction and license section of all nine README languages and in package metadata. Third-party licenses and the terms attached to previously distributed copies remain unchanged."
     ],
     "zh": [
-      "聊天正文和代码框中独立成行的本地路径支持点击，兼容含空格、中文的 Windows 路径；文件夹链接直接打开资源管理器。",
-      "本地文件增加本机应用打开和文件夹定位入口，视频及无法内嵌预览的格式也可使用；可执行文件和脚本只在文件夹中显示。",
-      "识别带行号片段的文件链接，并显示本机打开失败的具体原因。"
+      "本版本改用棱镜非商业使用许可证，不再采用 MIT。未经相关著作权人另行书面授权，禁止商用。",
+      "九种语言的 README 简介、许可证章节及软件包元数据同步注明非商业限制。第三方许可证及此前已分发副本所附的许可条款不变。"
     ]
   }
 }

@@ -10,6 +10,8 @@ Ein lokaler Windows-Desktop für **Codex, Claude Code und Grok**. Bringen Sie Ab
 
 Für Entwickler, Designer und unabhängige Kreative, die mehrere KI-Coding-CLIs nutzen und weniger Zeit mit Terminalwechseln und wiederholten Erklärungen verbringen möchten.
 
+**Nur für nichtkommerzielle Nutzung.** Der Quellcode steht unter der [Prism Desk-Lizenz für nichtkommerzielle Nutzung](LICENSE). Kommerzielle Nutzung ist ohne gesonderte schriftliche Genehmigung der Rechteinhaber untersagt.
+
 **[Neueste Version](https://github.com/shixi-11/prism-desk/releases/latest)** · **[Installationsanleitung](#install)**
 
 [![Prism mit Projektunterhaltungen, einer Designaufgabe, Claude-Modellwahl und Einstellungen zur automatischen Übergabe](output/20260912_prism-en-dark.png)](output/20260912_prism-en-dark.png)
@@ -54,12 +56,12 @@ Entwickelt von [Shixi Lin](https://shixilin.com/). Wenn Prism Ihre Arbeit erleic
 
 ### Installation
 
-Diese Befehle installieren die stabile Version **v0.1.29**. Den aktuellen Versionsstand und die zweisprachigen Änderungshinweise finden Sie in der [neuesten Veröffentlichung](https://github.com/shixi-11/prism-desk/releases/latest).
+Diese Befehle installieren die stabile Version **v0.1.30**. Den aktuellen Versionsstand und die zweisprachigen Änderungshinweise finden Sie in der [neuesten Veröffentlichung](https://github.com/shixi-11/prism-desk/releases/latest).
 
 Sie benötigen Windows, Git, Node.js 22.12 oder neuer, npm und die offiziellen CLIs der gewählten Anbieter. Melden Sie sich bei jedem CLI separat an.
 
 ```powershell
-git clone --branch v0.1.29 https://github.com/shixi-11/prism-desk.git
+git clone --branch v0.1.30 https://github.com/shixi-11/prism-desk.git
 cd prism-desk
 npm install
 npm run build
@@ -240,7 +242,7 @@ Lesen Sie vor dem Veröffentlichen [AGENTS.md](AGENTS.md) und [RELEASING.md](REL
 
 ### Lizenz
 
-[MIT](LICENSE). Prism Desk ist ein unabhängiges Projekt. Anbieternamen und Marken gehören ihren jeweiligen Inhabern.
+**Nur für nichtkommerzielle Nutzung.** Der Quellcode steht unter der [Prism Desk-Lizenz für nichtkommerzielle Nutzung](LICENSE). Kommerzielle Nutzung ist ohne gesonderte schriftliche Genehmigung der Rechteinhaber untersagt. Prism Desk ist ein unabhängiges Projekt. Anbieternamen und Marken gehören ihren jeweiligen Inhabern.
 
 Dateien können im Gespräch abgelegt oder über die Anhangsschaltfläche ausgewählt werden: maximal fünf pro Nachricht, 10 MB pro Bild und 50 MB pro anderer Datei. Dokumente behalten ihren ursprünglichen Inhalt und werden als lokale Dateiverweise an die gewählte CLI übergeben. Lesen und Vorschau hängen vom Format und den verfügbaren Werkzeugen ab. Aktiver Statustext erhält einen sanften Schimmer, der die Einstellung für reduzierte Bewegung berücksichtigt.
 

@@ -10,6 +10,8 @@
 
 複数の AI コーディング CLI で製品開発、Web デザイン、制作に取り組む方へ。ターミナルの切り替えや背景説明の繰り返しを減らし、作業に集中できます。
 
+**非商用に限り利用できます。** ソースコードは[Prism Desk 非商用ライセンス](LICENSE)で提供します。著作権者による別途の書面による許可がない限り、商用利用は禁止です。
+
 **[最新リリース](https://github.com/shixi-11/prism-desk/releases/latest)** · **[インストールガイド](#install)**
 
 [![プロジェクトの会話、デザインタスク、Claude のモデル設定、自動引き継ぎ設定を表示した Prism](output/20260912_prism-en-dark.png)](output/20260912_prism-en-dark.png)
@@ -54,12 +56,12 @@ Prism は現在、**Windows でのソースからのインストール**に対�
 
 ### インストール
 
-以下のコマンドで安定版 **v0.1.29** をインストールします。[最新リリース](https://github.com/shixi-11/prism-desk/releases/latest)で、バージョンと二言語の変更履歴を確認してください。
+以下のコマンドで安定版 **v0.1.30** をインストールします。[最新リリース](https://github.com/shixi-11/prism-desk/releases/latest)で、バージョンと二言語の変更履歴を確認してください。
 
 Windows、Git、Node.js 22.12 以降、npm、および利用するプロバイダーの公式 CLI が必要です。各 CLI に個別にサインインしてください。
 
 ```powershell
-git clone --branch v0.1.29 https://github.com/shixi-11/prism-desk.git
+git clone --branch v0.1.30 https://github.com/shixi-11/prism-desk.git
 cd prism-desk
 npm install
 npm run build
@@ -240,7 +242,7 @@ npm run build:desktop
 
 ### ライセンス
 
-[MIT](LICENSE)。Prism Desk は独立したプロジェクトです。プロバイダーの名称と商標は、それぞれの所有者に帰属します。
+**非商用に限り利用できます。** ソースコードは[Prism Desk 非商用ライセンス](LICENSE)で提供します。著作権者による別途の書面による許可がない限り、商用利用は禁止です。Prism Desk は独立したプロジェクトです。プロバイダーの名称と商標は、それぞれの所有者に帰属します。
 
 会話領域にファイルをドロップするか、添付ボタンから選択できます。1メッセージにつき5個まで、画像は各10 MB、その他のファイルは各50 MBが上限です。文書は元の内容を保持し、ローカルファイルの参照として選択した CLI に渡されます。読み取りとプレビューの対応範囲は形式と利用可能なツールによります。実行中の状態テキストには穏やかな光のアニメーションが付き、視差効果を減らす設定にも対応します。
 

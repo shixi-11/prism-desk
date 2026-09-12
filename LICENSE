@@ -1,21 +1,43 @@
-MIT License
+Prism Desk Non-Commercial License 1.0
+Effective for versions distributed with this license from 2026-09-13.
 
 Copyright (c) 2026 Prism Desk contributors
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+1. Non-commercial permission
+Permission is granted, free of charge, to use, copy, study, modify and redistribute
+this software and its accompanying project documentation (the "Software") solely
+for non-commercial purposes, subject to this license. Copies and modified versions
+must retain this license and the copyright notices, and identify modifications.
+Redistribution must remain subject to these non-commercial restrictions.
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+2. Commercial use prohibited
+Without separate written authorization from the relevant copyright holders,
+commercial use is prohibited. This includes selling or licensing the Software for
+payment; offering paid hosted services based on it; incorporating it into a
+commercial product or service; and using it in business operations, paid client
+work, or other activities directed toward commercial advantage or compensation.
+Providing source code or distributing a modified version does not remove these
+restrictions. No commercial rights are granted by this license.
 
+3. Scope
+This license applies only to material whose copyright holders distribute it under
+these terms. Third-party dependencies, provider software and other separately
+licensed materials retain their own licenses. No trademark rights are granted.
+This license does not change the terms attached to previously distributed copies.
+
+4. Termination
+The permissions granted here terminate upon a breach of these conditions.
+
+5. Disclaimer
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+IMPLIED, INCLUDING BUT NOT LIMITED TO MERCHANTABILITY, FITNESS FOR A PARTICULAR
+PURPOSE AND NONINFRINGEMENT. TO THE EXTENT PERMITTED BY APPLICABLE LAW, THE
+AUTHORS AND COPYRIGHT HOLDERS SHALL NOT BE LIABLE FOR ANY CLAIM, DAMAGES OR
+OTHER LIABILITY ARISING FROM THE SOFTWARE OR ITS USE.
+
+简体中文说明（以以上英文条款为准）
+本软件仅限非商业用途，可在遵守条款并保留许可证和版权声明的前提下使用、
+复制、研究、修改和再分发。未经相关著作权人另行书面授权，禁止商用，包括
+销售、收费授权、付费托管服务、集成到商业产品或服务，以及用于企业经营、
+有偿客户工作或其他谋取商业利益或报酬的活动。修改或公开源码不免除上述限制。
+第三方材料保留原许可证；本许可证不改变此前已分发副本所附的许可条款。

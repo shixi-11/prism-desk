@@ -10,6 +10,8 @@
 
 如果你使用多種 AI 程式設計 CLI 來開發產品、設計網站或完成創作專案，Prism 能減少切換終端與重複說明背景的時間，讓你專注於眼前的工作。
 
+**僅限非商業用途。** 原始碼依[棱鏡非商業使用授權條款](LICENSE)提供；未經著作權人另行書面授權，禁止商用。
+
 **[最新版本](https://github.com/shixi-11/prism-desk/releases/latest)** · **[安裝指南](#install)**
 
 [![Prism 桌面介面，展示專案對話、設計任務、Claude 模型設定與自動接續偏好](output/20260912_prism-en-dark.png)](output/20260912_prism-en-dark.png)
@@ -54,12 +56,12 @@ Prism 目前以 **Windows 原始碼安裝**方式提供。尚未發布獨立的 
 
 ### 安裝
 
-以下指令會安裝穩定版本 **v0.1.29**。請查看[最新發布版本](https://github.com/shixi-11/prism-desk/releases/latest)，確認其版本與雙語變更說明。
+以下指令會安裝穩定版本 **v0.1.30**。請查看[最新發布版本](https://github.com/shixi-11/prism-desk/releases/latest)，確認其版本與雙語變更說明。
 
 你需要 Windows、Git、Node.js 22.12 或更新版本、npm，以及所選供應商的官方 CLI。請分別登入各個 CLI。
 
 ```powershell
-git clone --branch v0.1.29 https://github.com/shixi-11/prism-desk.git
+git clone --branch v0.1.30 https://github.com/shixi-11/prism-desk.git
 cd prism-desk
 npm install
 npm run build
@@ -240,7 +242,7 @@ npm run build:desktop
 
 ### 授權條款
 
-[MIT](LICENSE)。Prism Desk 是獨立專案。供應商名稱與商標屬於各自的擁有者。
+**僅限非商業用途。** 原始碼依[棱鏡非商業使用授權條款](LICENSE)提供；未經著作權人另行書面授權，禁止商用。Prism Desk 是獨立專案。供應商名稱與商標屬於各自的擁有者。
 
 可將檔案拖入對話區域，或透過附件按鈕選擇檔案；每則訊息最多 5 個附件，圖片每張不超過 10 MB，其他檔案每個不超過 50 MB。文件保留原始內容，以本機檔案路徑交給所選 CLI；讀取與預覽能力取決於格式及可用工具。執行狀態文字帶有柔和微光，並配合減少動態效果的偏好。
 
