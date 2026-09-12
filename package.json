@@ -1,6 +1,6 @@
 {
   "name": "prism-desk",
-  "version": "0.1.30",
+  "version": "0.1.31",
   "private": true,
   "description": "棱镜：同一个任务，在不同 CLI 之间继续。",
   "type": "module",
@@ -30,5 +30,5 @@
   "engines": {
     "node": ">=22.12.0"
   },
-  "license": "SEE LICENSE IN LICENSE"
+  "license": "PolyForm-Noncommercial-1.0.0"
 }

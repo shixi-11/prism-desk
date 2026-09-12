@@ -1,14 +1,14 @@
 {
-  "version": "0.1.30",
+  "version": "0.1.31",
   "date": "2026-09-13",
   "notes": {
     "en": [
-      "Distribute this version under the Prism Desk Non-Commercial License instead of MIT. Commercial use requires separate written authorization from the relevant copyright holders.",
-      "Make the non-commercial restriction visible in the introduction and license section of all nine README languages and in package metadata. Third-party licenses and the terms attached to previously distributed copies remain unchanged."
+      "Adopt the unmodified official PolyForm Noncommercial License 1.0.0 in place of the custom non-commercial license, with copyright attribution in NOTICE. Commercial uses outside the license require separate written authorization.",
+      "Align all nine README languages and package metadata with the standardized license. Third-party licenses and the terms attached to previously distributed copies remain unchanged."
     ],
     "zh": [
-      "本版本改用棱镜非商业使用许可证，不再采用 MIT。未经相关著作权人另行书面授权，禁止商用。",
-      "九种语言的 README 简介、许可证章节及软件包元数据同步注明非商业限制。第三方许可证及此前已分发副本所附的许可条款不变。"
+      "采用未经修改的官方 PolyForm Noncommercial 1.0.0，替换自定义非商业许可证，并在 NOTICE 中保留版权声明。许可证允许范围之外的商业用途须另行取得书面授权。",
+      "九种语言的 README 与软件包元数据同步更新。第三方许可证及此前已分发副本所附的许可条款不变。"
     ]
   }
 }

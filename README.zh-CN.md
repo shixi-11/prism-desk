@@ -10,7 +10,7 @@
 
 如果你用不止一种 AI 编程 CLI 来开发产品、设计网站或处理创作项目，棱镜可以帮你少切几个终端、少重复几遍背景，把注意力留给正在做的事。
 
-**仅限非商业用途。** 源码按[棱镜非商业使用许可证](LICENSE)提供；未经著作权人另行书面授权，禁止商用。
+**仅限非商业用途。** 源码按[PolyForm Noncommercial 1.0.0](LICENSE)提供；未经著作权人另行书面授权，禁止商用。
 
 **[最新发布版本](https://github.com/shixi-11/prism-desk/releases/latest)** · **[安装指南](#安装)**
 
@@ -54,12 +54,12 @@
 
 ### 安装
 
-以下命令安装稳定版 **v0.1.30**。[最新发布页](https://github.com/shixi-11/prism-desk/releases/latest)提供版本号与中英文更新内容。
+以下命令安装稳定版 **v0.1.31**。[最新发布页](https://github.com/shixi-11/prism-desk/releases/latest)提供版本号与中英文更新内容。
 
 需要 Windows、Git、Node.js 22.12 或更新版本、npm，以及准备使用的官方 CLI。各 CLI 需分别完成登录。
 
 ```powershell
-git clone --branch v0.1.30 https://github.com/shixi-11/prism-desk.git
+git clone --branch v0.1.31 https://github.com/shixi-11/prism-desk.git
 cd prism-desk
 npm install
 npm run build
@@ -240,7 +240,7 @@ npm run build:desktop
 
 ### 许可证
 
-**仅限非商业用途。** 源码按[棱镜非商业使用许可证](LICENSE)提供；未经著作权人另行书面授权，禁止商用。棱镜是独立项目，各提供方名称与商标归其所有者所有。
+**仅限非商业用途。** 源码按[PolyForm Noncommercial 1.0.0](LICENSE)提供；未经著作权人另行书面授权，禁止商用。棱镜是独立项目，各提供方名称与商标归其所有者所有。
 
 可将文件拖入会话区域，或通过附件按钮选择文件；每条消息最多 5 个附件，图片每张不超过 10 MB，其他文件每个不超过 50 MB。文档保留原始内容，以本地文件路径交给所选 CLI；读取与预览能力取决于格式及可用工具。运行状态文字带有柔和微光，并适配减少动态效果的偏好。
 

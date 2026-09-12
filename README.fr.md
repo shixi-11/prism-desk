@@ -10,7 +10,7 @@ Un bureau local Windows pour **Codex, Claude Code et Grok**. Réunissez vos comp
 
 Pour les développeurs, designers et créateurs indépendants qui utilisent plusieurs CLI de programmation avec IA et veulent passer moins de temps à changer de terminal ou à répéter le contexte.
 
-**Usage non commercial uniquement.** Le code source est disponible sous la [licence non commerciale de Prism Desk](LICENSE). Toute utilisation commerciale est interdite sans autorisation écrite distincte des titulaires des droits.
+**Usage non commercial uniquement.** Le code source est disponible sous la [PolyForm Noncommercial 1.0.0](LICENSE). Toute utilisation commerciale est interdite sans autorisation écrite distincte des titulaires des droits.
 
 **[Dernière version](https://github.com/shixi-11/prism-desk/releases/latest)** · **[Guide d’installation](#install)**
 
@@ -56,12 +56,12 @@ Créé par [Shixi Lin](https://shixilin.com/). Si Prism vous aide à créer, [so
 
 ### Installation
 
-Ces commandes installent la version stable **v0.1.30**. Consultez la [dernière version publiée](https://github.com/shixi-11/prism-desk/releases/latest) pour connaître son numéro et lire ses notes de modification bilingues.
+Ces commandes installent la version stable **v0.1.31**. Consultez la [dernière version publiée](https://github.com/shixi-11/prism-desk/releases/latest) pour connaître son numéro et lire ses notes de modification bilingues.
 
 Vous aurez besoin de Windows, de Git, de Node.js 22.12 ou ultérieur, de npm et des CLI officiels des fournisseurs de votre choix. Connectez-vous séparément à chaque CLI.
 
 ```powershell
-git clone --branch v0.1.30 https://github.com/shixi-11/prism-desk.git
+git clone --branch v0.1.31 https://github.com/shixi-11/prism-desk.git
 cd prism-desk
 npm install
 npm run build
@@ -242,7 +242,7 @@ Avant toute publication, lisez [AGENTS.md](AGENTS.md) et [RELEASING.md](RELEASIN
 
 ### Licence
 
-**Usage non commercial uniquement.** Le code source est disponible sous la [licence non commerciale de Prism Desk](LICENSE). Toute utilisation commerciale est interdite sans autorisation écrite distincte des titulaires des droits. Prism Desk est un projet indépendant. Les noms et marques des fournisseurs appartiennent à leurs propriétaires respectifs.
+**Usage non commercial uniquement.** Le code source est disponible sous la [PolyForm Noncommercial 1.0.0](LICENSE). Toute utilisation commerciale est interdite sans autorisation écrite distincte des titulaires des droits. Prism Desk est un projet indépendant. Les noms et marques des fournisseurs appartiennent à leurs propriétaires respectifs.
 
 Déposez des fichiers dans la conversation ou utilisez le bouton de pièces jointes : cinq par message au maximum, 10 Mo par image et 50 Mo par autre fichier. Les documents conservent leur contenu original et sont transmis au CLI choisi sous forme de références locales ; la lecture et l’aperçu dépendent du format et des outils disponibles. Le texte d’état actif présente un léger reflet animé qui respecte la préférence de réduction des animations.
 
