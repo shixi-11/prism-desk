@@ -671,5 +671,9 @@
   "请选择工作树保存位置。": "Choose where to save the worktree.",
   "工作树目录已存在，请选择新目录。": "The worktree directory already exists. Choose a new directory.",
   "工作树必须保存在原项目目录之外。": "Save the worktree outside the original project directory.",
-  "消息已保留，执行入口就绪后自动发送": "Message retained; sends automatically when the execution connection is ready"
+  "消息已保留，执行入口就绪后自动发送": "Message retained; sends automatically when the execution connection is ready",
+  "用本机应用打开": "Open with default app",
+  "在文件夹中显示": "Show in folder",
+  "可在资源管理器中打开此文件夹。": "Open this folder in File Explorer.",
+  "此文件可用本机应用打开，或在文件夹中显示。": "Open this file with a local application, or show it in its folder."
 }

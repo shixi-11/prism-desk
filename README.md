@@ -52,12 +52,12 @@ Created by [Shixi Lin](https://shixilin.com/). If Prism helps you keep creating,
 
 ### Install
 
-These commands install stable version **v0.1.28**. Check the [latest Release](https://github.com/shixi-11/prism-desk/releases/latest) for its version and bilingual change notes.
+These commands install stable version **v0.1.29**. Check the [latest Release](https://github.com/shixi-11/prism-desk/releases/latest) for its version and bilingual change notes.
 
 You will need Windows, Git, Node.js 22.12 or later, npm, and the official CLIs for your chosen providers. Sign in to each CLI separately.
 
 ```powershell
-git clone --branch v0.1.28 https://github.com/shixi-11/prism-desk.git
+git clone --branch v0.1.29 https://github.com/shixi-11/prism-desk.git
 cd prism-desk
 npm install
 npm run build
@@ -128,6 +128,8 @@ Send more messages while work runs: queued messages wait in order and can be can
 #### File previews
 
 Open the preview panel or click a file link to view images, PDFs, Markdown, code and text. Text files can be edited and saved; external changes are checked before saving. HTML previews display standalone pages; interactive projects can use their running HTTP address. Some websites block embedding. The activity panel shows CLI-provided reasoning summaries, plans and execution status when available.
+
+Standalone absolute paths in text or code blocks are clickable, including Windows paths with spaces and Chinese characters. Folder links open File Explorer. Local files offer native-app or folder actions; video and other formats without an inline preview use these actions. Executables and scripts are revealed in their folder.
 
 ### Automatic updates
 

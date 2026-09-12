@@ -52,12 +52,12 @@
 
 ### 安装
 
-以下命令安装稳定版 **v0.1.28**。[最新发布页](https://github.com/shixi-11/prism-desk/releases/latest)提供版本号与中英文更新内容。
+以下命令安装稳定版 **v0.1.29**。[最新发布页](https://github.com/shixi-11/prism-desk/releases/latest)提供版本号与中英文更新内容。
 
 需要 Windows、Git、Node.js 22.12 或更新版本、npm，以及准备使用的官方 CLI。各 CLI 需分别完成登录。
 
 ```powershell
-git clone --branch v0.1.28 https://github.com/shixi-11/prism-desk.git
+git clone --branch v0.1.29 https://github.com/shixi-11/prism-desk.git
 cd prism-desk
 npm install
 npm run build
@@ -128,6 +128,8 @@ powershell -NoProfile -ExecutionPolicy Bypass -File scripts/start.ps1
 #### 文件预览
 
 点击预览按钮或对话中的文件链接，可查看图片、PDF、Markdown、代码和文本；文本支持编辑保存，并检查文件是否已被外部修改。HTML 可直接预览独立页面，交互项目可填写已启动的 HTTP 地址。部分网站禁止嵌入。思考与执行面板显示 CLI 实际返回的思考摘要、计划和执行状态。
+
+正文或代码框中独立成行的绝对路径支持点击，包括带空格、中文的 Windows 路径。文件夹链接可直接打开资源管理器；本地文件提供本机应用打开或文件夹定位入口，视频等无法内嵌预览的格式也可使用。可执行文件和脚本只在文件夹中显示。
 
 ### 自动更新
 

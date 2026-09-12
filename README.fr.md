@@ -54,12 +54,12 @@ Créé par [Shixi Lin](https://shixilin.com/). Si Prism vous aide à créer, [so
 
 ### Installation
 
-Ces commandes installent la version stable **v0.1.28**. Consultez la [dernière version publiée](https://github.com/shixi-11/prism-desk/releases/latest) pour connaître son numéro et lire ses notes de modification bilingues.
+Ces commandes installent la version stable **v0.1.29**. Consultez la [dernière version publiée](https://github.com/shixi-11/prism-desk/releases/latest) pour connaître son numéro et lire ses notes de modification bilingues.
 
 Vous aurez besoin de Windows, de Git, de Node.js 22.12 ou ultérieur, de npm et des CLI officiels des fournisseurs de votre choix. Connectez-vous séparément à chaque CLI.
 
 ```powershell
-git clone --branch v0.1.28 https://github.com/shixi-11/prism-desk.git
+git clone --branch v0.1.29 https://github.com/shixi-11/prism-desk.git
 cd prism-desk
 npm install
 npm run build
@@ -130,6 +130,8 @@ Vous pouvez envoyer des messages pendant l’exécution. Les messages en attente
 #### Aperçus de fichiers
 
 Ouvrez le panneau d’aperçu ou cliquez sur un lien de fichier pour afficher des images, des PDF, du Markdown, du code et du texte. Les fichiers texte peuvent être modifiés et enregistrés ; les modifications externes sont vérifiées avant l’enregistrement. Les aperçus HTML affichent des pages autonomes ; les projets interactifs peuvent utiliser l’adresse HTTP à laquelle ils s’exécutent. Certains sites web bloquent l’intégration. Le panneau d’activité affiche les résumés de raisonnement, les plans et l’état d’exécution fournis par le CLI lorsqu’ils sont disponibles.
+
+Les chemins absolus sur une ligne de texte ou dans un bloc de code sont cliquables, y compris les chemins Windows avec espaces et caractères chinois. Les dossiers s’ouvrent dans l’Explorateur de fichiers. Les fichiers locaux peuvent être ouverts avec une application ou affichés dans leur dossier, y compris les vidéos et formats sans aperçu intégré. Les exécutables et scripts sont uniquement affichés dans leur dossier.
 
 ### Mises à jour automatiques
 

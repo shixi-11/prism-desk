@@ -54,12 +54,12 @@ Creado por [Shixi Lin](https://shixilin.com/). Si Prism te ayuda a seguir creand
 
 ### Instalación
 
-Estos comandos instalan la versión estable **v0.1.28**. Consulta la [última versión publicada](https://github.com/shixi-11/prism-desk/releases/latest) para conocer su número y leer las notas de cambios bilingües.
+Estos comandos instalan la versión estable **v0.1.29**. Consulta la [última versión publicada](https://github.com/shixi-11/prism-desk/releases/latest) para conocer su número y leer las notas de cambios bilingües.
 
 Necesitarás Windows, Git, Node.js 22.12 o posterior, npm y las CLI oficiales de los proveedores que elijas. Inicia sesión en cada CLI por separado.
 
 ```powershell
-git clone --branch v0.1.28 https://github.com/shixi-11/prism-desk.git
+git clone --branch v0.1.29 https://github.com/shixi-11/prism-desk.git
 cd prism-desk
 npm install
 npm run build
@@ -130,6 +130,8 @@ Puedes enviar mensajes durante la ejecución. Los mensajes en cola mantienen su 
 #### Vistas previas de archivos
 
 Abre el panel de vista previa o haz clic en un enlace de archivo para ver imágenes, PDF, Markdown, código y texto. Los archivos de texto se pueden editar y guardar; antes de guardar, se comprueba si hay cambios externos. Las vistas previas de HTML muestran páginas independientes; los proyectos interactivos pueden usar la dirección HTTP en la que se estén ejecutando. Algunos sitios web bloquean la inserción en otras páginas. El panel de actividad muestra los resúmenes de razonamiento, los planes y el estado de ejecución que proporciona la CLI cuando están disponibles.
+
+Las rutas absolutas en una línea de texto o de un bloque de código son clicables, incluidas las rutas de Windows con espacios y caracteres chinos. Los enlaces a carpetas abren el Explorador de archivos. Los archivos locales se pueden abrir con una aplicación o mostrar en su carpeta, también los vídeos y formatos sin vista previa integrada. Los ejecutables y scripts solo se muestran en su carpeta.
 
 ### Actualizaciones automáticas
 

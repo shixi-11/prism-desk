@@ -54,12 +54,12 @@ Prism 目前以 **Windows 原始碼安裝**方式提供。尚未發布獨立的 
 
 ### 安裝
 
-以下指令會安裝穩定版本 **v0.1.28**。請查看[最新發布版本](https://github.com/shixi-11/prism-desk/releases/latest)，確認其版本與雙語變更說明。
+以下指令會安裝穩定版本 **v0.1.29**。請查看[最新發布版本](https://github.com/shixi-11/prism-desk/releases/latest)，確認其版本與雙語變更說明。
 
 你需要 Windows、Git、Node.js 22.12 或更新版本、npm，以及所選供應商的官方 CLI。請分別登入各個 CLI。
 
 ```powershell
-git clone --branch v0.1.28 https://github.com/shixi-11/prism-desk.git
+git clone --branch v0.1.29 https://github.com/shixi-11/prism-desk.git
 cd prism-desk
 npm install
 npm run build
@@ -130,6 +130,8 @@ powershell -NoProfile -ExecutionPolicy Bypass -File scripts/start.ps1
 #### 檔案預覽
 
 開啟預覽面板或按一下檔案連結，即可查看圖片、PDF、Markdown、程式碼與文字。文字檔案可以編輯並儲存；儲存前會檢查外部變更。HTML 預覽可顯示獨立頁面；互動式專案則可使用其執行中的 HTTP 位址。部分網站會封鎖嵌入顯示。活動面板會在有相關資料時，顯示 CLI 提供的推理摘要、計畫與執行狀態。
+
+正文或程式碼區塊中獨立成行的絕對路徑可點擊，包括含空格、中文的 Windows 路徑。資料夾連結可直接開啟檔案總管；本機檔案提供應用程式開啟或資料夾定位入口，影片等無法內嵌預覽的格式也可使用。執行檔和指令碼僅在資料夾中顯示。
 
 ### 自動更新
 

@@ -671,5 +671,9 @@
   "请选择工作树保存位置。": "Choisissez où enregistrer l’arbre de travail.",
   "工作树目录已存在，请选择新目录。": "Le dossier existe déjà. Choisissez un nouveau dossier.",
   "工作树必须保存在原项目目录之外。": "Enregistrez l’arbre hors du dossier d’origine.",
-  "消息已保留，执行入口就绪后自动发送": "Message conservé ; envoi automatique dès que la connexion est prête"
+  "消息已保留，执行入口就绪后自动发送": "Message conservé ; envoi automatique dès que la connexion est prête",
+  "用本机应用打开": "Ouvrir avec l’application par défaut",
+  "在文件夹中显示": "Afficher dans le dossier",
+  "可在资源管理器中打开此文件夹。": "Ouvrez ce dossier dans l’Explorateur de fichiers.",
+  "此文件可用本机应用打开，或在文件夹中显示。": "Ouvrez ce fichier avec une application locale ou affichez-le dans son dossier."
 }

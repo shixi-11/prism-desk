@@ -54,12 +54,12 @@ Prism은 현재 **Windows 소스 설치** 방식으로 제공됩니다. 독립�
 
 ### 설치
 
-다음 명령은 안정 버전 **v0.1.28**을 설치합니다. [최신 릴리스](https://github.com/shixi-11/prism-desk/releases/latest)에서 버전과 두 언어로 제공되는 변경 사항을 확인하세요.
+다음 명령은 안정 버전 **v0.1.29**을 설치합니다. [최신 릴리스](https://github.com/shixi-11/prism-desk/releases/latest)에서 버전과 두 언어로 제공되는 변경 사항을 확인하세요.
 
 Windows, Git, Node.js 22.12 이상, npm, 그리고 선택한 공급자의 공식 CLI가 필요합니다. 각 CLI에 별도로 로그인하세요.
 
 ```powershell
-git clone --branch v0.1.28 https://github.com/shixi-11/prism-desk.git
+git clone --branch v0.1.29 https://github.com/shixi-11/prism-desk.git
 cd prism-desk
 npm install
 npm run build
@@ -130,6 +130,8 @@ Codex에 목표 설정이나 변경을 요청하면 Prism의 내장 도구를 �
 #### 파일 미리 보기
 
 미리 보기 패널을 열거나 파일 링크를 클릭하면 이미지, PDF, Markdown, 코드, 텍스트를 볼 수 있습니다. 텍스트 파일은 편집하고 저장할 수 있으며, 저장 전에 외부 변경 사항을 확인합니다. HTML 미리 보기는 독립된 페이지를 표시합니다. 대화형 프로젝트는 실행 중인 HTTP 주소를 사용할 수 있습니다. 일부 웹사이트는 삽입 표시를 차단합니다. 활동 패널은 CLI가 제공하는 추론 요약, 계획, 실행 상태를 사용 가능한 경우 표시합니다.
+
+본문이나 코드 블록에서 한 줄로 표시된 절대 경로를 클릭할 수 있으며 공백과 중국어가 포함된 Windows 경로도 지원합니다. 폴더 링크는 파일 탐색기를 엽니다. 로컬 파일은 앱으로 열거나 폴더에서 볼 수 있고, 동영상 등 내장 미리보기가 없는 형식도 지원합니다. 실행 파일과 스크립트는 폴더에서만 표시합니다.
 
 ### 자동 업데이트
 

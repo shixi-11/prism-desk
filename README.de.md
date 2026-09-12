@@ -54,12 +54,12 @@ Entwickelt von [Shixi Lin](https://shixilin.com/). Wenn Prism Ihre Arbeit erleic
 
 ### Installation
 
-Diese Befehle installieren die stabile Version **v0.1.28**. Den aktuellen Versionsstand und die zweisprachigen Änderungshinweise finden Sie in der [neuesten Veröffentlichung](https://github.com/shixi-11/prism-desk/releases/latest).
+Diese Befehle installieren die stabile Version **v0.1.29**. Den aktuellen Versionsstand und die zweisprachigen Änderungshinweise finden Sie in der [neuesten Veröffentlichung](https://github.com/shixi-11/prism-desk/releases/latest).
 
 Sie benötigen Windows, Git, Node.js 22.12 oder neuer, npm und die offiziellen CLIs der gewählten Anbieter. Melden Sie sich bei jedem CLI separat an.
 
 ```powershell
-git clone --branch v0.1.28 https://github.com/shixi-11/prism-desk.git
+git clone --branch v0.1.29 https://github.com/shixi-11/prism-desk.git
 cd prism-desk
 npm install
 npm run build
@@ -130,6 +130,8 @@ Während der Ausführung können Sie weitere Nachrichten senden. Eingereihte Nac
 #### Dateivorschauen
 
 Öffnen Sie den Vorschaubereich oder klicken Sie auf einen Dateilink, um Bilder, PDFs, Markdown, Code und Text anzusehen. Textdateien können bearbeitet und gespeichert werden; vor dem Speichern wird auf externe Änderungen geprüft. HTML-Vorschauen zeigen eigenständige Seiten an; interaktive Projekte können ihre laufende HTTP-Adresse verwenden. Manche Websites verhindern die Einbettung. Der Aktivitätsbereich zeigt vom CLI bereitgestellte Zusammenfassungen der Überlegungen, Pläne und den Ausführungsstatus an, sofern diese verfügbar sind.
+
+Absolute Pfade auf einer eigenen Textzeile oder in einem Codeblock sind anklickbar, auch Windows-Pfade mit Leerzeichen und chinesischen Zeichen. Ordner öffnen sich im Datei-Explorer. Lokale Dateien lassen sich mit einer Anwendung öffnen oder im Ordner anzeigen; dies gilt auch für Videos und Formate ohne eingebettete Vorschau. Ausführbare Dateien und Skripte werden nur im Ordner angezeigt.
 
 ### Automatische Updates
 

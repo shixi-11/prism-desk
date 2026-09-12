@@ -671,5 +671,9 @@
   "请选择工作树保存位置。": "Speicherort für den Worktree wählen.",
   "工作树目录已存在，请选择新目录。": "Das Verzeichnis existiert bereits. Wählen Sie ein neues.",
   "工作树必须保存在原项目目录之外。": "Worktree außerhalb des ursprünglichen Projektordners speichern.",
-  "消息已保留，执行入口就绪后自动发送": "Nachricht gespeichert; Versand automatisch, sobald die Verbindung bereit ist"
+  "消息已保留，执行入口就绪后自动发送": "Nachricht gespeichert; Versand automatisch, sobald die Verbindung bereit ist",
+  "用本机应用打开": "Mit Standard-App öffnen",
+  "在文件夹中显示": "Im Ordner anzeigen",
+  "可在资源管理器中打开此文件夹。": "Diesen Ordner im Datei-Explorer öffnen.",
+  "此文件可用本机应用打开，或在文件夹中显示。": "Diese Datei mit einer lokalen Anwendung öffnen oder im Ordner anzeigen."
 }

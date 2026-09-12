@@ -281,6 +281,7 @@ app.whenReady().then(() => {
     const base=relativeTo&&previewFiles.has(relativeTo)?path.dirname(relativeTo):task.cwd;
     const result=await require('./preview.cjs').readPreview(target,base);if(result.path)previewFiles.add(result.path);return result;
   });
+  handle('openPreview',async(file,action='open')=>{if(!previewFiles.has(file))throw Error('请先打开文件');return require('./preview.cjs').openLocal(file,action,shell);});
   handle('savePreview',async(file,text,version)=>{if(!previewFiles.has(file))throw Error('请先打开文件');return require('./preview.cjs').savePreview(file,text,version);});
   handle("create", async input => {
     input={...input,mode:input.mode??require('./task-settings.cjs').newTaskMode(settings(),PROFILES.find(p=>p.id===(input.profile||PROFILES.find(p=>!p.disabled)?.id)))};
