@@ -1,14 +1,14 @@
 {
-  "version": "0.1.31",
-  "date": "2026-09-13",
+  "version": "0.1.32",
+  "date": "2026-09-14",
   "notes": {
     "en": [
-      "Adopt the unmodified official PolyForm Noncommercial License 1.0.0 in place of the custom non-commercial license, with copyright attribution in NOTICE. Commercial uses outside the license require separate written authorization.",
-      "Align all nine README languages and package metadata with the standardized license. Third-party licenses and the terms attached to previously distributed copies remain unchanged."
+      "Add Shared capabilities → MCP connections for individual Codex accounts, with a ChatCut shortcut and custom HTTPS service configuration.",
+      "Support browser sign-in, configuration/authentication status refresh and cancellation. Credentials remain with the selected CLI account; tool operation must be verified in a task. Claude, Grok and Gemini external MCP support is unchanged."
     ],
     "zh": [
-      "采用未经修改的官方 PolyForm Noncommercial 1.0.0，替换自定义非商业许可证，并在 NOTICE 中保留版权声明。许可证允许范围之外的商业用途须另行取得书面授权。",
-      "九种语言的 README 与软件包元数据同步更新。第三方许可证及此前已分发副本所附的许可条款不变。"
+      "新增“共享能力 → MCP 连接”，可按 Codex 账号添加 ChatCut 或自定义 HTTPS 服务。",
+      "支持浏览器登录授权、刷新配置与授权状态及取消操作。凭据保留在所选 CLI 账号，实际工具调用需在任务中验证；Claude、Grok、Gemini 的外部 MCP 支持范围不变。"
     ]
   }
 }

@@ -1,3 +1,4 @@
+import McpConnections from './McpConnections.jsx';
 import React, { useEffect, useState } from 'react';
 import { RefreshCw, Check, Plus, FolderOpen, Sparkles, Monitor, BookOpen } from 'lucide-react';
 import { tr, locale } from './i18n.js';
@@ -7,7 +8,7 @@ const changeLabel = { added: '新增', changed: '有更新', removed: '已失效
 const toolLabel = { 'skills-only': '技能资料', 'connection-required': '连接与授权待核验', unsupported: '工具暂不支持' };
 const timestamp = value => value ? new Date(value).toLocaleString(locale(), { month: 'numeric', day: 'numeric', hour: 'numeric', minute: '2-digit' }) : tr('尚未检查');
 
-export default function CapabilityDialog({ data, onClose, onUpdate, Modal, api }) {
+export default function CapabilityDialog({ data, profiles = [], onClose, onUpdate, Modal, api }) {
   const [tab, setTab] = useState('overview');
   const [query, setQuery] = useState('');
   const [busy, setBusy] = useState('');
@@ -46,7 +47,7 @@ export default function CapabilityDialog({ data, onClose, onUpdate, Modal, api }
       {error && <p className="capability-error" role="alert">{tr(error.replace(/^Error invoking remote method '[^']+': Error: /, ''))}</p>}
       {notice && <p className="capability-notice" role="status">{tr(notice)}</p>}
       <nav className="capability-tabs" aria-label={tr('共享能力分类')}>
-        {[['overview','使用概览'], ['skills','技能目录'], ['apps','本机应用'], ['sources','来源与接入']].map(([id, label]) => <button key={id} aria-current={tab === id ? 'page' : undefined} onClick={() => selectTab(id)}>{tr(label)}</button>)}
+        {[['overview','使用概览'], ['skills','技能目录'], ['apps','本机应用'], ['sources','来源与接入'], ['mcp','MCP 连接']].map(([id, label]) => <button key={id} aria-current={tab === id ? 'page' : undefined} onClick={() => selectTab(id)}>{tr(label)}</button>)}
       </nav>
       {tab === 'overview' && <>
         <div className="capability-summary">
@@ -73,6 +74,7 @@ export default function CapabilityDialog({ data, onClose, onUpdate, Modal, api }
         <input aria-label={tr('搜索应用')} placeholder={tr('搜索应用名称或类别，例如 ComfyUI')} value={query} onChange={e => setQuery(e.target.value)} />
         <div className="app-list">{apps.map(app => <div className="app-row" key={app.name}><Monitor size={16} /><strong>{app.name}</strong><span>{app.verification?.ok ? tr(app.verification.label || '命令已实测') : app.verification ? app.probe === 'comfy' ? tr('服务未连接') : tr('检测未通过') : tr('程序已发现，待实测')}</span><code>{app.path}</code>{app.taskVerification && <small className="task-verified">{tr('本机任务已实测')} · {tr(app.name === 'ComfyUI' ? '无模型工作流与文件输出' : app.name === 'Blender' ? '场景保存、重开与几何核验' : app.name === 'FFmpeg' ? '无声视频编码与逐帧解码' : '计算与中文文件读写')}</small>}<small>{tr(app.category)} · {tr(app.note)}</small>{app.verification && <small>{app.verification.ok ? app.verification.version : app.verification.error}</small>}{app.interfaceObservation && <small>{tr(app.interfaceObservation.detail)}</small>}</div>)}{!apps.length && <p className="muted">{tr('未找到匹配的已识别应用。')}</p>}</div>
       </>}
+      {tab === 'mcp' && <McpConnections profiles={profiles} api={api}/> }
       {tab === 'sources' && <>
         <div className="capability-next"><p>{tr('添加目录后检查并同步。原文件保留在来源位置，移除来源只停止引用。')}</p><button className="outline" disabled={!!busy} onClick={() => run('source', () => api.addCapabilitySource('skills'))}><Plus size={16} />{tr('添加技能目录')}</button></div>
         <div className="capability-sources">{(sync.sources || []).map(source => <div key={source.id}><div><strong>{source.kind === 'extra' ? source.name : tr(source.name)}</strong><small>{tr(source.exists ? '来源可读' : '路径失效')}</small><code>{source.path}</code></div><button className="quiet" aria-label={tr('打开来源') + ' ' + source.name} disabled={!!busy || !source.exists} onClick={() => open(source.id)}><FolderOpen size={17} /></button>{source.kind === 'extra' && <button className="quiet" disabled={!!busy} onClick={() => run('remove', () => api.removeCapabilitySource(source.id, sync.token))}>{tr('移除来源')}</button>}</div>)}</div>
@@ -86,7 +88,7 @@ export default function CapabilityDialog({ data, onClose, onUpdate, Modal, api }
         <label className="plugin-auto"><input type="checkbox" checked={showCached} onChange={e=>setShowCached(e.target.checked)}/><span>{tr('显示仅缓存的插件')}</span></label>
         <input value={query} onChange={e => setQuery(e.target.value)} placeholder={tr('搜索插件')} aria-label={tr('搜索插件')} />
         <div className="capability-plugins">{plugins.map(plugin => <div className="capability-plugin" key={plugin.id}><div><strong>{plugin.displayName || plugin.name}</strong><small>{plugin.marketplace} · v{plugin.version} · {plugin.count} {tr('个入口')}</small><p>{tr(!plugin.installed?'仅缓存，未确认安装':plugin.enabled===false?'已停用':plugin.missing?'安装版本资料不可读':plugin.selected?(plugin.count?'技能资料已接入':'已登记，无技能资料'):plugin.excluded?'已手动移除':'技能资料待接入')}{plugin.installed&&plugin.enabled!==false&&<> · {tr(toolLabel[plugin.toolState]||'连接与授权待核验')}</>}</p></div><div className="capability-plugin-actions"><button className="quiet" aria-label={tr('打开来源') + ' ' + plugin.name} disabled={!!busy||!plugin.path} onClick={() => open(plugin.id)}><FolderOpen size={16} /></button>{plugin.selected ? <button className="outline" disabled={!!busy} onClick={() => run('remove', () => api.removeCapabilitySource(plugin.id, sync.token))}>{tr('移除来源')}</button> : <button className="outline" disabled={!!busy || !plugin.installed || plugin.enabled===false || !installationReady} onClick={() => run('plugin', () => api.syncCapabilities(sync.token, plugin.id), '技能资料已接入，工具权限未改变。')}>{tr(plugin.count ? '接入技能资料' : '登记插件')}</button>}</div></div>)}{!plugins.length && <p className="muted">{tr('未找到匹配的插件资料。')}</p>}</div>
-        <details className="capability-help"><summary>{tr('怎样接通插件工具？')}</summary><p>{tr('先在原应用更新插件并完成授权，再回来检查并同步资料。桌面插件的授权不会自动传给棱镜账号。')}</p><p>{tr('Codex 的 MCP 连接需在该账号的独立 CLI 中配置并验证。Claude、Grok、Gemini 当前执行通道未开放外部 MCP，接入技能资料不会改变这一限制。')}</p><p>{tr('本机应用可到本机应用页检测和验证；验证通过的范围会逐项显示。')}</p></details>
+        <details className="capability-help"><summary>{tr('怎样接通插件工具？')}</summary><p>{tr('先在原应用更新插件并完成授权，再回来检查并同步资料。桌面插件的授权不会自动传给棱镜账号。')}</p><p>{tr('Codex 的 MCP 连接可在“MCP 连接”页按账号添加并登录授权。Claude、Grok、Gemini 当前执行通道未开放外部 MCP，接入技能资料不会改变这一限制。')}</p><p>{tr('本机应用可到本机应用页检测和验证；验证通过的范围会逐项显示。')}</p></details>
       </>}
     </div>
   </Modal>;

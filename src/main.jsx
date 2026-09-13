@@ -984,6 +984,7 @@ function App() {
       {modal === "capabilities" && (
         <CapabilityDialog
           data={init.capabilities}
+          profiles={init.profiles}
           onClose={() => setModal("")}
           Modal={Modal}
           api={api}

@@ -54,12 +54,12 @@ Created by [Shixi Lin](https://shixilin.com/). If Prism helps you keep creating,
 
 ### Install
 
-These commands install stable version **v0.1.31**. Check the [latest Release](https://github.com/shixi-11/prism-desk/releases/latest) for its version and bilingual change notes.
+These commands install stable version **v0.1.32**. Check the [latest Release](https://github.com/shixi-11/prism-desk/releases/latest) for its version and bilingual change notes.
 
 You will need Windows, Git, Node.js 22.12 or later, npm, and the official CLIs for your chosen providers. Sign in to each CLI separately.
 
 ```powershell
-git clone --branch v0.1.31 https://github.com/shixi-11/prism-desk.git
+git clone --branch v0.1.32 https://github.com/shixi-11/prism-desk.git
 cd prism-desk
 npm install
 npm run build
@@ -220,7 +220,7 @@ Assistant files and skills can be shared across accounts. MCP permissions and ap
 
 Open **Shared capabilities** and choose **Check shared capabilities → Sync local sources** to compare local skill entry files and paths with the last sync. System skills and added folders enter the shared index after syncing. **Connect installed plugins** registers the plugins reported by the local Codex installation and connects readable skill references in one batch. It also enables **Automatically sync installed plugin references**, which you can turn off under **Sources & connections**. Checks run at startup, on window focus, and every five minutes. Disabled, uninstalled, and manually excluded plugins are not automatically re-added. Original files stay in place; the next task turn receives the shared reference index.
 
-The installed-plugin list follows the actual installed versions, not the newest cached package. Cache-only plugins are shown separately on request and excluded from bulk import. A failed installation check preserves the last known catalog and blocks automatic import. Plugin registration and readable skills do not establish tool access or authorization: connection status is shown separately. Codex MCP connections still require configuration and verification in the account’s independent CLI. The current Claude, Grok, and Gemini execution channels do not enable external MCP. Tools tied to the original desktop app are marked unsupported here. Login credentials, API keys, and tool permissions are not copied or enabled by reference syncing.
+The installed-plugin list follows the actual installed versions, not the newest cached package. Cache-only plugins are shown separately on request and excluded from bulk import. A failed installation check preserves the last known catalog and blocks automatic import. Plugin registration and readable skills do not establish tool access or authorization: connection status is shown separately. In Shared capabilities → MCP connections, select a Codex account to add ChatCut or another HTTPS MCP service, sign in through the browser, refresh status, or cancel an operation. Changes apply to the next turn; verify tool access in a task.  The current Claude, Grok, and Gemini execution channels do not enable external MCP. Tools tied to the original desktop app are marked unsupported here. Login credentials, API keys, and tool permissions are not copied or enabled by reference syncing.
 
 ### Development
 

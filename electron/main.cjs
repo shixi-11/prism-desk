@@ -300,6 +300,11 @@ app.whenReady().then(() => {
   handle('defaultMode',mode=>{if(!require('./task-settings.cjs').MODES.includes(mode))throw Error('Invalid permission mode');atomic(path.join(dataPath(),'settings.json'),{...settings(),defaultMode:mode});return mode;});
   handle("scan", () => require('./diagnostics.cjs').verifyCapabilities());
   const shared = require('./shared-capabilities.cjs').manager();
+  const mcpAccounts=new (require('./mcp-accounts.cjs').McpAccounts)({profile:require('./core.cjs').profileFor,environment:require('./core.cjs').childEnv,executable:require('./discovery.cjs').resolveExecutable});
+  handle('mcpList',id=>mcpAccounts.list(id));
+  handle('mcpChange',async(id,action,input)=>{if(accountOperation)throw Error('请等待账号操作结束。');accountQueries++;try{return await mcpAccounts.change(id,action,input);}finally{accountQueries--;}});
+  handle('mcpCancel',id=>mcpAccounts.cancel(id));
+  app.on('will-quit',()=>mcpAccounts.close());
   handle('inspectCapabilities', async () => { await shared.refreshInstalled({ force: true }); return capabilities(); });
   handle('syncCapabilities', (token, pluginId) => { shared.sync(token, pluginId); const result=capabilities(); emit('capabilities',result); return result; });
   handle('importInstalledPlugins', token => { shared.syncInstalled(token); const result=capabilities(); emit('capabilities',result); return result; });
