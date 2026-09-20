@@ -1,14 +1,14 @@
 {
-  "version": "0.1.32",
-  "date": "2026-09-14",
+  "version": "0.1.33",
+  "date": "2026-09-21",
   "notes": {
     "en": [
-      "Add Shared capabilities → MCP connections for individual Codex accounts, with a ChatCut shortcut and custom HTTPS service configuration.",
-      "Support browser sign-in, configuration/authentication status refresh and cancellation. Credentials remain with the selected CLI account; tool operation must be verified in a task. Claude, Grok and Gemini external MCP support is unchanged."
+      "Reduce the sidebar Account, Archive, Settings and Check for updates labels from 15px to 12px. Preserve their icons, spacing and click targets.",
+      "Show and copy the live MCP OAuth sign-in URL while the CLI waits, so authorization can continue when the browser does not open. Links are cleared when the operation ends."
     ],
     "zh": [
-      "新增“共享能力 → MCP 连接”，可按 Codex 账号添加 ChatCut 或自定义 HTTPS 服务。",
-      "支持浏览器登录授权、刷新配置与授权状态及取消操作。凭据保留在所选 CLI 账号，实际工具调用需在任务中验证；Claude、Grok、Gemini 的外部 MCP 支持范围不变。"
+      "侧栏“账号、归档、设置、检查更新”字号由 15px 调整为 12px，保留图标、间距和点击区域。",
+      "MCP 登录等待期间显示并支持复制实际授权网址，浏览器未弹出时可手动打开；操作结束后清除链接。"
     ]
   }
 }

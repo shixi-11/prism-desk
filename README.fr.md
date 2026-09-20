@@ -56,12 +56,12 @@ Créé par [Shixi Lin](https://shixilin.com/). Si Prism vous aide à créer, [so
 
 ### Installation
 
-Ces commandes installent la version stable **v0.1.32**. Consultez la [dernière version publiée](https://github.com/shixi-11/prism-desk/releases/latest) pour connaître son numéro et lire ses notes de modification bilingues.
+Ces commandes installent la version stable **v0.1.33**. Consultez la [dernière version publiée](https://github.com/shixi-11/prism-desk/releases/latest) pour connaître son numéro et lire ses notes de modification bilingues.
 
 Vous aurez besoin de Windows, de Git, de Node.js 22.12 ou ultérieur, de npm et des CLI officiels des fournisseurs de votre choix. Connectez-vous séparément à chaque CLI.
 
 ```powershell
-git clone --branch v0.1.32 https://github.com/shixi-11/prism-desk.git
+git clone --branch v0.1.33 https://github.com/shixi-11/prism-desk.git
 cd prism-desk
 npm install
 npm run build
@@ -223,6 +223,8 @@ Les fichiers de l’assistant et les compétences peuvent être partagés entre 
 Dans **Capacités partagées**, choisissez **Vérifier les capacités partagées → Synchroniser les sources locales** pour comparer fichiers et chemins avec la dernière synchronisation. Les compétences système et les dossiers ajoutés rejoignent ensuite l’index. **Connecter les plugins installés** enregistre en lot les plugins signalés par Codex local et connecte leurs références lisibles. La synchronisation automatique est également activée ; vous pouvez la désactiver dans **Sources et connexions**. Vérification au démarrage, au retour dans la fenêtre et toutes les cinq minutes. Les plugins désactivés, désinstallés ou exclus manuellement ne sont pas réajoutés automatiquement. Les originaux restent en place ; le prochain tour reçoit l’index partagé.
 
 La liste utilise les versions réellement installées, sans les remplacer par un cache plus récent. Les plugins uniquement en cache peuvent être affichés séparément et sont exclus de l’import groupé. Si la vérification échoue, la dernière liste est conservée et l’import automatique est suspendu. L’enregistrement et la lecture des références ne confirment ni l’accès aux outils ni leur autorisation ; l’état de connexion est affiché séparément. Dans Capacités partagées → Connexions MCP, choisissez un compte Codex pour ajouter ChatCut ou un autre service HTTPS MCP, autoriser dans le navigateur, actualiser ou annuler. Les changements prennent effet au prochain tour ; vérifiez les outils dans une tâche.  Les canaux actuels de Claude, Grok et Gemini n’activent pas de MCP externe. Les outils liés à l’application de bureau d’origine sont marqués non pris en charge. La synchronisation ne copie ni identifiants ni clés API et n’active aucune permission d’outil.
+
+Copier l’URL de connexion: Ouvrez l’URL copiée dans le navigateur et gardez la connexion en attente. Reconnectez-vous après annulation ou expiration.
 
 ### Développement
 

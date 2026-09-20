@@ -690,5 +690,8 @@
   "已授权": "Autorisiert",
   "无需或不支持 OAuth": "OAuth nicht verfügbar oder unnötig",
   "授权状态待核验": "Autorisierung ungeprüft",
-  "Codex 的 MCP 连接可在“MCP 连接”页按账号添加并登录授权。Claude、Grok、Gemini 当前执行通道未开放外部 MCP，接入技能资料不会改变这一限制。": "MCP für das gewählte Codex-Konto konfigurieren. Im Browser anmelden; Änderungen gelten ab dem nächsten Durchlauf. Claude, Grok und Gemini unterstützen kein externes MCP; das Verbinden von Skill-Referenzen ändert diese Einschränkung nicht."
+  "Codex 的 MCP 连接可在“MCP 连接”页按账号添加并登录授权。Claude、Grok、Gemini 当前执行通道未开放外部 MCP，接入技能资料不会改变这一限制。": "MCP für das gewählte Codex-Konto konfigurieren. Im Browser anmelden; Änderungen gelten ab dem nächsten Durchlauf. Claude, Grok und Gemini unterstützen kein externes MCP; das Verbinden von Skill-Referenzen ändert diese Einschränkung nicht.",
+  "登录网址": "Anmelde-URL",
+  "复制登录网址": "Anmelde-URL kopieren",
+  "复制到浏览器完成授权，保持此连接等待；取消或超时后需重新登录。": "Öffnen Sie die kopierte URL im Browser und lassen Sie die Verbindung warten. Nach Abbruch oder Zeitüberschreitung erneut anmelden."
 }

@@ -56,12 +56,12 @@ Entwickelt von [Shixi Lin](https://shixilin.com/). Wenn Prism Ihre Arbeit erleic
 
 ### Installation
 
-Diese Befehle installieren die stabile Version **v0.1.32**. Den aktuellen Versionsstand und die zweisprachigen Änderungshinweise finden Sie in der [neuesten Veröffentlichung](https://github.com/shixi-11/prism-desk/releases/latest).
+Diese Befehle installieren die stabile Version **v0.1.33**. Den aktuellen Versionsstand und die zweisprachigen Änderungshinweise finden Sie in der [neuesten Veröffentlichung](https://github.com/shixi-11/prism-desk/releases/latest).
 
 Sie benötigen Windows, Git, Node.js 22.12 oder neuer, npm und die offiziellen CLIs der gewählten Anbieter. Melden Sie sich bei jedem CLI separat an.
 
 ```powershell
-git clone --branch v0.1.32 https://github.com/shixi-11/prism-desk.git
+git clone --branch v0.1.33 https://github.com/shixi-11/prism-desk.git
 cd prism-desk
 npm install
 npm run build
@@ -223,6 +223,8 @@ Assistentendateien und Skills können gemeinsam von mehreren Konten verwendet we
 Wählen Sie unter **Gemeinsame Funktionen** die Option **Gemeinsame Funktionen prüfen → Lokale Quellen synchronisieren**, um Dateien und Pfade mit der letzten Synchronisierung zu vergleichen. System-Skills und hinzugefügte Ordner werden danach indiziert. **Installierte Plugins verbinden** registriert die vom lokalen Codex gemeldeten Plugins gesammelt und verbindet lesbare Skill-Referenzen. Die automatische Synchronisierung wird dabei aktiviert und kann unter **Quellen und Verbindungen** abgeschaltet werden. Geprüft wird beim Start, bei Fensterfokus und alle fünf Minuten. Deaktivierte, deinstallierte oder manuell ausgeschlossene Plugins werden nicht automatisch erneut hinzugefügt. Originaldateien bleiben unverändert; der nächste Aufgabenschritt erhält den gemeinsamen Index.
 
 Die Liste verwendet tatsächlich installierte Versionen und ersetzt sie nicht durch neuere Cache-Versionen. Reine Cache-Plugins können separat angezeigt werden und sind vom Sammelimport ausgeschlossen. Bei fehlgeschlagener Prüfung bleibt die letzte Liste erhalten; der automatische Import wird ausgesetzt. Registrierung und lesbare Referenzen bestätigen weder Tool-Zugriff noch Autorisierung; der Verbindungsstatus wird separat angezeigt. Unter Gemeinsame Funktionen → MCP-Verbindungen wählen Sie ein Codex-Konto, um ChatCut oder einen anderen HTTPS-MCP-Dienst hinzuzufügen, sich im Browser anzumelden, den Status zu aktualisieren oder abzubrechen. Änderungen gelten ab dem nächsten Durchlauf; Werkzeuge in einer Aufgabe prüfen.  Die aktuellen Ausführungskanäle von Claude, Grok und Gemini aktivieren kein externes MCP. An die ursprüngliche Desktop-App gebundene Tools werden als nicht unterstützt markiert. Die Synchronisierung kopiert keine Zugangsdaten oder API-Schlüssel und aktiviert keine Tool-Berechtigungen.
+
+Anmelde-URL kopieren: Öffnen Sie die kopierte URL im Browser und lassen Sie die Verbindung warten. Nach Abbruch oder Zeitüberschreitung erneut anmelden.
 
 ### Entwicklung
 

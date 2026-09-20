@@ -303,6 +303,7 @@ app.whenReady().then(() => {
   const mcpAccounts=new (require('./mcp-accounts.cjs').McpAccounts)({profile:require('./core.cjs').profileFor,environment:require('./core.cjs').childEnv,executable:require('./discovery.cjs').resolveExecutable});
   handle('mcpList',id=>mcpAccounts.list(id));
   handle('mcpChange',async(id,action,input)=>{if(accountOperation)throw Error('请等待账号操作结束。');accountQueries++;try{return await mcpAccounts.change(id,action,input);}finally{accountQueries--;}});
+  handle('mcpCopyLogin',id=>{clipboard.writeText(mcpAccounts.copyUrl(id));return {copied:true};});
   handle('mcpCancel',id=>mcpAccounts.cancel(id));
   app.on('will-quit',()=>mcpAccounts.close());
   handle('inspectCapabilities', async () => { await shared.refreshInstalled({ force: true }); return capabilities(); });
