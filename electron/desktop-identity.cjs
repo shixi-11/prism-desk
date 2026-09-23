@@ -3,6 +3,7 @@ const appId=test=>test?'org.prismdesk.test':'org.prismdesk.desktop';
 function register(app,shell,root){
  const target=path.join(root,'runtime','desktop','Prism.exe');
  if(!fs.existsSync(target))return;
+ if(!app.setAsDefaultProtocolClient(require('./task-links.cjs').scheme,target,[root,'--user-data-dir='+app.getPath('userData')]))throw Error('Could not register Prism task links.');
  const options={target,cwd:root,args:`"${root}" --user-data-dir="${app.getPath('userData')}"`,description:'棱镜 · Prism',icon:target,iconIndex:0,appUserModelId:appId(false)};
  const menu=path.join(app.getPath('appData'),'Microsoft','Windows','Start Menu','Programs','棱镜.lnk');
  fs.mkdirSync(path.dirname(menu),{recursive:true});

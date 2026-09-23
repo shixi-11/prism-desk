@@ -1,14 +1,16 @@
 {
-  "version": "0.1.33",
-  "date": "2026-09-21",
+  "version": "0.1.34",
+  "date": "2026-09-23",
   "notes": {
     "en": [
-      "Reduce the sidebar Account, Archive, Settings and Check for updates labels from 15px to 12px. Preserve their icons, spacing and click targets.",
-      "Show and copy the live MCP OAuth sign-in URL while the CLI waits, so authorization can continue when the browser does not open. Links are cleared when the operation ends."
+      "Reduce the sidebar New button and project folder labels to 12px.",
+      "Replace the task Copy submenu with Copy working directory (Ctrl+Shift+C), Copy deep link (Alt+Ctrl+L), and Copy as Markdown.",
+      "On Windows, task links open an existing local task in Prism, including when Prism is closed. Links require the same local task data; archived or deleted tasks must be restored first."
     ],
     "zh": [
-      "侧栏“账号、归档、设置、检查更新”字号由 15px 调整为 12px，保留图标、间距和点击区域。",
-      "MCP 登录等待期间显示并支持复制实际授权网址，浏览器未弹出时可手动打开；操作结束后清除链接。"
+      "侧栏“新建”按钮及项目文件夹名称统一缩小为 12px。",
+      "任务“复制”子菜单调整为“复制工作目录”（Ctrl+Shift+C）、“复制深度链接”（Alt+Ctrl+L）、“复制为 Markdown”。",
+      "Windows 下可用深度链接打开棱镜中的已有本地任务，也支持未启动时打开；链接依赖本机任务数据，已归档或删除的任务需先恢复。"
     ]
   }
 }

@@ -10,7 +10,8 @@ h2, h3, .modal h2, .modal h3, .task-plan h2, .relay-preferences h2 { font-family
 .brand > span, .brand .wordmark, .empty h1 { font-family: var(--font-title); font-weight: 400; }
 .topbar h2 { font-family: var(--font-body); font-size: 24px; font-weight: 500; line-height: 1.4; }
 .new-task, .sidebar > footer button { font: 500 15px/1.5 var(--font-body); }
-.sidebar > footer > button { font-size: 12px; }
+.sidebar > footer > button, .new-task { font-size: 12px; }
+.sidebar nav .sidebar-section.nested > .sidebar-section-heading > .sidebar-section-toggle { font-size: 12px; }
 .sidebar > footer button { padding-block: 12px; gap: 12px; }
 .sidebar > footer button svg { width: 19px; height: 19px; flex-shrink: 0; }
 .task-caption { font: 500 16px/1.5 var(--font-body); }

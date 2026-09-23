@@ -54,12 +54,12 @@ Created by [Shixi Lin](https://shixilin.com/). If Prism helps you keep creating,
 
 ### Install
 
-These commands install stable version **v0.1.33**. Check the [latest Release](https://github.com/shixi-11/prism-desk/releases/latest) for its version and bilingual change notes.
+These commands install stable version **v0.1.34**. Check the [latest Release](https://github.com/shixi-11/prism-desk/releases/latest) for its version and bilingual change notes.
 
 You will need Windows, Git, Node.js 22.12 or later, npm, and the official CLIs for your chosen providers. Sign in to each CLI separately.
 
 ```powershell
-git clone --branch v0.1.33 https://github.com/shixi-11/prism-desk.git
+git clone --branch v0.1.34 https://github.com/shixi-11/prism-desk.git
 cd prism-desk
 npm install
 npm run build

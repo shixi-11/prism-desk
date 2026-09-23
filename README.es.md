@@ -56,12 +56,12 @@ Creado por [Shixi Lin](https://shixilin.com/). Si Prism te ayuda a seguir creand
 
 ### Instalación
 
-Estos comandos instalan la versión estable **v0.1.33**. Consulta la [última versión publicada](https://github.com/shixi-11/prism-desk/releases/latest) para conocer su número y leer las notas de cambios bilingües.
+Estos comandos instalan la versión estable **v0.1.34**. Consulta la [última versión publicada](https://github.com/shixi-11/prism-desk/releases/latest) para conocer su número y leer las notas de cambios bilingües.
 
 Necesitarás Windows, Git, Node.js 22.12 o posterior, npm y las CLI oficiales de los proveedores que elijas. Inicia sesión en cada CLI por separado.
 
 ```powershell
-git clone --branch v0.1.33 https://github.com/shixi-11/prism-desk.git
+git clone --branch v0.1.34 https://github.com/shixi-11/prism-desk.git
 cd prism-desk
 npm install
 npm run build

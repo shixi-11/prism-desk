@@ -693,5 +693,8 @@
   "Codex 的 MCP 连接可在“MCP 连接”页按账号添加并登录授权。Claude、Grok、Gemini 当前执行通道未开放外部 MCP，接入技能资料不会改变这一限制。": "Configurez MCP pour le compte Codex sélectionné. Autorisez dans le navigateur ; les changements s’appliquent au prochain tour. Claude, Grok et Gemini n’autorisent pas le MCP externe ; connecter des références de compétences ne change pas cette limitation.",
   "登录网址": "URL de connexion",
   "复制登录网址": "Copier l’URL de connexion",
-  "复制到浏览器完成授权，保持此连接等待；取消或超时后需重新登录。": "Ouvrez l’URL copiée dans le navigateur et gardez la connexion en attente. Reconnectez-vous après annulation ou expiration."
+  "复制到浏览器完成授权，保持此连接等待；取消或超时后需重新登录。": "Ouvrez l’URL copiée dans le navigateur et gardez la connexion en attente. Reconnectez-vous après annulation ou expiration.",
+  "复制深度链接": "Copier le lien profond",
+  "复制为 Markdown": "Copier au format Markdown",
+  "任务不存在或已归档、删除。": "Tâche introuvable, archivée ou supprimée."
 }

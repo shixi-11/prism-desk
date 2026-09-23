@@ -47,7 +47,11 @@ function showWindow(){
   window.show();
   window.focus();
 }
-app.on('second-instance',showWindow);
+const taskLinks=require('./task-links.cjs');
+let pendingLink=taskLinks.fromArgs(process.argv),openLinkedTask=null;
+function receiveLink(id){if(!id)return;if(openLinkedTask)openLinkedTask(id);else pendingLink=id;}
+app.on('second-instance',(_event,args)=>{const id=taskLinks.fromArgs(args);if(id)receiveLink(id);else showWindow();});
+app.on('open-url',(event,url)=>{event.preventDefault();receiveLink(taskLinks.taskId(url));});
 app.on('activate',showWindow);
 let resetInProgress=false;
 let geminiLogin=null;
@@ -229,7 +233,7 @@ app.whenReady().then(() => {
     if(action==='fork'){const fork=await forkTask(store,runner.forTask(id),id,!!value);broadcastTasks();return {selectId:fork.id};}
     if(action==='share'||action==='preview-conversation')return {text:conversationText(store,id),title:task.title};
     if(action==='save-conversation'){const result=await dialog.showSaveDialog(owner(),{defaultPath:task.title.replace(/[<>:"/\\|?*]/g,'_')+'.md',filters:[{name:'Markdown',extensions:['md']}]});if(!result.canceled)fs.writeFileSync(result.filePath,conversationText(store,id));return {};}
-    if(action.startsWith('copy-')){const values={'copy-conversation':()=>conversationText(store,id),'copy-title':()=>task.title,'copy-id':()=>id,'copy-path':()=>task.cwd};if(!values[action])throw Error('Unsupported copy action');clipboard.writeText(values[action]());return {};}
+    if(action.startsWith('copy-')){const values={'copy-conversation':()=>conversationText(store,id),'copy-title':()=>task.title,'copy-id':()=>id,'copy-path':()=>task.cwd,'copy-link':()=>taskLinks.taskLink(id)};if(!values[action])throw Error('Unsupported copy action');clipboard.writeText(values[action]());return {};}
     if(action==='open-folder'){await shell.openPath(task.cwd);return {};}
     if(action==='open-document'){const file=path.join(store.dir(id),'conversation.md');fs.writeFileSync(file,conversationText(store,id));await shell.openPath(file);return {};}
     if(action==='new-window'){makeWindow(id);return {};}
@@ -489,7 +493,12 @@ app.whenReady().then(() => {
   }
   const windowFile=path.join(dataPath(),'update-windows.json'),restoreWindows=updateBootstrap.read(windowFile,[]);
   const layouts=Array.isArray(restoreWindows)?restoreWindows.filter(item=>item&&(item.key==='primary'||/^[a-f0-9-]{36}$/.test(item.key))).slice(0,20):[];
-  window=makeWindow(undefined,layouts[0]);
+  let initialLink;
+  const validateLink=id=>{try{store.get(id);return id;}catch{dialog.showErrorBox(translate(settings().language,'打开棱镜'),translate(settings().language,'任务不存在或已归档、删除。'));return undefined;}};
+  if(pendingLink){initialLink=validateLink(pendingLink);pendingLink=null;}
+  window=makeWindow(initialLink,layouts[0]);
+  if(initialLink)window.once('ready-to-show',()=>{if(!process.env.PRISM_TEST_HIDE)showWindow();});
+  openLinkedTask=id=>{const valid=validateLink(id);if(valid){const win=makeWindow(valid);win.once('ready-to-show',()=>{if(!process.env.PRISM_TEST_HIDE){win.show();win.focus();}});}};
   for(const layout of layouts.slice(1))makeWindow(undefined,layout);
   if(fs.existsSync(windowFile))fs.unlinkSync(windowFile);
   if(!process.env.PRISM_TEST_HIDE||process.env.PRISM_TEST_TRAY){
