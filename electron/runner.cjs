@@ -133,7 +133,7 @@ class Runner extends EventEmitter {
         if(task.autoSwitch===false || this.active.cancelRequested || !this.active.quotaExhausted || task.state!=='failed')break;
         require('./task-settings.cjs').applyPendingMode(task);
         const ordered=[...(task.relayOrder||[]).map(id=>PROFILES.find(p=>p.id===id)).filter(Boolean),...PROFILES.filter(p=>!(task.relayOrder||[]).includes(p.id))];
-        const next=ordered.find(p=>!p.disabled&&!attempted.has(p.id) && (!task.linkedProjects?.length||task.execution.mode==='full-access'||['Codex','Claude'].includes(p.provider)) && (!this.active.images.some(image=>image.kind!=='file')||['Codex','Claude','Grok'].includes(p.provider)) && (task.execution.mode==='read-only'||p.write&&['Codex','Claude','Grok'].includes(p.provider)));
+        const next=ordered.find(p=>!p.disabled&&!task.relayPaused?.includes(p.id)&&!attempted.has(p.id) && (!task.linkedProjects?.length||task.execution.mode==='full-access'||['Codex','Claude'].includes(p.provider)) && (!this.active.images.some(image=>image.kind!=='file')||['Codex','Claude','Grok'].includes(p.provider)) && (task.execution.mode==='read-only'||p.write&&['Codex','Claude','Grok'].includes(p.provider)));
         if(!next){this.event(id,'notice',{text:'已尝试所有符合当前权限的入口；没有自动重复调用。'});break;}
         this.active.pending.clear();
         this.emit('approval-reset',{taskId:task.id});

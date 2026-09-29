@@ -269,6 +269,7 @@ function Inspector({
   onDraftAccount,
   onHandoff,
   onRelayPreferences,
+  onPauseRelayAccount,
   storage,
   disabled,
 }) {
@@ -399,7 +400,7 @@ function Inspector({
         {selected?.provider==='Gemini'&&<><p className="account-status">{tr("Gemini 当前提供只读接续；登录后仍需执行验证。")}</p><button className="outline" disabled={loginBusy||disabled} onClick={async()=>{setLoginBusy(true);setLoginMessage(tr("请在当前浏览器完成 Google 授权"));try{const result=await api.loginGemini();setLoginMessage(tr(result.ok?"Google 授权已完成；尚未验证模型执行":"登录未完成，请核对浏览器提示后重试"));await onRefresh(target);}catch(e){setLoginMessage(e.message);}finally{setLoginBusy(false);}}}>{tr(loginBusy?"等待浏览器授权…":"登录 Google")}</button><p className="account-status" role="status">{loginMessage}</p></>}
         {quota?.remaining===0&&!stale&&<p className="quota-notice" role="status">{tr("额度已用完，可换账号继续或等待恢复；重置卡需手动使用。")}</p>}
       </section>
-      {task&&<RelayPreferences key={task.id} task={task} profiles={profiles} onSaveOrder={onRelayPreferences} onModelSettings={onModelSettings} Modal={Modal} ModelControls={ModelControls}/>}
+      {task&&<RelayPreferences key={task.id} task={task} profiles={profiles} onSaveOrder={onRelayPreferences} onPauseAccount={onPauseRelayAccount} onModelSettings={onModelSettings} Modal={Modal} ModelControls={ModelControls}/>}
       <section className="shared">
         <div className="section-title">
           <h2>{tr("共享能力")}</h2>
@@ -980,6 +981,7 @@ function App() {
         quotas={quotas}
         checking={checking}
         onRefresh={refresh}
+        onPauseRelayAccount={async(id,paused)=>{const updated=await api.pauseRelayAccount(task.id,id,paused);if(current.current===updated.id)setTask(updated);return updated;}}
         onRelayPreferences={async order=>{const updated=await api.relayPreferences(task.id,order);if(current.current===updated.id)setTask(updated);return updated;}}
         onSwitch={changeProfile}
         waiting={queue.some(i=>i.taskId===task?.id&&i.status==='waiting')&&!busy}

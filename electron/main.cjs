@@ -180,6 +180,7 @@ app.whenReady().then(() => {
     if(action==='resume'&&(accountOperation||validatingApps||resetInProgress))throw Error('请等待账号或应用操作结束。');
     return require('./goal-actions.cjs').act(store,runner.forTask(id),messageQueue,id,action,revision);
   });
+  handle('pauseRelayAccount',(id,accountId,paused)=>{const task=require('./relay-preferences.cjs').pauseAccount(store,runner,PROFILES,id,accountId,paused);emit('state',task);return task;});
   handle('relayPreferences',(id,order)=>{if(!Array.isArray(order)||new Set(order).size!==order.length||order.some(id=>!PROFILES.some(p=>p.id===id)))throw Error('接续顺序无效');const task=runner.activeFor(id)?.task||store.get(id);task.relayOrder=order;store.save(task);emit('state',task);return task;});
   handle('planAction',(id,action,revision)=>{
     const task=store.get(id);runner.assertIdle(task);

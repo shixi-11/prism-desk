@@ -1,14 +1,14 @@
 {
-  "version": "0.1.36",
+  "version": "0.1.37",
   "date": "2026-09-30",
   "notes": {
     "en": [
-      "Long pasted text and pasted Markdown/text files now appear as compact composer cards with full-text preview and removal. Cards survive draft restoration and send their complete content with your instructions.",
-      "On Windows, Copy as Markdown places a Markdown file and plain text on the clipboard. Apps that accept pasted files can show an attachment card; the destination app controls its display. If file copy is unavailable, plain text is copied."
+      "Each account in Automatic handoff preferences now has a pause/resume button. Paused accounts are skipped during automatic quota handoff for this task only; their order and model settings are preserved.",
+      "Pause settings survive reopening the task and apply during an active run. Pausing does not interrupt the current execution or prevent manual account selection."
     ],
     "zh": [
-      "长文本及粘贴的 Markdown、文本文件现在显示为紧凑卡片，可查看全文、移除并恢复草稿；发送时完整保留内容及补充指令。",
-      "Windows 下“复制为 Markdown”同时复制 Markdown 文件和纯文本，支持粘贴文件的应用可显示附件卡片；实际样式由接收应用决定，文件复制不可用时退回纯文本。"
+      "“自动接续偏好”中的每个账号新增暂停、恢复按钮；自动轮换会跳过暂停的账号，仅影响当前任务，并保留原有排序和模型设置。",
+      "暂停设置会保存，重新打开任务仍然有效，运行中也可设置；暂停不会中断正在执行的账号，也不限制手动选择账号。"
     ]
   }
 }

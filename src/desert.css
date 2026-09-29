@@ -653,3 +653,7 @@ html:not([lang^="zh"]) .empty h1 { font-size:clamp(26px,3vw,44px); }
 .local-path-link { max-width:100%; text-align:start; white-space:pre-wrap; overflow-wrap:anywhere; }
 .preview-tools { flex-wrap:wrap; }
 .preview-native { padding:24px; overflow-wrap:anywhere; }
+
+.relay-order-row.relay-paused .relay-account { opacity:.65; }
+.relay-row-actions button[aria-pressed="true"] { background:var(--selection); }
+.relay-pause-help { font-size:12px; color:var(--muted); }

@@ -702,5 +702,11 @@
   "移除粘贴的文本": "Eliminar texto pegado",
   "粘贴的文本过长，请分开发送。": "El texto es demasiado largo. Envíalo en varios mensajes.",
   "已复制 Markdown 文件与文本": "Archivo Markdown y texto copiados",
-  "已复制文本": "Texto copiado"
+  "已复制文本": "Texto copiado",
+  "已暂停自动接续": "Continuación automática pausada",
+  "已恢复自动接续": "Continuación automática reanudada",
+  "暂停自动接续": "Pausar continuación automática",
+  "恢复自动接续": "Reanudar continuación automática",
+  "暂停的账号会在当前任务自动接续时被跳过，可随时恢复。": "Las cuentas pausadas se omiten en la continuación automática de esta tarea. Puedes reanudarlas en cualquier momento.",
+  "接续账号无效": "Cuenta de continuación no válida"
 }
