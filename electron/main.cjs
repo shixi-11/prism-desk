@@ -233,6 +233,7 @@ app.whenReady().then(() => {
     if(action==='fork'){const fork=await forkTask(store,runner.forTask(id),id,!!value);broadcastTasks();return {selectId:fork.id};}
     if(action==='share'||action==='preview-conversation')return {text:conversationText(store,id),title:task.title};
     if(action==='save-conversation'){const result=await dialog.showSaveDialog(owner(),{defaultPath:task.title.replace(/[<>:"/\\|?*]/g,'_')+'.md',filters:[{name:'Markdown',extensions:['md']}]});if(!result.canceled)fs.writeFileSync(result.filePath,conversationText(store,id));return {};}
+    if(action==='copy-conversation')return require('./copy-markdown.cjs').copyMarkdown({text:conversationText(store,id),title:task.title,directory:store.dir(id),clipboard});
     if(action.startsWith('copy-')){const values={'copy-conversation':()=>conversationText(store,id),'copy-title':()=>task.title,'copy-id':()=>id,'copy-path':()=>task.cwd,'copy-link':()=>taskLinks.taskLink(id)};if(!values[action])throw Error('Unsupported copy action');clipboard.writeText(values[action]());return {};}
     if(action==='open-folder'){await shell.openPath(task.cwd);return {};}
     if(action==='open-document'){const file=path.join(store.dir(id),'conversation.md');fs.writeFileSync(file,conversationText(store,id));await shell.openPath(file);return {};}

@@ -56,12 +56,12 @@ Prism 目前以 **Windows 原始碼安裝**方式提供。尚未發布獨立的 
 
 ### 安裝
 
-以下指令會安裝穩定版本 **v0.1.35**。請查看[最新發布版本](https://github.com/shixi-11/prism-desk/releases/latest)，確認其版本與雙語變更說明。
+以下指令會安裝穩定版本 **v0.1.36**。請查看[最新發布版本](https://github.com/shixi-11/prism-desk/releases/latest)，確認其版本與雙語變更說明。
 
 你需要 Windows、Git、Node.js 22.12 或更新版本、npm，以及所選供應商的官方 CLI。請分別登入各個 CLI。
 
 ```powershell
-git clone --branch v0.1.35 https://github.com/shixi-11/prism-desk.git
+git clone --branch v0.1.36 https://github.com/shixi-11/prism-desk.git
 cd prism-desk
 npm install
 npm run build
@@ -128,6 +128,8 @@ powershell -NoProfile -ExecutionPolicy Bypass -File scripts/start.ps1
 #### 訊息與草稿
 
 執行中可繼續傳送，佇列訊息依序等候，也可取消。設定中可選擇 Enter 或 Ctrl/⌘+Enter 傳送，以及佇列或即時引導。Codex、Claude 和 Grok 均可向執行中的原生對話傳送補充要求；CLI 可能在目前生成或工具步驟結束後處理。未確認送達的訊息會保留等待核對。應用程式開啟期間，切換任務會保留各自的草稿。
+
+長文字及貼上的 `.md`、`.txt` 檔案在輸入框中顯示為精簡卡片，可點開閱讀全文或移除，草稿會保留卡片，傳送時包含完整內容。Windows 下**複製為 Markdown**同時複製本機 Markdown 檔案和純文字，支援貼上檔案的應用程式可顯示附件卡片；實際樣式由接收端決定，檔案複製失敗時改為純文字。
 
 #### 檔案預覽
 

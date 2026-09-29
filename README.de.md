@@ -56,12 +56,12 @@ Entwickelt von [Shixi Lin](https://shixilin.com/). Wenn Prism Ihre Arbeit erleic
 
 ### Installation
 
-Diese Befehle installieren die stabile Version **v0.1.35**. Den aktuellen Versionsstand und die zweisprachigen Änderungshinweise finden Sie in der [neuesten Veröffentlichung](https://github.com/shixi-11/prism-desk/releases/latest).
+Diese Befehle installieren die stabile Version **v0.1.36**. Den aktuellen Versionsstand und die zweisprachigen Änderungshinweise finden Sie in der [neuesten Veröffentlichung](https://github.com/shixi-11/prism-desk/releases/latest).
 
 Sie benötigen Windows, Git, Node.js 22.12 oder neuer, npm und die offiziellen CLIs der gewählten Anbieter. Melden Sie sich bei jedem CLI separat an.
 
 ```powershell
-git clone --branch v0.1.35 https://github.com/shixi-11/prism-desk.git
+git clone --branch v0.1.36 https://github.com/shixi-11/prism-desk.git
 cd prism-desk
 npm install
 npm run build
@@ -128,6 +128,8 @@ Fügen Sie Screenshots ein, ziehen Sie Bilder in den Eingabebereich oder verwend
 #### Nachrichten und Entwürfe
 
 Während der Ausführung können Sie weitere Nachrichten senden. Eingereihte Nachrichten behalten ihre Reihenfolge und können abgebrochen werden. Die Einstellungen bieten Enter oder Ctrl/⌘+Enter sowie Warteschlange oder Live-Anweisungen. Codex, Claude und Grok nehmen zusätzliche Anweisungen in der aktiven nativen Unterhaltung entgegen. Die CLI kann diese nach der aktuellen Generierung oder dem Werkzeugschritt verarbeiten. Unbestätigte Sendungen bleiben zur Prüfung erhalten. Entwürfe bleiben beim Aufgabenwechsel in der App erhalten.
+
+Lange eingefügte Texte und `.md`/`.txt`-Dateien erscheinen als kompakte Karten. Der vollständige Text lässt sich anzeigen und die Karte entfernen; Entwürfe behalten die Karten und beim Senden wird ihr gesamter Inhalt übertragen. Unter Windows kopiert **Als Markdown kopieren** eine lokale Markdown-Datei und Klartext. Apps, die eingefügte Dateien unterstützen, können eine Anhangskarte anzeigen; die Darstellung bestimmt die empfangende App. Bei einem Fehler wird Klartext kopiert.
 
 #### Dateivorschauen
 

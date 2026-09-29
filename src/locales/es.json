@@ -696,5 +696,11 @@
   "复制到浏览器完成授权，保持此连接等待；取消或超时后需重新登录。": "Abre la URL copiada en el navegador y mantén la conexión en espera. Tras cancelar o agotar el tiempo, inicia sesión de nuevo.",
   "复制深度链接": "Copiar enlace profundo",
   "复制为 Markdown": "Copiar como Markdown",
-  "任务不存在或已归档、删除。": "La tarea no existe, está archivada o eliminada."
+  "任务不存在或已归档、删除。": "La tarea no existe, está archivada o eliminada.",
+  "粘贴的文本": "Texto pegado",
+  "查看粘贴的文本": "Ver texto pegado",
+  "移除粘贴的文本": "Eliminar texto pegado",
+  "粘贴的文本过长，请分开发送。": "El texto es demasiado largo. Envíalo en varios mensajes.",
+  "已复制 Markdown 文件与文本": "Archivo Markdown y texto copiados",
+  "已复制文本": "Texto copiado"
 }

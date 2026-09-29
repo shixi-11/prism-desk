@@ -56,12 +56,12 @@ Creado por [Shixi Lin](https://shixilin.com/). Si Prism te ayuda a seguir creand
 
 ### Instalación
 
-Estos comandos instalan la versión estable **v0.1.35**. Consulta la [última versión publicada](https://github.com/shixi-11/prism-desk/releases/latest) para conocer su número y leer las notas de cambios bilingües.
+Estos comandos instalan la versión estable **v0.1.36**. Consulta la [última versión publicada](https://github.com/shixi-11/prism-desk/releases/latest) para conocer su número y leer las notas de cambios bilingües.
 
 Necesitarás Windows, Git, Node.js 22.12 o posterior, npm y las CLI oficiales de los proveedores que elijas. Inicia sesión en cada CLI por separado.
 
 ```powershell
-git clone --branch v0.1.35 https://github.com/shixi-11/prism-desk.git
+git clone --branch v0.1.36 https://github.com/shixi-11/prism-desk.git
 cd prism-desk
 npm install
 npm run build
@@ -128,6 +128,8 @@ Pega capturas de pantalla, arrastra imágenes al cuadro de redacción o usa el b
 #### Mensajes y borradores
 
 Puedes enviar mensajes durante la ejecución. Los mensajes en cola mantienen su orden y se pueden cancelar. En ajustes puedes elegir Enter o Ctrl/⌘+Enter y cola o instrucciones en directo. Codex, Claude y Grok permiten enviar instrucciones a la conversación nativa activa. El CLI puede procesarlas tras la generación o el paso de herramienta actual. Los envíos sin confirmar quedan retenidos para revisión. Los borradores se conservan al cambiar de tarea en la aplicación.
+
+El texto largo pegado y los archivos `.md`/`.txt` aparecen como tarjetas compactas. Puedes leer el contenido completo o eliminarlas; se conservan en los borradores y se envían completas. En Windows, **Copiar como Markdown** copia un archivo Markdown local y texto sin formato. Las aplicaciones que admiten pegar archivos pueden mostrar una tarjeta adjunta; su apariencia depende de la aplicación receptora. Si falla la copia del archivo, se copia texto sin formato.
 
 #### Vistas previas de archivos
 

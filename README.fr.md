@@ -56,12 +56,12 @@ Créé par [Shixi Lin](https://shixilin.com/). Si Prism vous aide à créer, [so
 
 ### Installation
 
-Ces commandes installent la version stable **v0.1.35**. Consultez la [dernière version publiée](https://github.com/shixi-11/prism-desk/releases/latest) pour connaître son numéro et lire ses notes de modification bilingues.
+Ces commandes installent la version stable **v0.1.36**. Consultez la [dernière version publiée](https://github.com/shixi-11/prism-desk/releases/latest) pour connaître son numéro et lire ses notes de modification bilingues.
 
 Vous aurez besoin de Windows, de Git, de Node.js 22.12 ou ultérieur, de npm et des CLI officiels des fournisseurs de votre choix. Connectez-vous séparément à chaque CLI.
 
 ```powershell
-git clone --branch v0.1.35 https://github.com/shixi-11/prism-desk.git
+git clone --branch v0.1.36 https://github.com/shixi-11/prism-desk.git
 cd prism-desk
 npm install
 npm run build
@@ -128,6 +128,8 @@ Collez des captures d’écran, déposez des images dans la zone de saisie ou ut
 #### Messages et brouillons
 
 Vous pouvez envoyer des messages pendant l’exécution. Les messages en attente conservent leur ordre et peuvent être annulés. Les paramètres proposent Enter ou Ctrl/⌘+Enter, ainsi que la file d’attente ou les instructions en direct. Codex, Claude et Grok acceptent des instructions dans la conversation native active. Le CLI peut les traiter après la génération ou l’étape d’outil en cours. Les envois non confirmés restent disponibles pour vérification. Les brouillons sont conservés lors du changement de tâche dans l’application.
+
+Les longs textes collés et les fichiers `.md`/`.txt` apparaissent sous forme de cartes compactes. Vous pouvez lire le texte intégral ou retirer une carte ; les brouillons les conservent et leur contenu complet est envoyé. Sous Windows, **Copier au format Markdown** copie un fichier Markdown local et du texte brut. Les applications qui acceptent les fichiers collés peuvent afficher une carte jointe ; son apparence dépend de l’application destinataire. En cas d’échec, le texte brut est copié.
 
 #### Aperçus de fichiers
 

@@ -1,0 +1,9 @@
+.pasted-texts{display:flex;flex-wrap:wrap;gap:8px;padding:0 0 10px;}
+.pasted-text-card{display:flex;position:relative;max-width:100%;width:310px;border:1px solid var(--line);border-radius:12px;background:var(--surface);overflow:hidden;}
+.composer .pasted-text-open{display:flex;align-items:center;gap:12px;flex:1;min-width:0;padding:12px 34px 12px 12px;border:0;background:transparent;text-align:start;}
+.pasted-text-open>svg{flex:none;width:44px;height:44px;padding:9px;border-radius:10px;background:#0002;}
+.pasted-text-open>span{min-width:0;display:flex;flex-direction:column;gap:3px;}
+.pasted-text-open strong{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px;font-weight:500;}
+.pasted-text-open small{color:var(--muted);font-size:12px;}
+.composer .pasted-text-remove{position:absolute;inset-block-start:7px;inset-inline-end:7px;display:grid;place-items:center;width:22px;height:22px;padding:0;border:0;border-radius:50%;background:var(--bg);}
+.pasted-text-body{white-space:pre-wrap;overflow-wrap:anywhere;max-height:60vh;overflow:auto;font:13px/1.7 var(--font-body);}

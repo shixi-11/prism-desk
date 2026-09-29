@@ -54,12 +54,12 @@ Created by [Shixi Lin](https://shixilin.com/). If Prism helps you keep creating,
 
 ### Install
 
-These commands install stable version **v0.1.35**. Check the [latest Release](https://github.com/shixi-11/prism-desk/releases/latest) for its version and bilingual change notes.
+These commands install stable version **v0.1.36**. Check the [latest Release](https://github.com/shixi-11/prism-desk/releases/latest) for its version and bilingual change notes.
 
 You will need Windows, Git, Node.js 22.12 or later, npm, and the official CLIs for your chosen providers. Sign in to each CLI separately.
 
 ```powershell
-git clone --branch v0.1.35 https://github.com/shixi-11/prism-desk.git
+git clone --branch v0.1.36 https://github.com/shixi-11/prism-desk.git
 cd prism-desk
 npm install
 npm run build
@@ -126,6 +126,8 @@ Paste screenshots, drop images into the composer or use the image button (up to 
 #### Messages and drafts
 
 Send more messages while work runs: queued messages wait in order and can be cancelled. Settings lets you choose Enter or Ctrl/⌘+Enter and queueing or live guidance. Codex, Claude and Grok support sending guidance into the active native conversation. The CLI may process it after the current generation or tool step. Unconfirmed sends remain held for review. Drafts are retained while switching tasks in the open app.
+
+Long pasted text and pasted `.md`/`.txt` files appear as compact cards in the composer. Click to read the full text or remove a card; drafts retain the cards and sending includes their complete content. On Windows, **Copy as Markdown** copies both a local Markdown file and plain text. Apps that accept pasted files can display an attachment card; the receiving app controls the appearance. File-copy failures fall back to plain text.
 
 #### File previews
 

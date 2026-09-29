@@ -1,16 +1,14 @@
 {
-  "version": "0.1.35",
-  "date": "2026-09-29",
+  "version": "0.1.36",
+  "date": "2026-09-30",
   "notes": {
     "en": [
-      "Stop scanning skills and plugins when the window gains focus. Scheduled refresh and manual Check & sync remain available.",
-      "Reuse the completed capability scan when updating the interface instead of scanning the same files again.",
-      "Reuse rendered conversation history while streaming replies or typing. New messages, task state and language changes still update normally. Large histories still require an initial read."
+      "Long pasted text and pasted Markdown/text files now appear as compact composer cards with full-text preview and removal. Cards survive draft restoration and send their complete content with your instructions.",
+      "On Windows, Copy as Markdown places a Markdown file and plain text on the clipboard. Apps that accept pasted files can show an attachment card; the destination app controls its display. If file copy is unavailable, plain text is copied."
     ],
     "zh": [
-      "切回窗口时不再扫描技能和插件，保留定时刷新及手动“检查与同步”。",
-      "更新共享能力界面时复用刚完成的扫描结果，避免再次扫描相同文件。",
-      "流式回复及输入文字时复用已渲染的对话历史；新增消息、任务状态及语言变化仍正常更新。较大的历史记录首次打开仍需读取。"
+      "长文本及粘贴的 Markdown、文本文件现在显示为紧凑卡片，可查看全文、移除并恢复草稿；发送时完整保留内容及补充指令。",
+      "Windows 下“复制为 Markdown”同时复制 Markdown 文件和纯文本，支持粘贴文件的应用可显示附件卡片；实际样式由接收应用决定，文件复制不可用时退回纯文本。"
     ]
   }
 }

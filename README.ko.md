@@ -56,12 +56,12 @@ Prism은 현재 **Windows 소스 설치** 방식으로 제공됩니다. 독립�
 
 ### 설치
 
-다음 명령은 안정 버전 **v0.1.35**을 설치합니다. [최신 릴리스](https://github.com/shixi-11/prism-desk/releases/latest)에서 버전과 두 언어로 제공되는 변경 사항을 확인하세요.
+다음 명령은 안정 버전 **v0.1.36**을 설치합니다. [최신 릴리스](https://github.com/shixi-11/prism-desk/releases/latest)에서 버전과 두 언어로 제공되는 변경 사항을 확인하세요.
 
 Windows, Git, Node.js 22.12 이상, npm, 그리고 선택한 공급자의 공식 CLI가 필요합니다. 각 CLI에 별도로 로그인하세요.
 
 ```powershell
-git clone --branch v0.1.35 https://github.com/shixi-11/prism-desk.git
+git clone --branch v0.1.36 https://github.com/shixi-11/prism-desk.git
 cd prism-desk
 npm install
 npm run build
@@ -128,6 +128,8 @@ Codex에 목표 설정이나 변경을 요청하면 Prism의 내장 도구를 �
 #### 메시지와 초안
 
 실행 중에도 메시지를 보낼 수 있습니다. 대기 메시지는 순서대로 처리되며 취소할 수 있습니다. 설정에서 Enter 또는 Ctrl/⌘+Enter와 대기열 또는 실시간 지시를 선택할 수 있습니다. Codex, Claude, Grok은 실행 중인 기본 대화에 추가 지시를 전달합니다. CLI는 현재 생성이나 도구 단계가 끝난 뒤 처리할 수 있습니다. 수신이 확인되지 않은 메시지는 검토를 위해 보관됩니다. 앱에서 작업을 전환해도 초안은 유지됩니다.
+
+긴 텍스트와 붙여넣은 `.md`/`.txt` 파일은 입력창에 작은 카드로 표시됩니다. 전체 내용을 보거나 제거할 수 있으며, 초안에 저장되고 전송할 때 전체 내용이 포함됩니다. Windows의 **Markdown으로 복사**는 로컬 Markdown 파일과 일반 텍스트를 함께 복사합니다. 파일 붙여넣기를 지원하는 앱은 첨부 카드로 표시할 수 있으며 표시 방식은 수신 앱이 결정합니다. 파일 복사가 실패하면 일반 텍스트를 복사합니다.
 
 #### 파일 미리 보기
 

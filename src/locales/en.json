@@ -696,5 +696,11 @@
   "复制到浏览器完成授权，保持此连接等待；取消或超时后需重新登录。": "Open the copied URL in your browser and keep this connection waiting. Sign in again after cancellation or timeout.",
   "复制深度链接": "Copy deep link",
   "复制为 Markdown": "Copy as Markdown",
-  "任务不存在或已归档、删除。": "Task not found, archived or deleted."
+  "任务不存在或已归档、删除。": "Task not found, archived or deleted.",
+  "粘贴的文本": "Pasted text",
+  "查看粘贴的文本": "View pasted text",
+  "移除粘贴的文本": "Remove pasted text",
+  "粘贴的文本过长，请分开发送。": "Pasted text is too long. Send it in separate messages.",
+  "已复制 Markdown 文件与文本": "Markdown file and text copied",
+  "已复制文本": "Text copied"
 }

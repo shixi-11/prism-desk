@@ -56,12 +56,12 @@ Prism は現在、**Windows でのソースからのインストール**に対�
 
 ### インストール
 
-以下のコマンドで安定版 **v0.1.35** をインストールします。[最新リリース](https://github.com/shixi-11/prism-desk/releases/latest)で、バージョンと二言語の変更履歴を確認してください。
+以下のコマンドで安定版 **v0.1.36** をインストールします。[最新リリース](https://github.com/shixi-11/prism-desk/releases/latest)で、バージョンと二言語の変更履歴を確認してください。
 
 Windows、Git、Node.js 22.12 以降、npm、および利用するプロバイダーの公式 CLI が必要です。各 CLI に個別にサインインしてください。
 
 ```powershell
-git clone --branch v0.1.35 https://github.com/shixi-11/prism-desk.git
+git clone --branch v0.1.36 https://github.com/shixi-11/prism-desk.git
 cd prism-desk
 npm install
 npm run build
@@ -128,6 +128,8 @@ Codex に目標の設定や変更を依頼すると、Prism のネイティブ�
 #### メッセージと下書き
 
 実行中にもメッセージを送信できます。待機メッセージは順番に処理され、キャンセルできます。設定では Enter または Ctrl/⌘+Enter と、キューまたはリアルタイム指示を選択できます。Codex、Claude、Grok は実行中のネイティブ会話への追加指示に対応します。CLI は現在の生成やツール操作の終了後に処理する場合があります。受信未確認のメッセージは確認用に保持されます。アプリ内でタスクを切り替えても下書きは保持されます。
+
+長い貼り付けテキストと `.md` / `.txt` ファイルは入力欄のコンパクトなカードになります。全文表示と削除に対応し、下書きに保存され、送信時には全文が含まれます。Windows の **Markdown としてコピー**はローカルの Markdown ファイルとプレーンテキストをコピーします。ファイルの貼り付けに対応するアプリでは添付カードを表示できますが、表示方法は受信側が決めます。ファイルのコピーに失敗した場合はプレーンテキストをコピーします。
 
 #### ファイルのプレビュー
 

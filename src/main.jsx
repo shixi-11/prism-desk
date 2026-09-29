@@ -52,6 +52,8 @@ import {NewEntry,NewProject} from './ProjectCreation.jsx';
 import {sidebarGroups} from './sidebar-groups.js';
 import SidebarTasks from './SidebarTasks.jsx';
 import {conversationMessages} from './conversation-messages.js';
+import PastedTexts from './PastedTexts.jsx';
+import {isLongPaste,pasteCard,messageText} from './pasted-text.js';
 import FastControl from './FastControl.jsx';
 const api = window.prism;
 function TaskEntry({item,selected,onSelect,onRename,onAction}){
@@ -571,6 +573,7 @@ function App() {
   const [draftSettings,setDraftSettings]=useState({}),[draftAccount,setDraftAccount]=useState('');
   const [changingAccount,setChangingAccount]=useState(false);
   const [text, setText] = useState("");
+  const [pastedTexts,setPastedTexts]=useState([]),[openedPaste,setOpenedPaste]=useState(null);
   const [images,setImages]=useState([]),[uploading,setUploading]=useState(false),[sending,setSending]=useState(false),[queue,setQueue]=useState([]),[thinking,setThinking]=useState(""),[activity,setActivity]=useState("");
   const drafts=useRef({}),loadSequence=useRef(0),pendingImageFiles=useRef([]),attachmentUpload=useRef(false);
   const [streaming, setStreaming] = useState("");
@@ -587,16 +590,16 @@ function App() {
   const current = useRef(null);
   const fail = (error) => setToast(error.message || String(error));
   const goHome=()=>{
-    drafts.current[current.current||'_new']={text,images};++loadSequence.current;current.current=null;
+    drafts.current[current.current||'_new']={text,images,pastedTexts};++loadSequence.current;current.current=null;
     setTask(null);setEvents([]);setStreaming('');setThinking('');setActivity('');setCheckpoint('');
-    setText(drafts.current._new?.text||'');setImages(drafts.current._new?.images||[]);setPreview(null);
+    setText(drafts.current._new?.text||'');setImages(drafts.current._new?.images||[]);setPastedTexts(drafts.current._new?.pastedTexts||[]);setOpenedPaste(null);setPreview(null);
   };
   const load = async (id) => {
-    if(init||current.current)drafts.current[current.current||'_new']={text,images};
+    if(init||current.current)drafts.current[current.current||'_new']={text,images,pastedTexts};
     const sequence=++loadSequence.current;
     const result = await api.task(id);
     if(sequence!==loadSequence.current)return;
-    setText(drafts.current[id]?.text||"");setImages(drafts.current[id]?.images||[]);setThinking("");setActivity("");
+    setText(drafts.current[id]?.text||"");setImages(drafts.current[id]?.images||[]);setPastedTexts(drafts.current[id]?.pastedTexts||[]);setOpenedPaste(null);setThinking("");setActivity("");
     setTask(result.task);
     current.current = id;
     setEvents(result.events);
@@ -612,7 +615,7 @@ function App() {
       .init()
       .then((data) => {
         drafts.current=data.drafts||{};
-        if(!data.tasks.length){setText(drafts.current._new?.text||'');setImages(drafts.current._new?.images||[]);}
+        if(!data.tasks.length){setText(drafts.current._new?.text||'');setImages(drafts.current._new?.images||[]);setPastedTexts(drafts.current._new?.pastedTexts||[]);setOpenedPaste(null);}
         setInit(data);setQuotas(old=>({...data.quotas,...old}));setQueue(data.queue||[]);setAccountLogins(data.accountLogins||{});
         setAppUpdate(data.appUpdate);
         setDraftAccount(data.profiles.find(p=>!p.disabled)?.id||'');
@@ -621,7 +624,7 @@ function App() {
         setApprovals(data.approvals || []);
         const requested=new URLSearchParams(location.search).get('task');
         if (data.tasks.length&&(requested||drafts.current._selected!==null)) load(data.tasks.find(t=>t.id===(requested||drafts.current._selected))?.id||data.tasks[0].id);
-        else {setText(drafts.current._new?.text||'');setImages(drafts.current._new?.images||[]);}
+        else {setText(drafts.current._new?.text||'');setImages(drafts.current._new?.images||[]);setPastedTexts(drafts.current._new?.pastedTexts||[]);setOpenedPaste(null);}
         api.updateHealthy().then(result=>{if(result?.version)setToast(tr('已升级至 v{version}',{version:result.version}));}).catch(fail);
       })
       .catch(fail);
@@ -631,7 +634,7 @@ function App() {
       if(type==='app-update'){setAppUpdate(value);return;}
       if(type==='accounts'){setInit(old=>old?{...old,profiles:value}:old);if(!current.current)setDraftAccount(old=>value.some(p=>p.id===old&&!p.disabled)?old:value.find(p=>!p.disabled)?.id||'');return;}
       if(type==='account-login'){setAccountLogins(old=>({...old,[value.id]:value}));return;}
-      if(type==='task-list'){setInit(old=>old?{...old,...value}:old);const selected=value.tasks.find(t=>t.id===current.current);if(selected)setTask(selected);else if(current.current){++loadSequence.current;current.current=null;setTask(null);setEvents([]);setText('');setImages([]);setStreaming('');setThinking('');setActivity('');}return;}
+      if(type==='task-list'){setInit(old=>old?{...old,...value}:old);const selected=value.tasks.find(t=>t.id===current.current);if(selected)setTask(selected);else if(current.current){++loadSequence.current;current.current=null;setTask(null);setEvents([]);setText('');setImages([]);setPastedTexts([]);setOpenedPaste(null);setStreaming('');setThinking('');setActivity('');}return;}
       if(type==='approval-reset'){setApprovals(old=>old.filter(a=>a.taskId!==value.taskId));return;}
       if(type==='queue'){setQueue(value);return;}
       if(type==='quota'){setQuotas(old=>({...old,[value.id]:value}));return;}
@@ -680,16 +683,16 @@ function App() {
   }, []);
   const updateSnapshot=useRef(null),lastInteraction=useRef(Date.now());
   updateSnapshot.current=()=>{
-    drafts.current[current.current||'_new']={text,images};
+    drafts.current[current.current||'_new']={text,images,pastedTexts};
     drafts.current._selected=current.current;
     api.saveDrafts(drafts.current);
-    return !uploading&&!sending&&!preview&&!taskDialog&&!pendingImageFiles.current.length;
+    return !uploading&&!sending&&!preview&&!taskDialog&&!openedPaste&&!pendingImageFiles.current.length;
   };
   useEffect(()=>{
     if(!init)return;
     const timer=setTimeout(()=>{try{updateSnapshot.current();}catch(e){fail(e);}},300);
     return()=>clearTimeout(timer);
-  },[init,text,images,task?.id]);
+  },[init,text,images,pastedTexts,task?.id]);
   useEffect(()=>{
     const touched=()=>{lastInteraction.current=Date.now();};
     for(const event of ['pointerdown','keydown','input','wheel'])document.addEventListener(event,touched,true);
@@ -748,11 +751,11 @@ function App() {
     const result=await api.taskAction(id,action,value);
     if(result.selectId)await load(result.selectId);
     if(result.text!==undefined)setTaskDialog({id,action,...result});
-    if(action.startsWith('copy-'))setToast(tr('已复制'));
+    if(action.startsWith('copy-'))setToast(tr(action==='copy-conversation'?(result.fileCopied?'已复制 Markdown 文件与文本':'已复制文本'):'已复制'));
   }catch(error){fail(error);}};
   const create = async (values) => {
     const made = await api.create({...values,profile:draftAccount,executionOptions:draftSettings[draftAccount]});
-    if(!task)drafts.current[made.id]={text,images:[]};
+    if(!task)drafts.current[made.id]={text,images:[],pastedTexts};
     setInit((old) => ({ ...old, tasks: [made, ...old.tasks.filter(t=>t.id!==made.id)] }));
     setModal("");
     await load(made.id);
@@ -765,10 +768,10 @@ function App() {
     }
     try {
       if(sending||uploading)return;setSending(true);
-      const sentText=text,sentImages=images,sentId=task.id;
-      const result=await api.run(sentId,sentText,sentImages.map(image=>image.id));
-      drafts.current[sentId]={text:"",images:[]};
-      if(current.current===sentId){setText(value=>value===sentText?"":value);setImages(value=>value.filter(image=>!sentImages.some(sent=>sent.id===image.id)));}
+      const sentText=text,sentPastes=pastedTexts,sentImages=images,sentId=task.id;
+      const result=await api.run(sentId,messageText(sentText,sentPastes),sentImages.map(image=>image.id));
+      drafts.current[sentId]={text:"",images:[],pastedTexts:[]};
+      if(current.current===sentId){setText(value=>value===sentText?"":value);setPastedTexts(value=>value.filter(card=>!sentPastes.some(sent=>sent.id===card.id)));setImages(value=>value.filter(image=>!sentImages.some(sent=>sent.id===image.id)));}
       if(result.queued&&init.settings.busySend==='steer')setToast(tr(result.reason||'当前无法实时引导，消息已排队'));
     } catch (e) {
       fail(e);
@@ -776,6 +779,28 @@ function App() {
   };
   const savePreferences=async update=>{try{const settings=await api.preferences(update);setInit(old=>({...old,settings}));}catch(e){fail(e);}};
   const addImages=async files=>{if(attachmentUpload.current)return;if(!task){if(files){const list=Array.from(files);if(list.length>5){fail(Error(tr("每条消息最多添加 5 个附件")));return;}if(list.some(file=>file.size>(/\.(png|jpe?g|webp|gif|bmp|ico)$/i.test(file.name)?10:50)*1024*1024)){fail(Error(tr("图片不能超过 10 MB，其他文件不能超过 50 MB")));return;}pendingImageFiles.current=list;}newConversation();return;}const taskId=task.id;attachmentUpload.current=true;setUploading(true);try{let inputs=null;if(files){const list=Array.from(files);if(!list.length)return;if(images.length+list.length>5)throw Error(tr("每条消息最多添加 5 个附件"));inputs=await Promise.all(list.map(async file=>{if(file.size>(/\.(png|jpe?g|webp|gif|bmp|ico)$/i.test(file.name)?10:50)*1024*1024)throw Error(tr("图片不能超过 10 MB，其他文件不能超过 50 MB"));const bytes=new Uint8Array(await file.arrayBuffer());let binary="";for(let i=0;i<bytes.length;i+=32768)binary+=String.fromCharCode(...bytes.subarray(i,i+32768));return{name:file.name,data:btoa(binary)};}));}const added=await api.addImages(taskId,inputs);if(images.length+added.length>5)throw Error(tr("每条消息最多添加 5 个附件"));if(current.current===taskId)setImages(old=>[...old,...added].slice(0,5));else drafts.current[taskId]={...drafts.current[taskId],images:[...(drafts.current[taskId]?.images||[]),...added].slice(0,5)};}catch(e){fail(e);}finally{attachmentUpload.current=false;setUploading(false);}};
+  const handlePaste=async e=>{
+    const pasted=e.clipboardData.getData('text/plain'),files=[...e.clipboardData.files];
+    const textFiles=files.length&&files.every(file=>/\.(md|txt)$/i.test(file.name));
+    if(files.length&&!textFiles){e.preventDefault();addImages(files);return;}
+    if(!textFiles&&!isLongPaste(pasted))return;
+    e.preventDefault();const target=current.current||'_new';
+    if(attachmentUpload.current)return;
+    attachmentUpload.current=true;setUploading(true);
+    try{
+      if(textFiles&&files.reduce((total,file)=>total+file.size,0)>2*1024*1024)throw Error(tr('粘贴的文本过长，请分开发送。'));
+      const contents=textFiles?await Promise.all(files.map(file=>file.text())):[pasted];
+      const cards=contents.filter(value=>value.length).map(pasteCard);
+      if(target===(current.current||'_new')){
+        if(new TextEncoder().encode(messageText(text,[...pastedTexts,...cards])).length>2*1024*1024)throw Error(tr('粘贴的文本过长，请分开发送。'));
+        setPastedTexts(old=>[...old,...cards]);
+      }else{
+        const draft=drafts.current[target]||{text:'',images:[]};
+        if(new TextEncoder().encode(messageText(draft.text,[...(draft.pastedTexts||[]),...cards])).length>2*1024*1024)throw Error(tr('粘贴的文本过长，请分开发送。'));
+        drafts.current[target]={...draft,pastedTexts:[...(draft.pastedTexts||[]),...cards]};api.saveDrafts(drafts.current);
+      }
+    }catch(error){fail(error);}finally{attachmentUpload.current=false;setUploading(false);}
+  };
   const refresh = async (id,model) => {
     setChecking(old=>[...old,id]);
     try {
@@ -890,17 +915,18 @@ function App() {
           <div className="composer">
             {task?.goalLifecycle?.status==='paused'?<p className="plan-mode-note">{tr('目标已暂停，请先继续目标。')}</p>:task?.planReviewRequired&&<p className="plan-mode-note">{tr('计划待确认，当前消息仅用于讨论计划。')}<button disabled={busy||!task.workPlan?.steps?.length} onClick={async()=>{try{await api.planAction(task.id,'execute',task.workPlan?.revision);}catch(e){fail(e);}}}>{tr('确认计划并执行')}</button></p>}
             <ImageAttachments taskId={task?.id} images={images} onRemove={id=>setImages(old=>old.filter(image=>image.id!==id))} onPreview={image=>image.path&&setPreview({id:Date.now(),target:image.path,task})}/>
+            <PastedTexts cards={pastedTexts} onRemove={id=>setPastedTexts(old=>old.filter(card=>card.id!==id))} onOpen={setOpenedPaste}/>
             <textarea dir="auto"
               aria-label={tr("任务指令")}
               value={text}
               onChange={(e) => setText(e.target.value)}
-              onPaste={e=>{if(e.clipboardData.files.length){e.preventDefault();addImages(e.clipboardData.files);}}}
+              onPaste={handlePaste}
               placeholder={tr("写下你的想法，或者接着上次的工作…")}
               onKeyDown={(e) => {
                 if(e.nativeEvent.isComposing||e.keyCode===229)return;
                 if (e.key === "Enter" && (init.settings.sendShortcut==='enter'?!e.shiftKey:((e.ctrlKey||e.metaKey)&&!e.shiftKey))) {
                   e.preventDefault();
-                  if ((text.trim()||images.length)&&!sending&&!uploading&&task?.goalLifecycle?.status!=='paused') send();
+                  if ((text.trim()||pastedTexts.length||images.length)&&!sending&&!uploading&&task?.goalLifecycle?.status!=='paused') send();
                 }
               }}
             />
@@ -925,7 +951,7 @@ function App() {
               <button title={tr("添加附件")} aria-label={tr("添加附件")} disabled={uploading||images.length>=5} onClick={()=>addImages(null)}><Paperclip size={19}/></button>
               <span className="compose-spacer" />
               <FastControl task={task} profile={init.profiles.find(p=>p.id===(task?.profile||draftAccount))} draftSettings={draftSettings} onSave={async(value,id)=>{if(task){const updated=await api.modelSettings(task.id,value,id);if(current.current===updated.id)setTask(updated);}else setDraftSettings(old=>({...old,[id]:value}));}}/>
-              <ComposerSubmit key={task?.id||'draft'} busy={busy} stopping={task?.state==='stopping'} hasDraft={!!text.trim()||!!images.length} onSend={send} onStop={()=>api.stop(task.id).catch(fail)} sendLabel={busy?(init.settings.busySend==='steer'?'引导':'排队'):'发送'} disabled={(!text.trim()&&!images.length) || sending || uploading || changingAccount || task?.goalLifecycle?.status==='paused' || task?.state === "unknown" || !!task&&(!init.profiles.find(p=>p.id===task.profile)||init.profiles.find(p=>p.id===task.profile)?.disabled) || Object.values(accountLogins).some(s=>['starting','waiting','verifying'].includes(s.phase))}/>
+              <ComposerSubmit key={task?.id||'draft'} busy={busy} stopping={task?.state==='stopping'} hasDraft={!!text.trim()||!!pastedTexts.length||!!images.length} onSend={send} onStop={()=>api.stop(task.id).catch(fail)} sendLabel={busy?(init.settings.busySend==='steer'?'引导':'排队'):'发送'} disabled={(!text.trim()&&!pastedTexts.length&&!images.length) || sending || uploading || changingAccount || task?.goalLifecycle?.status==='paused' || task?.state === "unknown" || !!task&&(!init.profiles.find(p=>p.id===task.profile)||init.profiles.find(p=>p.id===task.profile)?.disabled) || Object.values(accountLogins).some(s=>['starting','waiting','verifying'].includes(s.phase))}/>
             </div>
           </div>
           <div className="task-tools">
@@ -977,6 +1003,7 @@ function App() {
           </button>
         </div>
       )}
+      {openedPaste&&<Modal title={tr('粘贴的文本')} onClose={()=>setOpenedPaste(null)} wide><pre className="pasted-text-body">{openedPaste.text}</pre></Modal>}
       {taskDialog&&<Modal title={taskDialog.title||tr(taskDialog.action==='history'?'归档与已删除':taskDialog.action==='section-new'?'新建分区':'分享对话')} wide={!!taskDialog.text} onClose={()=>setTaskDialog(null)}>
         {taskDialog.action==='history'?<div className="task-history">{['archivedTasks','deletedTasks'].map(key=><section key={key}><h3>{tr(key==='archivedTasks'?'已归档':'已删除')}</h3>{!init[key]?.length&&<p>{tr('暂无任务')}</p>}{init[key]?.map(t=><div className="history-row" key={t.id}><span>{t.title}</span><button onClick={()=>taskAction(t.id,'restore')}>{tr('恢复任务')}</button></div>)}</section>)}</div>:taskDialog.action==='section-new'?<form onSubmit={async e=>{e.preventDefault();if(!sectionName.trim())return;await taskAction(taskDialog.id,'section',sectionName);setTaskDialog(null);}}><label>{tr('分区名称')}<input autoFocus maxLength={60} value={sectionName} onChange={e=>setSectionName(e.target.value)}/></label><button type="submit" disabled={!sectionName.trim()}>{tr('保存')}</button></form>:<><p>{tr('复制或保存对话文档后即可分享。')}</p><div className="share-conversation"><Markdown>{taskDialog.text}</Markdown></div><div className="dialog-actions"><button onClick={()=>taskAction(taskDialog.id,'copy-conversation')}>{tr('复制对话')}</button><button onClick={()=>taskAction(taskDialog.id,'save-conversation')}>{tr('保存 Markdown')}</button></div></>}
       </Modal>}
