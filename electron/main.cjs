@@ -310,13 +310,13 @@ app.whenReady().then(() => {
   handle('mcpCopyLogin',id=>{clipboard.writeText(mcpAccounts.copyUrl(id));return {copied:true};});
   handle('mcpCancel',id=>mcpAccounts.cancel(id));
   app.on('will-quit',()=>mcpAccounts.close());
-  handle('inspectCapabilities', async () => { await shared.refreshInstalled({ force: true }); return capabilities(); });
+  handle('inspectCapabilities', async () => { const snapshot=await shared.refreshInstalled({ force: true }); return capabilities(snapshot); });
   handle('syncCapabilities', (token, pluginId) => { shared.sync(token, pluginId); const result=capabilities(); emit('capabilities',result); return result; });
   handle('importInstalledPlugins', token => { shared.syncInstalled(token); const result=capabilities(); emit('capabilities',result); return result; });
   handle('automaticPlugins', (enabled, token) => { shared.setAutomaticPlugins(enabled,token); const result=capabilities(); emit('capabilities',result); return result; });
   const refreshPlugins = async () => {
     if(updateInstalling || quitting)return;
-    try { await shared.refreshInstalled(); emit('capabilities',capabilities()); }
+    try { const snapshot=await shared.refreshInstalled(); emit('capabilities',capabilities(snapshot)); }
     catch { /* Keep the existing catalog; an explicit check reports the failure. */ }
   };
   if(!process.env.PRISM_TEST_DATA){setTimeout(refreshPlugins,5000).unref();setInterval(refreshPlugins,5*60000).unref();}
@@ -469,7 +469,8 @@ app.whenReady().then(() => {
     },
   });
   windows.add(window);
-  if(!process.env.PRISM_TEST_DATA)window.on('focus',refreshPlugins);
+  // Focus must not synchronously rescan hundreds of skill files.
+  // Scheduled refresh and explicit Check & sync still discover changes.
   if(process.platform==='win32'&&!process.env.PRISM_TEST_DATA){try{desktopIdentity.register(app,shell,updater.root);}catch(error){console.warn(error.message);}}
   window.draftKey=restore?.key||(taskId?require('node:crypto').randomUUID():'primary');
   if(restore?.bounds&&[restore.bounds.x,restore.bounds.y,restore.bounds.width,restore.bounds.height].every(Number.isFinite))window.setBounds(restore.bounds);

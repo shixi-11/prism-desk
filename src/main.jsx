@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useMemo, useCallback } from "react";
 import { createRoot } from "react-dom/client";
 import Markdown from "react-markdown";
 import QuestionChoices,{proseQuestion} from "./QuestionChoices.jsx";
@@ -436,26 +436,13 @@ function Conversation({ task, events, streaming, thinking, activity, awaitingApp
   useEffect(() => {
     end.current?.scrollIntoView({ block: "end", behavior: "instant" });
   }, [events.length, streaming, task?.state]);
-  const messages = conversationMessages(events);
-  if (!messages.length && (!task || task.state==='idle'))
-    return (
-      <div className="empty">
-        <h1>{tr("小主人，今天想造点什么？")}</h1>
-        <p>
-          {task
-            ? tr("写下你的想法，我们从这里继续。")
-            : tr("选好工作目录，我们就从这里开始。")}
-        </p>
-        {!task && (
-          <button className="empty-start" onClick={onNew}>{tr("新建任务")}<ArrowUpRight size={16} />
-          </button>
-        )}
-      </div>
-    );
-  return (
-    <div className="messages" aria-label={tr("任务对话")}>
-      {messages.map((e) =>
-        e.type==='progress'?<details key={e.id} className="assistant-progress" open={task.state==='running'}><summary>{tr('执行进度')} · {e.parts.length}</summary><div className="prose">{e.parts.map(part=><div key={part.id}><LinkedMarkdown onPreview={onPreview}>{part.text}</LinkedMarkdown></div>)}</div></details>:["handoff","notice"].includes(e.type) ? (
+  const messages = useMemo(()=>conversationMessages(events),[events]);
+  const handlers=useRef({onPreview,onChoice});handlers.current={onPreview,onChoice};
+  const preview=useCallback((...args)=>handlers.current.onPreview(...args),[]);
+  const choice=useCallback((...args)=>handlers.current.onChoice(...args),[]);
+  const historyLanguage=locale();
+  const history=useMemo(()=>(messages.map((e) =>
+        e.type==='progress'?<details key={e.id} className="assistant-progress" open={task.state==='running'}><summary>{tr('执行进度')} · {e.parts.length}</summary><div className="prose">{e.parts.map(part=><div key={part.id}><LinkedMarkdown onPreview={preview}>{part.text}</LinkedMarkdown></div>)}</div></details>:["handoff","notice"].includes(e.type) ? (
           <div key={e.id} className="handoff">
             <ArrowRightLeft size={14} />
             <div><p>{e.executionStatus?`${tr(e.executionStatus)} · ${e.provider} / ${tr(e.accountName)} · ${e.execution.reportedModel||e.execution.model} · ${e.execution.effort}${e.execution.serviceTier&&e.execution.serviceTier!=='default'?' · Fast':''}`:tr(e.text)}</p>{e.progress&&<details className="handoff-progress"><summary>{tr("交接进度")}</summary>
@@ -480,14 +467,32 @@ function Conversation({ task, events, streaming, thinking, activity, awaitingApp
               {e.type === "assistant" && <small>{e.profile}</small>}
             </header>
             <div className="prose">
-              <LinkedMarkdown onPreview={onPreview}>{e.type==='assistant'?(proseQuestion(e.text)?proseQuestion(e.text).prefix:goalProse(e.text)||tr('已提出目标建议')):e.text||""}</LinkedMarkdown>
+              <LinkedMarkdown onPreview={preview}>{e.type==='assistant'?(proseQuestion(e.text)?proseQuestion(e.text).prefix:goalProse(e.text)||tr('已提出目标建议')):e.text||""}</LinkedMarkdown>
               {e.type==='question'&&<QuestionChoices questions={e.questions} disabled={task.state!=='running'||!task.activeQuestionIds?.includes(e.requestId)} answer={events.find(v=>v.questionRequestId===e.requestId)?.text} onAnswer={answers=>api.answerQuestion(task.id,e.requestId,answers)}/>}
-              {e.type==='assistant'&&proseQuestion(e.text)&&<QuestionChoices questions={[proseQuestion(e.text)]} disabled={task.state==='unknown'||task.state==='stopping'} answer={events.find(v=>v.choiceEventId===e.id)?.text} onAnswer={answers=>onChoice(e.id,answers.choice.answers[0])}/>}
-              <ImageAttachments taskId={task.id} images={e.images} onPreview={image=>onPreview(image.path)}/>
+              {e.type==='assistant'&&proseQuestion(e.text)&&<QuestionChoices questions={[proseQuestion(e.text)]} disabled={task.state==='unknown'||task.state==='stopping'} answer={events.find(v=>v.choiceEventId===e.id)?.text} onAnswer={answers=>choice(e.id,answers.choice.answers[0])}/>}
+              <ImageAttachments taskId={task.id} images={e.images} onPreview={image=>preview(image.path)}/>
             </div>
           </article>
         ),
-      )}
+      )),[messages,events,task,historyLanguage,preview,choice]);
+  if (!messages.length && (!task || task.state==='idle'))
+    return (
+      <div className="empty">
+        <h1>{tr("小主人，今天想造点什么？")}</h1>
+        <p>
+          {task
+            ? tr("写下你的想法，我们从这里继续。")
+            : tr("选好工作目录，我们就从这里开始。")}
+        </p>
+        {!task && (
+          <button className="empty-start" onClick={onNew}>{tr("新建任务")}<ArrowUpRight size={16} />
+          </button>
+        )}
+      </div>
+    );
+  return (
+    <div className="messages" aria-label={tr("任务对话")}>
+      {history}
       {streaming && (
         <article className="message assistant streaming">
           <header>{tr("太初")}<span className="status-dot" />

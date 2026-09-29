@@ -269,10 +269,10 @@ function scanSkills() {
   }
   return found;
 }
-function capabilities() {
+function capabilities(snapshot) {
   const apps = require("./discovery.cjs").discoverApps();
   let sync;
-  try { sync = require('./shared-capabilities.cjs').manager().view(); }
+  try { sync = snapshot || require('./shared-capabilities.cjs').manager().view(); }
   catch (error) { sync = { token: null, errors: [{ name: '共享能力', reason: error.message }], sources: [], plugins: [], changes: [], active: scanSkills(), pending: 0 }; }
   return {
     taichu: sync.assistant || {
