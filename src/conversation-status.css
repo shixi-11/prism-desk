@@ -9,7 +9,11 @@
 @keyframes composer-spin{to{transform:rotate(360deg)}}
 @media(prefers-reduced-motion:reduce){.composer-stopping{animation:none}}
 
-.conversation-status.is-active .conversation-status-text{background:linear-gradient(100deg,var(--muted) 30%,var(--text) 48%,var(--muted) 66%);background-size:250% 100%;background-clip:text;-webkit-background-clip:text;color:transparent;animation:conversation-shimmer 2.2s linear infinite}
-@keyframes conversation-shimmer{from{background-position:150% 0}to{background-position:-100% 0}}
-@media(prefers-reduced-motion:reduce){.conversation-status.is-active .conversation-status-text{animation:none;background:none;color:var(--muted)}}
+.conversation-status-text{position:relative;display:inline-block}
+.conversation-status-shine{position:absolute;inset:0;overflow:hidden;pointer-events:none;-webkit-mask-image:linear-gradient(100deg,transparent 5%,#000 50%,transparent 95%);mask-image:linear-gradient(100deg,transparent 5%,#000 50%,transparent 95%);animation:conversation-shine 2.2s linear infinite;will-change:transform}
+.conversation-status-shine>span{display:block;white-space:nowrap;color:var(--text);animation:conversation-shine-back 2.2s linear infinite;will-change:transform}
+/* Same path and timing as the former 250% background sweep: the band crosses the label for part of each cycle. */
+@keyframes conversation-shine{from{transform:translateX(-155%)}to{transform:translateX(220%)}}
+@keyframes conversation-shine-back{from{transform:translateX(155%)}to{transform:translateX(-220%)}}
+@media(prefers-reduced-motion:reduce){.conversation-status-shine{display:none}}
 .image-attachments .image-preview.file-attachment{display:flex;align-items:center;gap:8px;padding:12px;max-width:220px;min-height:64px}.file-attachment span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}

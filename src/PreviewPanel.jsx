@@ -1,11 +1,16 @@
-import React,{useEffect,useRef,useState} from 'react';
+import React,{useEffect,useMemo,useRef,useState} from 'react';
 import Markdown from 'react-markdown';
 import {X,RefreshCw,FolderOpen,Maximize2,Save} from 'lucide-react';
 import {localPathText} from './local-path.js';
 import {tr} from './i18n.js';
+const pathLink=(children)=>{const value=Array.isArray(children)?children.every(c=>typeof c==='string')?children.join(''):null:children;return localPathText(value);};
+const keepUrl=url=>url;
+// Stable component types let React update streamed Markdown in place instead of
+// remounting every paragraph whenever more text arrives.
+const markdownComponents=onPreview=>({a:({href,children})=><button className="file-link" onClick={()=>href&&onPreview(href)}>{children}</button>,img:({src,alt})=><button className="file-link" onClick={()=>src&&onPreview(src)}>{alt||tr('预览图片')}</button>,code:({children,className})=>{const target=pathLink(children);return target?<button className="file-link local-path-link" title={tr('打开')} onClick={()=>onPreview(target)}><code>{children}</code></button>:<code className={className}>{children}</code>;},p:({children})=>{const target=pathLink(children);return <p>{target?<button className="file-link local-path-link" onClick={()=>onPreview(target)}>{children}</button>:children}</p>;}});
 export function LinkedMarkdown({children,onPreview}){
- const pathLink=(children)=>{const value=Array.isArray(children)?children.every(c=>typeof c==='string')?children.join(''):null:children;return localPathText(value);};
- return <Markdown urlTransform={url=>url} components={{a:({href,children})=><button className="file-link" onClick={()=>href&&onPreview(href)}>{children}</button>,img:({src,alt})=><button className="file-link" onClick={()=>src&&onPreview(src)}>{alt||tr('预览图片')}</button>,code:({children,className})=>{const target=pathLink(children);return target?<button className="file-link local-path-link" title={tr('打开')} onClick={()=>onPreview(target)}><code>{children}</code></button>:<code className={className}>{children}</code>;},p:({children})=>{const target=pathLink(children);return <p>{target?<button className="file-link local-path-link" onClick={()=>onPreview(target)}>{children}</button>:children}</p>;}}}>{children}</Markdown>;
+ const components=useMemo(()=>markdownComponents(onPreview),[onPreview]);
+ return <Markdown urlTransform={keepUrl} components={components}>{children}</Markdown>;
 }
 export default function PreviewPanel({task,request,onClose}){
  const [item,setItem]=useState(null),[text,setText]=useState(''),[edit,setEdit]=useState(false),[error,setError]=useState(''),[busy,setBusy]=useState(false),[wide,setWide]=useState(false),[address,setAddress]=useState(''),[frame,setFrame]=useState(0);

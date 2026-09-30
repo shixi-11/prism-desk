@@ -6,6 +6,7 @@ import RelayPreferences from "./RelayPreferences.jsx";
 import GoalBar from "./GoalBar.jsx";
 import UpdateSettings from "./UpdateSettings.jsx";
 import {goalProse} from './goal-message.js';
+import {createLiveText,emptyLiveText} from './live-text.js';
 import AccountManager from "./AccountManager.jsx";
 import CapabilityDialog from "./CapabilityDialog.jsx";
 import ConversationStatus from "./ConversationStatus.jsx";
@@ -501,7 +502,7 @@ function Conversation({ task, events, streaming, thinking, activity, awaitingApp
           <header>{tr("太初")}<span className="status-dot" />
           </header>
           <div className="prose">
-            <LinkedMarkdown onPreview={onPreview}>{streaming}</LinkedMarkdown>
+            <LinkedMarkdown onPreview={preview}>{streaming}</LinkedMarkdown>
           </div>
         </article>
       )}
@@ -575,9 +576,16 @@ function App() {
   const [changingAccount,setChangingAccount]=useState(false);
   const [text, setText] = useState("");
   const [pastedTexts,setPastedTexts]=useState([]),[openedPaste,setOpenedPaste]=useState(null);
-  const [images,setImages]=useState([]),[uploading,setUploading]=useState(false),[sending,setSending]=useState(false),[queue,setQueue]=useState([]),[thinking,setThinking]=useState(""),[activity,setActivity]=useState("");
+  const [images,setImages]=useState([]),[uploading,setUploading]=useState(false),[sending,setSending]=useState(false),[queue,setQueue]=useState([]);
   const drafts=useRef({}),loadSequence=useRef(0),pendingImageFiles=useRef([]),attachmentUpload=useRef(false);
-  const [streaming, setStreaming] = useState("");
+  const [live,setLive]=useState(emptyLiveText),liveText=useRef(null);
+  if(!liveText.current)liveText.current=createLiveText(setLive);
+  useEffect(()=>()=>liveText.current.dispose(),[]);
+  const {thinking,activity,streaming}=live;
+  // Resets apply at once; streamed chunks below go through the buffered path.
+  const setThinking=value=>liveText.current.change({thinking:value},{now:true});
+  const setActivity=value=>liveText.current.change({activity:value},{now:true});
+  const setStreaming=value=>liveText.current.change({streaming:value},{now:true});
   const [toast, setToast] = useState("");
   const [quotas, setQuotas] = useState({});
   const [checking, setChecking] = useState([]);
@@ -666,8 +674,8 @@ function App() {
         return;
       }
       if (value.taskId !== current.current) return;
-      if(type==='reasoning'){setActivity('');setThinking(old=>old+value.text);return;}
-      if(type==='activity'){setThinking('');setActivity(value.text);return;}
+      if(type==='reasoning'){liveText.current.change({activity:'',thinking:old=>old+value.text});return;}
+      if(type==='activity'){liveText.current.change({thinking:'',activity:value.text});return;}
       if (type === "event") {
         if(value.event.type==='user'){setThinking('');setActivity('');}
         if(value.event.type==='reasoning')setThinking('');
@@ -679,7 +687,7 @@ function App() {
         );
         if (value.event.type === "assistant") setStreaming("");
       }
-      if (type === "delta") {setThinking("");setActivity("");setStreaming((old) => old + value.text);}
+      if (type === "delta") liveText.current.change({thinking:'',activity:'',streaming:old=>old+value.text});
     });
   }, []);
   const updateSnapshot=useRef(null),lastInteraction=useRef(Date.now());
