@@ -1,14 +1,14 @@
 {
-  "version": "0.1.37",
-  "date": "2026-09-30",
+  "version": "0.1.38",
+  "date": "2026-10-01",
   "notes": {
     "en": [
-      "Each account in Automatic handoff preferences now has a pause/resume button. Paused accounts are skipped during automatic quota handoff for this task only; their order and model settings are preserved.",
-      "Pause settings survive reopening the task and apply during an active run. Pausing does not interrupt the current execution or prevent manual account selection."
+      "Lower CPU use while a task is running. The “Thinking…” shimmer no longer repaints the window every frame; it keeps the same look but now runs on the graphics compositor, so long conversations stay responsive during a run.",
+      "Streamed reasoning, tool activity and replies now update the window at most ten times per second instead of on every chunk, and the reply being written updates in place. Output speed and final content are unchanged."
     ],
     "zh": [
-      "“自动接续偏好”中的每个账号新增暂停、恢复按钮；自动轮换会跳过暂停的账号，仅影响当前任务，并保留原有排序和模型设置。",
-      "暂停设置会保存，重新打开任务仍然有效，运行中也可设置；暂停不会中断正在执行的账号，也不限制手动选择账号。"
+      "任务运行时占用更低：“正在思考…”的流光效果外观不变，改为交给显卡合成，不再每一帧重绘整个窗口，长对话在执行期间也保持流畅。",
+      "模型输出的思考过程、执行动态和回复改为每秒最多刷新十次界面，不再每收到一小段文字就刷新一次；正在输出的回复原地更新。输出速度和最终内容不变。"
     ]
   }
 }
