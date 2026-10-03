@@ -735,5 +735,10 @@
   "彻底删除": "Endgültig löschen",
   "清空已删除": "Gelöschte Aufgaben leeren",
   "确认彻底删除所选记录？": "Ausgewählte Einträge endgültig löschen?",
-  "将清除棱镜内记录、附件、草稿和任务工作区，无法恢复。外部项目文件及 CLI 自身历史不会删除。": "Prism-Verläufe, Anhänge, Entwürfe und Aufgabenarbeitsbereiche werden unwiederbringlich entfernt. Externe Projektdateien und CLI-Verläufe bleiben erhalten."
+  "将清除棱镜内记录、附件、草稿和任务工作区，无法恢复。外部项目文件及 CLI 自身历史不会删除。": "Prism-Verläufe, Anhänge, Entwürfe und Aufgabenarbeitsbereiche werden unwiederbringlich entfernt. Externe Projektdateien und CLI-Verläufe bleiben erhalten.",
+  "官方当前允许使用": "Vom Anbieter derzeit zugelassen",
+  "工作区成员额度受限": "Mitgliedskontingent im Arbeitsbereich eingeschränkt",
+  "工作区总额度受限": "Arbeitsbereichskontingent eingeschränkt",
+  "官方暂不允许使用": "Vom Anbieter derzeit eingeschränkt",
+  "可用状态尚未确认": "Verfügbarkeit noch nicht bestätigt"
 }

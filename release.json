@@ -1,14 +1,16 @@
 {
-  "version": "0.1.41",
+  "version": "0.1.42",
   "date": "2026-10-03",
   "notes": {
     "en": [
-      "Deleted tasks now have a permanent-delete action and a Clear deleted tasks button, with confirmation. Archived tasks can be moved to the deleted list. Permanent deletion removes Prism task records, attachments, task workspaces and drafts, and prevents older windows from restoring purged drafts. External project files and native CLI histories are retained.",
-      "Existing Codex sessions restore context readings from their own account-local history when opened, and support a read-only refresh without starting a model turn. Claude context readings now bind to the reported session before being saved. Unknown values remain unknown."
+      "Codex quota panels now prioritize the official ordinary-usage permission and preserve reported restriction reasons. A full percentage window alone no longer labels an account exhausted; missing permission remains unconfirmed. Member and owner workspace limits are distinguished.",
+      "Five-hour windows are omitted only for officially reported Pro plan classifications, including the account-plan fallback. Team and Business accounts are not treated as Pro based on their names. Remaining reset times are displayed directly from provider timestamps; global announcements never substitute for account readings.",
+      "Official availability and restriction fields survive display-cache reloads. Cached readings require refresh; actual service errors still govern execution and account relay. No automatic purchases, reset redemption or paid API fallback were added."
     ],
     "zh": [
-      "已删除任务新增“彻底删除”和“清空已删除”，确认后清除棱镜任务记录、附件、任务工作区和草稿，阻止旧窗口重新写回已清除草稿；已归档任务可移入已删除列表。外部项目文件及原生 CLI 历史保留。",
-      "打开已有 Codex 会话时，从对应账号的本机会话记录补读上下文，并支持不启动模型执行的刷新；Claude 用量数据先绑定返回的会话再保存，缺失数值仍显示未知。"
+      "Codex 额度面板优先显示官方普通用量可用状态，保留实际阻塞原因；不再仅凭窗口百分比已满就标记账号已用完，缺失可用状态明确显示尚未确认，并区分工作区成员与总额度限制。",
+      "只对官方明确返回的 Pro 套餐类型移除五小时窗口，支持账号套餐字段回退；不会依据名称把团队或 Business 账号当作 Pro。恢复时间直接显示官方时间戳，不用全局公告推算个人账号恢复日期。",
+      "官方可用状态与限制字段随显示缓存保存；缓存记录需刷新，真实执行错误仍决定失败与账号接续。本次未增加自动购买、重置卡兑换或付费 API 回退。"
     ]
   }
 }

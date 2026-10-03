@@ -173,27 +173,7 @@ class Rpc extends EventEmitter {
     return this.done;
   }
 }
-function quotaView(result) {
-  const bucket =
-    result.rateLimitsByLimitId?.codex ||
-    (result.rateLimits?.limitId === "codex" ? result.rateLimits : null);
-  if (!bucket) return { remaining: null, windows: [] };
-  const windows = [bucket.primary, bucket.secondary]
-    .filter((w) => w && Number.isFinite(w.usedPercent) && (!Number.isFinite(w.resetsAt) || w.resetsAt * 1000 > Date.now()))
-    .map((w) => ({
-      remaining: Math.max(0, Math.min(100, 100 - w.usedPercent)),
-      minutes: w.windowDurationMins,
-      resetsAt: w.resetsAt,
-    }));
-  return {
-    remaining: windows.length
-      ? Math.min(...windows.map((w) => w.remaining))
-      : null,
-    windows,
-    credits:bucket.credits||null,
-    planType:bucket.planType||null,
-  };
-}
+function quotaView(result,accountPlanType=null){return require('./codex-quota.cjs').codexQuota(result,accountPlanType);}
 async function accountStatus(id, cwd, model) {
   const base=profileFor(id);
   const profile=base.provider==='Claude'&&['opus','sonnet'].includes(model)?{...base,model}:base;
@@ -213,7 +193,7 @@ async function accountStatus(id, cwd, model) {
       id,
       status: "订阅已连接",
       email: auth.account.email,
-      ...quotaView(usage),
+      ...quotaView(usage,auth.account.planType),
       resetCredits: usage.rateLimitResetCredits ? {availableCount:usage.rateLimitResetCredits.availableCount,credits:(usage.rateLimitResetCredits.credits||[]).filter(c=>c.status==='available').map(c=>({expiresAt:c.expiresAt,status:c.status}))} : null,
       checkedAt: new Date().toISOString(),
     };

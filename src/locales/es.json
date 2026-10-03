@@ -735,5 +735,10 @@
   "彻底删除": "Eliminar definitivamente",
   "清空已删除": "Vaciar tareas eliminadas",
   "确认彻底删除所选记录？": "¿Eliminar definitivamente los registros seleccionados?",
-  "将清除棱镜内记录、附件、草稿和任务工作区，无法恢复。外部项目文件及 CLI 自身历史不会删除。": "Se eliminarán los registros, adjuntos, borradores y espacios de trabajo de Prism sin posibilidad de recuperación. Se conservarán los archivos de proyectos externos y el historial de la CLI."
+  "将清除棱镜内记录、附件、草稿和任务工作区，无法恢复。外部项目文件及 CLI 自身历史不会删除。": "Se eliminarán los registros, adjuntos, borradores y espacios de trabajo de Prism sin posibilidad de recuperación. Se conservarán los archivos de proyectos externos y el historial de la CLI.",
+  "官方当前允许使用": "Uso permitido actualmente",
+  "工作区成员额度受限": "Cuota del miembro del espacio restringida",
+  "工作区总额度受限": "Cuota del espacio de trabajo restringida",
+  "官方暂不允许使用": "Uso restringido actualmente",
+  "可用状态尚未确认": "Disponibilidad sin confirmar"
 }

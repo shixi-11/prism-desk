@@ -118,7 +118,7 @@ class Runner extends EventEmitter {
       while(true) {
         if(task.pendingModelRefresh?.[profile.id]){delete task.sessions[profile.id];delete task.pendingModelRefresh[profile.id];this.store.save(task);}
         attempted.add(profile.id);
-        Object.assign(this.active,{profile,questions:new Map(),confirmed:false,started:false,quotaExhausted:false,quotaByWindow:{},rpc:null,proc:null,turnId:null,grok:false,sessionId:null,sendGuidance:null});
+        Object.assign(this.active,{profile,questions:new Map(),confirmed:false,started:false,quotaExhausted:false,quotaByWindow:{},codexQuota:null,rpc:null,proc:null,turnId:null,grok:false,sessionId:null,sendGuidance:null});
         task.execution = {profile:profile.id, model:profile.model, effort:profile.effort, ...(profile.provider==='Codex'?{serviceTier:profile.serviceTier||'default'}:{}), mode:options.planning||options.maintenance?'read-only':task.mode};
         const record=this.store.context(task);
         const instructions=environmentPrompt({...task,mode:task.execution.mode},capabilities(),record)+(options.planning?'\n本轮只制订计划，禁止实施。读取必要材料后给出可核对的步骤与验收条件，等待用户确认。最后用 JSON 代码块返回 {"steps":[{"text":"步骤及验收条件"}]}，供界面展示待确认步骤。':'');
@@ -133,7 +133,7 @@ class Runner extends EventEmitter {
           this.event(id,'notice',{text:e.message});
           if(['running','stopping'].includes(task.state))this.state(task,this.active.started?'unknown':'failed');
         }
-        if(this.active.quotaExhausted)this.event(id,'notice',{text:`${profile.provider} / ${profile.name} 订阅额度已耗尽。${options.maintenance?'本次会话操作未切换账号。':task.autoSwitch===false?'自动接续已关闭，请选择其他账号继续。':'正在检查可接续的账号。'}`});
+        if(this.active.quotaExhausted)this.event(id,'notice',{text:`${profile.provider} / ${profile.name} ${this.active.codexQuota?.rateLimitReachedType==='workspace_member_credits_depleted'?'工作区成员额度受限':this.active.codexQuota?.rateLimitReachedType==='workspace_owner_credits_depleted'?'工作区总额度受限':'本次执行被服务额度限制'}。${options.maintenance?'本次会话操作未切换账号。':task.autoSwitch===false?'自动接续已关闭，请选择其他账号继续。':'正在检查可接续的账号。'}`});
         if(options.maintenance || task.autoSwitch===false || this.active.cancelRequested || !this.active.quotaExhausted || task.state!=='failed')break;
         require('./task-settings.cjs').applyPendingMode(task);
         const ordered=[...(task.relayOrder||[]).map(id=>PROFILES.find(p=>p.id===id)).filter(Boolean),...PROFILES.filter(p=>!(task.relayOrder||[]).includes(p.id))];
@@ -273,7 +273,7 @@ class Runner extends EventEmitter {
       if(profile.email&&auth.account.email?.toLowerCase()!==profile.email.toLowerCase())throw Error('登录账号与已有账号身份不一致，请使用原账号登录。');
       if(this.active.cancelRequested){this.state(task,'paused');return;}
       const usage=await rpc.call('account/rateLimits/read');
-      const quota=quotaView(usage);this.emit('quota',{id:profile.id,email:auth.account.email,...quota,status:'官方额度查询',checkedAt:new Date().toISOString()});
+      const quota=quotaView(usage,auth.account.planType);this.active.codexQuota=quota;this.emit('quota',{id:profile.id,email:auth.account.email,...quota,status:'官方额度查询',checkedAt:new Date().toISOString()});
       // Usage readings are informational; the service decides whether this turn can run.
       const options = {
         cwd: task.cwd,

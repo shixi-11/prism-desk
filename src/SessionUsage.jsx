@@ -1,3 +1,4 @@
+import {quotaStateLabel} from './quota-state.js';
 import React,{useEffect,useRef,useState} from 'react';
 import {ChevronRight,RefreshCw,X} from 'lucide-react';
 import {tr,locale} from './i18n.js';
@@ -22,7 +23,7 @@ export default function SessionUsage({task,profile,quota,onRefresh,checking}){
    <div className="usage-actions"><small>{context?.limit!=null&&context?.used!=null?tr('可用空间：{tokens}',{tokens:tokens(Math.max(0,context.limit-context.used))}):tr('等待 CLI 返回上下文数据')}</small><button disabled={busy||!native} onClick={()=>act('compact')}>{tr('压缩会话')}</button></div>
    <div className="usage-actions"><small>{tr('自动压缩阈值：CLI 暂未返回')}</small><button disabled={busy||!native} onClick={()=>act('context')}><RefreshCw size={13}/>{tr('刷新上下文')}</button></div>
    <hr/><div className="usage-plan"><strong>{tr('账号额度')} · {profile?.provider} / {tr(profile?.name||'')}</strong>{quota?.subscriptionType||quota?.planType?<small>{quota.subscriptionType||quota.planType}</small>:null}</div>
-   {stale&&<small className="usage-stale">{tr('上次查询记录，请刷新')}</small>}
+   {!stale&&quotaStateLabel(quota,profile?.provider)&&<p role="status">{tr(quotaStateLabel(quota,profile?.provider))}{quota?.rateLimitUpsell?.reset_at?` · ${tr('恢复：')}${new Date(quota.rateLimitUpsell.reset_at*1000).toLocaleString(locale())}`:''}</p>}{stale&&<small className="usage-stale">{tr('上次查询记录，请刷新')}</small>}
    {quota?.windows?.length?quota.windows.map((w,i)=>{const used=w.remaining==null?null:100-w.remaining;const label=w.kind?.includes('opus')?'Opus · '+tr('每周'):w.kind?.includes('sonnet')?'Sonnet · '+tr('每周'):w.minutes>=10080?tr('每周 · 所有模型'):w.minutes>=1440?tr('每日'):tr('会话额度');return <div key={i} className={`usage-window ${used>=80?'high':''}`}><div><span>{label}</span><small>{reset(w.resetsAt)}</small><b>{used==null?tr('暂未返回'):`${Math.round(used*10)/10}%`}</b></div><Meter value={used} label={label}/></div>;}):<p>{tr('等待 CLI 返回额度数据')}</p>}
    <div className="usage-credits"><span>{tr('使用余额')}</span><small>{quota?.credits?.unlimited?tr('不限量'):quota?.credits?.balance!=null?String(quota.credits.balance):tr('暂未返回')}</small></div>
    <button className="usage-details-toggle" aria-expanded={details} onClick={()=>setDetails(!details)}>{tr('查看详细用量')}<ChevronRight size={14}/></button>

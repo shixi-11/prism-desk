@@ -1,3 +1,4 @@
+import {quotaBlocked,quotaStateLabel} from './quota-state.js';
 import React, { useEffect, useRef, useState, useMemo, useCallback } from "react";
 import { createRoot } from "react-dom/client";
 import Markdown from "react-markdown";
@@ -345,7 +346,7 @@ function Inspector({
         <div className="quota">
           <span>{tr("剩余额度")}</span>
           <strong>
-            {stale ? tr("需要刷新") : quota?.remaining===0 ? tr("已用完") : quota?.remaining != null ? `${quota.remaining}%` : quota ? tr("暂时查不到") : tr("未查询")}
+            {stale ? tr("需要刷新") : quotaStateLabel(quota,selected?.provider) ? tr(quotaStateLabel(quota,selected?.provider)) : quota?.remaining != null ? `${quota.remaining}%` : quota ? tr("暂时查不到") : tr("未查询")}
           </strong>
         </div>
         {quota?.windows?.map((w, i) => (
@@ -400,7 +401,7 @@ function Inspector({
         </div>
         {quota?.status && <p className="account-status">{tr(quota.status)}</p>}
         {selected?.provider==='Gemini'&&<><p className="account-status">{tr("Gemini 当前提供只读接续；登录后仍需执行验证。")}</p><button className="outline" disabled={loginBusy||disabled} onClick={async()=>{setLoginBusy(true);setLoginMessage(tr("请在当前浏览器完成 Google 授权"));try{const result=await api.loginGemini();setLoginMessage(tr(result.ok?"Google 授权已完成；尚未验证模型执行":"登录未完成，请核对浏览器提示后重试"));await onRefresh(target);}catch(e){setLoginMessage(e.message);}finally{setLoginBusy(false);}}}>{tr(loginBusy?"等待浏览器授权…":"登录 Google")}</button><p className="account-status" role="status">{loginMessage}</p></>}
-        {quota?.remaining===0&&!stale&&<p className="quota-notice" role="status">{tr("额度已用完，可换账号继续或等待恢复；重置卡需手动使用。")}</p>}
+        {quotaBlocked(quota,selected?.provider)&&!stale&&<p className="quota-notice" role="status">{tr(quotaStateLabel(quota,selected?.provider)||'已用完')}{quota?.rateLimitUpsell?.reset_at?` · ${tr('恢复：')}${new Date(quota.rateLimitUpsell.reset_at*1000).toLocaleString(locale())}`:''}</p>}
       </section>
       {task&&<RelayPreferences key={task.id} task={task} profiles={profiles} onSaveOrder={onRelayPreferences} onPauseAccount={onPauseRelayAccount} onModelSettings={onModelSettings} Modal={Modal} ModelControls={ModelControls}/>}
       <section className="shared">

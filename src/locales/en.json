@@ -735,5 +735,10 @@
   "彻底删除": "Delete permanently",
   "清空已删除": "Clear deleted tasks",
   "确认彻底删除所选记录？": "Permanently delete the selected records?",
-  "将清除棱镜内记录、附件、草稿和任务工作区，无法恢复。外部项目文件及 CLI 自身历史不会删除。": "Prism records, attachments, drafts and task workspaces will be removed and cannot be restored. External project files and CLI history are kept."
+  "将清除棱镜内记录、附件、草稿和任务工作区，无法恢复。外部项目文件及 CLI 自身历史不会删除。": "Prism records, attachments, drafts and task workspaces will be removed and cannot be restored. External project files and CLI history are kept.",
+  "官方当前允许使用": "Currently allowed by provider",
+  "工作区成员额度受限": "Workspace member allowance restricted",
+  "工作区总额度受限": "Workspace allowance restricted",
+  "官方暂不允许使用": "Currently restricted by provider",
+  "可用状态尚未确认": "Availability not yet confirmed"
 }
