@@ -417,7 +417,6 @@ class Runner extends EventEmitter {
           continue;
         }
         input.receive(msg);
-        this.context(task,profile,require('./context-usage.cjs').claudeContext(msg,task.contextUsage?.[profile.id]));
         if(msg.type==='rate_limit_event') {
           const q=recordClaude(profile.id,msg.rate_limit_info,profile.model);if(q){this.emit('quota',q);this.active.quotaByWindow[msg.rate_limit_info.rateLimitType||'unknown']=require('./quota.cjs').normalizeClaude(msg.rate_limit_info,Date.now(),profile.model);this.active.quotaExhausted=Object.values(this.active.quotaByWindow).some(w=>w?.exhausted);}
           if(msg.rate_limit_info?.isUsingOverage)this.active.quotaExhausted=false;
@@ -427,6 +426,7 @@ class Runner extends EventEmitter {
           task.sessions[profile.id] = msg.session_id;
           this.store.save(task);
         }
+        this.context(task,profile,require('./context-usage.cjs').claudeContext(msg,task.contextUsage?.[profile.id]));
         if (
           msg.type === "stream_event" &&
           msg.event?.delta?.type === "text_delta"

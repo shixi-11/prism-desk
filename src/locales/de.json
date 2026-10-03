@@ -731,5 +731,9 @@
   "输入 Token": "Eingabetokens",
   "输出 Token": "Ausgabetokens",
   "缓存 Token": "Cache-Tokens",
-  "思考 Token": "Denktokens"
+  "思考 Token": "Denktokens",
+  "彻底删除": "Endgültig löschen",
+  "清空已删除": "Gelöschte Aufgaben leeren",
+  "确认彻底删除所选记录？": "Ausgewählte Einträge endgültig löschen?",
+  "将清除棱镜内记录、附件、草稿和任务工作区，无法恢复。外部项目文件及 CLI 自身历史不会删除。": "Prism-Verläufe, Anhänge, Entwürfe und Aufgabenarbeitsbereiche werden unwiederbringlich entfernt. Externe Projektdateien und CLI-Verläufe bleiben erhalten."
 }

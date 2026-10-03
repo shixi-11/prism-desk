@@ -731,5 +731,9 @@
   "输入 Token": "Tokens d’entrée",
   "输出 Token": "Tokens de sortie",
   "缓存 Token": "Tokens en cache",
-  "思考 Token": "Tokens de raisonnement"
+  "思考 Token": "Tokens de raisonnement",
+  "彻底删除": "Supprimer définitivement",
+  "清空已删除": "Vider les tâches supprimées",
+  "确认彻底删除所选记录？": "Supprimer définitivement les éléments sélectionnés ?",
+  "将清除棱镜内记录、附件、草稿和任务工作区，无法恢复。外部项目文件及 CLI 自身历史不会删除。": "Les historiques Prism, pièces jointes, brouillons et espaces de travail des tâches seront supprimés sans restauration possible. Les fichiers des projets externes et les historiques CLI sont conservés."
 }

@@ -731,5 +731,9 @@
   "输入 Token": "Input tokens",
   "输出 Token": "Output tokens",
   "缓存 Token": "Cached tokens",
-  "思考 Token": "Reasoning tokens"
+  "思考 Token": "Reasoning tokens",
+  "彻底删除": "Delete permanently",
+  "清空已删除": "Clear deleted tasks",
+  "确认彻底删除所选记录？": "Permanently delete the selected records?",
+  "将清除棱镜内记录、附件、草稿和任务工作区，无法恢复。外部项目文件及 CLI 自身历史不会删除。": "Prism records, attachments, drafts and task workspaces will be removed and cannot be restored. External project files and CLI history are kept."
 }

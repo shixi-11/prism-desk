@@ -1243,3 +1243,5 @@ button.brand { width:100%; justify-content:flex-start; text-align:start; }
 .project-access-row>span { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 .project-access-popover select { width:100%; max-width:none; margin:8px 0; }
 @media(max-width:1100px) { .project-access summary>span { display:none; } .compose-actions .folder-control { max-width:140px; } }
+
+.history-heading,.history-actions{display:flex;align-items:center;gap:12px}.history-heading{justify-content:space-between}.history-row>span{min-width:0;overflow-wrap:anywhere}.history-actions{flex-shrink:0}

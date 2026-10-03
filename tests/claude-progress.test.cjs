@@ -8,7 +8,7 @@ test('Claude receives linked directories and emits a final marker only for a suc
   let launchedArgs;
   const context={module:{exports:{}},require:name=>name==='./core.cjs'?{...core,spawnCLI:(_,args)=>{
    launchedArgs=args;const proc=new EventEmitter();proc.pid=123;proc.stdout=new PassThrough();proc.stderr=new PassThrough();proc.stdin=new PassThrough();proc.kill=()=>{};
-   setImmediate(()=>{for(const msg of [{type:'assistant',message:{content:[{type:'text',text:'Checking files'},{type:'tool_use',name:'Read',id:'tool'}]}},{type:'assistant',message:{content:[{type:'text',text:'Final report'}]}},{type:'result',subtype:success?'success':'error_during_execution',is_error:!success,result:'Final report'}])proc.stdout.write(JSON.stringify(msg)+'\n');proc.emit('close',success?0:1);});return proc;
+   setImmediate(()=>{for(const msg of [{type:'assistant',session_id:'native-claude',message:{usage:{input_tokens:100,output_tokens:20},content:[{type:'text',text:'Checking files'},{type:'tool_use',name:'Read',id:'tool'}]}},{type:'assistant',message:{content:[{type:'text',text:'Final report'}]}},{type:'result',subtype:success?'success':'error_during_execution',is_error:!success,result:'Final report'}])proc.stdout.write(JSON.stringify(msg)+'\n');proc.emit('close',success?0:1);});return proc;
   }}:name==='./provider-quota.cjs'?{claudeQuota:async()=>({remaining:80})}:localRequire(name)};
   vm.runInNewContext(fs.readFileSync(file,'utf8'),context);
   const store=new core.TaskStore(path.join(root,'progress-'+success)),task=store.create({title:'Stream test',cwd:root,profile:'claude-test-1',mode:'read-only'});task.linkedProjects=[linked];store.save(task);
@@ -17,6 +17,6 @@ test('Claude receives linked directories and emits a final marker only for a suc
   assert.equal(launchedArgs[launchedArgs.indexOf('--add-dir')+1],fs.realpathSync.native(linked));
   assert.equal(launchedArgs[launchedArgs.indexOf('--tools')+1],'Read,Glob,Grep');
   const events=store.events(task.id),answers=events.filter(e=>e.type==='assistant'),markers=events.filter(e=>e.type==='assistant-final');
-  assert.equal(answers.length,2);assert.ok(answers.every(e=>e.phase==='commentary'));assert.equal(markers.length,success?1:0);if(success)assert.equal(markers[0].messageId,answers[1].id);
+  assert.equal(store.get(task.id).contextUsage['claude-test-1'].sessionId,'native-claude');assert.equal(store.get(task.id).contextUsage['claude-test-1'].used,120);assert.equal(answers.length,2);assert.ok(answers.every(e=>e.phase==='commentary'));assert.equal(markers.length,success?1:0);if(success)assert.equal(markers[0].messageId,answers[1].id);
  }
 });

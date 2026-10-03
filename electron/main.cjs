@@ -93,10 +93,12 @@ app.whenReady().then(() => {
   quotaDisplay=new (require('./quota-display.cjs').QuotaDisplay)(dataPath());
   const draftFile=win=>path.join(dataPath(),'drafts',win.draftKey+'.json');
   const draftWriter=new (require('./draft-writer.cjs').DraftWriter)();
-  handle('saveDrafts',value=>draftWriter.save(draftFile(owner()),value));
+  const purgedFile=path.join(dataPath(),'purged-tasks.json'),purgedTasks=new Set(updateBootstrap.read(purgedFile,[])),purgingIds=new Set();
+  const cleanDrafts=value=>require('./task-purge.cjs').withoutPurged(value,purgedTasks);
+  handle('saveDrafts',value=>draftWriter.save(draftFile(owner()),cleanDrafts(value)));
   ipcMain.on('prism:saveDrafts',(event,value)=>{
     try{const win=[...windows].find(w=>w.webContents===event.sender);if(!win||event.senderFrame!==event.sender.mainFrame)throw Error('非法调用来源');
-      event.returnValue=draftWriter.flush(draftFile(win),value);
+      event.returnValue=draftWriter.flush(draftFile(win),cleanDrafts(value));
     }catch(error){event.returnValue={error:error.message};}
   });
   runner = new RunnerPool(store);
@@ -225,9 +227,24 @@ app.whenReady().then(() => {
   handle('copyAccountLogin',id=>{const login=accountLogins.get(id);const profile=PROFILES.find(p=>p.id===id);const url=profile&&login?.url&&require('./account-providers.cjs').officialLoginUrl(profile.provider,login.url);if(!url)throw Error('登录链接尚未准备好，请稍候。');clipboard.writeText(url);return {copied:true};});
   handle('submitAccountLoginCode',async(id,code)=>{const login=accountLogins.get(id);if(!login)throw Error('当前登录已结束或尚未就绪，请重新获取登录链接。');const result=await login.submitCode(code);if(accountLogins.get(id)===login&&accountLoginStates.get(id)?.phase==='waiting')loginState(id,{phase:'waiting',hasUrl:!!login.url,codeSubmitted:true});return result;});
   handle('cancelAccountLogin',async id=>{await accountLogins.get(id)?.cancel();});
-  handle("task", (id) => {const task=runner.activeFor(id)?.task||store.get(id);if(task.unread){task.unread=false;store.save(task);broadcastTasks();}return {task,events:store.events(id)};});
+  const restoreContext=async id=>{const task=store.get(id),profile=PROFILES.find(p=>p.id===task.profile),session=task.sessions?.[task.profile];if(runner.activeFor(id))return task;
+    const value=await require('./context-history.cjs').codexHistory(profile,session);const current=store.get(id);
+    if(value&&!runner.activeFor(id)&&current.profile===profile.id&&current.sessions?.[profile.id]===session){current.contextUsage={...current.contextUsage,[profile.id]:{...value,model:profile.model}};store.save(current);emit('state',current);}return current;};
+  handle("task", async(id) => {let task=runner.activeFor(id)?.task||store.get(id);const saved=task.contextUsage?.[task.profile];if(!runner.activeFor(id)&&(!saved||saved.sessionId!==task.sessions?.[task.profile]))task=await restoreContext(id);if(task.unread){task.unread=false;store.save(task);broadcastTasks();}return {task,events:store.events(id)};});
   handle('taskMenu',id=>new Promise(resolve=>{const task=store.get(id);let chosen=null;Menu.buildFromTemplate(require('./task-menu.cjs').taskMenuTemplate(task,store.list(),key=>translate(settings().language,key),action=>{chosen=action;},runner.activeFor(id)||['running','stopping','unknown'].includes(task.state),settings().projects||[])).popup({window:owner(),callback:()=>resolve(chosen)});}));
   handle('taskAction',async(id,action,value)=>{
+    if(purgingIds.has(id))throw Error('任务正在彻底删除。');
+    if(action==='purge'||action==='purge-deleted'){
+      const ids=action==='purge'?[id]:store.list('deleted').map(t=>t.id);if(!ids.length)return {};
+      const lang=settings().language,key=action==='purge'?'彻底删除':'清空已删除';
+      const confirmation=await dialog.showMessageBox(owner(),{type:'warning',title:translate(lang,key),message:translate(lang,'确认彻底删除所选记录？'),detail:translate(lang,'将清除棱镜内记录、附件、草稿和任务工作区，无法恢复。外部项目文件及 CLI 自身历史不会删除。'),buttons:[translate(lang,'取消'),translate(lang,key)],defaultId:0,cancelId:0});if(confirmation.response!==1)return {};
+      const purge=require('./task-purge.cjs'),targets=purge.purgeTargets(store,ids,id=>runner.activeFor(id)||purgingIds.has(id));for(const id of ids)purgingIds.add(id);
+      try{for(const id of ids)purgedTasks.add(id);updateBootstrap.write(purgedFile,[...purgedTasks]);
+        const dir=path.join(dataPath(),'drafts');if(fs.existsSync(dir))for(const name of fs.readdirSync(dir).filter(n=>n.endsWith('.json'))){const file=path.join(dir,name);draftWriter.flush(file,cleanDrafts(updateBootstrap.read(file,{})));}
+        messageQueue.items=messageQueue.items.filter(item=>!ids.includes(item.taskId));messageQueue.save();emit('tasks-purged',ids);
+        await purge.purgeTargetsOnDisk(targets);return {purgedIds:ids};
+      }finally{for(const id of ids)purgingIds.delete(id);broadcastTasks();}
+    }
     const {manageTask,forkTask,conversationText}=require('./task-actions.cjs');
     if(['pin','unread','archive','delete','restore','project','project-move','section'].includes(action)){const task=manageTask(store,runner.forTask(id),messageQueue,id,action,value);broadcastTasks();return {task};}
     const task=store.get(id);
@@ -390,9 +407,10 @@ app.whenReady().then(() => {
     if(choiceEventId)runner.event(id,'notice',{choiceEventId,text:'已提交选择 · '+text});
     return {started:!busy,queued:busy,id:item.id,...(busy?{reason:runner.guidanceReason(id)}:{})};
   });
-  handle('sessionAction',(id,action)=>{
+  handle('sessionAction',async(id,action)=>{
     if(!['compact','context'].includes(action))throw Error('会话操作无效');
     const task=store.get(id);runner.assertIdle(task);if(messageQueue.isBusy(id))throw Error('请等待当前执行结束。');
+    if(action==='context'&&PROFILES.find(p=>p.id===task.profile)?.provider==='Codex')return {started:false,task:await restoreContext(id)};
     runner.run(id,action==='compact'?'/compact':'/context',[],{maintenance:action}).catch(error=>emit('error',error.message));return {started:true};
   });
   handle("switch", (id, profile) => {const task=runner.switch(id, profile);broadcastTasks();emit('state',task);return task;});
