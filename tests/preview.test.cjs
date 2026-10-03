@@ -1,5 +1,9 @@
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs/promises'),os=require('node:os'),path=require('node:path');
 const {targetPath,readPreview,savePreview,openLocal}=require('../electron/preview.cjs');
+test('large Markdown stays complete and editable without expensive formatting',async t=>{
+ const dir=await fs.mkdtemp(path.join(os.tmpdir(),'prism-preview-'));t.after(()=>fs.rm(dir,{recursive:true,force:true}));const file=path.join(dir,'large.md'),text='# Heading\n\n**long content**\n'.repeat(7000);await fs.writeFile(file,text);
+ const item=await readPreview(file,dir);assert.equal(item.kind,'text');assert.equal(item.plainText,true);assert.equal(item.text,text);const saved=await savePreview(file,'# Short',item.version);assert.equal(saved.kind,'markdown');assert.equal(saved.text,'# Short');
+});
 test('preview resolves file links, saves explicit edits, and refuses stale versions',async t=>{
  const dir=await fs.mkdtemp(path.join(os.tmpdir(),'prism-preview-'));t.after(()=>fs.rm(dir,{recursive:true,force:true}));
  const file=path.join(dir,'notes.md');await fs.writeFile(file,'# Original');

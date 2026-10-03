@@ -708,5 +708,6 @@
   "暂停自动接续": "Pausar continuación automática",
   "恢复自动接续": "Reanudar continuación automática",
   "暂停的账号会在当前任务自动接续时被跳过，可随时恢复。": "Las cuentas pausadas se omiten en la continuación automática de esta tarea. Puedes reanudarlas en cualquier momento.",
-  "接续账号无效": "Cuenta de continuación no válida"
+  "接续账号无效": "Cuenta de continuación no válida",
+  "文件较大，已切换为纯文本预览。": "El archivo grande se muestra como texto sin formato para acelerar la vista previa."
 }

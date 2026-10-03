@@ -92,10 +92,11 @@ app.whenReady().then(() => {
   require('./model-preference-request.cjs').apply(store,PROFILES,path.join(dataPath(),'model-preference-request.json'));
   quotaDisplay=new (require('./quota-display.cjs').QuotaDisplay)(dataPath());
   const draftFile=win=>path.join(dataPath(),'drafts',win.draftKey+'.json');
+  const draftWriter=new (require('./draft-writer.cjs').DraftWriter)();
+  handle('saveDrafts',value=>draftWriter.save(draftFile(owner()),value));
   ipcMain.on('prism:saveDrafts',(event,value)=>{
     try{const win=[...windows].find(w=>w.webContents===event.sender);if(!win||event.senderFrame!==event.sender.mainFrame)throw Error('非法调用来源');
-      const encoded=JSON.stringify(value);if(encoded.length>4*1024*1024||!value||typeof value!=='object'||Array.isArray(value))throw Error('草稿过大');
-      updateBootstrap.write(draftFile(win),value);event.returnValue=true;
+      event.returnValue=draftWriter.flush(draftFile(win),value);
     }catch(error){event.returnValue={error:error.message};}
   });
   runner = new RunnerPool(store);

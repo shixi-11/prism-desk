@@ -1,14 +1,16 @@
 {
-  "version": "0.1.38",
-  "date": "2026-10-01",
+  "version": "0.1.39",
+  "date": "2026-10-03",
   "notes": {
     "en": [
-      "Lower CPU use while a task is running. The “Thinking…” shimmer no longer repaints the window every frame; it keeps the same look but now runs on the graphics compositor, so long conversations stay responsive during a run.",
-      "Streamed reasoning, tool activity and replies now update the window at most ten times per second instead of on every chunk, and the reply being written updates in place. Output speed and final content are unchanged."
+      "Tasks using a configured assistant now receive its live mother-package rules and memory navigation, plus the current local memory registry when available. Skills and memory are read as needed; connector authorization remains separate.",
+      "Routine draft saving is asynchronous and older writes cannot overwrite newer edits or closing snapshots. Closing and update preparation still flush drafts before proceeding.",
+      "Input no longer reparses unchanged Markdown previews or execution logs. Markdown files over 128 KiB display their complete content as plain text and remain editable to avoid costly formatting."
     ],
     "zh": [
-      "任务运行时占用更低：“正在思考…”的流光效果外观不变，改为交给显卡合成，不再每一帧重绘整个窗口，长对话在执行期间也保持流畅。",
-      "模型输出的思考过程、执行动态和回复改为每秒最多刷新十次界面，不再每收到一小段文字就刷新一次；正在输出的回复原地更新。输出速度和最终内容不变。"
+      "已配置助手的任务现在明确接入母包现役全局规则、记忆导航及可用的本机记忆索引；技能和记忆按需读取，连接器授权仍独立。",
+      "普通草稿保存改为异步，旧写入不会覆盖新输入或关闭时的草稿；关闭及更新准备仍先完成草稿保存。",
+      "输入时不再反复解析未变化的 Markdown 预览和执行记录；超过 128 KiB 的 Markdown 以完整纯文本预览，保留编辑功能，避免大量格式解析。"
     ]
   }
 }

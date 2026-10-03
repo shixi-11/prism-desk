@@ -708,5 +708,6 @@
   "暂停自动接续": "Pause automatic handoff",
   "恢复自动接续": "Resume automatic handoff",
   "暂停的账号会在当前任务自动接续时被跳过，可随时恢复。": "Paused accounts are skipped during automatic handoff in this task. You can resume them at any time.",
-  "接续账号无效": "Invalid handoff account"
+  "接续账号无效": "Invalid handoff account",
+  "文件较大，已切换为纯文本预览。": "Large file shown as plain text for faster preview."
 }

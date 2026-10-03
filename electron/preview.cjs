@@ -23,7 +23,8 @@ async function readPreview(value,cwd){
  if((!images[ext]&&ext!=='.pdf'&&!textTypes.has(ext))||stat.size>(images[ext]||ext==='.pdf'?20:2)*1024*1024)return {kind:'external',path:file,name:path.basename(file),nativeAction:safe.test(file)?'open':'reveal'};
  const bytes=await fs.readFile(file);const base={nativeAction:safe.test(file)?'open':'reveal',path:file,name:path.basename(file),version:crypto.createHash('sha256').update(bytes).digest('hex')};
  if(images[ext]||ext==='.pdf')return {...base,kind:ext==='.pdf'?'pdf':'image',data:`data:${images[ext]||'application/pdf'};base64,${bytes.toString('base64')}`};
- return {...base,kind:['.md','.markdown'].includes(ext)?'markdown':['.html','.htm'].includes(ext)?'html':'text',text:bytes.toString('utf8')};
+ const markdown=['.md','.markdown'].includes(ext),plainText=markdown&&bytes.length>128*1024;
+ return {...base,kind:markdown&&!plainText?'markdown':['.html','.htm'].includes(ext)?'html':'text',plainText,text:bytes.toString('utf8')};
 }
 async function savePreview(file,text,version){
  if(typeof text!=='string'||Buffer.byteLength(text)>2*1024*1024)throw Error('文件过大，请在本机应用中打开');

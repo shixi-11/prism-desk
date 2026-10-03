@@ -708,5 +708,6 @@
   "暂停自动接续": "Automatische Übergabe pausieren",
   "恢复自动接续": "Automatische Übergabe fortsetzen",
   "暂停的账号会在当前任务自动接续时被跳过，可随时恢复。": "Pausierte Konten werden bei der automatischen Übergabe dieser Aufgabe übersprungen. Sie lassen sich jederzeit wieder aktivieren.",
-  "接续账号无效": "Ungültiges Übergabekonto"
+  "接续账号无效": "Ungültiges Übergabekonto",
+  "文件较大，已切换为纯文本预览。": "Große Datei wird für eine schnellere Vorschau als Klartext angezeigt."
 }

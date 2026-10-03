@@ -511,7 +511,7 @@ function Conversation({ task, events, streaming, thinking, activity, awaitingApp
     </div>
   );
 }
-function ExecutionLog({ events }) {
+const ExecutionLog=React.memo(function ExecutionLog({ events }) {
   const [open, setOpen] = useState(false);
   const records = events.filter((e) =>
     ["tool", "notice", "diff", "plan"].includes(e.type),
@@ -556,7 +556,7 @@ function ExecutionLog({ events }) {
       )}
     </div>
   );
-}
+});
 function App() {
   const [init, setInit] = useState(null);
   const [appUpdate,setAppUpdate]=useState(null);
@@ -567,6 +567,7 @@ function App() {
   const [newTaskCwd,setNewTaskCwd]=useState(""),[revealedProject,setRevealedProject]=useState(null);
   const newConversation=(cwd="")=>{setNewTaskCwd(cwd);setModal("new");};
   const [preview,setPreview]=useState(null);
+  const closePreview=useCallback(()=>setPreview(null),[]);
   const [taskDialog,setTaskDialog]=useState(null),[sectionName,setSectionName]=useState('');
   const [view,setView]=useState(()=>{try{return {...{log:false,inspector:true},...JSON.parse(localStorage.getItem('prism-view')||'{}')};}catch{return {log:false,inspector:true};}});
   const changeView=update=>setView(old=>{const next={...old,...update};localStorage.setItem('prism-view',JSON.stringify(next));return next;});
@@ -691,10 +692,10 @@ function App() {
     });
   }, []);
   const updateSnapshot=useRef(null),lastInteraction=useRef(Date.now());
-  updateSnapshot.current=()=>{
+  updateSnapshot.current=(flush=false)=>{
     drafts.current[current.current||'_new']={text,images,pastedTexts};
     drafts.current._selected=current.current;
-    api.saveDrafts(drafts.current);
+    if(flush)api.flushDrafts(drafts.current);else api.saveDrafts(drafts.current).catch(fail);
     return !uploading&&!sending&&!preview&&!taskDialog&&!openedPaste&&!pendingImageFiles.current.length;
   };
   useEffect(()=>{
@@ -714,9 +715,9 @@ function App() {
       const dialogs=document.querySelectorAll('.modal');
       if(dialogs.length&&(automatic||dialogs.length!==1||!dialogs[0].querySelector('.update-settings')))return false;
       if(automatic&&Date.now()-lastInteraction.current<60000)return false;
-      try{if(!updateSnapshot.current?.())return false;document.body.inert=true;activeToken=token;return true;}catch{return false;}
+      try{if(!updateSnapshot.current?.(true))return false;document.body.inert=true;activeToken=token;return true;}catch{return false;}
     };
-    const save=()=>{try{updateSnapshot.current?.();}catch{}};
+    const save=()=>{try{updateSnapshot.current?.(true);}catch{}};
     window.addEventListener('beforeunload',save);
     return()=>{delete window.__prismPrepareUpdate;delete window.__prismCancelUpdate;window.removeEventListener('beforeunload',save);for(const event of ['pointerdown','keydown','input','wheel'])document.removeEventListener(event,touched,true);};
   },[]);
@@ -806,7 +807,7 @@ function App() {
       }else{
         const draft=drafts.current[target]||{text:'',images:[]};
         if(new TextEncoder().encode(messageText(draft.text,[...(draft.pastedTexts||[]),...cards])).length>2*1024*1024)throw Error(tr('粘贴的文本过长，请分开发送。'));
-        drafts.current[target]={...draft,pastedTexts:[...(draft.pastedTexts||[]),...cards]};api.saveDrafts(drafts.current);
+        drafts.current[target]={...draft,pastedTexts:[...(draft.pastedTexts||[]),...cards]};api.saveDrafts(drafts.current).catch(fail);
       }
     }catch(error){fail(error);}finally{attachmentUpload.current=false;setUploading(false);}
   };
@@ -979,7 +980,7 @@ function App() {
               </>
             )}
           </div>
-          {view.log&&<ExecutionLog events={events} />}
+          {view.log&&<ExecutionLog language={language} events={events} />}
         </div>
       </main>
       {view.inspector&&<Inspector
@@ -1003,7 +1004,7 @@ function App() {
         onNew={()=>newConversation()}
         disabled={busy || changingAccount || task?.state === "unknown"}
       />}
-      {preview&&<PreviewPanel task={preview.task} request={preview} onClose={()=>setPreview(null)}/>}
+      {preview&&<PreviewPanel language={language} task={preview.task} request={preview} onClose={closePreview}/>}
       {modal==='view'&&<Modal title={tr('视图设置')} onClose={()=>setModal('')}><div className="view-options"><label><input type="checkbox" checked={view.log} onChange={e=>changeView({log:e.target.checked})}/>{tr('底部执行记录')}</label><label><input type="checkbox" checked={view.inspector} onChange={e=>changeView({inspector:e.target.checked})}/>{tr('右侧账号栏')}</label></div></Modal>}
       {toast && (
         <div className="toast" role="alert">

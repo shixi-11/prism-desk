@@ -708,5 +708,6 @@
   "暂停自动接续": "Mettre le transfert automatique en pause",
   "恢复自动接续": "Reprendre le transfert automatique",
   "暂停的账号会在当前任务自动接续时被跳过，可随时恢复。": "Les comptes en pause sont ignorés lors du transfert automatique de cette tâche. Vous pouvez les réactiver à tout moment.",
-  "接续账号无效": "Compte de transfert invalide"
+  "接续账号无效": "Compte de transfert invalide",
+  "文件较大，已切换为纯文本预览。": "Le fichier volumineux est affiché en texte brut pour accélérer l’aperçu."
 }
