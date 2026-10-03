@@ -390,6 +390,11 @@ app.whenReady().then(() => {
     if(choiceEventId)runner.event(id,'notice',{choiceEventId,text:'已提交选择 · '+text});
     return {started:!busy,queued:busy,id:item.id,...(busy?{reason:runner.guidanceReason(id)}:{})};
   });
+  handle('sessionAction',(id,action)=>{
+    if(!['compact','context'].includes(action))throw Error('会话操作无效');
+    const task=store.get(id);runner.assertIdle(task);if(messageQueue.isBusy(id))throw Error('请等待当前执行结束。');
+    runner.run(id,action==='compact'?'/compact':'/context',[],{maintenance:action}).catch(error=>emit('error',error.message));return {started:true};
+  });
   handle("switch", (id, profile) => {const task=runner.switch(id, profile);broadcastTasks();emit('state',task);return task;});
   handle('stopAndContinue', (id, profile) => runner.stopAndContinue(id, profile));
   handle('openTaskStorage', () => shell.openPath(store.root));

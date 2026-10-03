@@ -44,6 +44,7 @@ class Runner extends EventEmitter {
     this.event(task.id,'notice',{text:`${changed?'已切换':'已开始执行'} · ${profile.provider} / ${profile.name} · ${reportedModel||profile.model} · ${profile.effort}`,executionStatus:changed?'已切换':'已开始执行',accountName:profile.name,provider:profile.provider,execution:task.lastExecution});
     this.store.save(task);this.emit('state',task);
   }
+  context(task,profile,value){if(!value)return;task.contextUsage={...task.contextUsage,[profile.id]:{...value,model:value.model||task.lastExecution?.reportedModel||profile.model,sessionId:task.sessions[profile.id]||null}};this.store.save(task);this.emit('state',task);}
   assertIdle(task) {
     if (this.active || ["running", "stopping", "unknown"].includes(task.state))
       throw Error("请等待当前执行结束；状态未知时需先核对工作目录。");
@@ -94,17 +95,20 @@ class Runner extends EventEmitter {
       throw Error("请输入 1–60000 字的指令。");
     const task = this.store.get(id);
     this.assertIdle(task);
-    if(task.goalLifecycle?.status==='paused')throw Error('目标已暂停，请先继续目标。');
-    if(task.planReviewRequired&&!options.planning)throw Error('请核对计划并确认后执行');
+    if(options.maintenance&&(task.pendingMode||task.pendingModelRefresh?.[task.profile]))throw Error('请先应用当前账号的待生效设置，再操作会话。');
+    if(!options.maintenance&&task.goalLifecycle?.status==='paused')throw Error('目标已暂停，请先继续目标。');
+    if(task.planReviewRequired&&!options.planning&&!options.maintenance)throw Error('请核对计划并确认后执行');
     require('./task-settings.cjs').applyPendingMode(task);
     let profile = require('./models.cjs').selection(task,profileFor(task.profile));
     if(profile.disabled)throw Error('账号尚未启用，请先登录或选择其他账号。');
     require('./project-access.cjs').validateAccess(task,profile);
     require('./task-settings.cjs').validateMode(options.planning?'read-only':task.mode,profile);
     if(images.some(image=>image.kind!=='file')&&!['Codex','Claude','Grok'].includes(profile.provider))throw Error('当前入口暂不支持图片，请选择 Codex、Claude 或 Grok');
-    this.event(id, "user", { text: text.trim(), images, profile: profile.id });
-    this.active = { task, profile, images, planning:!!options.planning, phase: "starting", pending: new Map(), cancelRequested:false };
+    if(options.maintenance&&(!['Codex','Claude'].includes(profile.provider)||!task.sessions[profile.id]))throw Error('当前账号还没有可用的原生会话');
+    this.event(id, options.maintenance?'notice':'user', { text: options.maintenance==='compact'?'正在压缩会话':options.maintenance==='context'?'正在查询上下文':text.trim(), images, profile: profile.id });
+    this.active = { task, profile, images, planning:!!options.planning, maintenance:options.maintenance, phase: "starting", pending: new Map(), cancelRequested:false };
     delete task.stopReason;delete task.relaySource;
+    const maintenanceLife=options.maintenance?structuredClone(task.goalLifecycle||null):null;
     const planRevision=task.workPlan?.revision;
     this.active.planRevision=planRevision;
     if(options.planning){task.planReviewRequired=true;delete task.sessions[profile.id];this.store.save(task);}
@@ -115,7 +119,7 @@ class Runner extends EventEmitter {
         if(task.pendingModelRefresh?.[profile.id]){delete task.sessions[profile.id];delete task.pendingModelRefresh[profile.id];this.store.save(task);}
         attempted.add(profile.id);
         Object.assign(this.active,{profile,questions:new Map(),confirmed:false,started:false,quotaExhausted:false,quotaByWindow:{},rpc:null,proc:null,turnId:null,grok:false,sessionId:null,sendGuidance:null});
-        task.execution = {profile:profile.id, model:profile.model, effort:profile.effort, ...(profile.provider==='Codex'?{serviceTier:profile.serviceTier||'default'}:{}), mode:options.planning?'read-only':task.mode};
+        task.execution = {profile:profile.id, model:profile.model, effort:profile.effort, ...(profile.provider==='Codex'?{serviceTier:profile.serviceTier||'default'}:{}), mode:options.planning||options.maintenance?'read-only':task.mode};
         const record=this.store.context(task);
         const instructions=environmentPrompt({...task,mode:task.execution.mode},capabilities(),record)+(options.planning?'\n本轮只制订计划，禁止实施。读取必要材料后给出可核对的步骤与验收条件，等待用户确认。最后用 JSON 代码块返回 {"steps":[{"text":"步骤及验收条件"}]}，供界面展示待确认步骤。':'');
         this.state(task,'running');
@@ -129,8 +133,8 @@ class Runner extends EventEmitter {
           this.event(id,'notice',{text:e.message});
           if(['running','stopping'].includes(task.state))this.state(task,this.active.started?'unknown':'failed');
         }
-        if(this.active.quotaExhausted)this.event(id,'notice',{text:`${profile.provider} / ${profile.name} 订阅额度已耗尽。${task.autoSwitch===false?'自动接续已关闭，请选择其他账号继续。':'正在检查可接续的账号。'}`});
-        if(task.autoSwitch===false || this.active.cancelRequested || !this.active.quotaExhausted || task.state!=='failed')break;
+        if(this.active.quotaExhausted)this.event(id,'notice',{text:`${profile.provider} / ${profile.name} 订阅额度已耗尽。${options.maintenance?'本次会话操作未切换账号。':task.autoSwitch===false?'自动接续已关闭，请选择其他账号继续。':'正在检查可接续的账号。'}`});
+        if(options.maintenance || task.autoSwitch===false || this.active.cancelRequested || !this.active.quotaExhausted || task.state!=='failed')break;
         require('./task-settings.cjs').applyPendingMode(task);
         const ordered=[...(task.relayOrder||[]).map(id=>PROFILES.find(p=>p.id===id)).filter(Boolean),...PROFILES.filter(p=>!(task.relayOrder||[]).includes(p.id))];
         const next=ordered.find(p=>!p.disabled&&!task.relayPaused?.includes(p.id)&&!attempted.has(p.id) && (!task.linkedProjects?.length||task.execution.mode==='full-access'||['Codex','Claude'].includes(p.provider)) && (!this.active.images.some(image=>image.kind!=='file')||['Codex','Claude','Grok'].includes(p.provider)) && (task.execution.mode==='read-only'||p.write&&['Codex','Claude','Grok'].includes(p.provider)));
@@ -146,9 +150,10 @@ class Runner extends EventEmitter {
       try {
       if(this.active?.quotaExhausted)task.stopReason='quota_exhausted';
       delete task.relaySource;
-      require('./task-plan.cjs').suggest(task,this.store.events(id),planRevision);
+      if(!options.maintenance)require('./task-plan.cjs').suggest(task,this.store.events(id),planRevision);
       if(options.planning){delete task.sessions[profile.id];if(task.state==='idle')require('./task-plan.cjs').capture(task,this.store.events(id),this.active?.planRevision);}
       task.requestedHandoff = this.active?.requestedHandoff || null;
+      if(options.maintenance){if(maintenanceLife)task.goalLifecycle=maintenanceLife;else delete task.goalLifecycle;}
       delete task.execution;
       delete task.activeQuestionIds;
       this.store.save(task);
@@ -243,6 +248,7 @@ class Runner extends EventEmitter {
             profile: profile.id,
           });
       }
+      if(message.method==='thread/tokenUsage/updated')this.context(task,profile,require('./context-usage.cjs').codexContext(p));
       if (message.method === "turn/plan/updated")
         this.event(task.id, "plan", { data: p });
       if (message.method === "turn/diff/updated")
@@ -280,19 +286,22 @@ class Runner extends EventEmitter {
       };
       // Older native sessions did not register Prism's goal tools. Their full
       // task history remains in the persistent handoff record.
-      const session = task.goalToolSessions?.[profile.id]===task.sessions[profile.id] ? task.sessions[profile.id] : null;
+      const session = this.active.maintenance||task.goalToolSessions?.[profile.id]===task.sessions[profile.id] ? task.sessions[profile.id] : null;
       const result = await rpc.call(
         session ? "thread/resume" : "thread/start",
         session ? { ...options, threadId: session } : {...options,dynamicTools:require('./goal-tools.cjs').tools},
       );
       task.sessions[profile.id] = result.thread.id;
-      task.goalToolSessions={...task.goalToolSessions,[profile.id]:result.thread.id};
+      if(!this.active.maintenance)task.goalToolSessions={...task.goalToolSessions,[profile.id]:result.thread.id};
       this.store.save(task);
       if(this.active.cancelRequested){this.state(task,'paused');return;}
       this.event(task.id, "notice", {
         text: `已连接 ${profile.provider} · ${profile.name}。工作目录：${task.cwd}`,
       });
       this.active.started = true;
+      if(this.active.maintenance==='context'){this.state(task,'idle');return;}
+      if(this.active.maintenance==='compact'){await rpc.call('thread/compact/start',{threadId:result.thread.id});await finished;}
+      else {
       const started = await rpc.call("turn/start", {
         threadId: result.thread.id,
         input: require('./attachments.cjs').codexInput(text,this.active.images),
@@ -307,6 +316,7 @@ class Runner extends EventEmitter {
       this.active.started = true;
       if(this.active.cancelRequested)await rpc.call('turn/interrupt',{threadId:task.sessions[profile.id],turnId:started.turn.id});
       await finished;
+      }
     } finally {
       await rpc.end();
     }
@@ -407,6 +417,7 @@ class Runner extends EventEmitter {
           continue;
         }
         input.receive(msg);
+        this.context(task,profile,require('./context-usage.cjs').claudeContext(msg,task.contextUsage?.[profile.id]));
         if(msg.type==='rate_limit_event') {
           const q=recordClaude(profile.id,msg.rate_limit_info,profile.model);if(q){this.emit('quota',q);this.active.quotaByWindow[msg.rate_limit_info.rateLimitType||'unknown']=require('./quota.cjs').normalizeClaude(msg.rate_limit_info,Date.now(),profile.model);this.active.quotaExhausted=Object.values(this.active.quotaByWindow).some(w=>w?.exhausted);}
           if(msg.rate_limit_info?.isUsingOverage)this.active.quotaExhausted=false;

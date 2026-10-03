@@ -190,6 +190,8 @@ function quotaView(result) {
       ? Math.min(...windows.map((w) => w.remaining))
       : null,
     windows,
+    credits:bucket.credits||null,
+    planType:bucket.planType||null,
   };
 }
 async function accountStatus(id, cwd, model) {

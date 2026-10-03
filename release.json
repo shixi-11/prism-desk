@@ -1,16 +1,16 @@
 {
-  "version": "0.1.39",
+  "version": "0.1.40",
   "date": "2026-10-03",
   "notes": {
     "en": [
-      "Tasks using a configured assistant now receive its live mother-package rules and memory navigation, plus the current local memory registry when available. Skills and memory are read as needed; connector authorization remains separate.",
-      "Routine draft saving is asynchronous and older writes cannot overwrite newer edits or closing snapshots. Closing and update preparation still flush drafts before proceeding.",
-      "Input no longer reparses unchanged Markdown previews or execution logs. Markdown files over 128 KiB display their complete content as plain text and remain editable to avoid costly formatting."
+      "A context ring beside Send opens a compact usage panel with context tokens and capacity, segmented breakdown when available, account usage bars, reset times, plan and reported balance. Data stays scoped to the active account and native session.",
+      "Existing Codex and Claude sessions can be compacted from the panel while idle. Claude also supports a native context refresh; Codex context readings update from native usage events. Maintenance actions preserve the task goal and do not trigger automatic account handoff.",
+      "Automatic compaction thresholds and unavailable balances remain explicitly unknown. Context telemetry and native compaction are currently supported for Codex and Claude; other providers retain their available account quota readings."
     ],
     "zh": [
-      "已配置助手的任务现在明确接入母包现役全局规则、记忆导航及可用的本机记忆索引；技能和记忆按需读取，连接器授权仍独立。",
-      "普通草稿保存改为异步，旧写入不会覆盖新输入或关闭时的草稿；关闭及更新准备仍先完成草稿保存。",
-      "输入时不再反复解析未变化的 Markdown 预览和执行记录；超过 128 KiB 的 Markdown 以完整纯文本预览，保留编辑功能，避免大量格式解析。"
+      "发送按钮旁新增上下文圆环，点击可查看上下文用量与容量、可用的分段详情、账号额度进度条、恢复时间、订阅类型及已返回的余额；数据按当前账号和原生会话隔离。",
+      "空闲时可在面板压缩已有的 Codex、Claude 会话；Claude 支持查询原生上下文，Codex 通过原生用量事件更新。维护操作保留任务目标，不触发自动账号轮换。",
+      "自动压缩阈值及未返回的余额明确显示未知；上下文读取和原生压缩目前支持 Codex、Claude，其他提供方仍显示已有的账号额度数据。"
     ]
   }
 }

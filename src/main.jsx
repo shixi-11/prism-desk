@@ -10,6 +10,7 @@ import {createLiveText,emptyLiveText} from './live-text.js';
 import AccountManager from "./AccountManager.jsx";
 import CapabilityDialog from "./CapabilityDialog.jsx";
 import ConversationStatus from "./ConversationStatus.jsx";
+import SessionUsage from './SessionUsage.jsx';
 import ComposerSubmit from "./ComposerSubmit.jsx";
 import "./conversation-status.css";
 import PreviewPanel,{LinkedMarkdown} from "./PreviewPanel.jsx";
@@ -961,6 +962,7 @@ function App() {
               <button title={tr("添加附件")} aria-label={tr("添加附件")} disabled={uploading||images.length>=5} onClick={()=>addImages(null)}><Paperclip size={19}/></button>
               <span className="compose-spacer" />
               <FastControl task={task} profile={init.profiles.find(p=>p.id===(task?.profile||draftAccount))} draftSettings={draftSettings} onSave={async(value,id)=>{if(task){const updated=await api.modelSettings(task.id,value,id);if(current.current===updated.id)setTask(updated);}else setDraftSettings(old=>({...old,[id]:value}));}}/>
+              {task&&<SessionUsage task={task} profile={init.profiles.find(p=>p.id===task.profile)} quota={quotas[task.profile]} checking={checking.includes(task.profile)} onRefresh={()=>refresh(task.profile)}/>}
               <ComposerSubmit key={task?.id||'draft'} busy={busy} stopping={task?.state==='stopping'} hasDraft={!!text.trim()||!!pastedTexts.length||!!images.length} onSend={send} onStop={()=>api.stop(task.id).catch(fail)} sendLabel={busy?(init.settings.busySend==='steer'?'引导':'排队'):'发送'} disabled={(!text.trim()&&!pastedTexts.length&&!images.length) || sending || uploading || changingAccount || task?.goalLifecycle?.status==='paused' || task?.state === "unknown" || !!task&&(!init.profiles.find(p=>p.id===task.profile)||init.profiles.find(p=>p.id===task.profile)?.disabled) || Object.values(accountLogins).some(s=>['starting','waiting','verifying'].includes(s.phase))}/>
             </div>
           </div>

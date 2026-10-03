@@ -9,7 +9,7 @@ function normalizeClaude(info,now=Date.now(),model=null) {
   const utilization=Number.isFinite(info.utilization) && info.utilization>=0 && info.utilization<=1 ? info.utilization : null;
   const remaining=exhausted ? 0 : utilization===null ? null : Math.round((1-utilization)*1000)/10;
   const resetsAt=Number.isFinite(info.resetsAt) ? info.resetsAt : null;
-  return {remaining,exhausted,windows:minutes[kind] && remaining!==null ? [{remaining,minutes:minutes[kind],resetsAt}] : [],checkedAt:new Date(now).toISOString(),source:'claude-rate-limit-event',status:exhausted?'订阅额度已耗尽':remaining===null?'订阅可用；CLI 未返回额度百分比':'CLI 返回的订阅额度',resetsAt};
+  return {remaining,exhausted,windows:minutes[kind] && remaining!==null ? [{remaining,minutes:minutes[kind],resetsAt,kind}] : [],checkedAt:new Date(now).toISOString(),source:'claude-rate-limit-event',status:exhausted?'订阅额度已耗尽':remaining===null?'订阅可用；CLI 未返回额度百分比':'CLI 返回的订阅额度',resetsAt};
 }
 function recordClaude(id,info,model=null) {
   const result=normalizeClaude(info);if(!result)return null;

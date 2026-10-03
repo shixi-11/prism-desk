@@ -97,7 +97,8 @@ async function claudeQuota(profile,cwd) {
     if(!cached.checkedAt)throw error;
     return {id:profile.id,...cached,extraUsageEnabled:null,cached:true,status:'实时额度查询暂不可用；显示执行时的额度记录'};
   }
-  const flag=usage?.rate_limits?.extra_usage?.is_enabled;
-  return {id:profile.id,email:usage.prismAccount?.email,subscriptionType:usage.prismAccount?.subscriptionType,...claudeUsageView(usage,profile.model),extraUsageEnabled:typeof flag==='boolean'?flag:null};
+  const extra=usage?.rate_limits?.extra_usage;
+  const flag=extra?.is_enabled;
+  return {id:profile.id,email:usage.prismAccount?.email,subscriptionType:usage.prismAccount?.subscriptionType,...claudeUsageView(usage,profile.model),extraUsage:extra?{used:extra.used_credits,limit:extra.monthly_limit,enabled:extra.is_enabled,unit:'provider-credits'}:null,extraUsageEnabled:typeof flag==='boolean'?flag:null};
 }
 module.exports={grokQuotaView,claudeUsageView,grokQuota,claudeQuota,readClaudeUsage,readClaudeUsageWithRetry,grokPaidUsageState};

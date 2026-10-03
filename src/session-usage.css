@@ -1,0 +1,17 @@
+.session-usage { position:relative; }
+.usage-trigger { display:flex;align-items:center;gap:5px;padding:6px; }
+.usage-ring { display:block;width:20px;height:20px;border-radius:50%;background:conic-gradient(var(--accent) var(--usage),var(--line) 0);position:relative; }
+.usage-ring:after { content:'';position:absolute;inset:4px;border-radius:50%;background:var(--surface); }
+.usage-ring.unknown { background:var(--line); }
+.usage-trigger small { font-size:10px; }
+.usage-popover { position:absolute;bottom:calc(100% + 14px);right:0;width:min(390px,calc(100vw - 40px));padding:18px;background:var(--surface);color:var(--text);border:1px solid var(--line);box-shadow:0 12px 40px #0005;border-radius:12px;z-index:60;max-height:min(650px,75vh);overflow:auto;font-size:12px; }
+.usage-popover header,.usage-actions,.usage-plan,.usage-window>div:first-child,.usage-credits,.usage-details>div { display:flex;align-items:center;gap:8px;justify-content:space-between; }
+.usage-popover header { margin-bottom:12px; }.usage-popover header>span { margin-left:auto;color:var(--muted); }
+.usage-meter { height:5px;background:var(--line);border-radius:4px;overflow:hidden; }.usage-meter span { display:block;height:100%;background:#4b91e2;border-radius:inherit; }
+.usage-actions { margin-top:10px; }.usage-actions small,.usage-window small,.usage-details small { color:var(--muted);font-size:11px; }
+.usage-popover button { font-size:11px;padding:6px 8px; }.usage-popover button:disabled { opacity:.45; }.usage-popover hr { border:0;border-top:1px solid var(--line);margin:15px 0; }
+.usage-window { margin-top:14px; }.usage-window .usage-meter { margin-top:6px; }.usage-window.high .usage-meter span { background:#e6aa38; }.usage-window b { font-weight:400; }.usage-credits { margin-top:16px;color:var(--muted); }
+.usage-details-toggle { display:flex;align-items:center;gap:10px;margin-top:14px;background:var(--selection);border-radius:6px; }.usage-details { display:grid;gap:8px;margin-top:12px; }.usage-popover footer { margin-top:12px;display:flex;justify-content:flex-end; }.usage-stale { display:block;color:var(--muted);margin-top:8px; }
+
+[dir="rtl"] .usage-popover {right:auto;left:0;}
+.usage-meter { display:flex; }
