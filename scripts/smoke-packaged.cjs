@@ -60,6 +60,7 @@ async function main() {
     const openWindow = async app => {
       const page = await app.firstWindow();
       await page.waitForFunction(() => Boolean(window.prism), null, { timeout: 30000 });
+      await page.locator('.composer textarea').waitFor({state:'visible',timeout:30000});
       return page;
     };
     const appInfo = async app => app.evaluate(({ app: electronApp }) => ({ packaged: electronApp.isPackaged, version: electronApp.getVersion(), arch: process.arch }));
@@ -86,10 +87,9 @@ async function main() {
     const taskTitle = `Packaged smoke ${smokeId}`;
     const created = await page.evaluate(async ({ id, title }) => window.prism.create({ title, mode: 'read-only' }), { id: smokeId, title: taskTitle });
     assert.equal(typeof created.id, 'string', 'window.prism.create must create a real task');
-    const sectionButtons = page.locator('.sidebar-section-toggle');
-    const recentIndex = await sectionButtons.evaluateAll(buttons => buttons.findIndex(button => /recent|最近/i.test(button.querySelector('span')?.textContent || '')));
-    assert.ok(recentIndex >= 0, 'Task sidebar must expose the recent section');
-    await sectionButtons.nth(recentIndex).click();
+    const recentToggle=page.locator('.sidebar-section-toggle').filter({hasText:/recent|最近/i}).first();
+    await recentToggle.waitFor({state:'visible',timeout:10000});
+    if(await recentToggle.getAttribute('aria-expanded')!=='true')await recentToggle.click();
     const taskEntry = page.getByRole('button', { name: taskTitle, exact: true });
     await taskEntry.waitFor({ state: 'visible', timeout: 10000 });
     await taskEntry.click();
@@ -140,7 +140,7 @@ async function main() {
     try { fs.rmSync(resolved, { recursive: true, force: true, maxRetries: 12, retryDelay: 250 }); }
     catch (error) {
       if (process.platform !== 'win32' || !['EPERM', 'EBUSY', 'ENOTEMPTY'].includes(error.code)) throw error;
-      process.stderr.write('Smoke checks passed; Windows kept the isolated temporary directory because an OS file handle was still active.\n');
+      process.stderr.write('Windows kept the isolated temporary directory because an OS file handle was still active.\n');
     }
   }
 }
