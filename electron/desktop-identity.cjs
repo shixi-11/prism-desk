@@ -1,6 +1,7 @@
 const fs=require('node:fs'),path=require('node:path');
 const appId=test=>test?'org.prismdesk.test':'org.prismdesk.desktop';
 function register(app,shell,root){
+ if(app.isPackaged){if(!app.setAsDefaultProtocolClient(require('./task-links.cjs').scheme))throw Error('Could not register Prism task links.');return;}
  const target=path.join(root,'runtime','desktop','Prism.exe');
  if(!fs.existsSync(target))return;
  if(!app.setAsDefaultProtocolClient(require('./task-links.cjs').scheme,target,[root,'--user-data-dir='+app.getPath('userData')]))throw Error('Could not register Prism task links.');

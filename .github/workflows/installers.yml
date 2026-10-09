@@ -1,0 +1,65 @@
+name: Native macOS installer smoke
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  mac-installer:
+    name: macOS ${{ matrix.arch }}
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: macos-15
+            arch: arm64
+          - runner: macos-15-intel
+            arch: x64
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run build:installer
+      - run: node --test tests/unix-process.test.cjs tests/release.test.cjs tests/installer-updater.test.cjs
+      - name: Verify, mount, and smoke test the packaged app
+        shell: bash
+        env:
+          ARCH: ${{ matrix.arch }}
+        run: |
+          set -euo pipefail
+          dmg="$(find .local/installer -maxdepth 1 -type f -name '*.dmg' -print -quit)"
+          test -n "$dmg"
+          hdiutil verify "$dmg"
+          mount="$RUNNER_TEMP/prism-dmg"
+          artifacts="$RUNNER_TEMP/prism-artifacts"
+          mkdir -p "$mount" "$artifacts"
+          attached=0
+          cleanup() {
+            if [[ "$attached" == 1 ]]; then hdiutil detach "$mount" -quiet || true; fi
+          }
+          trap cleanup EXIT
+          hdiutil attach "$dmg" -readonly -nobrowse -mountpoint "$mount"
+          attached=1
+          app="$(find "$mount" -maxdepth 2 -type d -name '*.app' -print -quit)"
+          test -n "$app"
+          codesign --verify --deep --strict "$app"
+          npm install --no-save --ignore-scripts playwright
+          node scripts/smoke-packaged.cjs "$app" --metadata "$artifacts/metadata.json"
+          node -e 'const m=require(process.argv[1]); if(m.arch!==process.argv[2]) throw Error(`Expected ${process.argv[2]} but smoke app reported ${m.arch}`)' "$artifacts/metadata.json" "$ARCH"
+          cp "$dmg" "$artifacts/Prism-${ARCH}.dmg"
+          hdiutil detach "$mount" -quiet
+          attached=0
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mac-${{ matrix.arch }}
+          path: |
+            ${{ runner.temp }}/prism-artifacts/Prism-${{ matrix.arch }}.dmg
+            ${{ runner.temp }}/prism-artifacts/metadata.json
+          retention-days: 3

@@ -746,5 +746,6 @@
   "设置待生效，下次发送后开始统计": "Settings pending; context tracking starts after your next message",
   "当前账号尚无会话，发送消息后开始统计": "No session for this account yet; context tracking starts after you send a message",
   "尚未读取到上下文用量，请刷新": "Context usage has not been read; refresh to try again",
-  "未能从当前会话记录读取上下文用量，请在下一次执行结束后重试。": "Unable to read context usage from this session. Try again after the next run finishes."
+  "未能从当前会话记录读取上下文用量，请在下一次执行结束后重试。": "Unable to read context usage from this session. Try again after the next run finishes.",
+  "打开安装包": "Open installer"
 }

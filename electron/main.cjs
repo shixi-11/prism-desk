@@ -1,4 +1,5 @@
 const { app, BrowserWindow, ipcMain, dialog, shell, Menu, clipboard, Tray } = require("electron");
+if(app.isPackaged&&!process.env.PRISM_TEST_DATA)app.setPath('userData',require('node:path').join(app.getPath('appData'),'Prism'));
 const updateBootstrap=require('./update-bootstrap.cjs');
 const callers=new (require('node:async_hooks').AsyncLocalStorage)();
 const windows=new Set();
@@ -102,7 +103,7 @@ app.whenReady().then(() => {
     }catch(error){event.returnValue={error:error.message};}
   });
   runner = new RunnerPool(store);
-  updater=new (require('./updater.cjs').Updater)(app.getAppPath(),process.env.PRISM_TEST_DATA?{root:path.join(dataPath(),'installation')}:{ });
+  updater=app.isPackaged?new (require('./installer-updater.cjs').InstallerUpdater)({root:dataPath(),version:app.getVersion()}):new (require('./updater.cjs').Updater)(app.getAppPath(),process.env.PRISM_TEST_DATA?{root:path.join(dataPath(),'installation')}:{ });
   updater.on('change',value=>emit('app-update',value));
   if(bootstrapError){updater.state.status='error';updater.state.error=bootstrapError;}
   updater.current().then(current=>updater.set({current,...(updater.state.latest===current?{status:'current'}:{})})).catch(()=>{});
@@ -146,12 +147,22 @@ app.whenReady().then(() => {
       if(!opened.length||ready.some(v=>v.status!=='fulfilled'||!v.value)||updateBusy())throw Error('请保存并关闭编辑窗口，空闲后将自动更新');
       updateBootstrap.write(path.join(dataPath(),'update-windows.json'),opened.map(w=>({key:w.draftKey,hidden:!w.isVisible(),bounds:w.getBounds()})));
       const target=await updater.activate();
-      app.relaunch({execPath:path.join(target,'runtime','desktop','Prism.exe'),args:[target,'--user-data-dir='+dataPath()]});
+      if(app.isPackaged&&process.platform==='darwin'){
+        const error=await shell.openPath(target);if(error)throw Error(error);
+        updater.cancelActivation();updateInstalling=false;messageQueue.paused=false;
+        try{fs.unlinkSync(path.join(dataPath(),'update-windows.json'));}catch{}
+        for(const w of opened)if(!w.isDestroyed())await w.webContents.executeJavaScript(`window.__prismCancelUpdate?.(${JSON.stringify(token)})`);
+        messageQueue.pump();return updater.snapshot();
+      }
+      if(app.isPackaged){
+        const child=require('node:child_process').spawn(target,['/S','--updated','--force-run'],{detached:true,stdio:'ignore',windowsHide:true});
+        await new Promise((resolve,reject)=>{child.once('spawn',resolve);child.once('error',reject);});child.unref();
+      }else app.relaunch({execPath:path.join(target,'runtime','desktop','Prism.exe'),args:[target,'--user-data-dir='+dataPath()]});
       quitting=true;tray?.destroy();app.quit();
     }catch(error){updateInstalling=false;messageQueue.paused=false;try{updater.cancelActivation();}catch{}const layoutFile=path.join(dataPath(),'update-windows.json');try{if(fs.existsSync(layoutFile))fs.unlinkSync(layoutFile);}catch{}for(const w of opened)if(!w.isDestroyed())w.webContents.executeJavaScript(`window.__prismCancelUpdate?.(${JSON.stringify(token)})`).catch(()=>{});messageQueue.pump();throw error;}
   }
   handle('updateStatus',()=>updater.snapshot());
-  handle('updateHealthy',()=>process.env.PRISM_TEST_DATA?null:updateBootstrap.healthy(app.getAppPath()));
+  handle('updateHealthy',()=>process.env.PRISM_TEST_DATA||app.isPackaged?null:updateBootstrap.healthy(app.getAppPath()));
   handle('checkUpdates',()=>updater.check());
   handle('prepareUpdate',()=>updater.prepare());
   handle('automaticUpdates',value=>updater.automatic(value));
@@ -485,7 +496,7 @@ app.whenReady().then(() => {
     minWidth: 1000,
     minHeight: 640,
     title: `棱镜 · Prism v${app.getVersion()}`,
-    icon: path.join(__dirname, "..", "src", "assets", "prism.ico"),
+    icon: path.join(__dirname, "..", "src", "assets", process.platform==='darwin'?"prism-icon.png":"prism.ico"),
     backgroundColor: "#272119",
     show: false,
     webPreferences: {
@@ -507,7 +518,7 @@ app.whenReady().then(() => {
   window.webContents.setWindowOpenHandler(() => ({ action: "deny" }));
   window.setMenu(null);
   window.once('ready-to-show',()=>{if(!process.env.PRISM_TEST_HIDE&&!restore?.hidden)window.showInactive();});
-  if(process.platform==='win32')window.setAppDetails({appId,appIconPath:path.join(updater.root,'runtime','desktop','Prism.exe'),appIconIndex:0,relaunchDisplayName:'棱镜',relaunchCommand:`"${path.join(updater.root,'runtime','desktop','Prism.exe')}" "${updater.root}" --user-data-dir="${app.getPath('userData')}"`});
+  if(process.platform==='win32'){const executable=app.isPackaged?process.execPath:path.join(updater.root,'runtime','desktop','Prism.exe');window.setAppDetails({appId,appIconPath:executable,appIconIndex:0,relaunchDisplayName:'棱镜',relaunchCommand:app.isPackaged?`"${executable}"`:`"${executable}" "${updater.root}" --user-data-dir="${app.getPath('userData')}"`});}
   window.webContents.on("will-navigate", (event) => event.preventDefault());
   window.loadFile(path.join(__dirname, "..", "dist", "index.html"),{query:taskId?{task:taskId}:{}});
   window.webContents.once('did-finish-load',()=>messageQueue.pump());
@@ -531,7 +542,7 @@ app.whenReady().then(() => {
   for(const layout of layouts.slice(1))makeWindow(undefined,layout);
   if(fs.existsSync(windowFile))fs.unlinkSync(windowFile);
   if(!process.env.PRISM_TEST_HIDE||process.env.PRISM_TEST_TRAY){
-    tray=new Tray(path.join(__dirname,'..','src','assets','prism.ico'));
+    tray=new Tray(path.join(__dirname,'..','src','assets',process.platform==='darwin'?'prism-icon.png':'prism.ico'));
     tray.setToolTip('棱镜 · Prism');
     const updateTray=()=>tray.setContextMenu(Menu.buildFromTemplate([
       {label:translate(settings().language,'打开棱镜'),click:showWindow},

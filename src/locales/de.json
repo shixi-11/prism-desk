@@ -746,5 +746,6 @@
   "设置待生效，下次发送后开始统计": "Die Einstellungen und Kontexterfassung gelten ab der nächsten Nachricht",
   "当前账号尚无会话，发送消息后开始统计": "Für dieses Konto gibt es noch keine Sitzung; die Erfassung beginnt mit einer Nachricht",
   "尚未读取到上下文用量，请刷新": "Die Kontextnutzung wurde noch nicht gelesen; bitte aktualisieren",
-  "未能从当前会话记录读取上下文用量，请在下一次执行结束后重试。": "Die Kontextnutzung dieser Sitzung konnte nicht gelesen werden. Versuchen Sie es nach der nächsten Ausführung erneut."
+  "未能从当前会话记录读取上下文用量，请在下一次执行结束后重试。": "Die Kontextnutzung dieser Sitzung konnte nicht gelesen werden. Versuchen Sie es nach der nächsten Ausführung erneut.",
+  "打开安装包": "Installationsprogramm öffnen"
 }

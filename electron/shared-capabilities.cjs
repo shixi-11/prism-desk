@@ -284,8 +284,7 @@ let instance;
 function manager() {
   if (!instance) {
     const { CONFIG } = require('./config.cjs');
-    const root = require('./update-bootstrap.cjs').installation(path.resolve(__dirname, '..'));
-    instance = new SharedCapabilities({ config: CONFIG, directory: process.env.PRISM_TEST_DATA || path.join(root, '.local'), home: process.env.PRISM_TEST_DATA ? '' : process.env.USERPROFILE || require('node:os').homedir(), codexHome: process.env.PRISM_TEST_DATA ? '' : process.env.CODEX_HOME });
+    instance = new SharedCapabilities({ config: CONFIG, directory: require('./runtime-paths.cjs').stateRoot(), home: process.env.PRISM_TEST_DATA ? '' : process.env.USERPROFILE || require('node:os').homedir(), codexHome: process.env.PRISM_TEST_DATA ? '' : process.env.CODEX_HOME });
   }
   return instance;
 }

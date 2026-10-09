@@ -6,13 +6,13 @@
 
 **하나의 작업, 계속 앞으로.**
 
-**Codex, Claude Code, Grok**을 하나의 Windows 데스크톱에서 사용하세요. 구독 계정, 프로젝트 폴더, 대화를 한곳에 모으고 계정을 바꿔도 작업을 이어갈 수 있습니다.
+**Codex, Claude Code, Grok**을 Windows와 Mac 데스크톱에서 사용하세요. 구독 계정, 프로젝트 폴더, 대화를 한곳에 모으고 계정을 바꿔도 작업을 이어갈 수 있습니다.
 
 여러 AI 코딩 CLI로 제품을 개발하거나 웹사이트와 창작 프로젝트를 만드는 분들을 위한 도구입니다. 터미널 전환과 반복 설명을 줄이고 작업에 집중하세요.
 
 **비상업적 용도로만 사용할 수 있습니다.** 소스 코드는[PolyForm Noncommercial 1.0.0](LICENSE)에 따라 제공됩니다. 저작권자의 별도 서면 허가 없이 상업적으로 이용할 수 없습니다.
 
-**[최신 릴리스](https://github.com/shixi-11/prism-desk/releases/latest)** · **[설치 안내](#install)**
+**[Windows x64 설치 프로그램](https://github.com/shixi-11/prism-desk/releases/latest/download/Prism-Setup.exe)** · **[Mac · Apple 실리콘](https://github.com/shixi-11/prism-desk/releases/latest/download/Prism-arm64.dmg)** · **[Mac · Intel](https://github.com/shixi-11/prism-desk/releases/latest/download/Prism-x64.dmg)** · **[최신 릴리스](https://github.com/shixi-11/prism-desk/releases/latest)** · **[설치 안내](#install)**
 
 [![프로젝트 대화, 디자인 작업, Claude 모델 설정과 자동 계정 인계 설정을 보여 주는 Prism](output/20260912_prism-en-dark.png)](output/20260912_prism-en-dark.png)
 
@@ -46,9 +46,7 @@
 
 ### 버전 및 다운로드
 
-**[최신 릴리스](https://github.com/shixi-11/prism-desk/releases/latest)** · **[설치 안내](#install)**
-
-Prism은 현재 **Windows 소스 설치** 방식으로 제공됩니다. 독립형 `.exe` 또는 `.msi` 설치 프로그램은 배포하지 않습니다. GitHub의 “Source code” 다운로드에는 소스 파일이 들어 있습니다. 설치 안내에 따라 데스크톱 앱을 빌드하고 실행하세요. 각 안정 버전 릴리스에는 버전 태그 하나와 영어 및 중국어 간체 변경 사항을 빠짐없이 담은 페이지 하나가 있습니다.
+이번 릴리스는 Windows x64 및 Mac 설치 프로그램을 제공합니다. 플랫폼별 설치와 서명 안내는 [설치](#install)를 참조하세요.
 
 제작: [Shixi Lin](https://shixilin.com/). Prism이 창작에 도움이 된다면 [지속적인 개발을 후원해 주세요](https://shixilin.com/support?lang=ko).
 
@@ -56,12 +54,22 @@ Prism은 현재 **Windows 소스 설치** 방식으로 제공됩니다. 독립�
 
 ### 설치
 
-다음 명령은 안정 버전 **v0.1.43**을 설치합니다. [최신 릴리스](https://github.com/shixi-11/prism-desk/releases/latest)에서 버전과 두 언어로 제공되는 변경 사항을 확인하세요.
+**v0.1.44 Windows x64 설치 프로그램**을 다운로드하고 `Prism-Setup.exe`를 더블클릭하세요. Git, Node.js, npm은 필요하지 않습니다. 설치 프로그램은 서명되지 않았으므로 Windows에서 “알 수 없는 게시자” 경고가 표시될 수 있습니다.
 
-Windows, Git, Node.js 22.12 이상, npm, 그리고 선택한 공급자의 공식 CLI가 필요합니다. 각 CLI에 별도로 로그인하세요.
+Mac은 칩에 맞는 디스크 이미지를 다운로드하세요: [Apple 실리콘](https://github.com/shixi-11/prism-desk/releases/latest/download/Prism-arm64.dmg) 또는 [Intel](https://github.com/shixi-11/prism-desk/releases/latest/download/Prism-x64.dmg). `.dmg`를 열고 Prism을 Applications 폴더로 드래그하면 됩니다. Git과 Node.js는 필요하지 않습니다. Mac 앱에는 ad-hoc 서명이 있지만 Apple Developer ID 서명과 공증이 없어 첫 실행을 macOS가 차단할 수 있습니다. 실행하기로 확인했다면 시스템 설정 → 개인정보 보호 및 보안에서 허용하세요.
+
+앱에는 타사 CLI, 계정 또는 타이추의 비공개 자료가 포함되지 않습니다. Codex, Claude Code 및/또는 Grok 공식 CLI를 별도로 설치하고 각 구독 계정으로 로그인하세요.
+
+Windows 데이터: `%APPDATA%\Prism`, 독립 계정: `%LOCALAPPDATA%\Prism\accounts`. Mac 데이터: `~/Library/Application Support/Prism`, 독립 계정: `~/Library/Application Support/Prism/accounts`. 제거 시 사용자 데이터는 기본적으로 보존됩니다.
+
+#### 개발자 옵션: 소스에서 설치
+
+소스 빌드에는 아래 명령을 사용하세요. Git, Node.js 22.12 이상, npm 및 사용할 공식 CLI가 필요합니다.
+
+아래 PowerShell 명령은 Windows 전용입니다.
 
 ```powershell
-git clone --branch v0.1.43 https://github.com/shixi-11/prism-desk.git
+git clone --branch v0.1.44 https://github.com/shixi-11/prism-desk.git
 cd prism-desk
 npm install
 npm run build
@@ -166,7 +174,9 @@ Codex에 목표 설정이나 변경을 요청하면 Prism의 내장 도구를 �
 
 대부분의 사용자는 **계정 → 계정 연결**에서 계정을 연결할 수 있습니다. 아래 설정 파일은 고급 사용자를 위한 대안입니다. 예제를 복사하기 전에 기존 파일을 백업하세요.
 
-```powershell
+```
+
+Mac 개발은 저장소와 종속 항목을 준비한 뒤 `npm run build && npm start`를 실행하세요.powershell
 New-Item -ItemType Directory -Force .local
 Copy-Item config.example.json .local/config.json
 ```

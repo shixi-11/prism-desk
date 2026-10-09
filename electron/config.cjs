@@ -1,18 +1,21 @@
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
-const DEFAULT_CONFIG_PATH=path.join(require('./update-bootstrap.cjs').installation(path.resolve(__dirname,'..')),'.local','config.json');
+const DEFAULT_CONFIG_PATH=path.join(require('./runtime-paths.cjs').stateRoot(),'config.json');
 
 // This file contains configuration conventions only. Credentials remain in the
 // provider's own login directory and must never be copied into configuration.
-function defaultConfig(env = process.env) {
-  const home = env.USERPROFILE || os.homedir();
-  const local = env.LOCALAPPDATA || path.join(home, '.local', 'share');
+function defaultConfig(env = process.env, platform = process.platform) {
+  const home = (platform === 'win32' ? env.USERPROFILE : env.HOME) || env.USERPROFILE || os.homedir();
+  const local = platform === 'darwin'
+    ? path.join(home, 'Library', 'Application Support')
+    : platform === 'win32' ? (env.LOCALAPPDATA || path.join(home, '.local', 'share')) : (env.XDG_DATA_HOME || path.join(home, '.local', 'share'));
   const accountRoot = path.join(local, 'Prism', 'accounts');
+  const suffix = platform === 'win32' ? '.exe' : '';
   const definitions = [
-    ['Codex', 'codex.exe', 'gpt-6-astra', true],
-    ['Claude', 'claude.exe', 'opus', true],
-    ['Grok', 'grok.exe', 'grok-4.6', true],
+    ['Codex', `codex${suffix}`, 'gpt-6-astra', true],
+    ['Claude', `claude${suffix}`, 'opus', true],
+    ['Grok', `grok${suffix}`, 'grok-4.6', true],
   ];
   return {
     profiles: definitions.map(([provider, executable, model, write]) => ({

@@ -1,6 +1,6 @@
 {
   "name": "prism-desk",
-  "version": "0.1.43",
+  "version": "0.1.44",
   "private": true,
   "description": "棱镜：同一个任务，在不同 CLI 之间继续。",
   "type": "module",
@@ -13,7 +13,8 @@
     "test": "node --test tests/*.test.cjs",
     "postinstall": "node scripts/install-runtime.cjs",
     "release:check": "node scripts/release.cjs check",
-    "release:publish": "node scripts/release.cjs publish"
+    "release:publish": "node scripts/release.cjs publish",
+    "build:installer": "npm run build && node scripts/build-installer.cjs"
   },
   "dependencies": {
     "lucide-react": "^0.468.0",
@@ -23,6 +24,7 @@
   },
   "devDependencies": {
     "electron": "^44.2.0",
+    "electron-builder": "26.0.12",
     "npm": "10.9.4",
     "rcedit": "^4.0.1",
     "vite": "^7.0.0"

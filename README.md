@@ -6,13 +6,13 @@
 
 **One task. Keep moving forward.**
 
-A local Windows desktop for **Codex, Claude Code, and Grok**. Bring your subscription accounts, project folders, and conversations into one place—and keep working when it is time to change accounts.
+A local desktop for Windows and Mac, bringing **Codex, Claude Code, and Grok** together. Bring your subscription accounts, project folders, and conversations into one place—and keep working when it is time to change accounts.
 
 Built for developers, designers, and independent makers who use more than one AI coding CLI and want less time lost to terminal juggling and repeated explanations.
 
 **For non-commercial use only.** Source is available under the [PolyForm Noncommercial 1.0.0](LICENSE). Commercial use is prohibited unless separately authorized in writing by the copyright holders.
 
-**[Latest release](https://github.com/shixi-11/prism-desk/releases/latest)** · **[Installation guide](#install)**
+**[Windows x64 installer](https://github.com/shixi-11/prism-desk/releases/latest/download/Prism-Setup.exe)** · **[Mac · Apple silicon](https://github.com/shixi-11/prism-desk/releases/latest/download/Prism-arm64.dmg)** · **[Mac · Intel](https://github.com/shixi-11/prism-desk/releases/latest/download/Prism-x64.dmg)** · **[Latest release](https://github.com/shixi-11/prism-desk/releases/latest)** · **[Installation guide](#install)**
 
 [![Prism desktop with project conversations, a design task, Claude model controls, and automatic account handoff preferences](output/20260912_prism-en-dark.png)](output/20260912_prism-en-dark.png)
 
@@ -46,20 +46,30 @@ Right-click a project to pin it, edit its name, choose a section, create a perma
 
 ### Versions and downloads
 
-**[Latest release](https://github.com/shixi-11/prism-desk/releases/latest)** · **[Installation guide](#install)**
-
-Prism currently ships as a **Windows source installation**. No standalone `.exe` or `.msi` installer is published. GitHub’s “Source code” downloads contain source files; follow the installation guide to build and launch the desktop app. Each stable release has one version tag and one page containing complete English and Simplified Chinese change notes.
+This release provides Windows x64 and Mac installers. See [Install](#install) for platform-specific instructions and signing details.
 
 Created by [Shixi Lin](https://shixilin.com/). If Prism helps you keep creating, [support its continued development](https://shixilin.com/support?lang=en).
 
 ### Install
 
-These commands install stable version **v0.1.43**. Check the [latest Release](https://github.com/shixi-11/prism-desk/releases/latest) for its version and bilingual change notes.
+Download the **Windows x64 installer for v0.1.44** and double-click `Prism-Setup.exe`. No Git, Node.js or npm is needed. Windows may show an “Unknown publisher” warning because the installer is unsigned.
 
-You will need Windows, Git, Node.js 22.12 or later, npm, and the official CLIs for your chosen providers. Sign in to each CLI separately.
+For Mac, choose the disk image for your chip: [Apple silicon](https://github.com/shixi-11/prism-desk/releases/latest/download/Prism-arm64.dmg) or [Intel](https://github.com/shixi-11/prism-desk/releases/latest/download/Prism-x64.dmg). Open the `.dmg` and drag Prism to Applications; Git and Node.js are not needed. The Mac app has an ad-hoc signature but no Apple Developer ID signature or notarization, so macOS may block the first launch. If you choose to open it, allow it in System Settings → Privacy & Security.
+
+The installers do not include third-party CLIs, accounts or private Taichu materials. Install the official Codex, Claude Code and/or Grok CLI separately, then sign in to each with its supported subscription account.
+
+Windows app data: `%APPDATA%\Prism`; independent accounts: `%LOCALAPPDATA%\Prism\accounts`. Mac app data: `~/Library/Application Support/Prism`; independent accounts: `~/Library/Application Support/Prism/accounts`. Uninstalling Prism keeps user data by default.
+
+#### Developer option: build from source
+
+The PowerShell build and start scripts below are for Windows only.
+
+For Windows source builds, use the PowerShell commands below. This option requires Git, Node.js 22.12 or later, npm and the official CLIs you plan to use.
+
+The following PowerShell commands are for Windows only.
 
 ```powershell
-git clone --branch v0.1.43 https://github.com/shixi-11/prism-desk.git
+git clone --branch v0.1.44 https://github.com/shixi-11/prism-desk.git
 cd prism-desk
 npm install
 npm run build
@@ -69,6 +79,8 @@ powershell -NoProfile -ExecutionPolicy Bypass -File scripts/start.ps1
 ```
 
 The build script compiles the Windows process host used to stop CLI subprocesses together. It uses the .NET Framework compiler included with Windows.
+
+For Mac development, with the repository and dependencies already set up, run `npm run build && npm start`.
 
 ### Before your first task
 

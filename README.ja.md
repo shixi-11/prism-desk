@@ -46,9 +46,7 @@
 
 ### バージョンとダウンロード
 
-**[最新リリース](https://github.com/shixi-11/prism-desk/releases/latest)** · **[インストールガイド](#install)**
-
-Prism は現在、**Windows でのソースからのインストール**に対応しています。単体の `.exe` または `.msi` インストーラーは公開していません。GitHub の「Source code」ダウンロードにはソースファイルが含まれています。インストールガイドに従って、デスクトップアプリをビルドして起動してください。各安定版リリースには、バージョンタグが一つと、英語および簡体字中国語の完全な変更履歴を掲載したページが一つあります。
+このリリースではWindows x64版とMac版のインストーラーを提供します。各プラットフォームの導入方法と署名の詳細は[インストール](#install)をご覧ください。
 
 作者：[Shixi Lin](https://shixilin.com/)。 Prism が制作に役立ったら、[今後の開発をご支援ください](https://shixilin.com/support?lang=ja)。
 
@@ -56,12 +54,16 @@ Prism は現在、**Windows でのソースからのインストール**に対�
 
 ### インストール
 
-以下のコマンドで安定版 **v0.1.43** をインストールします。[最新リリース](https://github.com/shixi-11/prism-desk/releases/latest)で、バージョンと二言語の変更履歴を確認してください。
+**v0.1.44 Windows x64版**をダウンロードし、`Prism-Setup.exe` をダブルクリックします。Windows は未署名インストーラーについて警告する場合があります。
 
-Windows、Git、Node.js 22.12 以降、npm、および利用するプロバイダーの公式 CLI が必要です。各 CLI に個別にサインインしてください。
+Macではチップに合うディスクイメージを選び、`.dmg`を開いてPrismをApplicationsへドラッグしてください。Mac版にはad-hoc署名がありますが、Apple Developer ID署名と公証はなく、初回起動がブロックされる場合があります。
+
+Windowsでソースからビルドする場合は、以下のPowerShellコマンドを使用します。Git、Node.js 22.12以降、npmと利用する公式CLIが必要です。
+
+以下のPowerShellコマンドはWindows専用です。
 
 ```powershell
-git clone --branch v0.1.43 https://github.com/shixi-11/prism-desk.git
+git clone --branch v0.1.44 https://github.com/shixi-11/prism-desk.git
 cd prism-desk
 npm install
 npm run build
@@ -71,6 +73,8 @@ powershell -NoProfile -ExecutionPolicy Bypass -File scripts/start.ps1
 ```
 
 ビルドスクリプトは、CLI の子プロセスをまとめて停止するための Windows プロセスホストをコンパイルします。Windows に付属する .NET Framework コンパイラーを使用します。
+
+Macで開発する場合、リポジトリと依存関係を準備済みであれば `npm run build && npm start` を実行します。
 
 ### 最初のタスクを始める前に
 

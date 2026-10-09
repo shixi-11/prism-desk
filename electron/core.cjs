@@ -15,22 +15,34 @@ function profileFor(id) {
   if (!p) throw Error("请选择已接入的订阅账号。");
   return p;
 }
-function childEnv(profile) {
+function childEnv(profile, envSource = process.env, platform = process.platform) {
+  const home = (platform === 'win32' ? envSource.USERPROFILE : envSource.HOME) || require("node:os").homedir();
   if (!fs.existsSync(profile.home))
     throw Error("这个账号的独立登录目录不存在，请先完成订阅登录。");
   const real = fs.realpathSync.native(profile.home).toLowerCase();
-  const desktopPath = path.join(process.env.USERPROFILE || require("node:os").homedir(), ".codex");
+  const desktopPath = path.join(home, ".codex");
   const desktop = fs.existsSync(desktopPath) ? fs.realpathSync.native(desktopPath).toLowerCase() : null;
   if (real === desktop) throw Error("棱镜禁止使用当前桌面账号目录。");
   const env = {};
   const allowed =
     /^(PATH|PATHEXT|SYSTEMROOT|WINDIR|COMSPEC|USERPROFILE|USERNAME|USERDOMAIN|HOMEDRIVE|HOMEPATH|APPDATA|LOCALAPPDATA|TEMP|TMP|PROGRAMDATA|PROGRAMFILES|PROGRAMFILES\(X86\)|COMMONPROGRAMFILES|COMMONPROGRAMFILES\(X86\)|NUMBER_OF_PROCESSORS|PROCESSOR_ARCHITECTURE|OS|HTTPS_PROXY|HTTP_PROXY|ALL_PROXY|NO_PROXY|SSL_CERT_FILE|NODE_EXTRA_CA_CERTS|GIT_EXEC_PATH)$/i;
-  for (const [key, value] of Object.entries(process.env))
+  for (const [key, value] of Object.entries(envSource))
     if (allowed.test(key)) env[key] = value;
-  env.CODEX_HOME =
-    profile.provider === "Codex"
-      ? profile.home
-      : path.join(process.env.LOCALAPPDATA, "Prism", "unavailable-codex-home");
+  if (platform !== 'win32') {
+    env.HOME = home;
+    if (envSource.TMPDIR) env.TMPDIR = envSource.TMPDIR;
+    const unixPaths = [path.join(home, '.local', 'bin'), path.join(home, '.grok', 'bin'), ...(platform === 'darwin' ? ['/opt/homebrew/bin'] : []), '/usr/local/bin', '/usr/bin'];
+    const delimiter = platform === 'win32' ? path.delimiter : ':';
+    env.PATH = [env.PATH, ...unixPaths].filter(Boolean).join(delimiter);
+  }
+  const codexBase = platform === 'win32'
+    ? (envSource.LOCALAPPDATA || home)
+    : platform === 'darwin'
+      ? path.join(home, 'Library', 'Application Support')
+      : (envSource.XDG_CONFIG_HOME || path.join(home, '.config'));
+  env.CODEX_HOME = profile.provider === "Codex"
+    ? profile.home
+    : path.join(codexBase, "Prism", "unavailable-codex-home");
   if (profile.provider === "Claude") {env.CLAUDE_CONFIG_DIR = profile.home;env.CLAUDE_CODE_DISABLE_FAST_MODE='1';}
   if (profile.provider === "Grok") {env.GROK_AUTH_PATH = path.join(profile.home, "auth.json");if(profile.isolatedHome)env.GROK_HOME=profile.home;}
   if (profile.provider === 'Gemini') {
@@ -47,11 +59,17 @@ function childEnv(profile) {
   }
   return env;
 }
-function executable(profile) { return require("./discovery.cjs").resolveExecutable(profile); }
-function spawnCLI(profile, args, cwd) {
+function executable(profile, platform = process.platform) { return require("./discovery.cjs").resolveExecutable(profile, process.env, platform); }
+function spawnCLI(profile, args, cwd, platform = process.platform) {
   if (profile.provider === 'Gemini') {
     if (!CONFIG.geminiEntry || !fs.existsSync(CONFIG.geminiEntry)) throw Error('Configure the installed Gemini CLI entry path before execution.');
     args = [CONFIG.geminiEntry, ...args];
+  }
+  if (platform !== 'win32') {
+    const proc = require('./unix-process.cjs').spawnUnix(executable(profile, platform), args, {
+      cwd, env: childEnv(profile, process.env, platform), stdio: ["pipe", "pipe", "pipe"],
+    });
+    return proc;
   }
   const host = path.join(__dirname, "..", "runtime", "PrismProcess.exe");
   if (!fs.existsSync(host))

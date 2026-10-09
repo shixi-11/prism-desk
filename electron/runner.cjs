@@ -491,7 +491,7 @@ class Runner extends EventEmitter {
     });
     if(this.active.stopSignal)await this.active.stopSignal.catch(()=>{});
     if(streamError)throw streamError;
-    if(this.active.cancelRequested && this.active.stopAcknowledged && code===1223){
+    if(require('./unix-process.cjs').confirmedStop(process.platform,this.active.cancelRequested,this.active.stopAcknowledged,code)){
       this.event(task.id,'notice',{text:'Claude 执行及其子进程已停止；交接时将核对可能的部分写入。'});
       delete task.sessions[profile.id];
       this.state(task,'paused');
@@ -519,7 +519,7 @@ class Runner extends EventEmitter {
     if(run.proc?.requestStop){
       this.state(run.task,'stopping');
       run.stopSignal=run.proc.requestStop().then(()=>{run.stopAcknowledged=true;});
-      try{await run.stopSignal;}catch(e){run.cancelRequested=false;this.state(run.task,'running');throw e;}
+      try{await run.stopSignal;}catch(e){if(e.code==='STOP_UNKNOWN')this.state(run.task,'unknown');else{run.cancelRequested=false;this.state(run.task,'running');}throw e;}
       return;
     }
     if(run.grok && run.sessionId){

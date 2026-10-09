@@ -3,7 +3,7 @@ const SHA=/^[a-f0-9]{40}$/;
 function canonical(value){try{return fs.realpathSync.native(value).toLowerCase();}catch{return path.resolve(value).toLowerCase();}}
 function rootExists(root){return typeof root==='string'&&path.isAbsolute(root)&&read(path.join(root,'package.json')).name==='prism-desk'&&fs.existsSync(path.join(root,'electron','main.cjs'));}
 function read(file,fallback={}){try{return JSON.parse(fs.readFileSync(file,'utf8'));}catch{return fallback;}}
-function write(file,value){fs.mkdirSync(path.dirname(file),{recursive:true});const tmp=file+'.'+process.pid+'.tmp';fs.writeFileSync(tmp,JSON.stringify(value,null,2));fs.renameSync(tmp,file);}
+function write(file,value){require('./atomic-file.cjs').atomic(file,value);}
 function installation(appRoot){
  const marker=read(path.join(appRoot,'.local','installation.json'));
  if(rootExists(marker.root))return path.resolve(marker.root);
@@ -14,7 +14,7 @@ function installation(appRoot){
 function versionPath(root,sha){if(!SHA.test(sha))throw Error('Invalid update revision');return path.join(root,'.local','updates','versions',sha);}
 function validVersion(root,sha){try{const dir=versionPath(root,sha);return ['electron/main.cjs','electron/update-bootstrap.cjs','dist/index.html','runtime/desktop/Prism.exe','runtime/PrismProcess.exe','runtime/node/node.exe','node_modules/npm/bin/npm-cli.js','.local/installation.json'].every(p=>fs.existsSync(path.join(dir,p)))&&canonical(installation(dir))===canonical(root)&&read(path.join(dir,'.local','ready.json')).revision===sha;}catch{return false;}}
 function bootstrap(app,appRoot){
- if(process.env.PRISM_TEST_DATA)return;
+ if(process.env.PRISM_TEST_DATA||app.isPackaged)return;
  try{
  const root=installation(appRoot),file=path.join(root,'.local','updates','active.json');
  if(!process.env.PRISM_CONFIG&&fs.existsSync(path.join(root,'.local','config.json')))process.env.PRISM_CONFIG=path.join(root,'.local','config.json');

@@ -6,13 +6,13 @@
 
 **一个任务，持续向前。**
 
-把 **Codex、Claude Code 和 Grok** 放进同一个 Windows 桌面工作台。订阅账号、项目文件和对话集中管理，换账号时也能接着做下去。
+把 **Codex、Claude Code 和 Grok** 放进同一个 Windows 与 Mac 桌面工作台。订阅账号、项目文件和对话集中管理，换账号时也能接着做下去。
 
 如果你用不止一种 AI 编程 CLI 来开发产品、设计网站或处理创作项目，棱镜可以帮你少切几个终端、少重复几遍背景，把注意力留给正在做的事。
 
 **仅限非商业用途。** 源码按[PolyForm Noncommercial 1.0.0](LICENSE)提供；未经著作权人另行书面授权，禁止商用。
 
-**[最新发布版本](https://github.com/shixi-11/prism-desk/releases/latest)** · **[安装指南](#安装)**
+**[Windows 64位安装包](https://github.com/shixi-11/prism-desk/releases/latest/download/Prism-Setup.exe)** · **[Mac · Apple芯片](https://github.com/shixi-11/prism-desk/releases/latest/download/Prism-arm64.dmg)** · **[Mac · Intel芯片](https://github.com/shixi-11/prism-desk/releases/latest/download/Prism-x64.dmg)** · **[最新发布版本](https://github.com/shixi-11/prism-desk/releases/latest)** · **[安装指南](#安装)**
 
 [![棱镜深色桌面界面，展示项目会话、设计任务、Claude 模型设置与账号自动接续偏好](output/20260912_prism-zh-dark.png)](output/20260912_prism-zh-dark.png)
 
@@ -46,20 +46,30 @@
 
 ### 版本与下载
 
-**[最新发布版本](https://github.com/shixi-11/prism-desk/releases/latest)** · **[安装指南](#安装)**
+本次发布提供 Windows 64 位与 Mac 安装包。平台安装方式和签名说明见[安装](#安装)。
 
-棱镜目前提供 **Windows 源码安装**，尚未发布可直接安装的 `.exe` 或 `.msi` 客户端。GitHub 的“Source code”下载包含源码，需要按安装指南构建并启动桌面应用。每个稳定版本对应一个版本标签和一个发布页面，页面内包含完整的英文与简体中文更新说明。
-
-由[林拾汐](https://shixilin.com/)创作。 如果棱镜让你更顺畅地投入创作，欢迎[支持后续开发](https://shixilin.com/support?lang=zh)。
+由[光之十一](https://shixilin.com/)创作。 如果棱镜让你更顺畅地投入创作，欢迎[支持后续开发](https://shixilin.com/support?lang=zh)。
 
 ### 安装
 
-以下命令安装稳定版 **v0.1.43**。[最新发布页](https://github.com/shixi-11/prism-desk/releases/latest)提供版本号与中英文更新内容。
+下载 **v0.1.44 Windows 64位安装包**，双击 `Prism-Setup.exe` 即可安装。安装棱镜无需 Git、Node.js 或 npm。由于安装包尚未签名，Windows 可能显示“未知发布者”提示。
 
-需要 Windows、Git、Node.js 22.12 或更新版本、npm，以及准备使用的官方 CLI。各 CLI 需分别完成登录。
+Mac用户按芯片下载：[Apple芯片版](https://github.com/shixi-11/prism-desk/releases/latest/download/Prism-arm64.dmg)或[Intel芯片版](https://github.com/shixi-11/prism-desk/releases/latest/download/Prism-x64.dmg)。打开 `.dmg`，将 Prism 拖入 Applications 文件夹即可，无需 Git 或 Node.js。Mac版有 ad-hoc 签名，但没有 Apple Developer ID 签名或公证，macOS 首次打开时可能会阻止启动。若你确认要打开，可在“系统设置 → 隐私与安全性”中允许。
+
+安装包不包含第三方 CLI、账号或太初私密资料。请另行安装准备使用的 Codex、Claude Code 和／或 Grok 官方 CLI，并分别使用对应的订阅账号登录。
+
+Windows应用数据：`%APPDATA%\Prism`；独立账号：`%LOCALAPPDATA%\Prism\accounts`。Mac应用数据：`~/Library/Application Support/Prism`；独立账号：`~/Library/Application Support/Prism/accounts`。默认卸载时会保留用户数据。
+
+#### 开发者选项：从源码构建
+
+以下 PowerShell 构建和启动脚本仅适用于 Windows。
+
+Windows 源码构建请使用以下 PowerShell 命令，需要 Git、Node.js 22.12 或更新版本、npm，以及准备使用的官方 CLI。
+
+以下 PowerShell 命令仅适用于 Windows。
 
 ```powershell
-git clone --branch v0.1.43 https://github.com/shixi-11/prism-desk.git
+git clone --branch v0.1.44 https://github.com/shixi-11/prism-desk.git
 cd prism-desk
 npm install
 npm run build
@@ -69,6 +79,8 @@ powershell -NoProfile -ExecutionPolicy Bypass -File scripts/start.ps1
 ```
 
 构建脚本使用 Windows 自带的 .NET Framework 编译器生成进程宿主，用于一起停止 CLI 及其子进程。
+
+Mac开发时，在仓库和依赖已准备好的前提下运行 `npm run build && npm start`。
 
 ### 首次使用前
 

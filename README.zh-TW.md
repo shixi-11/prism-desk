@@ -6,13 +6,13 @@
 
 **一個任務，持續向前。**
 
-把 **Codex、Claude Code 和 Grok** 放進同一個 Windows 桌面工作台。集中管理訂閱帳號、專案檔案與對話，切換帳號後也能接著做下去。
+把 **Codex、Claude Code 和 Grok** 放進同一個 Windows 與 Mac 桌面工作台。集中管理訂閱帳號、專案檔案與對話，切換帳號後也能接著做下去。
 
 如果你使用多種 AI 程式設計 CLI 來開發產品、設計網站或完成創作專案，Prism 能減少切換終端與重複說明背景的時間，讓你專注於眼前的工作。
 
 **僅限非商業用途。** 原始碼依[PolyForm Noncommercial 1.0.0](LICENSE)提供；未經著作權人另行書面授權，禁止商用。
 
-**[最新版本](https://github.com/shixi-11/prism-desk/releases/latest)** · **[安裝指南](#install)**
+**[Windows 64 位元安裝程式](https://github.com/shixi-11/prism-desk/releases/latest/download/Prism-Setup.exe)** · **[Mac · Apple 晶片](https://github.com/shixi-11/prism-desk/releases/latest/download/Prism-arm64.dmg)** · **[Mac · Intel 晶片](https://github.com/shixi-11/prism-desk/releases/latest/download/Prism-x64.dmg)** · **[最新版本](https://github.com/shixi-11/prism-desk/releases/latest)** · **[安裝指南](#install)**
 
 [![Prism 桌面介面，展示專案對話、設計任務、Claude 模型設定與自動接續偏好](output/20260912_prism-en-dark.png)](output/20260912_prism-en-dark.png)
 
@@ -46,22 +46,30 @@
 
 ### 版本與下載
 
-**[最新版本](https://github.com/shixi-11/prism-desk/releases/latest)** · **[安裝指南](#install)**
+本次發布提供 Windows 64 位元與 Mac 安裝程式。平台安裝方式與簽章說明請見[安裝](#安裝)。
 
-Prism 目前以 **Windows 原始碼安裝**方式提供。尚未發布獨立的 `.exe` 或 `.msi` 安裝程式。GitHub 的「Source code」下載項目包含原始碼檔案；請依照安裝指南建置並啟動桌面應用程式。每個穩定版本都有一個版本標籤，以及一個包含完整英文與簡體中文變更說明的發布頁面。
-
-由[林拾汐](https://shixilin.com/)創作。 如果 Prism 讓創作更順暢，歡迎[支持後續開發](https://shixilin.com/support?lang=zh-TW)。
+由[光之十一](https://shixilin.com/)創作。 如果 Prism 讓創作更順暢，歡迎[支持後續開發](https://shixilin.com/support?lang=zh-TW)。
 
 <a id="install"></a>
 
 ### 安裝
 
-以下指令會安裝穩定版本 **v0.1.43**。請查看[最新發布版本](https://github.com/shixi-11/prism-desk/releases/latest)，確認其版本與雙語變更說明。
+下載 **v0.1.44 Windows 64 位元安裝程式**，按兩下 `Prism-Setup.exe` 即可安裝。安裝 Prism 不需要 Git、Node.js 或 npm。由於安裝程式尚未簽署，Windows 可能顯示「未知的發行者」警告。
 
-你需要 Windows、Git、Node.js 22.12 或更新版本、npm，以及所選供應商的官方 CLI。請分別登入各個 CLI。
+Mac 使用者請依晶片下載：[Apple 晶片版](https://github.com/shixi-11/prism-desk/releases/latest/download/Prism-arm64.dmg)或[Intel 晶片版](https://github.com/shixi-11/prism-desk/releases/latest/download/Prism-x64.dmg)。開啟 `.dmg`，將 Prism 拖到 Applications 資料夾即可，不需要 Git 或 Node.js。Mac 版未經 Apple 簽署或公證，macOS 首次開啟時可能會阻止啟動。若你確認要開啟，可在「系統設定 → 隱私權與安全性」中允許。
+
+安裝程式不包含第三方 CLI、帳號或太初私密資料。請另外安裝要使用的 Codex、Claude Code 和／或 Grok 官方 CLI，並分別使用支援的訂閱帳號登入。
+
+Windows 應用程式資料：`%APPDATA%\Prism`；獨立帳號：`%LOCALAPPDATA%\Prism\accounts`。Mac 應用程式資料：`~/Library/Application Support/Prism`；獨立帳號：`~/Library/Application Support/Prism/accounts`。預設解除安裝時會保留使用者資料。
+
+#### 開發者選項：從原始碼安裝
+
+從原始碼建置請使用以下命令，需要 Git、Node.js 22.12 或更新版本、npm，以及準備使用的官方 CLI。
+
+以下 PowerShell 指令僅適用於 Windows。
 
 ```powershell
-git clone --branch v0.1.43 https://github.com/shixi-11/prism-desk.git
+git clone --branch v0.1.44 https://github.com/shixi-11/prism-desk.git
 cd prism-desk
 npm install
 npm run build
@@ -166,7 +174,9 @@ powershell -NoProfile -ExecutionPolicy Bypass -File scripts/start.ps1
 
 多數使用者可以在**帳號 → 連接帳號**中連接帳號。下方設定檔是進階替代方式。複製範例前，請先備份既有檔案。
 
-```powershell
+```
+
+Mac 開發時，若儲存庫與相依套件已準備好，請執行 `npm run build && npm start`。powershell
 New-Item -ItemType Directory -Force .local
 Copy-Item config.example.json .local/config.json
 ```

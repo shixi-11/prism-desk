@@ -746,5 +746,6 @@
   "设置待生效，下次发送后开始统计": "La configuración y el seguimiento del contexto se aplicarán al enviar el próximo mensaje",
   "当前账号尚无会话，发送消息后开始统计": "Esta cuenta aún no tiene sesión; el seguimiento comenzará al enviar un mensaje",
   "尚未读取到上下文用量，请刷新": "No se ha leído el uso de contexto; actualiza para volver a intentarlo",
-  "未能从当前会话记录读取上下文用量，请在下一次执行结束后重试。": "No se pudo leer el uso de contexto de esta sesión. Inténtalo después de la próxima ejecución."
+  "未能从当前会话记录读取上下文用量，请在下一次执行结束后重试。": "No se pudo leer el uso de contexto de esta sesión. Inténtalo después de la próxima ejecución.",
+  "打开安装包": "Abrir instalador"
 }

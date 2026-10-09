@@ -1,23 +1,27 @@
 const fs=require('node:fs'),path=require('node:path');
 function isFile(file){try{return fs.statSync(file).isFile();}catch{return false;}}
 function dirs(root){try{return fs.readdirSync(root,{withFileTypes:true}).filter(d=>d.isDirectory()).map(d=>path.join(root,d.name));}catch{return [];}}
-function resolveExecutable(profile,env=process.env){
+function resolveExecutable(profile,env=process.env,platform=process.platform){
   if(path.isAbsolute(profile.executable)){if(isFile(profile.executable))return profile.executable;throw Error('程序未安装或路径已失效：'+profile.executable);}
   // Explorer does not inherit the Codex terminal's injected PATH. Find the
   // official per-device installation without touching any account directory.
-  const home=env.USERPROFILE||require('node:os').homedir();
-  const native=profile.provider==='Claude'?path.join(home,'.local','bin','claude.exe'):profile.provider==='Grok'?path.join(home,'.grok','bin','grok.exe'):null;
+  const home=(platform==='win32'?env.USERPROFILE:env.HOME)||env.USERPROFILE||require('node:os').homedir();
+  const suffix=platform==='win32'?'.exe':'';
+  const native=profile.provider==='Claude'?path.join(home,'.local','bin',`claude${suffix}`):profile.provider==='Grok'?path.join(home,'.grok','bin',`grok${suffix}`):null;
   if(native&&isFile(native))return native;
-  if(profile.provider==='Codex' && env.LOCALAPPDATA && path.isAbsolute(env.LOCALAPPDATA)){
+  if(platform==='win32'&&profile.provider==='Codex' && env.LOCALAPPDATA && path.isAbsolute(env.LOCALAPPDATA)){
     const root=path.join(env.LOCALAPPDATA||'', 'OpenAI','Codex','bin');
     const candidates=[path.join(root,'codex.exe'),...dirs(root).map(dir=>path.join(dir,'codex.exe'))].filter(isFile);
     candidates.sort((a,b)=>fs.statSync(b).mtimeMs-fs.statSync(a).mtimeMs);
     if(candidates.length)return candidates[0];
   }
   const key=Object.keys(env).find(k=>k.toUpperCase()==='PATH');
-  for(const entry of (env[key]||'').split(path.delimiter).filter(Boolean)){
+  const fallback=platform==='darwin'||platform==='linux'?[path.join(home,'.local','bin'),path.join(home,'.grok','bin'),...(platform==='darwin'?['/opt/homebrew/bin']:[]),'/usr/local/bin','/usr/bin']:[];
+  const search=[...(env[key]||'').split(path.delimiter).filter(Boolean),...fallback];
+  for(const entry of [...new Set(search)]){
     const dir=entry.replace(/^"|"$/g,'');if(!path.isAbsolute(dir))continue;
-    const file=path.join(dir,profile.executable);if(isFile(file))return file;
+    const name=platform==='win32'&& !profile.executable.toLowerCase().endsWith('.exe')?profile.executable+'.exe':profile.executable;
+    const file=path.join(dir,name);if(isFile(file))return file;
   }
   throw Error('没有找到 '+profile.executable+'，请检查本机 CLI 安装。');
 }

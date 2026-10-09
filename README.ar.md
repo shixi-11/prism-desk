@@ -6,13 +6,13 @@
 
 **مهمة واحدة. واصل التقدم.**
 
-مساحة عمل محلية على Windows تجمع **Codex وClaude Code وGrok**. نظّم حسابات الاشتراك ومجلدات المشاريع والمحادثات في مكان واحد، وواصل العمل عند الانتقال إلى حساب آخر.
+مساحة عمل محلية على Windows وMac تجمع **Codex وClaude Code وGrok**. نظّم حسابات الاشتراك ومجلدات المشاريع والمحادثات في مكان واحد، وواصل العمل عند الانتقال إلى حساب آخر.
 
 للمطورين والمصممين والمبدعين المستقلين الذين يستخدمون أكثر من أداة برمجة بالذكاء الاصطناعي عبر سطر الأوامر، ويريدون تقليل التنقل بين الطرفيات وتكرار شرح سياق العمل.
 
 **للاستخدام غير التجاري فقط.** تتوفر الشفرة المصدرية بموجب [PolyForm Noncommercial 1.0.0](LICENSE). يُحظر الاستخدام التجاري دون إذن كتابي منفصل من أصحاب حقوق النشر.
 
-**[أحدث إصدار](https://github.com/shixi-11/prism-desk/releases/latest)** · **[دليل التثبيت](#install)**
+**[Windows x64](https://github.com/shixi-11/prism-desk/releases/latest/download/Prism-Setup.exe)** · **[Mac · Apple silicon](https://github.com/shixi-11/prism-desk/releases/latest/download/Prism-arm64.dmg)** · **[Mac · Intel](https://github.com/shixi-11/prism-desk/releases/latest/download/Prism-x64.dmg)** · **[أحدث إصدار](https://github.com/shixi-11/prism-desk/releases/latest)** · **[دليل التثبيت](#install)**
 
 [![واجهة Prism تعرض محادثات المشروع ومهمة تصميم وإعدادات نماذج Claude وتفضيلات الانتقال التلقائي بين الحسابات](output/20260912_prism-en-dark.png)](output/20260912_prism-en-dark.png)
 
@@ -46,9 +46,7 @@
 
 ### الإصدارات والتنزيلات
 
-**[أحدث إصدار](https://github.com/shixi-11/prism-desk/releases/latest)** · **[دليل التثبيت](#install)**
-
-يتوفر Prism حاليًا عبر **التثبيت من الشفرة المصدرية على Windows**. لا يتوفر برنامج تثبيت مستقل بصيغة `.exe` أو `.msi`. تحتوي تنزيلات «Source code» في GitHub على ملفات الشفرة المصدرية؛ اتبع دليل التثبيت لبناء تطبيق سطح المكتب وتشغيله. لكل إصدار مستقر وسم إصدار واحد وصفحة واحدة تتضمن ملاحظات التغييرات كاملة بالإنجليزية والصينية المبسطة.
+يوفّر هذا الإصدار مثبّتات Windows x64 وMac. راجع [التثبيت](#install) للتعليمات الخاصة بكل منصة وتفاصيل التوقيع.
 
 من إنشاء [Shixi Lin](https://shixilin.com/). إذا ساعدك Prism على مواصلة الإبداع، يمكنك [دعم تطويره](https://shixilin.com/support?lang=ar).
 
@@ -56,12 +54,22 @@
 
 ### التثبيت
 
-تثبّت هذه الأوامر الإصدار المستقر **v0.1.43**. راجع [أحدث إصدار](https://github.com/shixi-11/prism-desk/releases/latest) لمعرفة رقمه وملاحظات تغييراته باللغتين.
+نزّل مثبّت **v0.1.44 لنظام Windows x64**، ثم انقر نقرًا مزدوجًا على `Prism-Setup.exe`. لا تحتاج إلى Git أو Node.js أو npm. لأن المثبّت غير موقّع، قد يعرض Windows تحذير «ناشر غير معروف».
 
-ستحتاج إلى Windows وGit وNode.js 22.12 أو أحدث وnpm، بالإضافة إلى واجهات CLI الرسمية للمزوّدين الذين تختارهم. سجّل الدخول إلى كل CLI على حدة.
+على Mac، اختر صورة القرص المناسبة للشريحة: [Apple silicon](https://github.com/shixi-11/prism-desk/releases/latest/download/Prism-arm64.dmg) أو [Intel](https://github.com/shixi-11/prism-desk/releases/latest/download/Prism-x64.dmg). افتح ملف `.dmg` واسحب Prism إلى مجلد Applications. لا تحتاج إلى Git أو Node.js. يحمل تطبيق Mac توقيعًا مؤقتًا (ad-hoc)، لكنه لا يحمل توقيع Apple Developer ID ولا توثيق Apple، وقد يمنع macOS تشغيله أول مرة. إذا أكدت رغبتك في فتحه، اسمح بذلك من إعدادات النظام → الخصوصية والأمان.
+
+لا يتضمن التطبيق واجهات CLI خارجية أو حسابات أو مواد تايتشو الخاصة. ثبّت واجهات CLI الرسمية لـ Codex وClaude Code و/أو Grok بشكل منفصل، وسجّل الدخول إلى كل منها بالاشتراك المناسب.
+
+بيانات Windows: `%APPDATA%\Prism`؛ الحسابات المستقلة: `%LOCALAPPDATA%\Prism\accounts`. بيانات Mac: `~/Library/Application Support/Prism`؛ الحسابات المستقلة: `~/Library/Application Support/Prism/accounts`. افتراضيًا، يحتفظ إلغاء التثبيت ببيانات المستخدم.
+
+#### خيار المطورين: التثبيت من الشفرة المصدرية
+
+لبناء التطبيق من الشفرة المصدرية، استخدم خطوات المطورين أدناه. ستحتاج إلى Git وNode.js 22.12 أو أحدث وnpm وواجهات CLI الرسمية التي ستستخدمها.
+
+أوامر PowerShell التالية خاصة بنظام Windows فقط.
 
 ```powershell
-git clone --branch v0.1.43 https://github.com/shixi-11/prism-desk.git
+git clone --branch v0.1.44 https://github.com/shixi-11/prism-desk.git
 cd prism-desk
 npm install
 npm run build
@@ -166,7 +174,9 @@ powershell -NoProfile -ExecutionPolicy Bypass -File scripts/start.ps1
 
 يمكن لمعظم المستخدمين توصيل الحسابات من **الحسابات → ربط حساب**. ملف الإعدادات أدناه بديل متقدم. احتفظ بنسخة احتياطية من أي ملف موجود قبل نسخ المثال.
 
-```powershell
+```
+
+لتطوير Mac، وبعد تجهيز المستودع والتبعيات، شغّل `npm run build && npm start`.powershell
 New-Item -ItemType Directory -Force .local
 Copy-Item config.example.json .local/config.json
 ```

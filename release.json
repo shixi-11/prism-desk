@@ -1,16 +1,21 @@
 {
-  "version": "0.1.43",
+  "version": "0.1.44",
   "date": "2026-10-09",
+  "distribution": [
+    "windows-x64",
+    "mac-arm64",
+    "mac-x64"
+  ],
   "notes": {
     "en": [
-      "Opening the context panel now reads the selected Codex session’s native usage record. Manual refresh reports missing records instead of silently succeeding. Accounts without a session and settings awaiting the next run show their actual state; measurements from an old session are not substituted.",
-      "Codex usage notifications retain their native thread ID even when they arrive before thread/start or thread/resume returns. Resumed sessions recover recorded context usage when no fresh notification is emitted.",
-      "Verified with a real, isolated Codex session: the desktop compaction button called the native compact endpoint, waited for completion, displayed the returned token usage, and refreshed to the same recorded result. Existing user tasks were not compacted. Unreported auto-compaction thresholds remain unknown."
+      "Download and install Prism directly: Windows x64 installer, plus native Mac DMGs for Apple silicon and Intel. Git and Node.js are no longer required to install the app; official model CLIs and subscription login remain separate.",
+      "Installer editions keep settings, tasks and drafts in the user data directory. Updates download only on request and verify the published SHA-256 digest. Windows installs after confirmation; Mac opens the DMG for manual replacement.",
+      "Mac CLI discovery includes common Homebrew and user paths. Execution uses an isolated Unix process group, with confirmed cancellation of its descendants. Installers are not signed with a commercial developer certificate; Mac builds are ad-hoc signed and are not notarized."
     ],
     "zh": [
-      "打开上下文面板时读取当前 Codex 会话的真实用量记录；手动刷新读取不到记录时明确提示，不再无反馈。尚无会话与设置待生效分别显示实际状态，不拿旧会话用量代替当前数据。",
-      "修复原生用量通知早于会话启动或恢复响应时的会话标识绑定；恢复会话未收到新通知时，从该会话记录补齐上下文用量。",
-      "已用独立真实 Codex 会话验证：界面压缩按钮调用原生压缩接口，等待完成并显示返回用量，刷新结果与原生记录一致。未压缩用户已有任务；官方未返回的自动压缩阈值仍明确保留未知状态。"
+      "提供 Windows x64 安装包，以及 Apple 芯片与 Intel 的 Mac 原生 DMG。安装棱镜无需 Git 或 Node.js；各模型官方 CLI 与订阅账号仍需单独安装、登录。",
+      "安装版将设置、任务与草稿保存在用户数据目录。更新只在确认后下载，并核对发布的 SHA-256。Windows 确认后安装；Mac 打开 DMG 后手动替换应用。",
+      "Mac 自动发现常见 Homebrew 与用户目录中的 CLI；执行使用独立 Unix 进程组，停止时核对本次执行及其子进程退出。安装包暂无商业开发者证书签名；Mac 使用临时签名，尚未公证。"
     ]
   }
 }
