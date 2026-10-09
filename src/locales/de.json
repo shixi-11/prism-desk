@@ -740,5 +740,11 @@
   "工作区成员额度受限": "Mitgliedskontingent im Arbeitsbereich eingeschränkt",
   "工作区总额度受限": "Arbeitsbereichskontingent eingeschränkt",
   "官方暂不允许使用": "Vom Anbieter derzeit eingeschränkt",
-  "可用状态尚未确认": "Verfügbarkeit noch nicht bestätigt"
+  "可用状态尚未确认": "Verfügbarkeit noch nicht bestätigt",
+  "此账号不支持上下文查询": "Kontextabfragen sind für dieses Konto nicht verfügbar",
+  "此账号已暂停": "Dieses Konto ist pausiert",
+  "设置待生效，下次发送后开始统计": "Die Einstellungen und Kontexterfassung gelten ab der nächsten Nachricht",
+  "当前账号尚无会话，发送消息后开始统计": "Für dieses Konto gibt es noch keine Sitzung; die Erfassung beginnt mit einer Nachricht",
+  "尚未读取到上下文用量，请刷新": "Die Kontextnutzung wurde noch nicht gelesen; bitte aktualisieren",
+  "未能从当前会话记录读取上下文用量，请在下一次执行结束后重试。": "Die Kontextnutzung dieser Sitzung konnte nicht gelesen werden. Versuchen Sie es nach der nächsten Ausführung erneut."
 }

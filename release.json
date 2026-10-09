@@ -1,16 +1,16 @@
 {
-  "version": "0.1.42",
-  "date": "2026-10-03",
+  "version": "0.1.43",
+  "date": "2026-10-09",
   "notes": {
     "en": [
-      "Codex quota panels now prioritize the official ordinary-usage permission and preserve reported restriction reasons. A full percentage window alone no longer labels an account exhausted; missing permission remains unconfirmed. Member and owner workspace limits are distinguished.",
-      "Five-hour windows are omitted only for officially reported Pro plan classifications, including the account-plan fallback. Team and Business accounts are not treated as Pro based on their names. Remaining reset times are displayed directly from provider timestamps; global announcements never substitute for account readings.",
-      "Official availability and restriction fields survive display-cache reloads. Cached readings require refresh; actual service errors still govern execution and account relay. No automatic purchases, reset redemption or paid API fallback were added."
+      "Opening the context panel now reads the selected Codex session’s native usage record. Manual refresh reports missing records instead of silently succeeding. Accounts without a session and settings awaiting the next run show their actual state; measurements from an old session are not substituted.",
+      "Codex usage notifications retain their native thread ID even when they arrive before thread/start or thread/resume returns. Resumed sessions recover recorded context usage when no fresh notification is emitted.",
+      "Verified with a real, isolated Codex session: the desktop compaction button called the native compact endpoint, waited for completion, displayed the returned token usage, and refreshed to the same recorded result. Existing user tasks were not compacted. Unreported auto-compaction thresholds remain unknown."
     ],
     "zh": [
-      "Codex 额度面板优先显示官方普通用量可用状态，保留实际阻塞原因；不再仅凭窗口百分比已满就标记账号已用完，缺失可用状态明确显示尚未确认，并区分工作区成员与总额度限制。",
-      "只对官方明确返回的 Pro 套餐类型移除五小时窗口，支持账号套餐字段回退；不会依据名称把团队或 Business 账号当作 Pro。恢复时间直接显示官方时间戳，不用全局公告推算个人账号恢复日期。",
-      "官方可用状态与限制字段随显示缓存保存；缓存记录需刷新，真实执行错误仍决定失败与账号接续。本次未增加自动购买、重置卡兑换或付费 API 回退。"
+      "打开上下文面板时读取当前 Codex 会话的真实用量记录；手动刷新读取不到记录时明确提示，不再无反馈。尚无会话与设置待生效分别显示实际状态，不拿旧会话用量代替当前数据。",
+      "修复原生用量通知早于会话启动或恢复响应时的会话标识绑定；恢复会话未收到新通知时，从该会话记录补齐上下文用量。",
+      "已用独立真实 Codex 会话验证：界面压缩按钮调用原生压缩接口，等待完成并显示返回用量，刷新结果与原生记录一致。未压缩用户已有任务；官方未返回的自动压缩阈值仍明确保留未知状态。"
     ]
   }
 }

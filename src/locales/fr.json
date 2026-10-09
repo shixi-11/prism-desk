@@ -740,5 +740,11 @@
   "工作区成员额度受限": "Quota du membre de l’espace de travail limité",
   "工作区总额度受限": "Quota de l’espace de travail limité",
   "官方暂不允许使用": "Utilisation actuellement limitée",
-  "可用状态尚未确认": "Disponibilité non confirmée"
+  "可用状态尚未确认": "Disponibilité non confirmée",
+  "此账号不支持上下文查询": "La consultation du contexte est indisponible pour ce compte",
+  "此账号已暂停": "Ce compte est en pause",
+  "设置待生效，下次发送后开始统计": "Les paramètres et le suivi du contexte prendront effet au prochain message",
+  "当前账号尚无会话，发送消息后开始统计": "Ce compte n’a pas encore de session ; le suivi commencera à l’envoi d’un message",
+  "尚未读取到上下文用量，请刷新": "L’utilisation du contexte n’a pas été lue ; actualisez pour réessayer",
+  "未能从当前会话记录读取上下文用量，请在下一次执行结束后重试。": "Impossible de lire l’utilisation du contexte de cette session. Réessayez après la prochaine exécution."
 }

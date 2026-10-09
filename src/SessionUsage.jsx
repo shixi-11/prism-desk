@@ -1,4 +1,5 @@
 import {quotaStateLabel} from './quota-state.js';
+import {sessionContext} from './session-context.js';
 import React,{useEffect,useRef,useState} from 'react';
 import {ChevronRight,RefreshCw,X} from 'lucide-react';
 import {tr,locale} from './i18n.js';
@@ -10,9 +11,10 @@ export default function SessionUsage({task,profile,quota,onRefresh,checking}){
  const [open,setOpen]=useState(false),[details,setDetails]=useState(false),[error,setError]=useState(''),[pending,setPending]=useState(false),[now,setNow]=useState(Date.now());const root=useRef(null);
  useEffect(()=>{if(!open)return;const timer=setInterval(()=>setNow(Date.now()),30000);const close=e=>{if(!root.current?.contains(e.target))setOpen(false);};const key=e=>{if(e.key==='Escape')setOpen(false);};document.addEventListener('pointerdown',close);document.addEventListener('keydown',key);return()=>{clearInterval(timer);document.removeEventListener('pointerdown',close);document.removeEventListener('keydown',key);};},[open]);
  useEffect(()=>{setOpen(false);setDetails(false);setError('');},[task.id,profile?.id]);
- const raw=task.contextUsage?.[profile?.id],context=raw?.sessionId&&raw.sessionId===task.sessions?.[profile?.id]?raw:null,value=percent(context?.used,context?.limit);
- const busy=pending||['running','stopping','unknown'].includes(task.state),native=!profile?.disabled&&!task.pendingMode&&!task.pendingModelRefresh?.[profile?.id]&&!!task.sessions?.[profile?.id]&&['Codex','Claude'].includes(profile?.provider);
- const act=async action=>{setPending(true);setError('');try{await window.prism.sessionAction(task.id,action);}catch(e){setError(e.message);}finally{setPending(false);}};
+ const {context,native,message}=sessionContext(task,profile),value=percent(context?.used,context?.limit);
+ const busy=pending||['running','stopping','unknown'].includes(task.state);
+ const act=async action=>{setPending(true);setError('');try{await window.prism.sessionAction(task.id,action);}catch(e){setError(tr(e.message));}finally{setPending(false);}};
+ useEffect(()=>{if(open&&native&&profile?.provider==='Codex'&&!['running','stopping','unknown'].includes(task.state))act('context');},[open,task.id,profile?.id]);
  const reset=epoch=>{if(!Number.isFinite(epoch))return tr('暂未返回');const mins=Math.ceil((epoch*1000-now)/60000);return mins<=0?tr('需要刷新'):mins<1440?tr('{hours} 小时 {minutes} 分钟后恢复',{hours:Math.floor(mins/60),minutes:mins%60}):new Date(epoch*1000).toLocaleString(locale(),{weekday:'short',hour:'2-digit',minute:'2-digit'});};
  const stale=quota?.cached||quota?.checkedAt&&now-Date.parse(quota.checkedAt)>300000;
  return <div className="session-usage" ref={root}>
@@ -20,7 +22,7 @@ export default function SessionUsage({task,profile,quota,onRefresh,checking}){
   {open&&<section className="usage-popover" aria-label={tr('上下文与额度')}>
    <header><strong>{tr('上下文窗口')}</strong><span>{tokens(context?.used)} / {tokens(context?.limit)}{value!==null?` (${Math.round(value)}%)`:''}</span><button aria-label={tr('关闭')} onClick={()=>setOpen(false)}><X size={15}/></button></header>
    <Meter value={value} label={tr('上下文窗口')} segments={context?.categories} limit={context?.limit}/>
-   <div className="usage-actions"><small>{context?.limit!=null&&context?.used!=null?tr('可用空间：{tokens}',{tokens:tokens(Math.max(0,context.limit-context.used))}):tr('等待 CLI 返回上下文数据')}</small><button disabled={busy||!native} onClick={()=>act('compact')}>{tr('压缩会话')}</button></div>
+   <div className="usage-actions"><small>{message?tr(message):context?.limit!=null&&context?.used!=null?tr('可用空间：{tokens}',{tokens:tokens(Math.max(0,context.limit-context.used))}):tr('等待 CLI 返回上下文数据')}</small><button title={message?tr(message):undefined} disabled={busy||!native} onClick={()=>act('compact')}>{tr('压缩会话')}</button></div>
    <div className="usage-actions"><small>{tr('自动压缩阈值：CLI 暂未返回')}</small><button disabled={busy||!native} onClick={()=>act('context')}><RefreshCw size={13}/>{tr('刷新上下文')}</button></div>
    <hr/><div className="usage-plan"><strong>{tr('账号额度')} · {profile?.provider} / {tr(profile?.name||'')}</strong>{quota?.subscriptionType||quota?.planType?<small>{quota.subscriptionType||quota.planType}</small>:null}</div>
    {!stale&&quotaStateLabel(quota,profile?.provider)&&<p role="status">{tr(quotaStateLabel(quota,profile?.provider))}{quota?.rateLimitUpsell?.reset_at?` · ${tr('恢复：')}${new Date(quota.rateLimitUpsell.reset_at*1000).toLocaleString(locale())}`:''}</p>}{stale&&<small className="usage-stale">{tr('上次查询记录，请刷新')}</small>}

@@ -44,7 +44,7 @@ class Runner extends EventEmitter {
     this.event(task.id,'notice',{text:`${changed?'已切换':'已开始执行'} · ${profile.provider} / ${profile.name} · ${reportedModel||profile.model} · ${profile.effort}`,executionStatus:changed?'已切换':'已开始执行',accountName:profile.name,provider:profile.provider,execution:task.lastExecution});
     this.store.save(task);this.emit('state',task);
   }
-  context(task,profile,value){if(!value)return;task.contextUsage={...task.contextUsage,[profile.id]:{...value,model:value.model||task.lastExecution?.reportedModel||profile.model,sessionId:task.sessions[profile.id]||null}};this.store.save(task);this.emit('state',task);}
+  context(task,profile,value){if(!value)return;task.contextUsage={...task.contextUsage,[profile.id]:{...value,model:value.model||task.lastExecution?.reportedModel||profile.model,sessionId:value.sessionId||task.sessions[profile.id]||null}};this.store.save(task);this.emit('state',task);}
   assertIdle(task) {
     if (this.active || ["running", "stopping", "unknown"].includes(task.state))
       throw Error("请等待当前执行结束；状态未知时需先核对工作目录。");
@@ -248,7 +248,11 @@ class Runner extends EventEmitter {
             profile: profile.id,
           });
       }
-      if(message.method==='thread/tokenUsage/updated')this.context(task,profile,require('./context-usage.cjs').codexContext(p));
+      if(message.method==='thread/tokenUsage/updated'){
+        // Resume may emit usage before its response binds the session ID.
+        const value=require('./context-usage.cjs').codexContext(p);
+        if(value)this.context(task,profile,{...value,...(p.threadId?{sessionId:p.threadId}:{})});
+      }
       if (message.method === "turn/plan/updated")
         this.event(task.id, "plan", { data: p });
       if (message.method === "turn/diff/updated")
@@ -292,6 +296,10 @@ class Runner extends EventEmitter {
         session ? { ...options, threadId: session } : {...options,dynamicTools:require('./goal-tools.cjs').tools},
       );
       task.sessions[profile.id] = result.thread.id;
+      if(task.contextUsage?.[profile.id]?.sessionId!==result.thread.id){
+        const restored=await require('./context-history.cjs').codexHistory(profile,result.thread.id);
+        if(restored)this.context(task,profile,restored);
+      }
       if(!this.active.maintenance)task.goalToolSessions={...task.goalToolSessions,[profile.id]:result.thread.id};
       this.store.save(task);
       if(this.active.cancelRequested){this.state(task,'paused');return;}

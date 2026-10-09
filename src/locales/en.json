@@ -740,5 +740,11 @@
   "工作区成员额度受限": "Workspace member allowance restricted",
   "工作区总额度受限": "Workspace allowance restricted",
   "官方暂不允许使用": "Currently restricted by provider",
-  "可用状态尚未确认": "Availability not yet confirmed"
+  "可用状态尚未确认": "Availability not yet confirmed",
+  "此账号不支持上下文查询": "Context queries are unavailable for this account",
+  "此账号已暂停": "This account is paused",
+  "设置待生效，下次发送后开始统计": "Settings pending; context tracking starts after your next message",
+  "当前账号尚无会话，发送消息后开始统计": "No session for this account yet; context tracking starts after you send a message",
+  "尚未读取到上下文用量，请刷新": "Context usage has not been read; refresh to try again",
+  "未能从当前会话记录读取上下文用量，请在下一次执行结束后重试。": "Unable to read context usage from this session. Try again after the next run finishes."
 }

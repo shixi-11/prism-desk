@@ -24,3 +24,16 @@ test('Codex compaction calls the native method and waits for completion, without
  const store=new core.TaskStore(root),task=store.create({title:'compact',cwd:root});task.sessions[task.profile]='existing';store.save(task);const runner=new context.module.exports.Runner(store);runner.active={task,profile:core.profileFor(task.profile),images:[],pending:new Map(),maintenance:'compact'};
  await runner.codex(task,core.profileFor(task.profile),'/compact','');assert.ok(calls.includes('thread/compact/start'));assert.ok(!calls.includes('turn/start'));assert.equal(store.get(task.id).state,'idle');assert.equal(store.get(task.id).contextUsage[task.profile].used,2000);
 });
+
+test('usage arriving before thread/start response keeps the native thread identity',async t=>{
+ const fs=require('node:fs'),path=require('node:path'),os=require('node:os'),vm=require('node:vm'),{createRequire}=require('node:module'),{EventEmitter}=require('node:events'),core=require('../electron/core.cjs');
+ const root=fs.mkdtempSync(path.join(os.tmpdir(),'prism-early-context-'));t.after(()=>fs.rmSync(root,{recursive:true,force:true}));
+ class Rpc extends EventEmitter{constructor(){super();this.proc={pid:123};}async init(){}async end(){}async call(method){
+  if(method==='account/read')return {account:{type:'chatgpt'}};if(method==='account/rateLimits/read')return {};
+  if(method==='thread/start'){this.emit('message',{method:'thread/tokenUsage/updated',params:{threadId:'new-native-session',tokenUsage:{last:{totalTokens:4595},modelContextWindow:258400}}});return {thread:{id:'new-native-session'}};}
+  if(method==='turn/start'){setImmediate(()=>this.emit('message',{method:'turn/completed',params:{turn:{status:'completed'}}}));return {turn:{id:'turn'}};}throw Error(method);
+ }}
+ const file=path.resolve(__dirname,'../electron/runner.cjs'),local=createRequire(file),context={module:{exports:{}},require:name=>name==='./core.cjs'?{...core,Rpc}:local(name)};vm.runInNewContext(fs.readFileSync(file,'utf8'),context);
+ const store=new core.TaskStore(root),task=store.create({title:'early usage',cwd:root}),runner=new context.module.exports.Runner(store);runner.active={task,profile:core.profileFor(task.profile),images:[],pending:new Map()};
+ await runner.codex(task,core.profileFor(task.profile),'OK','');const saved=store.get(task.id);assert.equal(saved.contextUsage[task.profile].sessionId,saved.sessions[task.profile]);assert.equal(saved.contextUsage[task.profile].used,4595);
+});

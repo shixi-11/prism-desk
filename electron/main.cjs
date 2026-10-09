@@ -227,8 +227,10 @@ app.whenReady().then(() => {
   handle('copyAccountLogin',id=>{const login=accountLogins.get(id);const profile=PROFILES.find(p=>p.id===id);const url=profile&&login?.url&&require('./account-providers.cjs').officialLoginUrl(profile.provider,login.url);if(!url)throw Error('登录链接尚未准备好，请稍候。');clipboard.writeText(url);return {copied:true};});
   handle('submitAccountLoginCode',async(id,code)=>{const login=accountLogins.get(id);if(!login)throw Error('当前登录已结束或尚未就绪，请重新获取登录链接。');const result=await login.submitCode(code);if(accountLogins.get(id)===login&&accountLoginStates.get(id)?.phase==='waiting')loginState(id,{phase:'waiting',hasUrl:!!login.url,codeSubmitted:true});return result;});
   handle('cancelAccountLogin',async id=>{await accountLogins.get(id)?.cancel();});
-  const restoreContext=async id=>{const task=store.get(id),profile=PROFILES.find(p=>p.id===task.profile),session=task.sessions?.[task.profile];if(runner.activeFor(id))return task;
+  const restoreContext=async(id,required=false)=>{const task=store.get(id),profile=PROFILES.find(p=>p.id===task.profile),session=task.sessions?.[task.profile];if(runner.activeFor(id))return task;
+    if(!session){if(required)throw Error('当前账号尚无会话，发送消息后开始统计');return task;}
     const value=await require('./context-history.cjs').codexHistory(profile,session);const current=store.get(id);
+    if(!value&&required)throw Error('未能从当前会话记录读取上下文用量，请在下一次执行结束后重试。');
     if(value&&!runner.activeFor(id)&&current.profile===profile.id&&current.sessions?.[profile.id]===session){current.contextUsage={...current.contextUsage,[profile.id]:{...value,model:profile.model}};store.save(current);emit('state',current);}return current;};
   handle("task", async(id) => {let task=runner.activeFor(id)?.task||store.get(id);const saved=task.contextUsage?.[task.profile];if(!runner.activeFor(id)&&(!saved||saved.sessionId!==task.sessions?.[task.profile]))task=await restoreContext(id);if(task.unread){task.unread=false;store.save(task);broadcastTasks();}return {task,events:store.events(id)};});
   handle('taskMenu',id=>new Promise(resolve=>{const task=store.get(id);let chosen=null;Menu.buildFromTemplate(require('./task-menu.cjs').taskMenuTemplate(task,store.list(),key=>translate(settings().language,key),action=>{chosen=action;},runner.activeFor(id)||['running','stopping','unknown'].includes(task.state),settings().projects||[])).popup({window:owner(),callback:()=>resolve(chosen)});}));
@@ -410,7 +412,7 @@ app.whenReady().then(() => {
   handle('sessionAction',async(id,action)=>{
     if(!['compact','context'].includes(action))throw Error('会话操作无效');
     const task=store.get(id);runner.assertIdle(task);if(messageQueue.isBusy(id))throw Error('请等待当前执行结束。');
-    if(action==='context'&&PROFILES.find(p=>p.id===task.profile)?.provider==='Codex')return {started:false,task:await restoreContext(id)};
+    if(action==='context'&&PROFILES.find(p=>p.id===task.profile)?.provider==='Codex')return {started:false,task:await restoreContext(id,true)};
     runner.run(id,action==='compact'?'/compact':'/context',[],{maintenance:action}).catch(error=>emit('error',error.message));return {started:true};
   });
   handle("switch", (id, profile) => {const task=runner.switch(id, profile);broadcastTasks();emit('state',task);return task;});
