@@ -128,6 +128,20 @@ async function main() {
     await page.waitForFunction(version => document.querySelector('.update-settings .update-version')?.textContent.includes(version), info.version, { timeout: 10000 });
     assert.ok((await versionLabel.innerText()).includes(info.version), 'Update settings must show the packaged app version');
 
+    await application.close();
+    const migratedRoot=path.join(root,'migrated-installation');
+    require('../electron/install-migration.cjs').registerSource({sharedRoot:migratedRoot,configFile:path.join(root,'config.json'),userData:root});
+    env.PRISM_TEST_DATA=migratedRoot;
+    application=await launch();page=await openWindow(application);
+    const migrated=await page.evaluate(()=>window.prism.init());
+    assert.ok(migrated.profiles.some(profile=>profile.id===account.id),'First installed launch must import existing account references');
+    assert.ok(migrated.tasks.some(task=>task.id===created.id),'First installed launch must import source tasks');
+    assert.equal(migrated.drafts[created.id]?.text,draftText,'First installed launch must import source drafts');
+    await application.close();application=await launch();page=await openWindow(application);
+    const migrationRestart=await page.evaluate(()=>window.prism.init());
+    assert.equal(migrationRestart.profiles.length,migrated.profiles.length,'Migration must remain stable across restart');
+    assert.equal(migrationRestart.drafts[created.id]?.text,draftText);
+
     const commit = process.env.GITHUB_SHA || execFileSync('git', ['rev-parse', 'HEAD'], { cwd: path.resolve(__dirname, '..'), encoding: 'utf8' }).trim();
     const metadata = { version: info.version, commit, arch: info.arch };
     const metadataIndex = process.argv.indexOf('--metadata');

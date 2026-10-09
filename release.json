@@ -1,5 +1,5 @@
 {
-  "version": "0.1.44",
+  "version": "0.1.45",
   "date": "2026-10-09",
   "distribution": [
     "windows-x64",
@@ -8,14 +8,12 @@
   ],
   "notes": {
     "en": [
-      "Download and install Prism directly: Windows x64 installer, plus native Mac DMGs for Apple silicon and Intel. Git and Node.js are no longer required to install the app; official model CLIs and subscription login remain separate.",
-      "Installer editions keep settings, tasks and drafts in the user data directory. Updates download only on request and verify the published SHA-256 digest. Windows installs after confirmation; Mac opens the DMG for manual replacement.",
-      "Mac CLI discovery includes common Homebrew and user paths. Execution uses an isolated Unix process group, with confirmed cancellation of its descendants. Installers are not signed with a commercial developer certificate; Mac builds are ad-hoc signed and are not notarized."
+      "Fix source-to-installer migration so existing account references, assistant and skill sources, settings, tasks and drafts are retained without copying provider credentials. Existing installer configurations remain unchanged.",
+      "Fix a race between checking updates and verifying an installer for activation. Accept UTF-8 BOM in local configuration, and resume matching draft releases safely after interrupted publication."
     ],
     "zh": [
-      "提供 Windows x64 安装包，以及 Apple 芯片与 Intel 的 Mac 原生 DMG。安装棱镜无需 Git 或 Node.js；各模型官方 CLI 与订阅账号仍需单独安装、登录。",
-      "安装版将设置、任务与草稿保存在用户数据目录。更新只在确认后下载，并核对发布的 SHA-256。Windows 确认后安装；Mac 打开 DMG 后手动替换应用。",
-      "Mac 自动发现常见 Homebrew 与用户目录中的 CLI；执行使用独立 Unix 进程组，停止时核对本次执行及其子进程退出。安装包暂无商业开发者证书签名；Mac 使用临时签名，尚未公证。"
+      "修复从源码版转到安装版时未接续原配置的问题：保留已有账号入口、助手与技能来源、设置、任务和草稿，不复制模型服务的登录凭据；已有安装版配置保持不变。",
+      "修复检查更新与安装包校验同时发生时的冲突；支持带 UTF-8 BOM 的配置文件，并在发布中断后安全接续同版本的发布草稿。"
     ]
   }
 }

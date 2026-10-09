@@ -54,7 +54,7 @@
 
 ### التثبيت
 
-نزّل مثبّت **v0.1.44 لنظام Windows x64**، ثم انقر نقرًا مزدوجًا على `Prism-Setup.exe`. لا تحتاج إلى Git أو Node.js أو npm. لأن المثبّت غير موقّع، قد يعرض Windows تحذير «ناشر غير معروف».
+نزّل مثبّت **v0.1.45 لنظام Windows x64**، ثم انقر نقرًا مزدوجًا على `Prism-Setup.exe`. لا تحتاج إلى Git أو Node.js أو npm. لأن المثبّت غير موقّع، قد يعرض Windows تحذير «ناشر غير معروف».
 
 على Mac، اختر صورة القرص المناسبة للشريحة: [Apple silicon](https://github.com/shixi-11/prism-desk/releases/latest/download/Prism-arm64.dmg) أو [Intel](https://github.com/shixi-11/prism-desk/releases/latest/download/Prism-x64.dmg). افتح ملف `.dmg` واسحب Prism إلى مجلد Applications. لا تحتاج إلى Git أو Node.js. يحمل تطبيق Mac توقيعًا مؤقتًا (ad-hoc)، لكنه لا يحمل توقيع Apple Developer ID ولا توثيق Apple، وقد يمنع macOS تشغيله أول مرة. إذا أكدت رغبتك في فتحه، اسمح بذلك من إعدادات النظام → الخصوصية والأمان.
 
@@ -69,7 +69,7 @@
 أوامر PowerShell التالية خاصة بنظام Windows فقط.
 
 ```powershell
-git clone --branch v0.1.44 https://github.com/shixi-11/prism-desk.git
+git clone --branch v0.1.45 https://github.com/shixi-11/prism-desk.git
 cd prism-desk
 npm install
 npm run build

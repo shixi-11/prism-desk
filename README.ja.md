@@ -54,7 +54,7 @@
 
 ### インストール
 
-**v0.1.44 Windows x64版**をダウンロードし、`Prism-Setup.exe` をダブルクリックします。Windows は未署名インストーラーについて警告する場合があります。
+**v0.1.45 Windows x64版**をダウンロードし、`Prism-Setup.exe` をダブルクリックします。Windows は未署名インストーラーについて警告する場合があります。
 
 Macではチップに合うディスクイメージを選び、`.dmg`を開いてPrismをApplicationsへドラッグしてください。Mac版にはad-hoc署名がありますが、Apple Developer ID署名と公証はなく、初回起動がブロックされる場合があります。
 
@@ -63,7 +63,7 @@ Windowsでソースからビルドする場合は、以下のPowerShellコマン
 以下のPowerShellコマンドはWindows専用です。
 
 ```powershell
-git clone --branch v0.1.44 https://github.com/shixi-11/prism-desk.git
+git clone --branch v0.1.45 https://github.com/shixi-11/prism-desk.git
 cd prism-desk
 npm install
 npm run build

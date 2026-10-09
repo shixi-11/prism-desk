@@ -52,7 +52,7 @@
 
 ### 安装
 
-下载 **v0.1.44 Windows 64位安装包**，双击 `Prism-Setup.exe` 即可安装。安装棱镜无需 Git、Node.js 或 npm。由于安装包尚未签名，Windows 可能显示“未知发布者”提示。
+下载 **v0.1.45 Windows 64位安装包**，双击 `Prism-Setup.exe` 即可安装。安装棱镜无需 Git、Node.js 或 npm。由于安装包尚未签名，Windows 可能显示“未知发布者”提示。
 
 Mac用户按芯片下载：[Apple芯片版](https://github.com/shixi-11/prism-desk/releases/latest/download/Prism-arm64.dmg)或[Intel芯片版](https://github.com/shixi-11/prism-desk/releases/latest/download/Prism-x64.dmg)。打开 `.dmg`，将 Prism 拖入 Applications 文件夹即可，无需 Git 或 Node.js。Mac版有 ad-hoc 签名，但没有 Apple Developer ID 签名或公证，macOS 首次打开时可能会阻止启动。若你确认要打开，可在“系统设置 → 隐私与安全性”中允许。
 
@@ -65,7 +65,7 @@ Windows应用数据：`%APPDATA%\Prism`；独立账号：`%LOCALAPPDATA%\Prism\a
 Windows 源码构建请使用以下 PowerShell 命令，需要 Git、Node.js 22.12 或更新版本、npm，以及准备使用的官方 CLI。
 
 ```powershell
-git clone --branch v0.1.44 https://github.com/shixi-11/prism-desk.git
+git clone --branch v0.1.45 https://github.com/shixi-11/prism-desk.git
 cd prism-desk
 npm install
 npm run build

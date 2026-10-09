@@ -52,7 +52,7 @@ Created by [Shixi Lin](https://shixilin.com/). If Prism helps you keep creating,
 
 ### Install
 
-Download the **Windows x64 installer for v0.1.44** and double-click `Prism-Setup.exe`. No Git, Node.js or npm is needed. Windows may show an “Unknown publisher” warning because the installer is unsigned.
+Download the **Windows x64 installer for v0.1.45** and double-click `Prism-Setup.exe`. No Git, Node.js or npm is needed. Windows may show an “Unknown publisher” warning because the installer is unsigned.
 
 For Mac, choose the disk image for your chip: [Apple silicon](https://github.com/shixi-11/prism-desk/releases/latest/download/Prism-arm64.dmg) or [Intel](https://github.com/shixi-11/prism-desk/releases/latest/download/Prism-x64.dmg). Open the `.dmg` and drag Prism to Applications; Git and Node.js are not needed. The Mac app has an ad-hoc signature but no Apple Developer ID signature or notarization, so macOS may block the first launch. If you choose to open it, allow it in System Settings → Privacy & Security.
 
@@ -69,7 +69,7 @@ For Windows source builds, use the PowerShell commands below. This option requir
 The following PowerShell commands are for Windows only.
 
 ```powershell
-git clone --branch v0.1.44 https://github.com/shixi-11/prism-desk.git
+git clone --branch v0.1.45 https://github.com/shixi-11/prism-desk.git
 cd prism-desk
 npm install
 npm run build

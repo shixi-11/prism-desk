@@ -54,7 +54,7 @@
 
 ### 安裝
 
-下載 **v0.1.44 Windows 64 位元安裝程式**，按兩下 `Prism-Setup.exe` 即可安裝。安裝 Prism 不需要 Git、Node.js 或 npm。由於安裝程式尚未簽署，Windows 可能顯示「未知的發行者」警告。
+下載 **v0.1.45 Windows 64 位元安裝程式**，按兩下 `Prism-Setup.exe` 即可安裝。安裝 Prism 不需要 Git、Node.js 或 npm。由於安裝程式尚未簽署，Windows 可能顯示「未知的發行者」警告。
 
 Mac 使用者請依晶片下載：[Apple 晶片版](https://github.com/shixi-11/prism-desk/releases/latest/download/Prism-arm64.dmg)或[Intel 晶片版](https://github.com/shixi-11/prism-desk/releases/latest/download/Prism-x64.dmg)。開啟 `.dmg`，將 Prism 拖到 Applications 資料夾即可，不需要 Git 或 Node.js。Mac 版未經 Apple 簽署或公證，macOS 首次開啟時可能會阻止啟動。若你確認要開啟，可在「系統設定 → 隱私權與安全性」中允許。
 
@@ -69,7 +69,7 @@ Windows 應用程式資料：`%APPDATA%\Prism`；獨立帳號：`%LOCALAPPDATA%\
 以下 PowerShell 指令僅適用於 Windows。
 
 ```powershell
-git clone --branch v0.1.44 https://github.com/shixi-11/prism-desk.git
+git clone --branch v0.1.45 https://github.com/shixi-11/prism-desk.git
 cd prism-desk
 npm install
 npm run build

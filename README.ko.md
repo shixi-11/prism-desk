@@ -54,7 +54,7 @@
 
 ### 설치
 
-**v0.1.44 Windows x64 설치 프로그램**을 다운로드하고 `Prism-Setup.exe`를 더블클릭하세요. Git, Node.js, npm은 필요하지 않습니다. 설치 프로그램은 서명되지 않았으므로 Windows에서 “알 수 없는 게시자” 경고가 표시될 수 있습니다.
+**v0.1.45 Windows x64 설치 프로그램**을 다운로드하고 `Prism-Setup.exe`를 더블클릭하세요. Git, Node.js, npm은 필요하지 않습니다. 설치 프로그램은 서명되지 않았으므로 Windows에서 “알 수 없는 게시자” 경고가 표시될 수 있습니다.
 
 Mac은 칩에 맞는 디스크 이미지를 다운로드하세요: [Apple 실리콘](https://github.com/shixi-11/prism-desk/releases/latest/download/Prism-arm64.dmg) 또는 [Intel](https://github.com/shixi-11/prism-desk/releases/latest/download/Prism-x64.dmg). `.dmg`를 열고 Prism을 Applications 폴더로 드래그하면 됩니다. Git과 Node.js는 필요하지 않습니다. Mac 앱에는 ad-hoc 서명이 있지만 Apple Developer ID 서명과 공증이 없어 첫 실행을 macOS가 차단할 수 있습니다. 실행하기로 확인했다면 시스템 설정 → 개인정보 보호 및 보안에서 허용하세요.
 
@@ -69,7 +69,7 @@ Windows 데이터: `%APPDATA%\Prism`, 독립 계정: `%LOCALAPPDATA%\Prism\accou
 아래 PowerShell 명령은 Windows 전용입니다.
 
 ```powershell
-git clone --branch v0.1.44 https://github.com/shixi-11/prism-desk.git
+git clone --branch v0.1.45 https://github.com/shixi-11/prism-desk.git
 cd prism-desk
 npm install
 npm run build

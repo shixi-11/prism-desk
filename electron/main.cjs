@@ -1,6 +1,25 @@
 const { app, BrowserWindow, ipcMain, dialog, shell, Menu, clipboard, Tray } = require("electron");
 if(app.isPackaged&&!process.env.PRISM_TEST_DATA)app.setPath('userData',require('node:path').join(app.getPath('appData'),'Prism'));
 const updateBootstrap=require('./update-bootstrap.cjs');
+// Source and installer editions share only a pointer to existing local data.
+// Import before loading config/core so the first window keeps account identity.
+if(!process.env.PRISM_CONFIG){
+ const migration=require('./install-migration.cjs');
+ const sharedRoot=process.env.PRISM_TEST_DATA||require('node:path').join(app.getPath('appData'),'Prism');
+ if(app.isPackaged){
+  if(!process.env.PRISM_TEST_DATA&&process.platform==='win32'&&!require('node:fs').existsSync(require('node:path').join(sharedRoot,'config.json'))&&!require('node:fs').existsSync(require('node:path').join(sharedRoot,'source-installation.json'))){
+   const p=require('node:path');
+   const source=migration.discoverSource({shortcuts:[p.join(app.getPath('desktop'),'棱镜.lnk'),p.join(app.getPath('appData'),'Microsoft','Windows','Start Menu','Programs','棱镜.lnk')],readShortcut:file=>shell.readShortcutLink(file)});
+   if(source)migration.registerSource({sharedRoot,configFile:source.configFile,userData:source.sourceData});
+  }
+  migration.migrate({sharedRoot,userData:sharedRoot});
+ }
+ else if(!process.env.PRISM_TEST_DATA){
+  const root=updateBootstrap.installation(require('node:path').resolve(__dirname,'..'));
+  const configFile=require('node:path').join(root,'.local','config.json');
+  if(require('node:fs').existsSync(configFile))migration.registerSource({sharedRoot,configFile,userData:app.getPath('userData')});
+ }
+}
 const callers=new (require('node:async_hooks').AsyncLocalStorage)();
 const windows=new Set();
 const owner=()=>callers.getStore()||[...windows][0];

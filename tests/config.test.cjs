@@ -38,6 +38,8 @@ test('explicit local configuration preserves account identity and assistant sett
   original.geminiEntry=path.join(root,'gemini.js');
   fs.writeFileSync(file,JSON.stringify(original));
   assert.deepEqual(loadConfig(file),original);
+  fs.writeFileSync(file,'\uFEFF'+JSON.stringify(original));
+  assert.deepEqual(loadConfig(file),original);
 });
 
 test('bad configuration cannot silently fall back to a different account', t => {

@@ -56,7 +56,7 @@ function loadConfig(file = process.env.PRISM_CONFIG || DEFAULT_CONFIG_PATH, env 
     return validate(defaults);
   }
   // A malformed local configuration must not silently switch account identity.
-  const local = JSON.parse(fs.readFileSync(file, 'utf8'));
+  const local = JSON.parse(fs.readFileSync(file, 'utf8').replace(/^\uFEFF/, ''));
   if (!local || typeof local !== 'object' || Array.isArray(local)) throw Error('Invalid PRISM configuration.');
   return validate({...defaults, ...local, assistant: {...defaults.assistant, ...local.assistant}});
 }

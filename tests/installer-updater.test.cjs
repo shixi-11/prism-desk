@@ -15,6 +15,13 @@ test('checking never downloads; explicit preparation verifies bytes and activati
 test('bad digest and oversized downloads cannot become installable',async t=>{
  for(const bytes of [Buffer.alloc(data.length),Buffer.alloc(data.length+1)]){const {u}=fixture(t,'win32','x64',bytes);await u.check();assert.equal((await u.prepare()).status,'error');assert.equal(fs.existsSync(u.installerFile()),false);assert.equal(fs.existsSync(u.installerFile()+'.partial'),false);await assert.rejects(u.activate());}
 });
+test('a simultaneous update check cannot replace the installer during activation verification',async t=>{
+ const {u}=fixture(t);await u.check();await u.prepare();const file=u.installerFile();
+ let fetched=false;u.fetchRelease=async()=>{fetched=true;return {version:'0.1.2',installers:u.state.release.installers};};
+ const activation=u.activate();
+ await u.check();await assert.rejects(u.activate(),/not ready/);
+ assert.equal(await activation,file);assert.equal(fetched,false);assert.equal(u.state.release.version,'0.1.1');
+});
 test('Mac selects the matching native disk image and never falls back to Windows',async t=>{
  for(const arch of ['arm64','x64']){const {u}=fixture(t,'darwin',arch);await u.check();assert.equal((await u.prepare()).distribution,'mac-dmg');assert.ok(u.installerFile().endsWith(`-${arch}.dmg`));assert.equal(await u.activate(),u.installerFile());}
  const {u}=fixture(t,'darwin');u.fetchRelease=async()=>({version:'0.1.1',installer:{size:data.length,sha256}});assert.equal((await u.check()).status,'error');

@@ -15,7 +15,13 @@ class InstallerUpdater extends EventEmitter{
    await pipeline(Readable.fromWeb(response.body),new Transform({transform(part,_enc,done){bytes+=part.length;done(bytes>asset.size?Error('Installer download exceeds its published size'):null,part);}}),fs.createWriteStream(temp));
    if(!await matches(temp,asset))throw Error('Installer integrity verification failed.');fs.renameSync(temp,file);
   }return this.set({status:'ready',detail:''});}catch(e){fs.rmSync(temp,{force:true});return this.set({status:'error',error:e.message});}finally{this.busy=false;}}
- async activate(){if(this.busy||this.state.status!=='ready'||!await matches(this.installerFile(),this.asset()))throw Error('The verified installer is not ready.');this.set({status:'restarting'});return this.installerFile();}
+ async activate(){
+  if(this.busy||this.state.status!=='ready')throw Error('The verified installer is not ready.');
+  this.busy=true;
+  const file=this.installerFile(),asset=this.asset();
+  try{if(!await matches(file,asset))throw Error('The verified installer is not ready.');this.set({status:'restarting'});return file;}
+  finally{this.busy=false;}
+ }
  cancelActivation(){if(this.state.status==='restarting')this.set({status:'ready'});}
 }
 module.exports={InstallerUpdater,matches};

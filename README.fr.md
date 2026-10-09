@@ -54,7 +54,7 @@ Créé par [Shixi Lin](https://shixilin.com/). Si Prism vous aide à créer, [so
 
 ### Installation
 
-Téléchargez l’installateur **v0.1.44 pour Windows x64**, puis double-cliquez sur `Prism-Setup.exe`. Git, Node.js et npm ne sont pas nécessaires. Ce programme n’étant pas signé, Windows peut afficher un avertissement indiquant un éditeur inconnu.
+Téléchargez l’installateur **v0.1.45 pour Windows x64**, puis double-cliquez sur `Prism-Setup.exe`. Git, Node.js et npm ne sont pas nécessaires. Ce programme n’étant pas signé, Windows peut afficher un avertissement indiquant un éditeur inconnu.
 
 Sur Mac, choisissez l’image disque adaptée à la puce : [Apple silicon](https://github.com/shixi-11/prism-desk/releases/latest/download/Prism-arm64.dmg) ou [Intel](https://github.com/shixi-11/prism-desk/releases/latest/download/Prism-x64.dmg). Ouvrez le `.dmg` et faites glisser Prism dans Applications. Git et Node.js ne sont pas nécessaires. L’app Mac possède une signature ad hoc, mais pas de signature Apple Developer ID ni de notarisation ; macOS peut donc bloquer son premier lancement. Si vous confirmez vouloir l’ouvrir, autorisez-la dans Réglages Système → Confidentialité et sécurité.
 
@@ -69,7 +69,7 @@ Pour compiler depuis les sources, utilisez les commandes développeur ci-dessous
 Les commandes PowerShell suivantes sont réservées à Windows.
 
 ```powershell
-git clone --branch v0.1.44 https://github.com/shixi-11/prism-desk.git
+git clone --branch v0.1.45 https://github.com/shixi-11/prism-desk.git
 cd prism-desk
 npm install
 npm run build

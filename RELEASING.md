@@ -31,7 +31,7 @@ The 0.1.0 updater still follows main until its first upgrade. Once users install
 
 ## Installer distribution
 
-For the v0.1.44 installer release, `release.json` lists exactly `windows-x64`, `mac-arm64`, and `mac-x64` under `distribution`. Before publishing, the corresponding files must exist locally at `.local/installer/Prism-Setup.exe`, `.local/installer/Prism-arm64.dmg`, and `.local/installer/Prism-x64.dmg`. The publisher enforces bounded, non-zero file sizes and SHA-256 integrity; it does not create archives or checksum sidecars.
+For installer releases, `release.json` lists exactly `windows-x64`, `mac-arm64`, and `mac-x64` under `distribution`. Before publishing, the corresponding files must exist locally at `.local/installer/Prism-Setup.exe`, `.local/installer/Prism-arm64.dmg`, and `.local/installer/Prism-x64.dmg`. The publisher enforces bounded, non-zero file sizes and SHA-256 integrity; it does not create archives or checksum sidecars.
 
 The generated Release body links the Windows x64 NSIS installer and both Mac disk images. Windows users double-click `Prism-Setup.exe`; Git and Node.js are not required. Windows may warn that the unsigned installer has an unknown publisher. Mac users choose the disk image for Apple silicon or Intel, open it, and drag Prism to Applications. The Mac builds have an ad-hoc signature but no Apple Developer ID signature or notarization, so macOS may block the first launch; users who choose to open the app can allow it in System Settings → Privacy & Security. Mac updates remain a manual download and DMG install; the Release must not imply that the app installs Mac updates automatically.
 
