@@ -145,7 +145,15 @@ Lange eingefügte Texte und `.md`/`.txt`-Dateien erscheinen als kompakte Karten.
 
 Absolute Pfade auf einer eigenen Textzeile oder in einem Codeblock sind anklickbar, auch Windows-Pfade mit Leerzeichen und chinesischen Zeichen. Ordner öffnen sich im Datei-Explorer. Lokale Dateien lassen sich mit einer Anwendung öffnen oder im Ordner anzeigen; dies gilt auch für Videos und Formate ohne eingebettete Vorschau. Ausführbare Dateien und Skripte werden nur im Ordner angezeigt.
 
-### Automatische Updates
+### Updates
+
+#### Installierte Versionen
+
+**Windows:** Wählen Sie **Nach Updates suchen → Herunterladen und vorbereiten → Aktualisieren und neu starten**. Die App überprüft das Installationspaket vor der Verwendung; Git und Node.js sind nicht erforderlich.
+
+**Mac:** Wählen Sie **Nach Updates suchen → Herunterladen und vorbereiten → Installationsprogramm öffnen**. Beenden Sie Prism und ziehen Sie die App aus dem DMG in Applications, um sie zu ersetzen. Mac-Updates werden manuell abgeschlossen; das Öffnen des DMG ersetzt die App nicht und startet sie nicht neu.
+
+#### Quellcode-Installationen unter Windows
 
 1. **Nach Updates suchen** meldet „Update verfügbar“ oder „Bereits aktuell“. Dabei wird nichts heruntergeladen und kein Neustart ausgelöst.
 2. **Herunterladen und vorbereiten** meldet nach abgeschlossener Vorbereitung „Das Update ist bereit“. Sie können die aktuelle Version weiterverwenden.

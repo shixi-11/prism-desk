@@ -147,7 +147,15 @@ Open the preview panel or click a file link to view images, PDFs, Markdown, code
 
 Standalone absolute paths in text or code blocks are clickable, including Windows paths with spaces and Chinese characters. Folder links open File Explorer. Local files offer native-app or folder actions; video and other formats without an inline preview use these actions. Executables and scripts are revealed in their folder.
 
-### Automatic updates
+### Updates
+
+#### Installer editions
+
+**Windows:** Choose **Check for updates → Download and prepare → Update and restart**. The app verifies the installer before use; Git and Node.js are not required.
+
+**Mac:** Choose **Check for updates → Download and prepare → Open installer**. Quit Prism, then drag the app from the DMG into Applications to replace it. Mac updates are completed manually; opening the DMG does not replace or restart the app.
+
+#### Windows source installations
 
 1. **Check for updates** reports “Update available” or “You’re up to date”. It does not download or restart.
 2. **Download and prepare** reports “Update is ready” when preparation finishes. You can continue using the current version.

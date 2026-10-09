@@ -62,11 +62,7 @@ Windows应用数据：`%APPDATA%\Prism`；独立账号：`%LOCALAPPDATA%\Prism\a
 
 #### 开发者选项：从源码构建
 
-以下 PowerShell 构建和启动脚本仅适用于 Windows。
-
 Windows 源码构建请使用以下 PowerShell 命令，需要 Git、Node.js 22.12 或更新版本、npm，以及准备使用的官方 CLI。
-
-以下 PowerShell 命令仅适用于 Windows。
 
 ```powershell
 git clone --branch v0.1.44 https://github.com/shixi-11/prism-desk.git
@@ -147,7 +143,15 @@ Mac开发时，在仓库和依赖已准备好的前提下运行 `npm run build &
 
 正文或代码框中独立成行的绝对路径支持点击，包括带空格、中文的 Windows 路径。文件夹链接可直接打开资源管理器；本地文件提供本机应用打开或文件夹定位入口，视频等无法内嵌预览的格式也可使用。可执行文件和脚本只在文件夹中显示。
 
-### 自动更新
+### 更新
+
+#### 安装版
+
+**Windows：**选择**检查更新 → 下载并准备 → 更新并重启**。应用使用前会校验安装包，无需 Git 或 Node.js。
+
+**Mac：**选择**检查更新 → 下载并准备 → 打开安装包**。退出棱镜后，将 DMG 中的应用拖入 Applications 文件夹替换。Mac 更新由你手动完成；打开 DMG 不会自动替换或重启应用。
+
+#### Windows 源码安装
 
 1. **检查更新**：提示“发现新版本”或“已是最新版本”，不会下载或重启。
 2. **下载并准备**：完成后提示“更新已准备好”，可继续使用当前版本。

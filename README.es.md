@@ -145,7 +145,15 @@ Abre el panel de vista previa o haz clic en un enlace de archivo para ver imáge
 
 Las rutas absolutas en una línea de texto o de un bloque de código son clicables, incluidas las rutas de Windows con espacios y caracteres chinos. Los enlaces a carpetas abren el Explorador de archivos. Los archivos locales se pueden abrir con una aplicación o mostrar en su carpeta, también los vídeos y formatos sin vista previa integrada. Los ejecutables y scripts solo se muestran en su carpeta.
 
-### Actualizaciones automáticas
+### Actualizaciones
+
+#### Versiones con instalador
+
+**Windows:** Elige **Buscar actualizaciones → Descargar y preparar → Actualizar y reiniciar**. La aplicación verifica el instalador antes de usarlo; no requiere Git ni Node.js.
+
+**Mac:** Elige **Buscar actualizaciones → Descargar y preparar → Abrir instalador**. Sal de Prism y arrastra la aplicación del DMG a Applications para reemplazarla. Las actualizaciones de Mac se completan manualmente; abrir el DMG no reemplaza ni reinicia la aplicación.
+
+#### Instalaciones desde el código fuente en Windows
 
 1. **Buscar actualizaciones** informa «Actualización disponible» o «Ya está actualizado». No descarga nada ni reinicia la aplicación.
 2. **Descargar y preparar** informa «La actualización está lista» cuando termina la preparación. Puedes seguir usando la versión actual.

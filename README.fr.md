@@ -145,7 +145,15 @@ Ouvrez le panneau d’aperçu ou cliquez sur un lien de fichier pour afficher de
 
 Les chemins absolus sur une ligne de texte ou dans un bloc de code sont cliquables, y compris les chemins Windows avec espaces et caractères chinois. Les dossiers s’ouvrent dans l’Explorateur de fichiers. Les fichiers locaux peuvent être ouverts avec une application ou affichés dans leur dossier, y compris les vidéos et formats sans aperçu intégré. Les exécutables et scripts sont uniquement affichés dans leur dossier.
 
-### Mises à jour automatiques
+### Mises à jour
+
+#### Versions avec installateur
+
+**Windows :** Choisissez **Rechercher des mises à jour → Télécharger et préparer → Mettre à jour et redémarrer**. L’application vérifie l’installateur avant utilisation ; Git et Node.js ne sont pas nécessaires.
+
+**Mac :** Choisissez **Rechercher des mises à jour → Télécharger et préparer → Ouvrir le programme d’installation**. Quittez Prism, puis faites glisser l’application du DMG dans Applications pour la remplacer. Les mises à jour Mac se font manuellement ; ouvrir le DMG ne remplace ni ne redémarre l’application.
+
+#### Installations depuis les sources sous Windows
 
 1. **Rechercher des mises à jour** indique « Mise à jour disponible » ou « Vous êtes à jour ». Cette action ne télécharge rien et ne redémarre pas l’application.
 2. **Télécharger et préparer** indique « La mise à jour est prête » lorsque la préparation est terminée. Vous pouvez continuer à utiliser la version actuelle.
