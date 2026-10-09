@@ -54,7 +54,7 @@
 
 ### 설치
 
-**v0.1.45 Windows x64 설치 프로그램**을 다운로드하고 `Prism-Setup.exe`를 더블클릭하세요. Git, Node.js, npm은 필요하지 않습니다. 설치 프로그램은 서명되지 않았으므로 Windows에서 “알 수 없는 게시자” 경고가 표시될 수 있습니다.
+**v0.1.46 Windows x64 설치 프로그램**을 다운로드하고 `Prism-Setup.exe`를 더블클릭하세요. Git, Node.js, npm은 필요하지 않습니다. 설치 프로그램은 서명되지 않았으므로 Windows에서 “알 수 없는 게시자” 경고가 표시될 수 있습니다.
 
 Mac은 칩에 맞는 디스크 이미지를 다운로드하세요: [Apple 실리콘](https://github.com/shixi-11/prism-desk/releases/latest/download/Prism-arm64.dmg) 또는 [Intel](https://github.com/shixi-11/prism-desk/releases/latest/download/Prism-x64.dmg). `.dmg`를 열고 Prism을 Applications 폴더로 드래그하면 됩니다. Git과 Node.js는 필요하지 않습니다. Mac 앱에는 ad-hoc 서명이 있지만 Apple Developer ID 서명과 공증이 없어 첫 실행을 macOS가 차단할 수 있습니다. 실행하기로 확인했다면 시스템 설정 → 개인정보 보호 및 보안에서 허용하세요.
 
@@ -69,7 +69,7 @@ Windows 데이터: `%APPDATA%\Prism`, 독립 계정: `%LOCALAPPDATA%\Prism\accou
 아래 PowerShell 명령은 Windows 전용입니다.
 
 ```powershell
-git clone --branch v0.1.45 https://github.com/shixi-11/prism-desk.git
+git clone --branch v0.1.46 https://github.com/shixi-11/prism-desk.git
 cd prism-desk
 npm install
 npm run build
@@ -134,6 +134,8 @@ Codex에 목표 설정이나 변경을 요청하면 Prism의 내장 도구를 �
 스크린샷을 붙여 넣거나, 이미지를 입력 영역에 끌어 놓거나, 이미지 버튼을 사용하세요. 최대 다섯 장까지 첨부할 수 있으며 각 이미지는 10 MB까지 가능합니다. Codex는 로컬 이미지를 전달받고, Claude는 구독 확인을 통과한 경우 네이티브 이미지 콘텐츠를 전달받습니다. Claude의 이미지 실행은 아직 로그인된 계정으로 검증하지 않았습니다. Grok은 CLI가 직접 이미지 콘텐츠 지원을 알리는 경우 해당 방식을 사용하고, 그렇지 않으면 내장 Read 도구로 첨부 이미지를 엽니다. 이 경로는 구독 계정에 로그인한 상태에서 검증했습니다.
 
 #### 메시지와 초안
+
+작업 템플릿은 이 기기에 저장되며 계정 간에 함께 사용할 수 있습니다. 현재 초안을 템플릿으로 저장한 뒤 검색, 편집, 삭제할 수 있습니다. 템플릿을 삽입하면 현재 작업에 텍스트 카드로 추가되고 기존 초안 내용은 유지됩니다. 템플릿에는 텍스트만 저장되며 첨부 파일이나 계정 자격 증명은 포함되지 않습니다. 삽입해도 자동으로 전송되거나 스킬이 자동 호출되지 않습니다.
 
 실행 중에도 메시지를 보낼 수 있습니다. 대기 메시지는 순서대로 처리되며 취소할 수 있습니다. 설정에서 Enter 또는 Ctrl/⌘+Enter와 대기열 또는 실시간 지시를 선택할 수 있습니다. Codex, Claude, Grok은 실행 중인 기본 대화에 추가 지시를 전달합니다. CLI는 현재 생성이나 도구 단계가 끝난 뒤 처리할 수 있습니다. 수신이 확인되지 않은 메시지는 검토를 위해 보관됩니다. 앱에서 작업을 전환해도 초안은 유지됩니다.
 

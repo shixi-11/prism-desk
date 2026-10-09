@@ -73,6 +73,7 @@ async function main() {
     assert.equal(info.version, expectedVersion, 'Packaged app version must match package.json');
 
     const initial = await page.evaluate(() => window.prism.init());
+    await page.locator('.language-toggle').selectOption('zh');
     assert.equal(initial.capabilities?.taichu?.exists, false, 'Smoke data must not load a configured assistant');
     assert.equal(initial.capabilities?.taichu?.path, '', 'Smoke data must not expose a private assistant path');
     assert.ok(initial.profiles.every(profile => !('home' in profile) && !('executable' in profile)), 'Init must not expose account directories or executable paths');
@@ -111,6 +112,27 @@ async function main() {
     }
     assert.equal(persistedDraft?.text, draftText, 'Composer autosave must persist the UI draft before restart');
 
+    // Exercise the real UI, IPC and disk store without sending a model request.
+    await page.getByRole('button',{name:'任务模板',exact:true}).click();
+    await page.getByRole('button',{name:'保存当前草稿',exact:true}).click();
+    await page.getByLabel('模板名称',{exact:true}).fill('Reusable review');
+    await page.getByLabel('模板内容',{exact:true}).fill('Review the current changes.\nKeep the approved layout.');
+    await page.getByRole('button',{name:'保存',exact:true}).click();
+    await page.getByRole('heading',{name:'Reusable review',exact:true}).waitFor();
+    if(process.env.PRISM_TEMPLATE_SCREENSHOT){
+      fs.mkdirSync(path.dirname(process.env.PRISM_TEMPLATE_SCREENSHOT),{recursive:true});
+      await application.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows()[0].showInactive());
+      await page.screenshot({path:process.env.PRISM_TEMPLATE_SCREENSHOT,animations:'disabled'});
+      await application.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows()[0].hide());
+    }
+    await page.getByLabel('搜索模板',{exact:true}).fill('approved');
+    await page.getByRole('button',{name:'插入当前任务',exact:true}).click();
+    assert.equal(await composer.inputValue(),draftText,'Inserting a template must retain existing draft text');
+    await page.locator('.pasted-texts').getByText('Reusable review',{exact:true}).waitFor();
+    const savedTemplates=await page.evaluate(()=>window.prism.listTemplates());
+    assert.equal(savedTemplates.length,1);
+    assert.equal(savedTemplates[0].body,'Review the current changes.\nKeep the approved layout.');
+
     await application.close();
     application = await launch();
     page = await openWindow(application);
@@ -119,6 +141,20 @@ async function main() {
     assert.ok(restored.profiles.some(profile=>profile.id===account.id),'Saved account settings must persist across app restart');
     assert.equal(restored.drafts[created.id]?.text, draftText, 'UI draft must persist across app restart');
     assert.equal(await page.locator('.composer textarea').inputValue(), draftText, 'Persisted draft must be restored into the composer');
+    assert.equal(restored.drafts[created.id]?.pastedTexts?.[0]?.text,savedTemplates[0].body,'Template card must survive draft restart');
+    assert.deepEqual(await page.evaluate(()=>window.prism.listTemplates()),savedTemplates,'Templates must survive app restart');
+    await page.getByRole('button',{name:'任务模板',exact:true}).click();
+    await page.getByRole('button',{name:'编辑 Reusable review',exact:true}).click();
+    await page.getByLabel('模板内容',{exact:true}).fill('Updated review instructions');
+    await page.getByRole('button',{name:'保存',exact:true}).click();
+    await page.getByRole('button',{name:'删除 Reusable review',exact:true}).click();
+    await page.getByRole('button',{name:'取消',exact:true}).click();
+    assert.equal((await page.evaluate(()=>window.prism.listTemplates())).length,1,'Cancel deletion must retain the template');
+    await page.getByRole('button',{name:'删除 Reusable review',exact:true}).click();
+    await page.locator('.task-templates').getByRole('button',{name:'删除',exact:true}).click();
+    await page.getByText('暂无模板',{exact:true}).waitFor();
+    assert.deepEqual(await page.evaluate(()=>window.prism.listTemplates()),[],'Confirmed deletion must remove the stored template');
+    await page.getByRole('button',{name:'关闭',exact:true}).click();
     const secondUpdateStatus = await page.evaluate(() => window.prism.updateStatus());
     assert.equal(secondUpdateStatus.distribution, updateStatus.distribution);
     const updateButtons = page.locator('button[aria-label]');
@@ -153,6 +189,11 @@ async function main() {
       fs.writeFileSync(file, JSON.stringify(metadata, null, 2) + '\n');
     }
     process.stdout.write(JSON.stringify(metadata) + '\n');
+  } catch(error) {
+    if(application&&process.env.PRISM_TEMPLATE_SCREENSHOT){
+      try{const page=await application.firstWindow();await page.screenshot({path:process.env.PRISM_TEMPLATE_SCREENSHOT.replace(/\.png$/,'.failure.png')});}catch{}
+    }
+    throw error;
   } finally {
     if (application) await application.close().catch(() => {});
     const resolved = fs.realpathSync.native(root);

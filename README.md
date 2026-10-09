@@ -52,7 +52,7 @@ Created by [Shixi Lin](https://shixilin.com/). If Prism helps you keep creating,
 
 ### Install
 
-Download the **Windows x64 installer for v0.1.45** and double-click `Prism-Setup.exe`. No Git, Node.js or npm is needed. Windows may show an “Unknown publisher” warning because the installer is unsigned.
+Download the **Windows x64 installer for v0.1.46** and double-click `Prism-Setup.exe`. No Git, Node.js or npm is needed. Windows may show an “Unknown publisher” warning because the installer is unsigned.
 
 For Mac, choose the disk image for your chip: [Apple silicon](https://github.com/shixi-11/prism-desk/releases/latest/download/Prism-arm64.dmg) or [Intel](https://github.com/shixi-11/prism-desk/releases/latest/download/Prism-x64.dmg). Open the `.dmg` and drag Prism to Applications; Git and Node.js are not needed. The Mac app has an ad-hoc signature but no Apple Developer ID signature or notarization, so macOS may block the first launch. If you choose to open it, allow it in System Settings → Privacy & Security.
 
@@ -69,7 +69,7 @@ For Windows source builds, use the PowerShell commands below. This option requir
 The following PowerShell commands are for Windows only.
 
 ```powershell
-git clone --branch v0.1.45 https://github.com/shixi-11/prism-desk.git
+git clone --branch v0.1.46 https://github.com/shixi-11/prism-desk.git
 cd prism-desk
 npm install
 npm run build
@@ -136,6 +136,8 @@ The top bar has toggles for the bottom execution log and account sidebar. Their 
 Paste screenshots, drop images into the composer or use the image button (up to five images, 10 MB each). Codex receives local images; Claude receives native image content when its subscription checks pass. Claude image execution has not yet been verified against a signed-in account. Grok uses direct image content when the CLI advertises it, otherwise its native Read tool opens the attached images; this path has been verified with a signed-in subscription.
 
 #### Messages and drafts
+
+Task templates are stored locally and shared across accounts on this device. Save the current draft as a template, then search, edit, or delete templates. Inserting one adds a text card to the current task and preserves the rest of the draft. Templates contain text only, with no attachments or account credentials. Insertion does not send the task or automatically invoke skills.
 
 Send more messages while work runs: queued messages wait in order and can be cancelled. Settings lets you choose Enter or Ctrl/⌘+Enter and queueing or live guidance. Codex, Claude and Grok support sending guidance into the active native conversation. The CLI may process it after the current generation or tool step. Unconfirmed sends remain held for review. Drafts are retained while switching tasks in the open app.
 

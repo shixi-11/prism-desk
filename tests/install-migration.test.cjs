@@ -24,6 +24,7 @@ function clean(f) { fs.rmSync(f.root, { recursive: true, force: true }); }
 test('imports approved config and state, merges destination draft values, and is safe to retry', t => {
   const f = fixture(); t.after(() => clean(f));
   fs.writeFileSync(path.join(f.sourceData, 'settings.json'), JSON.stringify({ language: 'zh-CN', theme: 'dark' }));
+  const template=require('../electron/task-templates.cjs').save({title:'Reusable review',body:'Keep the approved layout.'},f.sourceData);
   fs.writeFileSync(path.join(f.userData, 'settings.json'), JSON.stringify({ theme: 'light' }));
   fs.mkdirSync(path.join(f.sourceData, 'drafts'));
   fs.writeFileSync(path.join(f.sourceData, 'drafts', 'window.json'), JSON.stringify({ old: 1, edit: 'source' }));
@@ -38,6 +39,7 @@ test('imports approved config and state, merges destination draft values, and is
   assert.deepEqual(JSON.parse(fs.readFileSync(path.join(f.userData, 'config.json'))), f.config);
   assert.deepEqual(JSON.parse(fs.readFileSync(path.join(f.userData, 'settings.json'))), { language: 'zh-CN', theme: 'light' });
   assert.deepEqual(JSON.parse(fs.readFileSync(path.join(f.userData, 'drafts', 'window.json'))), { old: 1, edit: 'destination' });
+  assert.deepEqual(require('../electron/task-templates.cjs').list(f.userData),[template]);
   assert.equal(fs.readFileSync(path.join(f.userData, 'tasks', '123e4567-e89b-12d3-a456-426614174000', 'task.json'), 'utf8'), '{"id":"kept"}');
   assert.equal(migrate({ sharedRoot: f.sharedRoot, userData: f.userData }).reason, 'installed-config-exists');
   assert.equal(fs.readFileSync(f.configFile, 'utf8').startsWith('\uFEFF'), true);

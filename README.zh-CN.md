@@ -52,7 +52,7 @@
 
 ### 安装
 
-下载 **v0.1.45 Windows 64位安装包**，双击 `Prism-Setup.exe` 即可安装。安装棱镜无需 Git、Node.js 或 npm。由于安装包尚未签名，Windows 可能显示“未知发布者”提示。
+下载 **v0.1.46 Windows 64位安装包**，双击 `Prism-Setup.exe` 即可安装。安装棱镜无需 Git、Node.js 或 npm。由于安装包尚未签名，Windows 可能显示“未知发布者”提示。
 
 Mac用户按芯片下载：[Apple芯片版](https://github.com/shixi-11/prism-desk/releases/latest/download/Prism-arm64.dmg)或[Intel芯片版](https://github.com/shixi-11/prism-desk/releases/latest/download/Prism-x64.dmg)。打开 `.dmg`，将 Prism 拖入 Applications 文件夹即可，无需 Git 或 Node.js。Mac版有 ad-hoc 签名，但没有 Apple Developer ID 签名或公证，macOS 首次打开时可能会阻止启动。若你确认要打开，可在“系统设置 → 隐私与安全性”中允许。
 
@@ -65,7 +65,7 @@ Windows应用数据：`%APPDATA%\Prism`；独立账号：`%LOCALAPPDATA%\Prism\a
 Windows 源码构建请使用以下 PowerShell 命令，需要 Git、Node.js 22.12 或更新版本、npm，以及准备使用的官方 CLI。
 
 ```powershell
-git clone --branch v0.1.45 https://github.com/shixi-11/prism-desk.git
+git clone --branch v0.1.46 https://github.com/shixi-11/prism-desk.git
 cd prism-desk
 npm install
 npm run build
@@ -132,6 +132,8 @@ Mac开发时，在仓库和依赖已准备好的前提下运行 `npm run build &
 支持粘贴截图、拖入图片或点击图片按钮，每条最多 5 张、每张不超过 10 MB。Codex 使用原生图片输入；Claude 在订阅检查通过后使用原生图片消息，目前尚未完成已登录账号的图片实测。Grok 在 CLI 声明支持时使用直接图片输入，否则由原生 Read 工具查看附件；已用真实订阅账号验证读图。
 
 #### 消息与草稿
+
+任务模板保存在本机，并可供不同账号共用。你可以把当前草稿保存为模板，之后搜索、编辑或删除；插入时会以文字卡片加入当前任务，并保留草稿中已有内容。模板只保存文字，不包含附件或账号凭据；插入后不会自动发送，也不会自动调用技能。
 
 执行中可继续发送，排队消息依次等待，也可取消。设置中可选择 Enter 或 Ctrl/⌘+Enter 发送，以及排队或实时引导。Codex、Claude 和 Grok 均可向正在运行的原生会话发送补充要求；CLI 可能在当前生成或工具步骤结束后处理。未确认送达的消息保留等待核对。应用打开期间，切换任务会保留各自的输入草稿。
 

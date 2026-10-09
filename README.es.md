@@ -54,7 +54,7 @@ Creado por [Shixi Lin](https://shixilin.com/). Si Prism te ayuda a seguir creand
 
 ### Instalación
 
-Descarga el instalador **v0.1.45 para Windows x64** y haz doble clic en `Prism-Setup.exe`. No necesitas Git, Node.js ni npm. Como no está firmado, Windows puede mostrar una advertencia de «Editor desconocido».
+Descarga el instalador **v0.1.46 para Windows x64** y haz doble clic en `Prism-Setup.exe`. No necesitas Git, Node.js ni npm. Como no está firmado, Windows puede mostrar una advertencia de «Editor desconocido».
 
 En Mac, elige la imagen de disco según el chip: [Apple silicon](https://github.com/shixi-11/prism-desk/releases/latest/download/Prism-arm64.dmg) o [Intel](https://github.com/shixi-11/prism-desk/releases/latest/download/Prism-x64.dmg). Abre el `.dmg` y arrastra Prism a Aplicaciones. No necesitas Git ni Node.js. La app para Mac tiene una firma ad hoc, pero no una firma de Apple Developer ID ni notarización, por lo que macOS puede bloquear el primer inicio. Si confirmas que quieres abrirla, permite la apertura en Ajustes del Sistema → Privacidad y seguridad.
 
@@ -69,7 +69,7 @@ Para compilar desde el código fuente, sigue los comandos para desarrolladores. 
 Los siguientes comandos de PowerShell son solo para Windows.
 
 ```powershell
-git clone --branch v0.1.45 https://github.com/shixi-11/prism-desk.git
+git clone --branch v0.1.46 https://github.com/shixi-11/prism-desk.git
 cd prism-desk
 npm install
 npm run build
@@ -134,6 +134,8 @@ La barra superior contiene controles para mostrar u ocultar el registro de ejecu
 Pega capturas de pantalla, arrastra imágenes al cuadro de redacción o usa el botón de imagen (hasta cinco imágenes de 10 MB cada una). Codex recibe imágenes locales; Claude recibe contenido de imagen nativo cuando supera las comprobaciones de suscripción. La ejecución con imágenes en Claude aún no se ha verificado con una cuenta que haya iniciado sesión. Grok usa contenido de imagen directo cuando la CLI anuncia que lo admite; de lo contrario, su herramienta nativa Read abre las imágenes adjuntas. Esta vía se ha verificado con una cuenta de suscripción que ha iniciado sesión.
 
 #### Mensajes y borradores
+
+Las plantillas de tareas se guardan en este dispositivo y se comparten entre cuentas. Puedes guardar el borrador actual como plantilla y después buscarla, editarla o eliminarla. Al insertarla, se añade como una tarjeta de texto a la tarea actual y se conserva el resto del borrador. Las plantillas solo guardan texto, sin archivos adjuntos ni credenciales de cuenta. La inserción no envía la tarea ni activa habilidades automáticamente.
 
 Puedes enviar mensajes durante la ejecución. Los mensajes en cola mantienen su orden y se pueden cancelar. En ajustes puedes elegir Enter o Ctrl/⌘+Enter y cola o instrucciones en directo. Codex, Claude y Grok permiten enviar instrucciones a la conversación nativa activa. El CLI puede procesarlas tras la generación o el paso de herramienta actual. Los envíos sin confirmar quedan retenidos para revisión. Los borradores se conservan al cambiar de tarea en la aplicación.
 

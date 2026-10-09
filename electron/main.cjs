@@ -116,6 +116,10 @@ app.whenReady().then(() => {
   const purgedFile=path.join(dataPath(),'purged-tasks.json'),purgedTasks=new Set(updateBootstrap.read(purgedFile,[])),purgingIds=new Set();
   const cleanDrafts=value=>require('./task-purge.cjs').withoutPurged(value,purgedTasks);
   handle('saveDrafts',value=>draftWriter.save(draftFile(owner()),cleanDrafts(value)));
+  const taskTemplates=require('./task-templates.cjs');
+  handle('listTemplates',()=>taskTemplates.list());
+  handle('saveTemplate',input=>taskTemplates.save(input));
+  handle('removeTemplate',id=>taskTemplates.remove(id));
   ipcMain.on('prism:saveDrafts',(event,value)=>{
     try{const win=[...windows].find(w=>w.webContents===event.sender);if(!win||event.senderFrame!==event.sender.mainFrame)throw Error('非法调用来源');
       event.returnValue=draftWriter.flush(draftFile(win),cleanDrafts(value));

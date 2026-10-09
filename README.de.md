@@ -54,7 +54,7 @@ Entwickelt von [Shixi Lin](https://shixilin.com/). Wenn Prism Ihre Arbeit erleic
 
 ### Installation
 
-Laden Sie den **Installer v0.1.45 für Windows x64** herunter und doppelklicken Sie auf `Prism-Setup.exe`. Git, Node.js und npm sind nicht erforderlich. Da der Installer nicht signiert ist, zeigt Windows möglicherweise eine Warnung zu einem unbekannten Herausgeber an.
+Laden Sie den **Installer v0.1.46 für Windows x64** herunter und doppelklicken Sie auf `Prism-Setup.exe`. Git, Node.js und npm sind nicht erforderlich. Da der Installer nicht signiert ist, zeigt Windows möglicherweise eine Warnung zu einem unbekannten Herausgeber an.
 
 Wählen Sie auf dem Mac das Disk-Image passend zum Chip: [Apple Silicon](https://github.com/shixi-11/prism-desk/releases/latest/download/Prism-arm64.dmg) oder [Intel](https://github.com/shixi-11/prism-desk/releases/latest/download/Prism-x64.dmg). Öffnen Sie die `.dmg` und ziehen Sie Prism in den Ordner „Programme“. Git und Node.js sind nicht erforderlich. Die Mac-App hat eine Ad-hoc-Signatur, aber keine Apple-Developer-ID-Signatur und keine Notarisierung; macOS kann deshalb den ersten Start blockieren. Wenn Sie das Öffnen bestätigen, erlauben Sie es unter Systemeinstellungen → Datenschutz & Sicherheit.
 
@@ -69,7 +69,7 @@ Für Builds aus dem Quellcode folgen Sie den Entwickler-Schritten unten. Sie ben
 Die folgenden PowerShell-Befehle sind nur für Windows.
 
 ```powershell
-git clone --branch v0.1.45 https://github.com/shixi-11/prism-desk.git
+git clone --branch v0.1.46 https://github.com/shixi-11/prism-desk.git
 cd prism-desk
 npm install
 npm run build
@@ -134,6 +134,8 @@ Die obere Leiste enthält Schalter für das Ausführungsprotokoll am unteren Ran
 Fügen Sie Screenshots ein, ziehen Sie Bilder in den Eingabebereich oder verwenden Sie die Bildschaltfläche (bis zu fünf Bilder mit jeweils 10 MB). Codex erhält lokale Bilder; Claude erhält native Bildinhalte, wenn die Abonnementprüfungen erfolgreich sind. Die Ausführung mit Bildern bei Claude wurde noch nicht mit einem angemeldeten Konto überprüft. Grok verwendet direkte Bildinhalte, wenn das CLI diese Unterstützung meldet; andernfalls öffnet sein natives Werkzeug Read die angehängten Bilder. Dieser Weg wurde mit einem angemeldeten Abonnementkonto überprüft.
 
 #### Nachrichten und Entwürfe
+
+Aufgabenvorlagen werden lokal gespeichert und sind kontenübergreifend verfügbar. Sie können den aktuellen Entwurf als Vorlage speichern und Vorlagen anschließend suchen, bearbeiten oder löschen. Beim Einfügen wird eine Textkarte zur aktuellen Aufgabe hinzugefügt; der übrige Entwurf bleibt erhalten. Vorlagen speichern nur Text, keine Anhänge oder Kontozugangsdaten. Das Einfügen sendet die Aufgabe nicht und ruft keine Skills automatisch auf.
 
 Während der Ausführung können Sie weitere Nachrichten senden. Eingereihte Nachrichten behalten ihre Reihenfolge und können abgebrochen werden. Die Einstellungen bieten Enter oder Ctrl/⌘+Enter sowie Warteschlange oder Live-Anweisungen. Codex, Claude und Grok nehmen zusätzliche Anweisungen in der aktiven nativen Unterhaltung entgegen. Die CLI kann diese nach der aktuellen Generierung oder dem Werkzeugschritt verarbeiten. Unbestätigte Sendungen bleiben zur Prüfung erhalten. Entwürfe bleiben beim Aufgabenwechsel in der App erhalten.
 

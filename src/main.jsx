@@ -56,6 +56,7 @@ import {sidebarGroups} from './sidebar-groups.js';
 import SidebarTasks from './SidebarTasks.jsx';
 import {conversationMessages} from './conversation-messages.js';
 import PastedTexts from './PastedTexts.jsx';
+import TaskTemplates from './TaskTemplates.jsx';
 import {isLongPaste,pasteCard,messageText} from './pasted-text.js';
 import FastControl from './FastControl.jsx';
 const api = window.prism;
@@ -962,6 +963,7 @@ function App() {
               {task && <PermissionControl task={task} profile={init.profiles.find(p=>p.id===task.profile)} defaultMode={init.settings.defaultMode||'workspace-write'} onChange={changeMode} onDefault={async mode=>{try{await api.defaultMode(mode);setInit(old=>({...old,settings:{...old.settings,defaultMode:mode}}));}catch(e){fail(e);}}}/>}
               {task?.pendingMode&&<small className="permission-pending">{tr("下次执行生效")}</small>}
               <button title={tr("添加附件")} aria-label={tr("添加附件")} disabled={uploading||images.length>=5} onClick={()=>addImages(null)}><Paperclip size={19}/></button>
+              <button title={tr('任务模板')} aria-label={tr('任务模板')} onClick={()=>setModal('templates')}><BookOpen size={19}/></button>
               <span className="compose-spacer" />
               <FastControl task={task} profile={init.profiles.find(p=>p.id===(task?.profile||draftAccount))} draftSettings={draftSettings} onSave={async(value,id)=>{if(task){const updated=await api.modelSettings(task.id,value,id);if(current.current===updated.id)setTask(updated);}else {const saved=await api.rememberModel(id,value);setDraftSettings(old=>({...old,[id]:saved}));}}}/>
               {task&&<SessionUsage task={task} profile={init.profiles.find(p=>p.id===task.profile)} quota={quotas[task.profile]} checking={checking.includes(task.profile)} onRefresh={()=>refresh(task.profile)}/>}
@@ -1009,6 +1011,7 @@ function App() {
         disabled={busy || changingAccount || task?.state === "unknown"}
       />}
       {preview&&<PreviewPanel language={language} task={preview.task} request={preview} onClose={closePreview}/>}
+      {modal==='templates'&&<TaskTemplates Modal={Modal} draft={messageText(text,pastedTexts)} onClose={()=>setModal('')} onInsert={item=>{setPastedTexts(old=>[...old,{...pasteCard(item.body),title:item.title}]);setModal('');setToast(tr('模板已插入'));}}/>}
       {modal==='view'&&<Modal title={tr('视图设置')} onClose={()=>setModal('')}><div className="view-options"><label><input type="checkbox" checked={view.log} onChange={e=>changeView({log:e.target.checked})}/>{tr('底部执行记录')}</label><label><input type="checkbox" checked={view.inspector} onChange={e=>changeView({inspector:e.target.checked})}/>{tr('右侧账号栏')}</label></div></Modal>}
       {toast && (
         <div className="toast" role="alert">

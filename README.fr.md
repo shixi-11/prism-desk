@@ -54,7 +54,7 @@ Créé par [Shixi Lin](https://shixilin.com/). Si Prism vous aide à créer, [so
 
 ### Installation
 
-Téléchargez l’installateur **v0.1.45 pour Windows x64**, puis double-cliquez sur `Prism-Setup.exe`. Git, Node.js et npm ne sont pas nécessaires. Ce programme n’étant pas signé, Windows peut afficher un avertissement indiquant un éditeur inconnu.
+Téléchargez l’installateur **v0.1.46 pour Windows x64**, puis double-cliquez sur `Prism-Setup.exe`. Git, Node.js et npm ne sont pas nécessaires. Ce programme n’étant pas signé, Windows peut afficher un avertissement indiquant un éditeur inconnu.
 
 Sur Mac, choisissez l’image disque adaptée à la puce : [Apple silicon](https://github.com/shixi-11/prism-desk/releases/latest/download/Prism-arm64.dmg) ou [Intel](https://github.com/shixi-11/prism-desk/releases/latest/download/Prism-x64.dmg). Ouvrez le `.dmg` et faites glisser Prism dans Applications. Git et Node.js ne sont pas nécessaires. L’app Mac possède une signature ad hoc, mais pas de signature Apple Developer ID ni de notarisation ; macOS peut donc bloquer son premier lancement. Si vous confirmez vouloir l’ouvrir, autorisez-la dans Réglages Système → Confidentialité et sécurité.
 
@@ -69,7 +69,7 @@ Pour compiler depuis les sources, utilisez les commandes développeur ci-dessous
 Les commandes PowerShell suivantes sont réservées à Windows.
 
 ```powershell
-git clone --branch v0.1.45 https://github.com/shixi-11/prism-desk.git
+git clone --branch v0.1.46 https://github.com/shixi-11/prism-desk.git
 cd prism-desk
 npm install
 npm run build
@@ -134,6 +134,8 @@ La barre supérieure contient les commandes permettant d’afficher ou de masque
 Collez des captures d’écran, déposez des images dans la zone de saisie ou utilisez le bouton d’image (jusqu’à cinq images de 10 Mo chacune). Codex reçoit les images locales ; Claude reçoit du contenu image natif lorsque les vérifications de son abonnement réussissent. L’exécution avec des images sur Claude n’a pas encore été vérifiée avec un compte connecté. Grok utilise directement le contenu image lorsque le CLI annonce cette prise en charge ; sinon, son outil natif Read ouvre les images jointes. Cette méthode a été vérifiée avec un compte connecté disposant d’un abonnement.
 
 #### Messages et brouillons
+
+Les modèles de tâche sont enregistrés sur cet appareil et partagés entre les comptes. Vous pouvez enregistrer le brouillon actuel comme modèle, puis rechercher, modifier ou supprimer des modèles. L’insertion ajoute une carte de texte à la tâche en cours et conserve le reste du brouillon. Les modèles ne contiennent que du texte, sans pièce jointe ni identifiant de compte. L’insertion n’envoie pas la tâche et n’appelle pas automatiquement de compétences.
 
 Vous pouvez envoyer des messages pendant l’exécution. Les messages en attente conservent leur ordre et peuvent être annulés. Les paramètres proposent Enter ou Ctrl/⌘+Enter, ainsi que la file d’attente ou les instructions en direct. Codex, Claude et Grok acceptent des instructions dans la conversation native active. Le CLI peut les traiter après la génération ou l’étape d’outil en cours. Les envois non confirmés restent disponibles pour vérification. Les brouillons sont conservés lors du changement de tâche dans l’application.
 

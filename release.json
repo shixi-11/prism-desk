@@ -1,6 +1,6 @@
 {
-  "version": "0.1.45",
-  "date": "2026-10-09",
+  "version": "0.1.46",
+  "date": "2026-10-10",
   "distribution": [
     "windows-x64",
     "mac-arm64",
@@ -8,14 +8,12 @@
   ],
   "notes": {
     "en": [
-      "Fix source-to-installer migration so existing account references, assistant and skill sources, settings, tasks and drafts are retained without copying provider credentials. Existing installer configurations remain unchanged.",
-      "Fix a race between checking updates and verifying an installer for activation. Accept UTF-8 BOM in local configuration, and resume matching draft releases safely after interrupted publication.",
-      "Codex now starts with GPT-6.1-Sol and high reasoning. Manual model and reasoning changes are remembered for later tasks and other Codex accounts, including after restart; existing task-specific choices and per-account Fast settings remain available."
+      "Add task templates beside the message composer. Save a draft or create a template, search and edit saved instructions, and confirm before deleting a template.",
+      "Insert a template as an expandable text card while keeping the current draft. Templates are stored locally, shared across accounts, and retained after restart and source-to-installer migration. Inserting a template does not send a message; attachments and account credentials are not saved in templates."
     ],
     "zh": [
-      "修复从源码版转到安装版时未接续原配置的问题：保留已有账号入口、助手与技能来源、设置、任务和草稿，不复制模型服务的登录凭据；已有安装版配置保持不变。",
-      "修复检查更新与安装包校验同时发生时的冲突；支持带 UTF-8 BOM 的配置文件，并在发布中断后安全接续同版本的发布草稿。",
-      "Codex 初始默认使用 GPT-6.1-Sol、高思考等级。手动修改模型或思考等级后，后续任务和其他 Codex 账号沿用最近选择，重启后仍保留；已有任务单独保存的选择和各账号 Fast 设置继续保留。"
+      "在输入框旁加入任务模板入口：可将草稿保存为模板，也可新建、搜索和编辑模板，删除前需确认。",
+      "模板以可展开的文字卡片插入，保留当前草稿。本机模板供不同账号共用，重启及从源码版转到安装版后仍保留；插入不会自动发送，模板不保存附件或账号凭据。"
     ]
   }
 }
