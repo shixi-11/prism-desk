@@ -82,6 +82,9 @@ async function main() {
     assert.equal(updateStatus.distribution, process.platform === 'darwin' ? 'mac-dmg' : 'installer');
     const storageRelative = path.relative(path.resolve(root), path.resolve(initial.taskStorage));
     assert.ok(storageRelative && !storageRelative.startsWith('..') && !path.isAbsolute(storageRelative), 'Task storage must stay inside PRISM_TEST_DATA');
+    const account=await page.evaluate(()=>window.prism.saveAccount({provider:'Codex',name:'Packaged account fixture'}));
+    const accountBase=process.platform==='darwin'?path.join(home,'Library','Application Support','Prism','accounts'):path.join(local,'Prism','accounts');
+    assert.equal(path.dirname(account.home),accountBase,'New accounts must use the documented writable user directory');
 
     const smokeId = `packaged-${Date.now()}-${Math.random().toString(16).slice(2)}`;
     const taskTitle = `Packaged smoke ${smokeId}`;
@@ -111,6 +114,7 @@ async function main() {
     page = await openWindow(application);
     const restored = await page.evaluate(async () => window.prism.init());
     assert.ok(restored.tasks.some(task => task.id === created.id), 'Created task must persist across app restart');
+    assert.ok(restored.profiles.some(profile=>profile.id===account.id),'Saved account settings must persist across app restart');
     assert.equal(restored.drafts[created.id]?.text, draftText, 'UI draft must persist across app restart');
     assert.equal(await page.locator('.composer textarea').inputValue(), draftText, 'Persisted draft must be restored into the composer');
     const secondUpdateStatus = await page.evaluate(() => window.prism.updateStatus());

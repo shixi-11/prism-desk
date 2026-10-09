@@ -213,11 +213,11 @@ app.whenReady().then(() => {
   });
   handle('authorHomepage',()=>shell.openExternal('https://shixilin.com/'));
   handle('projectRepository',()=>shell.openExternal('https://github.com/shixi-11/prism-desk'));
-  handle('saveAccount',input=>{assertAccountIdle();const result=require('./accounts.cjs').saveAccount(input,path.join(dataPath(),'accounts'));broadcastAccounts();return result;});
+  handle('saveAccount',input=>{assertAccountIdle();const root=app.isPackaged?path.dirname(require('./config.cjs').defaultConfig().profiles[0].home):path.join(dataPath(),'accounts');const result=require('./accounts.cjs').saveAccount(input,root);broadcastAccounts();return result;});
   handle('enableAccount',(id,enabled)=>{assertAccountIdle();if(typeof enabled!=='boolean')throw Error('账号设置无效。');const result=require('./accounts.cjs').setEnabled(id,enabled);broadcastAccounts();return result;});
   handle('verifyAccount',async id=>{assertAccountIdle();accountOperation=true;messageQueue.paused=true;try{return await verifyAccount(id);}finally{accountOperation=false;messageQueue.paused=false;messageQueue.pump();}});
   handle('accountInstall',provider=>shell.openExternal(require('./account-providers.cjs').providerFor(provider).installUrl));
-  handle('pickAccountFile',async kind=>{if(!['directory','executable'].includes(kind))throw Error('Invalid selection');const selected=await dialog.showOpenDialog(owner(),kind==='directory'?{properties:['openDirectory']}:{properties:['openFile'],filters:[{name:'CLI',extensions:['exe']}]});return selected.canceled?null:selected.filePaths[0];});
+  handle('pickAccountFile',async kind=>{if(!['directory','executable'].includes(kind))throw Error('Invalid selection');const selected=await dialog.showOpenDialog(owner(),kind==='directory'?{properties:['openDirectory']}:{properties:['openFile'],...(process.platform==='win32'?{filters:[{name:'CLI',extensions:['exe']}]}:{})});return selected.canceled?null:selected.filePaths[0];});
   handle('startAccountLogin',id=>{
     assertAccountIdle();const profile=PROFILES.find(p=>p.id===id);if(!profile)throw Error('账号不存在。');
     require('./account-providers.cjs').providerFor(profile.provider);
