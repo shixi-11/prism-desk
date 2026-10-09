@@ -32,10 +32,29 @@ async function main() {
     if (isBundle) {
       // Run a private copy so this smoke test cannot collide with a user's installed instance.
       stagedBundle = path.join(root, path.basename(target));
-      fs.cpSync(target, stagedBundle, { recursive: true, preserveTimestamps: true });
+      fs.cpSync(target, stagedBundle, { recursive: true, preserveTimestamps: true, verbatimSymlinks: true });
+      execFileSync('codesign', ['--verify', '--deep', '--strict', stagedBundle], { stdio: 'inherit' });
       executablePath = bundleExecutable(stagedBundle);
     }
-    const env = { ...process.env, PRISM_TEST_DATA: root, PRISM_TEST_HIDE: '1' };
+    const home = path.join(root, 'home');
+    const local = path.join(home, 'AppData', 'Local');
+    const roaming = path.join(home, 'AppData', 'Roaming');
+    const temp = path.join(root, 'tmp');
+    for (const directory of [home, local, roaming, temp, path.join(root, 'xdg-config'), path.join(root, 'xdg-data')]) fs.mkdirSync(directory, { recursive: true });
+    const env = {
+      ...process.env,
+      HOME: home,
+      USERPROFILE: home,
+      LOCALAPPDATA: local,
+      APPDATA: roaming,
+      TMPDIR: temp,
+      TEMP: temp,
+      TMP: temp,
+      XDG_CONFIG_HOME: path.join(root, 'xdg-config'),
+      XDG_DATA_HOME: path.join(root, 'xdg-data'),
+      PRISM_TEST_DATA: root,
+      PRISM_TEST_HIDE: '1',
+    };
     const { _electron } = playwright();
     const launch = () => _electron.launch({ executablePath, env, timeout: 60000 });
     const openWindow = async app => {
@@ -67,11 +86,25 @@ async function main() {
     const taskTitle = `Packaged smoke ${smokeId}`;
     const created = await page.evaluate(async ({ id, title }) => window.prism.create({ title, mode: 'read-only' }), { id: smokeId, title: taskTitle });
     assert.equal(typeof created.id, 'string', 'window.prism.create must create a real task');
-    await page.getByRole('button', { name: taskTitle, exact: true }).click();
+    const sectionButtons = page.locator('.sidebar-section-toggle');
+    const recentIndex = await sectionButtons.evaluateAll(buttons => buttons.findIndex(button => /recent|最近/i.test(button.querySelector('span')?.textContent || '')));
+    assert.ok(recentIndex >= 0, 'Task sidebar must expose the recent section');
+    await sectionButtons.nth(recentIndex).click();
+    const taskEntry = page.getByRole('button', { name: taskTitle, exact: true });
+    await taskEntry.waitFor({ state: 'visible', timeout: 10000 });
+    await taskEntry.click();
     const composer = page.locator('.composer textarea');
     const draftText = `packaged persistence check ${smokeId}`;
     await composer.fill(draftText);
-    await page.waitForFunction(async ({ id, text }) => (await window.prism.init()).drafts[id]?.text === text, { id: created.id, text: draftText }, { timeout: 10000 });
+    const draftFile = path.join(root, 'drafts', 'primary.json');
+    const saveDeadline = Date.now() + 10000;
+    let persistedDraft;
+    while (Date.now() < saveDeadline) {
+      try { persistedDraft = JSON.parse(fs.readFileSync(draftFile, 'utf8'))[created.id]; } catch {}
+      if (persistedDraft?.text === draftText) break;
+      await new Promise(resolve => setTimeout(resolve, 100));
+    }
+    assert.equal(persistedDraft?.text, draftText, 'Composer autosave must persist the UI draft before restart');
 
     await application.close();
     application = await launch();
@@ -83,12 +116,13 @@ async function main() {
     const secondUpdateStatus = await page.evaluate(() => window.prism.updateStatus());
     assert.equal(secondUpdateStatus.distribution, updateStatus.distribution);
     const updateButtons = page.locator('button[aria-label]');
-    const updateButtonIndex = await updateButtons.evaluateAll(buttons => buttons.findIndex(button => /update|更新|アップデート|更新を確認/i.test(button.getAttribute('aria-label') || '')));
+    const updateButtonIndex = await updateButtons.evaluateAll(buttons => buttons.findIndex(button => /update|actualiz|mise à jour|mise a jour|更新|アップデート|更新を確認|업데이트/i.test(button.getAttribute('aria-label') || '')));
     assert.ok(updateButtonIndex >= 0, 'Packaged UI must expose the update settings entry');
     await updateButtons.nth(updateButtonIndex).click();
     const versionLabel = page.locator('.update-settings .update-version').first();
     await versionLabel.waitFor({ state: 'visible', timeout: 10000 });
-    assert.match(await versionLabel.innerText(), new RegExp(`v${info.version.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`));
+    await page.waitForFunction(version => document.querySelector('.update-settings .update-version')?.textContent.includes(version), info.version, { timeout: 10000 });
+    assert.ok((await versionLabel.innerText()).includes(info.version), 'Update settings must show the packaged app version');
 
     const commit = process.env.GITHUB_SHA || execFileSync('git', ['rev-parse', 'HEAD'], { cwd: path.resolve(__dirname, '..'), encoding: 'utf8' }).trim();
     const metadata = { version: info.version, commit, arch: info.arch };
@@ -103,7 +137,11 @@ async function main() {
     if (application) await application.close().catch(() => {});
     const resolved = fs.realpathSync.native(root);
     if (path.dirname(resolved) !== fs.realpathSync.native(os.tmpdir())) throw Error('Refusing to remove smoke data outside the temporary directory.');
-    fs.rmSync(resolved, { recursive: true, force: true });
+    try { fs.rmSync(resolved, { recursive: true, force: true, maxRetries: 12, retryDelay: 250 }); }
+    catch (error) {
+      if (process.platform !== 'win32' || !['EPERM', 'EBUSY', 'ENOTEMPTY'].includes(error.code)) throw error;
+      process.stderr.write('Smoke checks passed; Windows kept the isolated temporary directory because an OS file handle was still active.\n');
+    }
   }
 }
 

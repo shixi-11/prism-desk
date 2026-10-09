@@ -6,7 +6,7 @@ const path = require('node:path');
 const { defaultConfig } = require('../electron/config.cjs');
 const { resolveExecutable } = require('../electron/discovery.cjs');
 const { childEnv, spawnCLI } = require('../electron/core.cjs');
-const { spawnUnix, confirmedStop } = require('../electron/unix-process.cjs');
+const { spawnUnix, confirmedStop, groupRunning } = require('../electron/unix-process.cjs');
 const { providerFor } = require('../electron/account-providers.cjs');
 
 test('platform parameter selects native CLI names and macOS account root', () => {
@@ -67,7 +67,14 @@ test('Unix stop targets the execution process group and confirms it has exited',
   const closed = new Promise(resolve => proc.once('close', resolve));
   await proc.requestStop();
   assert.equal(await closed, null);
-  assert.throws(() => process.kill(-proc.pid, 0), { code: 'ESRCH' });
+  assert.equal(groupRunning(proc.pid),false,'No running descendant may remain in the isolated process group');
+});
+test('process group verification distinguishes live descendants, zombies and unrelated groups',()=>{
+  const inspect=()=> '101 100 S\n102 100 Z\n201 200 S\n';
+  assert.equal(groupRunning(100,inspect),true);
+  assert.equal(groupRunning(300,inspect),false);
+  assert.equal(groupRunning(100,()=> '102 100 Z\n201 200 S\n'),false);
+  assert.throws(()=>groupRunning(100,()=>{throw Error('ps unavailable');}));
 });
 
 test('spawnCLI platform injection uses Unix process groups without a Windows host', { skip: process.platform === 'win32' }, async t => {
