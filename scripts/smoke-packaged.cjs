@@ -76,6 +76,8 @@ async function main() {
     assert.equal(initial.capabilities?.taichu?.exists, false, 'Smoke data must not load a configured assistant');
     assert.equal(initial.capabilities?.taichu?.path, '', 'Smoke data must not expose a private assistant path');
     assert.ok(initial.profiles.every(profile => !('home' in profile) && !('executable' in profile)), 'Init must not expose account directories or executable paths');
+    assert.equal(initial.profiles.find(p=>p.provider==='Codex').model,'gpt-6.1-sol');
+    assert.equal(initial.profiles.find(p=>p.provider==='Codex').effort,'high');
     assert.ok(!('assistant' in initial.settings), 'Init must not load private assistant settings');
     const updateStatus = await page.evaluate(() => window.prism.updateStatus());
     assert.equal(updateStatus.version, info.version);

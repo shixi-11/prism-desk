@@ -9,11 +9,13 @@
   "notes": {
     "en": [
       "Fix source-to-installer migration so existing account references, assistant and skill sources, settings, tasks and drafts are retained without copying provider credentials. Existing installer configurations remain unchanged.",
-      "Fix a race between checking updates and verifying an installer for activation. Accept UTF-8 BOM in local configuration, and resume matching draft releases safely after interrupted publication."
+      "Fix a race between checking updates and verifying an installer for activation. Accept UTF-8 BOM in local configuration, and resume matching draft releases safely after interrupted publication.",
+      "Codex now starts with GPT-6.1-Sol and high reasoning. Manual model and reasoning changes are remembered for later tasks and other Codex accounts, including after restart; existing task-specific choices and per-account Fast settings remain available."
     ],
     "zh": [
       "修复从源码版转到安装版时未接续原配置的问题：保留已有账号入口、助手与技能来源、设置、任务和草稿，不复制模型服务的登录凭据；已有安装版配置保持不变。",
-      "修复检查更新与安装包校验同时发生时的冲突；支持带 UTF-8 BOM 的配置文件，并在发布中断后安全接续同版本的发布草稿。"
+      "修复检查更新与安装包校验同时发生时的冲突；支持带 UTF-8 BOM 的配置文件，并在发布中断后安全接续同版本的发布草稿。",
+      "Codex 初始默认使用 GPT-6.1-Sol、高思考等级。手动修改模型或思考等级后，后续任务和其他 Codex 账号沿用最近选择，重启后仍保留；已有任务单独保存的选择和各账号 Fast 设置继续保留。"
     ]
   }
 }

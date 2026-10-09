@@ -237,9 +237,9 @@ function NewTask({ onClose, onCreate, initialCwd="", projects=[], projectNames={
 function ModelControls({task,profile,disabled,onSave}) {
   const [catalog,setCatalog]=useState(null),[error,setError]=useState(''),[busy,setBusy]=useState(false);
   useEffect(()=>{let live=true;setCatalog(null);setError('');api.models(profile.id).then(v=>{if(live)setCatalog(v);}).catch(e=>{if(live)setError(e.message);});return()=>{live=false;};},[profile.id]);
-  const saved=task.modelSettings?.[profile.id];const current=saved?.model||(profile.provider==='Codex'?'gpt-6-astra':profile.model);
+  const saved=task.modelSettings?.[profile.id];const current=saved?.model||profile.model;
   const model=catalog?.models.find(m=>m.id===current);
-  const effort=saved?.effort||(profile.provider==='Codex'?'low':profile.provider==='Gemini'?'auto':'high');
+  const effort=saved?.effort||(profile.effort||(profile.provider==='Gemini'?'auto':'high'));
   const labels={auto:tr("模型自动管理"),low:tr("低"),medium:tr("中"),high:tr("高"),xhigh:tr("更高"),max:tr("最高"),ultra:tr("极高"),minimal:tr("最少"),none:tr("无")};
   const serviceTier=saved?.serviceTier||'default';
   async function save(model,effort,tier=serviceTier){setBusy(true);setError('');try{await onSave({model,effort,...(profile.provider==='Codex'?{serviceTier:tier}:{})});}catch(e){setError(e.message);}finally{setBusy(false);}}
@@ -644,7 +644,7 @@ function App() {
       if(type==='capabilities'){setInit(old=>old?{...old,capabilities:value}:old);return;}
       if(type==='projects'){setInit(old=>old?{...old,settings:{...old.settings,...value}}:old);return;}
       if(type==='app-update'){setAppUpdate(value);return;}
-      if(type==='accounts'){setInit(old=>old?{...old,profiles:value}:old);if(!current.current)setDraftAccount(old=>value.some(p=>p.id===old&&!p.disabled)?old:value.find(p=>!p.disabled)?.id||'');return;}
+      if(type==='accounts'){setInit(old=>old?{...old,profiles:value}:old);setDraftSettings(old=>Object.fromEntries(Object.entries(old).map(([id,saved])=>{const p=value.find(p=>p.id===id);return [id,p?.provider==='Codex'?{...saved,model:p.model,effort:p.effort}:saved];})));if(!current.current)setDraftAccount(old=>value.some(p=>p.id===old&&!p.disabled)?old:value.find(p=>!p.disabled)?.id||'');return;}
       if(type==='account-login'){setAccountLogins(old=>({...old,[value.id]:value}));return;}
       if(type==='tasks-purged'){for(const id of value)delete drafts.current[id];return;}
       if(type==='task-list'){setInit(old=>old?{...old,...value}:old);const selected=value.tasks.find(t=>t.id===current.current);if(selected)setTask(selected);else if(current.current){++loadSequence.current;current.current=null;setTask(null);setEvents([]);setText('');setImages([]);setPastedTexts([]);setOpenedPaste(null);setStreaming('');setThinking('');setActivity('');}return;}
@@ -963,7 +963,7 @@ function App() {
               {task?.pendingMode&&<small className="permission-pending">{tr("下次执行生效")}</small>}
               <button title={tr("添加附件")} aria-label={tr("添加附件")} disabled={uploading||images.length>=5} onClick={()=>addImages(null)}><Paperclip size={19}/></button>
               <span className="compose-spacer" />
-              <FastControl task={task} profile={init.profiles.find(p=>p.id===(task?.profile||draftAccount))} draftSettings={draftSettings} onSave={async(value,id)=>{if(task){const updated=await api.modelSettings(task.id,value,id);if(current.current===updated.id)setTask(updated);}else setDraftSettings(old=>({...old,[id]:value}));}}/>
+              <FastControl task={task} profile={init.profiles.find(p=>p.id===(task?.profile||draftAccount))} draftSettings={draftSettings} onSave={async(value,id)=>{if(task){const updated=await api.modelSettings(task.id,value,id);if(current.current===updated.id)setTask(updated);}else {const saved=await api.rememberModel(id,value);setDraftSettings(old=>({...old,[id]:saved}));}}}/>
               {task&&<SessionUsage task={task} profile={init.profiles.find(p=>p.id===task.profile)} quota={quotas[task.profile]} checking={checking.includes(task.profile)} onRefresh={()=>refresh(task.profile)}/>}
               <ComposerSubmit key={task?.id||'draft'} busy={busy} stopping={task?.state==='stopping'} hasDraft={!!text.trim()||!!pastedTexts.length||!!images.length} onSend={send} onStop={()=>api.stop(task.id).catch(fail)} sendLabel={busy?(init.settings.busySend==='steer'?'引导':'排队'):'发送'} disabled={(!text.trim()&&!pastedTexts.length&&!images.length) || sending || uploading || changingAccount || task?.goalLifecycle?.status==='paused' || task?.state === "unknown" || !!task&&(!init.profiles.find(p=>p.id===task.profile)||init.profiles.find(p=>p.id===task.profile)?.disabled) || Object.values(accountLogins).some(s=>['starting','waiting','verifying'].includes(s.phase))}/>
             </div>
@@ -1000,7 +1000,7 @@ function App() {
         waiting={queue.some(i=>i.taskId===task?.id&&i.status==='waiting')&&!busy}
         onSelectAccount={async target=>{setChangingAccount(true);try{const updated=await api.switch(task.id,target);if(current.current===updated.id)setTask(updated);setInit(old=>({...old,tasks:old.tasks.map(t=>t.id===updated.id?updated:t)}));}catch(error){fail(error);throw error;}finally{setChangingAccount(false);}}}
         onCapabilities={() => setModal("capabilities")}
-        onModelSettings={async(settings,id)=>{if(task){const updated=await api.modelSettings(task.id,settings,id);if(current.current===updated.id)setTask(updated);}else setDraftSettings(old=>({...old,[id]:settings}));if(init.profiles.find(p=>p.id===id)?.provider==='Claude')await refresh(id,settings.model);}}
+        onModelSettings={async(settings,id)=>{if(task){const updated=await api.modelSettings(task.id,settings,id);if(current.current===updated.id)setTask(updated);}else {const saved=await api.rememberModel(id,settings);setDraftSettings(old=>({...old,[id]:saved}));}if(init.profiles.find(p=>p.id===id)?.provider==='Claude')await refresh(id,settings.model);}}
         draftSettings={draftSettings}
         storage={init.taskStorage}
         onHandoff={async id=>{try{await api.stopAndContinue(task.id,id);}catch(e){fail(e);}}}

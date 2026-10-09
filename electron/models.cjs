@@ -16,7 +16,7 @@ async function readModelOptions(id,cwd){
  if(!models.length)throw Error('CLI 未返回可选择的模型');
  const value={models,note:p.provider==='Gemini'?'由 Gemini CLI 自动选模；暂不提供独立思考等级':p.provider==='Claude'?'官方模型别名；实际可用性由订阅与组织权限决定':p.provider==='Grok'?'来自当前 CLI；思考等级暂提供已验证的 high':'来自当前 CLI 模型目录；实际调用仍受账号权限限制'};return value;
 }
-function selection(task,profile){const saved=task.modelSettings?.[profile.id];return {...profile,model:saved?.model||(profile.provider==='Codex'?'gpt-6-astra':profile.model),effort:saved?.effort||(profile.provider==='Codex'?'low':profile.provider==='Gemini'?'auto':'high'),...(profile.provider==='Codex'?{serviceTier:saved?.serviceTier||'default'}:{})};}
+function selection(task,profile){const saved=task.modelSettings?.[profile.id],preferred=require('./model-preferences.cjs').defaults(profile.provider);return {...profile,model:saved?.model||preferred?.model||profile.model,effort:saved?.effort||preferred?.effort||(profile.provider==='Gemini'?'auto':'high'),...(profile.provider==='Codex'?{serviceTier:saved?.serviceTier||'default'}:{})};}
 async function validateSelection(profileId,cwd,input){
  if(!input||typeof input.model!=='string'||typeof input.effort!=='string')throw Error('模型设置无效');
  const profile=profileFor(profileId),list=await modelOptions(profileId,cwd),model=list.models.find(m=>m.id===input.model);
@@ -28,7 +28,11 @@ async function validateSelection(profileId,cwd,input){
 async function saveSelection(store,task,input,beforeSave=()=>{},profileId=task.profile){
  const value=await validateSelection(profileId,task.cwd,input);
  const current=store.get(task.id);if(current.profile!==task.profile)throw Error('账号已改变，请重新选择模型');task=current;beforeSave(task);
- task.modelSettings={...task.modelSettings,[profileId]:value};task.pendingModelRefresh={...task.pendingModelRefresh,[profileId]:true};return store.save(task);
+ const profile=profileFor(profileId),previous=selection(task,profile);
+ task.modelSettings={...task.modelSettings,[profileId]:value};task.pendingModelRefresh={...task.pendingModelRefresh,[profileId]:true};const updated=store.save(task);
+ if(previous.model!==value.model||previous.effort!==value.effort)require('./model-preferences.cjs').remember(profile,value);
+ return updated;
 }
+async function rememberSelection(profileId,cwd,input){const value=await validateSelection(profileId,cwd,input);require('./model-preferences.cjs').remember(profileFor(profileId),value);return value;}
 async function updateSelectionForRunner(store,runner,id,input,profileId){const updated=await saveSelection(store,store.get(id),input,()=>{},profileId);if(runner.active?.task.id===id){runner.active.task.modelSettings=updated.modelSettings;runner.active.task.pendingModelRefresh=updated.pendingModelRefresh;}return updated;}
-module.exports={modelOptions,selection,saveSelection,validateSelection,fastServiceTier,updateSelectionForRunner,invalidate:id=>{cache.delete(id);pending.delete(id);}};
+module.exports={modelOptions,selection,saveSelection,rememberSelection,validateSelection,fastServiceTier,updateSelectionForRunner,invalidate:id=>{cache.delete(id);pending.delete(id);}};

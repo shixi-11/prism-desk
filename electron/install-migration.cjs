@@ -78,7 +78,7 @@ function importKnownFiles(sourceData, userData, configDir) {
       atomic(to, [...new Set([...source, ...existing])]);
     } else atomic(to, fs.existsSync(to) ? { ...source, ...readJson(to) } : source);
   }
-  for (const name of ['shared-capabilities.json', 'plugin-inventory.json']) {
+  for (const name of ['shared-capabilities.json', 'plugin-inventory.json', 'model-preferences.json']) {
     const from = path.join(configDir, name), to = path.join(userData, name);
     if (!fs.existsSync(from) || fs.existsSync(to)) continue;
     assertNotLink(from); assertNotLink(to);

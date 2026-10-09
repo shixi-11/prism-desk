@@ -142,7 +142,7 @@ app.whenReady().then(() => {
     archivedTasks:store.list('archived'),deletedTasks:store.list('deleted'),
     accountLogins:Object.fromEntries(accountLoginStates),
     quotas:quotaDisplay.snapshot(PROFILES),
-    profiles: PROFILES.map(({ home, executable, ...p }) => p),
+    profiles: publicProfiles(),
     settings: settings(),
     queue:messageQueue.items,
     taskStorage:store.root,
@@ -194,7 +194,7 @@ app.whenReady().then(() => {
     }catch{}finally{autoUpdating=false;}
   }
   if(!process.env.PRISM_TEST_DATA){setTimeout(autoUpdate,60000).unref();setInterval(autoUpdate,30000).unref();}
-  const publicProfiles=()=>PROFILES.map(({home,executable,...p})=>p);
+  const publicProfiles=()=>PROFILES.map(({home,executable,...p})=>({...p,...require('./model-preferences.cjs').defaults(p.provider)}));
   const broadcastAccounts=()=>emit('accounts',publicProfiles());
   const assertAccountIdle=()=>{if(runner.active||accountOperation||accountQueries||resetInProgress||store.list().some(t=>['running','stopping','unknown'].includes(t.state)))throw Error('请等待当前执行或账号操作结束。');};
   const loginState=(id,state)=>{const value={id,...state};accountLoginStates.set(id,value);emit('account-login',value);};
@@ -419,7 +419,8 @@ app.whenReady().then(() => {
     }finally{resetInProgress=false;}
   });
   handle('models',id=>{if(accountOperation)throw Error('请等待账号操作结束。');return require('./models.cjs').modelOptions(id,app.getAppPath());});
-  handle('modelSettings',(id,input,profileId)=>{if(accountOperation)throw Error('请等待账号操作结束。');return require('./models.cjs').updateSelectionForRunner(store,runner.forTask(id),id,input,profileId);});
+  handle('modelSettings',async(id,input,profileId)=>{if(accountOperation)throw Error('请等待账号操作结束。');const task=await require('./models.cjs').updateSelectionForRunner(store,runner.forTask(id),id,input,profileId);broadcastAccounts();return task;});
+  handle('rememberModel',async(id,input)=>{if(accountOperation)throw Error('请等待账号操作结束。');const value=await require('./models.cjs').rememberSelection(id,app.getAppPath(),input);broadcastAccounts();return value;});
   handle("run", async (id, text, imageIds=[], choiceEventId) => {
     if(accountOperation)throw Error('请先完成或取消账号登录。');
     if(validatingApps)throw Error('请等待本机应用验证结束');

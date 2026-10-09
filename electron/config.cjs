@@ -13,7 +13,7 @@ function defaultConfig(env = process.env, platform = process.platform) {
   const accountRoot = path.join(local, 'Prism', 'accounts');
   const suffix = platform === 'win32' ? '.exe' : '';
   const definitions = [
-    ['Codex', `codex${suffix}`, 'gpt-6-astra', true],
+    ['Codex', `codex${suffix}`, 'gpt-6.1-sol', true],
     ['Claude', `claude${suffix}`, 'opus', true],
     ['Grok', `grok${suffix}`, 'grok-4.6', true],
   ];

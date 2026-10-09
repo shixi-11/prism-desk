@@ -22,8 +22,9 @@ test('unconfigured install has generic isolated accounts and no personal assista
   assert.deepEqual(config.assistant,{path:'',instructions:''});
   assert.equal(config.skillsPath,'');
   assert.equal(config.geminiEntry,'');
+  const accountRoot=process.platform==='darwin'?path.join(root,'Library','Application Support','Prism','accounts'):process.platform==='win32'?path.join(env.LOCALAPPDATA,'Prism','accounts'):path.join(root,'.local','share','Prism','accounts');
   for(const p of config.profiles) {
-    assert.ok(p.home.startsWith(env.LOCALAPPDATA));
+    assert.equal(path.dirname(p.home),accountRoot);
     assert.match(p.id,/^(codex|claude|grok|gemini)-personal-1$/);
     assert.ok(!p.home.includes('@'));
   }

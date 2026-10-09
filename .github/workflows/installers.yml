@@ -27,7 +27,7 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run build:installer
-      - run: node --test tests/unix-process.test.cjs tests/release.test.cjs tests/installer-updater.test.cjs tests/install-migration.test.cjs tests/config.test.cjs
+      - run: node --test tests/unix-process.test.cjs tests/release.test.cjs tests/installer-updater.test.cjs tests/install-migration.test.cjs tests/config.test.cjs tests/model-preferences.test.cjs tests/model-defaults.test.cjs tests/settings.test.cjs tests/fast-mode.test.cjs
       - name: Verify, mount, and smoke test the packaged app
         shell: bash
         env:
