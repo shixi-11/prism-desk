@@ -115,7 +115,7 @@ async function main() {
       },path.join(root,'native-shortcut-check'));
       for(const [index,name] of ['棱镜','Prism'].entries())for(const shortcut of shortcuts.snapshots[index]){
         assert.deepEqual(shortcut.files,[name+'.lnk']);
-        assert.equal(shortcut.link.target.toLowerCase(),shortcuts.target.toLowerCase());
+        assert.equal(fs.realpathSync.native(shortcut.link.target).toLowerCase(),fs.realpathSync.native(shortcuts.target).toLowerCase());
         assert.equal(shortcut.link.appUserModelId,'org.prismdesk.desktop');
       }
     }

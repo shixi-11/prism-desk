@@ -7,7 +7,8 @@ function register(app,shell,root,language='zh',execFileSync=require('node:child_
  if(!registered)throw Error('Could not register Prism task links.');
  const name=require('./branding.cjs').name(language);
  const options={target,cwd:app.isPackaged?path.dirname(target):root,args:app.isPackaged?'':`"${root}" --user-data-dir="${app.getPath('userData')}"`,description:name,icon:target,iconIndex:0,appUserModelId:appId(false)};
- const same=(a,b)=>path.resolve(a).toLowerCase()===path.resolve(b).toLowerCase();
+ const identity=value=>{try{return fs.realpathSync.native(value).toLowerCase();}catch{return path.resolve(value).toLowerCase();}};
+ const same=(a,b)=>identity(a)===identity(b);
  const owned=file=>{try{const previous=shell.readShortcutLink(file);return same(previous.target,target)&&(app.isPackaged||(previous.args||'').startsWith(`"${root}" `));}catch{return false;}};
  const updates=[];
  for(const [directory,create] of [[path.join(app.getPath('appData'),'Microsoft','Windows','Start Menu','Programs'),!app.isPackaged],[app.getPath('desktop'),false]]){

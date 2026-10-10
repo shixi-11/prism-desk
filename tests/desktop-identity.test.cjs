@@ -43,3 +43,10 @@ test('source edition retains its arguments and never adopts shortcuts from anoth
  assert.equal(shortcut.args,`"${f.root}" --user-data-dir="${f.directories.userData}"`);
  assert.equal(fs.readFileSync(other,'utf8'),original);
 });
+test('an alternate path to the same installed executable still owns its existing shortcuts',t=>{
+ const f=fixture(t);f.link(f.menu,'Prism Desk');f.link(f.directories.desktop,'Prism Desk');
+ const alias=path.join(f.root,'alias-install');fs.symlinkSync(path.dirname(f.target),alias,'junction');
+ const original=f.app.getPath;f.app.getPath=key=>key==='exe'?path.join(alias,'Prism.exe'):original(key);
+ register(f.app,f.shell,f.root,'zh',()=>{});
+ for(const folder of [f.menu,f.directories.desktop])assert.deepEqual(fs.readdirSync(folder),['棱镜.lnk']);
+});
