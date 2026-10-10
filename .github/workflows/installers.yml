@@ -1,4 +1,4 @@
-name: Native macOS installer smoke
+name: Native installer smoke
 
 on:
   workflow_dispatch:
@@ -7,6 +7,27 @@ permissions:
   contents: read
 
 jobs:
+  windows-installer:
+    name: Windows x64
+    runs-on: windows-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run build:installer
+      - run: npm install --no-save --ignore-scripts playwright
+      - run: node scripts/smoke-windows-installer.cjs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows-x64
+          path: |
+            .local/installer/Prism-Setup.exe
+            .local/installer/metadata.json
+          retention-days: 3
   mac-installer:
     name: macOS ${{ matrix.arch }}
     timeout-minutes: 20

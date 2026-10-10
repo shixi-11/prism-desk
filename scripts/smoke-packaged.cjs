@@ -83,6 +83,10 @@ async function main() {
     assert.equal(info.version, expectedVersion, 'Packaged app version must match package.json');
 
     const initial = await page.evaluate(() => window.prism.init());
+    if(process.platform==='win32'){
+      const marker=path.join(path.dirname(executablePath),'prism-install-language.txt');
+      if(fs.existsSync(marker))assert.equal(initial.settings.language,{'1033':'en','2052':'zh','1028':'zh-TW'}[fs.readFileSync(marker,'utf8').trim()],'A new data directory must use the actual installer language');
+    }
     const initialData=await application.evaluate(({app})=>app.getPath('userData'));
     await page.locator('.language-toggle').selectOption('en');
     await waitForTitle('Prism');
