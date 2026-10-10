@@ -50,11 +50,13 @@
 
 由[光之十一](https://shixilin.com/)创作。 如果棱镜让你更顺畅地投入创作，欢迎[支持后续开发](https://shixilin.com/support?lang=zh)。
 
+<a id="install"></a>
+
 ### 安装
 
 下载 **v0.1.47 Windows 64位安装包**，双击 `Prism-Setup.exe` 即可安装。安装棱镜无需 Git、Node.js 或 npm。由于安装包尚未签名，Windows 可能显示“未知发布者”提示。
 
-Windows 使用同一个安装包，可选择 English、简体中文或繁體中文；中文界面名称为“棱镜”，其他语言显示为“Prism”。仅在尚未保存界面语言时，首次界面语言才采用安装时的选择；升级后仍保留已保存的界面语言。Mac 的 Finder 应用名称会随系统语言显示。
+Windows 使用同一个安装包，可选择英文、简体中文或繁体中文。中文名称为“棱镜”，其他语言显示为“Prism”。首次安装采用所选语言，升级时保留已有的界面语言设置。Mac 中的应用名称随系统语言显示。
 
 Mac用户按芯片下载：[Apple芯片版](https://github.com/shixi-11/prism-desk/releases/latest/download/Prism-arm64.dmg)或[Intel芯片版](https://github.com/shixi-11/prism-desk/releases/latest/download/Prism-x64.dmg)。打开 `.dmg`，将 Prism 拖入 Applications 文件夹即可，无需 Git 或 Node.js。Mac版有 ad-hoc 签名，但没有 Apple Developer ID 签名或公证，macOS 首次打开时可能会阻止启动。若你确认要打开，可在“系统设置 → 隐私与安全性”中允许。
 
