@@ -31,9 +31,9 @@ function assertData(){for(const [file,content] of preserved)assert.equal(fs.read
  cp.execFileSync(process.execPath,['scripts/smoke-packaged.cjs',path.join(target,'Prism.exe'),'--metadata',path.resolve('.local/installer/metadata.json')],{stdio:'inherit',windowsHide:true,timeout:180000});
  cp.execFileSync(path.join(target,'Uninstall Prism.exe'),['/S'],{stdio:'inherit',windowsHide:true,timeout:180000});
  const deadline=Date.now()+30000;
- while(fs.existsSync(path.join(target,'Prism.exe'))&&Date.now()<deadline)await new Promise(resolve=>setTimeout(resolve,200));
+ while((fs.existsSync(path.join(target,'Prism.exe'))||[menu,desktop].some(folder=>fs.existsSync(path.join(folder,'棱镜.lnk'))))&&Date.now()<deadline)await new Promise(resolve=>setTimeout(resolve,200));
  assert.ok(!fs.existsSync(path.join(target,'Prism.exe')),'Uninstaller must remove its own program');
  for(const folder of [menu,desktop])assert.ok(!fs.existsSync(path.join(folder,'棱镜.lnk')),'Uninstaller must remove the localized shortcut');
  assertData();
  console.log('Verified three installer languages, shortcut upgrades, real app startup, and data-preserving uninstall.');
-})().catch(error=>{console.error(error.stack);process.exitCode=1;});
+})().catch(error=>{console.error(error.stack);console.error(JSON.stringify({status:error.status,signal:error.signal,code:error.code,installed:fs.existsSync(target)?fs.readdirSync(target):[],stdout:error.stdout?.toString(),stderr:error.stderr?.toString()}));process.exitCode=1;});

@@ -2,12 +2,19 @@ name: Native installer smoke
 
 on:
   workflow_dispatch:
+    inputs:
+      platform:
+        description: Installer checks to run
+        type: choice
+        options: [all, windows, macos]
+        default: all
 
 permissions:
   contents: read
 
 jobs:
   windows-installer:
+    if: inputs.platform != 'macos'
     name: Windows x64
     runs-on: windows-latest
     timeout-minutes: 20
@@ -29,6 +36,7 @@ jobs:
             .local/installer/metadata.json
           retention-days: 3
   mac-installer:
+    if: inputs.platform != 'windows'
     name: macOS ${{ matrix.arch }}
     timeout-minutes: 20
     strategy:
