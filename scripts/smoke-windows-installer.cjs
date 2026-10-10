@@ -21,7 +21,10 @@ function assertData(){for(const [file,content] of preserved)assert.equal(fs.read
   cp.execFileSync(installer,['/S','/D='+target],{stdio:'inherit',windowsHide:true,timeout:180000});
   assert.equal(fs.readFileSync(path.join(target,'prism-install-language.txt'),'utf8').trim(),code,'Silent upgrade must read the saved installer language from the x64 registry');
   assert.equal(fs.readFileSync(path.join(target,'prism-install-key.txt'),'utf8').trim(),key.slice(5));
-  assert.match(reg(['query',key,'/v','ShortcutName','/reg:64']),new RegExp('REG_SZ\\s+'+name+'\\s*$'));
+  // reg query loses Chinese text on an English Windows console; .reg exports use UTF-16.
+  const registryExport=path.join(root,'installed.reg');
+  reg(['export',key,registryExport,'/y']);
+  assert.ok(fs.readFileSync(registryExport,'utf16le').includes(`"ShortcutName"="${name}"`),'The installed registry name must match the selected language');
   for(const folder of [menu,desktop]){
    assert.ok(fs.existsSync(path.join(folder,name+'.lnk')),'The selected language must name the actual installed shortcut');
    for(const alias of ['棱镜','Prism','Prism Desk'])if(alias!==name)assert.ok(!fs.existsSync(path.join(folder,alias+'.lnk')),'An upgrade must not leave duplicate shortcuts');
