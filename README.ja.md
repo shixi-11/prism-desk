@@ -1,6 +1,6 @@
-# Prism Desk · 棱镜
+# Prism · 棱镜
 
-<img src="src/assets/prism-icon.svg" width="80" height="80" alt="Prism Desk">
+<img src="src/assets/prism-icon.svg" width="80" height="80" alt="Prism">
 
 [English](README.md) · [简体中文](README.zh-CN.md) · [繁體中文](README.zh-TW.md) · [日本語](README.ja.md) · [한국어](README.ko.md) · [Español](README.es.md) · [Français](README.fr.md) · [Deutsch](README.de.md) · [العربية](README.ar.md)
 
@@ -54,7 +54,9 @@
 
 ### インストール
 
-**v0.1.46 Windows x64版**をダウンロードし、`Prism-Setup.exe` をダブルクリックします。Windows は未署名インストーラーについて警告する場合があります。
+**v0.1.47 Windows x64版**をダウンロードし、`Prism-Setup.exe` をダブルクリックします。Windows は未署名インストーラーについて警告する場合があります。
+
+Windows では共通のインストーラーで English、简体中文、繁體中文を選択できます。中国語では「棱镜」、その他の言語では「Prism」と表示されます。保存済みの表示言語がない場合に限り、初回の画面言語にインストーラーの選択が使われ、アップグレード後も保存済みの言語が引き継がれます。Mac の Finder 上のアプリ名はシステム言語に従います。
 
 Macではチップに合うディスクイメージを選び、`.dmg`を開いてPrismをApplicationsへドラッグしてください。Mac版にはad-hoc署名がありますが、Apple Developer ID署名と公証はなく、初回起動がブロックされる場合があります。
 
@@ -63,7 +65,7 @@ Windowsでソースからビルドする場合は、以下のPowerShellコマン
 以下のPowerShellコマンドはWindows専用です。
 
 ```powershell
-git clone --branch v0.1.46 https://github.com/shixi-11/prism-desk.git
+git clone --branch v0.1.47 https://github.com/shixi-11/prism-desk.git
 cd prism-desk
 npm install
 npm run build
@@ -260,7 +262,7 @@ npm run build:desktop
 
 ### ライセンス
 
-**非商用に限り利用できます。** ソースコードは[PolyForm Noncommercial 1.0.0](LICENSE)で提供します。著作権者による別途の書面による許可がない限り、商用利用は禁止です。Prism Desk は独立したプロジェクトです。プロバイダーの名称と商標は、それぞれの所有者に帰属します。
+**非商用に限り利用できます。** ソースコードは[PolyForm Noncommercial 1.0.0](LICENSE)で提供します。著作権者による別途の書面による許可がない限り、商用利用は禁止です。Prism は独立したプロジェクトです。プロバイダーの名称と商標は、それぞれの所有者に帰属します。
 
 会話領域にファイルをドロップするか、添付ボタンから選択できます。1メッセージにつき5個まで、画像は各10 MB、その他のファイルは各50 MBが上限です。文書は元の内容を保持し、ローカルファイルの参照として選択した CLI に渡されます。読み取りとプレビューの対応範囲は形式と利用可能なツールによります。実行中の状態テキストには穏やかな光のアニメーションが付き、視差効果を減らす設定にも対応します。
 

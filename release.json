@@ -1,5 +1,5 @@
 {
-  "version": "0.1.46",
+  "version": "0.1.47",
   "date": "2026-10-10",
   "distribution": [
     "windows-x64",
@@ -8,12 +8,14 @@
   ],
   "notes": {
     "en": [
-      "Add task templates beside the message composer. Save a draft or create a template, search and edit saved instructions, and confirm before deleting a template.",
-      "Insert a template as an expandable text card while keeping the current draft. Templates are stored locally, shared across accounts, and retained after restart and source-to-installer migration. Inserting a template does not send a message; attachments and account credentials are not saved in templates."
+      "Use Prism as the English application name and 棱镜 in Chinese. One Windows installer offers English, Simplified Chinese and Traditional Chinese, with matching shortcut and uninstall names. Existing installation identity and data directories are retained.",
+      "First launch follows the installer language or system language. A manually selected app language remains saved across restarts and upgrades; changing it also updates existing Windows shortcuts for this installation. Deleted desktop shortcuts are not recreated.",
+      "macOS application names are localized for English and Chinese using the system language. Apple silicon and Intel installers include the same changes."
     ],
     "zh": [
-      "在输入框旁加入任务模板入口：可将草稿保存为模板，也可新建、搜索和编辑模板，删除前需确认。",
-      "模板以可展开的文字卡片插入，保留当前草稿。本机模板供不同账号共用，重启及从源码版转到安装版后仍保留；插入不会自动发送，模板不保存附件或账号凭据。"
+      "英文应用名称统一为 Prism，中文保持棱镜。Windows 共用一个安装包，可选择英文、简体中文或繁体中文，快捷方式与卸载名称随安装语言显示，沿用原安装身份和数据目录。",
+      "首次启动采用安装语言或系统语言；手动选择的应用语言会在重启和升级后保留，并更新此安装位置已有的 Windows 快捷方式名称。已主动删除的桌面快捷方式不会重建。",
+      "macOS 应用名称随系统语言显示为 Prism 或棱镜，Apple 芯片与 Intel 安装包同步提供。"
     ]
   }
 }

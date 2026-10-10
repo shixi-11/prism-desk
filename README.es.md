@@ -1,6 +1,6 @@
-# Prism Desk · 棱镜
+# Prism · 棱镜
 
-<img src="src/assets/prism-icon.svg" width="80" height="80" alt="Prism Desk">
+<img src="src/assets/prism-icon.svg" width="80" height="80" alt="Prism">
 
 [English](README.md) · [简体中文](README.zh-CN.md) · [繁體中文](README.zh-TW.md) · [日本語](README.ja.md) · [한국어](README.ko.md) · [Español](README.es.md) · [Français](README.fr.md) · [Deutsch](README.de.md) · [العربية](README.ar.md)
 
@@ -54,7 +54,9 @@ Creado por [Shixi Lin](https://shixilin.com/). Si Prism te ayuda a seguir creand
 
 ### Instalación
 
-Descarga el instalador **v0.1.46 para Windows x64** y haz doble clic en `Prism-Setup.exe`. No necesitas Git, Node.js ni npm. Como no está firmado, Windows puede mostrar una advertencia de «Editor desconocido».
+Descarga el instalador **v0.1.47 para Windows x64** y haz doble clic en `Prism-Setup.exe`. No necesitas Git, Node.js ni npm. Como no está firmado, Windows puede mostrar una advertencia de «Editor desconocido».
+
+El instalador único de Windows permite elegir English, 简体中文 o 繁體中文. En chino, la aplicación se llama «棱镜»; en los demás idiomas, «Prism». La elección del instalador solo determina el idioma inicial si aún no hay uno guardado; el idioma guardado se conserva al actualizar. En Mac, el nombre de la app en Finder sigue el idioma del sistema.
 
 En Mac, elige la imagen de disco según el chip: [Apple silicon](https://github.com/shixi-11/prism-desk/releases/latest/download/Prism-arm64.dmg) o [Intel](https://github.com/shixi-11/prism-desk/releases/latest/download/Prism-x64.dmg). Abre el `.dmg` y arrastra Prism a Aplicaciones. No necesitas Git ni Node.js. La app para Mac tiene una firma ad hoc, pero no una firma de Apple Developer ID ni notarización, por lo que macOS puede bloquear el primer inicio. Si confirmas que quieres abrirla, permite la apertura en Ajustes del Sistema → Privacidad y seguridad.
 
@@ -69,7 +71,7 @@ Para compilar desde el código fuente, sigue los comandos para desarrolladores. 
 Los siguientes comandos de PowerShell son solo para Windows.
 
 ```powershell
-git clone --branch v0.1.46 https://github.com/shixi-11/prism-desk.git
+git clone --branch v0.1.47 https://github.com/shixi-11/prism-desk.git
 cd prism-desk
 npm install
 npm run build
@@ -266,7 +268,7 @@ Antes de publicar, lee [AGENTS.md](AGENTS.md) y [RELEASING.md](RELEASING.md). Ca
 
 ### Licencia
 
-**Solo para uso no comercial.** El código fuente se ofrece bajo la [PolyForm Noncommercial 1.0.0](LICENSE). Se prohíbe el uso comercial sin autorización previa y por escrito de los titulares de los derechos. Prism Desk es un proyecto independiente. Los nombres y las marcas de los proveedores pertenecen a sus respectivos propietarios.
+**Solo para uso no comercial.** El código fuente se ofrece bajo la [PolyForm Noncommercial 1.0.0](LICENSE). Se prohíbe el uso comercial sin autorización previa y por escrito de los titulares de los derechos. Prism es un proyecto independiente. Los nombres y las marcas de los proveedores pertenecen a sus respectivos propietarios.
 
 Puede soltar archivos en la conversación o usar el botón de adjuntos: hasta cinco por mensaje, 10 MB por imagen y 50 MB por otro archivo. Los documentos conservan su contenido original y se pasan al CLI seleccionado como referencias a archivos locales; la lectura y la vista previa dependen del formato y de las herramientas disponibles. El texto de estado activo tiene un brillo suave que respeta la preferencia de movimiento reducido.
 

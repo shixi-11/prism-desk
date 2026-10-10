@@ -1,6 +1,6 @@
-# Prism Desk · 棱镜
+# Prism · 棱镜
 
-<img src="src/assets/prism-icon.svg" width="80" height="80" alt="Prism Desk">
+<img src="src/assets/prism-icon.svg" width="80" height="80" alt="Prism">
 
 [English](README.md) · [简体中文](README.zh-CN.md) · [繁體中文](README.zh-TW.md) · [日本語](README.ja.md) · [한국어](README.ko.md) · [Español](README.es.md) · [Français](README.fr.md) · [Deutsch](README.de.md) · [العربية](README.ar.md)
 
@@ -54,7 +54,9 @@
 
 ### التثبيت
 
-نزّل مثبّت **v0.1.46 لنظام Windows x64**، ثم انقر نقرًا مزدوجًا على `Prism-Setup.exe`. لا تحتاج إلى Git أو Node.js أو npm. لأن المثبّت غير موقّع، قد يعرض Windows تحذير «ناشر غير معروف».
+نزّل مثبّت **v0.1.47 لنظام Windows x64**، ثم انقر نقرًا مزدوجًا على `Prism-Setup.exe`. لا تحتاج إلى Git أو Node.js أو npm. لأن المثبّت غير موقّع، قد يعرض Windows تحذير «ناشر غير معروف».
+
+يتيح مثبّت Windows الموحّد اختيار English أو 简体中文 أو 繁體中文. يظهر اسم التطبيق بالصينية «棱镜» وباللغات الأخرى «Prism». لا يحدد اختيار المثبّت لغة الواجهة الأولى إلا إذا لم تكن هناك لغة محفوظة؛ وتظل اللغة المحفوظة كما هي بعد الترقية. على Mac، يتبع اسم التطبيق في Finder لغة النظام.
 
 على Mac، اختر صورة القرص المناسبة للشريحة: [Apple silicon](https://github.com/shixi-11/prism-desk/releases/latest/download/Prism-arm64.dmg) أو [Intel](https://github.com/shixi-11/prism-desk/releases/latest/download/Prism-x64.dmg). افتح ملف `.dmg` واسحب Prism إلى مجلد Applications. لا تحتاج إلى Git أو Node.js. يحمل تطبيق Mac توقيعًا مؤقتًا (ad-hoc)، لكنه لا يحمل توقيع Apple Developer ID ولا توثيق Apple، وقد يمنع macOS تشغيله أول مرة. إذا أكدت رغبتك في فتحه، اسمح بذلك من إعدادات النظام → الخصوصية والأمان.
 
@@ -69,7 +71,7 @@
 أوامر PowerShell التالية خاصة بنظام Windows فقط.
 
 ```powershell
-git clone --branch v0.1.46 https://github.com/shixi-11/prism-desk.git
+git clone --branch v0.1.47 https://github.com/shixi-11/prism-desk.git
 cd prism-desk
 npm install
 npm run build
@@ -266,7 +268,7 @@ npm run build:desktop
 
 ### الترخيص
 
-**للاستخدام غير التجاري فقط.** تتوفر الشفرة المصدرية بموجب [PolyForm Noncommercial 1.0.0](LICENSE). يُحظر الاستخدام التجاري دون إذن كتابي منفصل من أصحاب حقوق النشر. Prism Desk مشروع مستقل. تعود أسماء المزوّدين وعلاماتهم التجارية إلى مالكيها المعنيين.
+**للاستخدام غير التجاري فقط.** تتوفر الشفرة المصدرية بموجب [PolyForm Noncommercial 1.0.0](LICENSE). يُحظر الاستخدام التجاري دون إذن كتابي منفصل من أصحاب حقوق النشر. Prism مشروع مستقل. تعود أسماء المزوّدين وعلاماتهم التجارية إلى مالكيها المعنيين.
 
 يمكن إسقاط الملفات في المحادثة أو استخدام زر المرفقات: حتى خمسة مرفقات لكل رسالة، و10 ميغابايت لكل صورة و50 ميغابايت لكل ملف آخر. تحتفظ المستندات بمحتواها الأصلي وتُمرر إلى CLI المحدد كمراجع لملفات محلية؛ تعتمد القراءة والمعاينة على التنسيق والأدوات المتاحة. يظهر نص الحالة النشطة بلمعان خفيف مع احترام تفضيل تقليل الحركة.
 

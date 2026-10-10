@@ -8,6 +8,10 @@ const root=path.resolve(__dirname,'..');
   const runtime=path.join(root,'.local','installer-runtime');fs.mkdirSync(runtime,{recursive:true});
   cp.execFileSync('powershell.exe',['-NoProfile','-NonInteractive','-ExecutionPolicy','Bypass','-File',path.join(root,'scripts/build-host.ps1'),'-OutputDirectory',runtime],{cwd:root,stdio:'inherit',windowsHide:true});
  }
- await require('electron-builder').build({projectDir:root,config:require('../electron-builder.cjs'),publish:'never'});
+ await require('electron-builder').build({projectDir:root,config:require('../electron-builder.cjs'),publish:'never',effectiveOptionComputed:async options=>{
+  // Change NSIS display text without changing the stable product/bundle install identity.
+  if(process.platform==='win32'&&Array.isArray(options)&&options[0]?.APP_ID==='org.prismdesk.desktop')options[0].PRODUCT_NAME='$(prismName)';
+  return false;
+ }});
  console.log(JSON.stringify({installer:path.join(root,'.local/installer',process.platform==='win32'?'Prism-Setup.exe':`Prism-${process.arch}.dmg`),version:require('../package.json').version}));
 })().catch(e=>{console.error(e.message);process.exitCode=1;});

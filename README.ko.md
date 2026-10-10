@@ -1,6 +1,6 @@
-# Prism Desk · 棱镜
+# Prism · 棱镜
 
-<img src="src/assets/prism-icon.svg" width="80" height="80" alt="Prism Desk">
+<img src="src/assets/prism-icon.svg" width="80" height="80" alt="Prism">
 
 [English](README.md) · [简体中文](README.zh-CN.md) · [繁體中文](README.zh-TW.md) · [日本語](README.ja.md) · [한국어](README.ko.md) · [Español](README.es.md) · [Français](README.fr.md) · [Deutsch](README.de.md) · [العربية](README.ar.md)
 
@@ -54,7 +54,9 @@
 
 ### 설치
 
-**v0.1.46 Windows x64 설치 프로그램**을 다운로드하고 `Prism-Setup.exe`를 더블클릭하세요. Git, Node.js, npm은 필요하지 않습니다. 설치 프로그램은 서명되지 않았으므로 Windows에서 “알 수 없는 게시자” 경고가 표시될 수 있습니다.
+**v0.1.47 Windows x64 설치 프로그램**을 다운로드하고 `Prism-Setup.exe`를 더블클릭하세요. Git, Node.js, npm은 필요하지 않습니다. 설치 프로그램은 서명되지 않았으므로 Windows에서 “알 수 없는 게시자” 경고가 표시될 수 있습니다.
+
+Windows에서는 하나의 설치 프로그램에서 English, 简体中文, 繁體中文을 선택할 수 있습니다. 중국어에서는 “棱镜”, 그 밖의 언어에서는 “Prism”으로 표시됩니다. 저장된 UI 언어가 없을 때만 설치 선택이 최초 UI 언어로 적용되며, 업그레이드 후에도 저장된 언어가 유지됩니다. Mac의 Finder 앱 이름은 시스템 언어를 따릅니다.
 
 Mac은 칩에 맞는 디스크 이미지를 다운로드하세요: [Apple 실리콘](https://github.com/shixi-11/prism-desk/releases/latest/download/Prism-arm64.dmg) 또는 [Intel](https://github.com/shixi-11/prism-desk/releases/latest/download/Prism-x64.dmg). `.dmg`를 열고 Prism을 Applications 폴더로 드래그하면 됩니다. Git과 Node.js는 필요하지 않습니다. Mac 앱에는 ad-hoc 서명이 있지만 Apple Developer ID 서명과 공증이 없어 첫 실행을 macOS가 차단할 수 있습니다. 실행하기로 확인했다면 시스템 설정 → 개인정보 보호 및 보안에서 허용하세요.
 
@@ -69,7 +71,7 @@ Windows 데이터: `%APPDATA%\Prism`, 독립 계정: `%LOCALAPPDATA%\Prism\accou
 아래 PowerShell 명령은 Windows 전용입니다.
 
 ```powershell
-git clone --branch v0.1.46 https://github.com/shixi-11/prism-desk.git
+git clone --branch v0.1.47 https://github.com/shixi-11/prism-desk.git
 cd prism-desk
 npm install
 npm run build
@@ -266,7 +268,7 @@ npm run build:desktop
 
 ### 라이선스
 
-**비상업적 용도로만 사용할 수 있습니다.** 소스 코드는[PolyForm Noncommercial 1.0.0](LICENSE)에 따라 제공됩니다. 저작권자의 별도 서면 허가 없이 상업적으로 이용할 수 없습니다. Prism Desk는 독립 프로젝트입니다. 공급자 이름과 상표는 각 소유자에게 귀속됩니다.
+**비상업적 용도로만 사용할 수 있습니다.** 소스 코드는[PolyForm Noncommercial 1.0.0](LICENSE)에 따라 제공됩니다. 저작권자의 별도 서면 허가 없이 상업적으로 이용할 수 없습니다. Prism는 독립 프로젝트입니다. 공급자 이름과 상표는 각 소유자에게 귀속됩니다.
 
 대화 영역에 파일을 끌어 놓거나 첨부 버튼으로 선택할 수 있습니다. 메시지당 최대 5개, 이미지당 10 MB, 기타 파일당 50 MB까지 지원합니다. 문서는 원본 내용을 유지하며 선택한 CLI에 로컬 파일 경로로 전달됩니다. 읽기와 미리보기 지원은 형식과 사용 가능한 도구에 따라 달라집니다. 실행 상태 텍스트에 은은한 빛 효과가 표시되며 동작 줄이기 설정을 따릅니다.
 

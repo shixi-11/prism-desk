@@ -1,6 +1,6 @@
-# Prism Desk · 棱镜
+# Prism · 棱镜
 
-<img src="src/assets/prism-icon.svg" width="80" height="80" alt="Prism Desk">
+<img src="src/assets/prism-icon.svg" width="80" height="80" alt="Prism">
 
 [English](README.md) · [简体中文](README.zh-CN.md) · [繁體中文](README.zh-TW.md) · [日本語](README.ja.md) · [한국어](README.ko.md) · [Español](README.es.md) · [Français](README.fr.md) · [Deutsch](README.de.md) · [العربية](README.ar.md)
 
@@ -52,7 +52,9 @@
 
 ### 安装
 
-下载 **v0.1.46 Windows 64位安装包**，双击 `Prism-Setup.exe` 即可安装。安装棱镜无需 Git、Node.js 或 npm。由于安装包尚未签名，Windows 可能显示“未知发布者”提示。
+下载 **v0.1.47 Windows 64位安装包**，双击 `Prism-Setup.exe` 即可安装。安装棱镜无需 Git、Node.js 或 npm。由于安装包尚未签名，Windows 可能显示“未知发布者”提示。
+
+Windows 使用同一个安装包，可选择 English、简体中文或繁體中文；中文界面名称为“棱镜”，其他语言显示为“Prism”。仅在尚未保存界面语言时，首次界面语言才采用安装时的选择；升级后仍保留已保存的界面语言。Mac 的 Finder 应用名称会随系统语言显示。
 
 Mac用户按芯片下载：[Apple芯片版](https://github.com/shixi-11/prism-desk/releases/latest/download/Prism-arm64.dmg)或[Intel芯片版](https://github.com/shixi-11/prism-desk/releases/latest/download/Prism-x64.dmg)。打开 `.dmg`，将 Prism 拖入 Applications 文件夹即可，无需 Git 或 Node.js。Mac版有 ad-hoc 签名，但没有 Apple Developer ID 签名或公证，macOS 首次打开时可能会阻止启动。若你确认要打开，可在“系统设置 → 隐私与安全性”中允许。
 
@@ -65,7 +67,7 @@ Windows应用数据：`%APPDATA%\Prism`；独立账号：`%LOCALAPPDATA%\Prism\a
 Windows 源码构建请使用以下 PowerShell 命令，需要 Git、Node.js 22.12 或更新版本、npm，以及准备使用的官方 CLI。
 
 ```powershell
-git clone --branch v0.1.46 https://github.com/shixi-11/prism-desk.git
+git clone --branch v0.1.47 https://github.com/shixi-11/prism-desk.git
 cd prism-desk
 npm install
 npm run build

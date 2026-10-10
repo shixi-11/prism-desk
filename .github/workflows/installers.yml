@@ -27,7 +27,7 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run build:installer
-      - run: node --test tests/unix-process.test.cjs tests/release.test.cjs tests/installer-updater.test.cjs tests/install-migration.test.cjs tests/config.test.cjs tests/model-preferences.test.cjs tests/model-defaults.test.cjs tests/settings.test.cjs tests/fast-mode.test.cjs tests/task-templates.test.cjs tests/pasted-text.test.cjs tests/draft-writer.test.cjs
+      - run: node --test tests/unix-process.test.cjs tests/release.test.cjs tests/installer-updater.test.cjs tests/install-migration.test.cjs tests/config.test.cjs tests/model-preferences.test.cjs tests/model-defaults.test.cjs tests/settings.test.cjs tests/fast-mode.test.cjs tests/task-templates.test.cjs tests/pasted-text.test.cjs tests/draft-writer.test.cjs tests/branding.test.cjs tests/desktop-identity.test.cjs tests/mac-localization.test.cjs
       - name: Verify, mount, and smoke test the packaged app
         shell: bash
         env:
@@ -50,6 +50,7 @@ jobs:
           app="$(find "$mount" -maxdepth 2 -type d -name '*.app' -print -quit)"
           test -n "$app"
           codesign --verify --deep --strict "$app"
+          node scripts/verify-mac-localization.cjs "$app"
           npm install --no-save --ignore-scripts playwright
           node scripts/smoke-packaged.cjs "$app" --metadata "$artifacts/metadata.json"
           node -e 'const m=require(process.argv[1]); if(m.arch!==process.argv[2]) throw Error(`Expected ${process.argv[2]} but smoke app reported ${m.arch}`)' "$artifacts/metadata.json" "$ARCH"

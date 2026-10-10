@@ -85,13 +85,23 @@ const emit = (type, value) => {
   for(const win of windows)if(!win.isDestroyed())win.webContents.send("prism:event", { type, value });
 };
 function settings() {
+  let saved;
   try {
-    return JSON.parse(
+    saved=JSON.parse(
       fs.readFileSync(path.join(dataPath(), "settings.json"), "utf8"),
     );
   } catch {
-    return { theme: "system" };
+    saved={ theme: "system" };
   }
+  return require('./branding.cjs').settings(saved,{locale:app.getLocale(),installDirectory:app.isPackaged?path.dirname(process.execPath):undefined});
+}
+function brandWindow(win,language){
+ const name=require('./branding.cjs').name(language);
+ win.setTitle(`${name} v${app.getVersion()}`);
+ if(process.platform==='win32'){
+  const executable=app.isPackaged?process.execPath:path.join(updater.root,'runtime','desktop','Prism.exe');
+  win.setAppDetails({appId,appIconPath:executable,appIconIndex:0,relaunchDisplayName:name,relaunchCommand:app.isPackaged?`"${executable}"`:`"${executable}" "${updater.root}" --user-data-dir="${app.getPath('userData')}"`});
+ }
 }
 function handle(method, fn) {
   ipcMain.handle("prism:" + method, async (event, ...args) => {
@@ -107,6 +117,9 @@ function handle(method, fn) {
 }
 app.whenReady().then(() => {
   if(!primaryInstance)return;
+  const existingUserData=dataPath();
+  app.setName(require('./branding.cjs').name(settings().language));
+  app.setPath('userData',existingUserData);
   store = new TaskStore(require('./storage.cjs').taskRoot(app.getAppPath(),dataPath()));
   store.recover();
   require('./model-preference-request.cjs').apply(store,PROFILES,path.join(dataPath(),'model-preference-request.json'));
@@ -356,7 +369,14 @@ app.whenReady().then(() => {
     if (!["system", "light", "dark"].includes(theme)) throw Error("主题无效");
     atomic(path.join(dataPath(), "settings.json"), { ...settings(), theme });
   });
-  handle('language',language=>{if(!isSupportedLanguage(language))throw Error('Unsupported language');atomic(path.join(dataPath(),'settings.json'),{...settings(),language});});
+  handle('language',language=>{
+   if(!isSupportedLanguage(language))throw Error('Unsupported language');
+   atomic(path.join(dataPath(),'settings.json'),{...settings(),language});
+   app.setName(require('./branding.cjs').name(language));
+   for(const win of windows)brandWindow(win,language);
+   if(tray)tray.setToolTip(require('./branding.cjs').name(language));
+   if(process.platform==='win32'&&!process.env.PRISM_TEST_DATA){try{desktopIdentity.register(app,shell,updater.root,language);}catch(error){console.warn(error.message);emit('error',error.message);}}
+  });
   handle('defaultMode',mode=>{if(!require('./task-settings.cjs').MODES.includes(mode))throw Error('Invalid permission mode');atomic(path.join(dataPath(),'settings.json'),{...settings(),defaultMode:mode});return mode;});
   handle("scan", () => require('./diagnostics.cjs').verifyCapabilities());
   const shared = require('./shared-capabilities.cjs').manager();
@@ -519,7 +539,7 @@ app.whenReady().then(() => {
     height: 940,
     minWidth: 1000,
     minHeight: 640,
-    title: `棱镜 · Prism v${app.getVersion()}`,
+    title: `${require('./branding.cjs').name(settings().language)} v${app.getVersion()}`,
     icon: path.join(__dirname, "..", "src", "assets", process.platform==='darwin'?"prism-icon.png":"prism.ico"),
     backgroundColor: "#272119",
     show: false,
@@ -534,7 +554,7 @@ app.whenReady().then(() => {
   windows.add(window);
   // Focus must not synchronously rescan hundreds of skill files.
   // Scheduled refresh and explicit Check & sync still discover changes.
-  if(process.platform==='win32'&&!process.env.PRISM_TEST_DATA){try{desktopIdentity.register(app,shell,updater.root);}catch(error){console.warn(error.message);}}
+  if(process.platform==='win32'&&!process.env.PRISM_TEST_DATA){try{desktopIdentity.register(app,shell,updater.root,settings().language);}catch(error){console.warn(error.message);}}
   window.draftKey=restore?.key||(taskId?require('node:crypto').randomUUID():'primary');
   if(restore?.bounds&&[restore.bounds.x,restore.bounds.y,restore.bounds.width,restore.bounds.height].every(Number.isFinite))window.setBounds(restore.bounds);
   window.on('page-title-updated',event=>event.preventDefault());
@@ -542,7 +562,7 @@ app.whenReady().then(() => {
   window.webContents.setWindowOpenHandler(() => ({ action: "deny" }));
   window.setMenu(null);
   window.once('ready-to-show',()=>{if(!process.env.PRISM_TEST_HIDE&&!restore?.hidden)window.showInactive();});
-  if(process.platform==='win32'){const executable=app.isPackaged?process.execPath:path.join(updater.root,'runtime','desktop','Prism.exe');window.setAppDetails({appId,appIconPath:executable,appIconIndex:0,relaunchDisplayName:'棱镜',relaunchCommand:app.isPackaged?`"${executable}"`:`"${executable}" "${updater.root}" --user-data-dir="${app.getPath('userData')}"`});}
+  brandWindow(window,settings().language);
   window.webContents.on("will-navigate", (event) => event.preventDefault());
   window.loadFile(path.join(__dirname, "..", "dist", "index.html"),{query:taskId?{task:taskId}:{}});
   window.webContents.once('did-finish-load',()=>messageQueue.pump());
@@ -567,7 +587,7 @@ app.whenReady().then(() => {
   if(fs.existsSync(windowFile))fs.unlinkSync(windowFile);
   if(!process.env.PRISM_TEST_HIDE||process.env.PRISM_TEST_TRAY){
     tray=new Tray(path.join(__dirname,'..','src','assets',process.platform==='darwin'?'prism-icon.png':'prism.ico'));
-    tray.setToolTip('棱镜 · Prism');
+    tray.setToolTip(require('./branding.cjs').name(settings().language));
     const updateTray=()=>tray.setContextMenu(Menu.buildFromTemplate([
       {label:translate(settings().language,'打开棱镜'),click:showWindow},
       {type:'separator'},

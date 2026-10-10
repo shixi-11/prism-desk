@@ -57,6 +57,16 @@ async function main() {
     };
     const { _electron } = playwright();
     const launch = () => _electron.launch({ executablePath, env, timeout: 60000 });
+    const waitForTitle=async name=>{
+      const expected=`${name} v${require('../package.json').version}`,deadline=Date.now()+10000;
+      let actual;
+      do{
+        actual=await application.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows()[0].getTitle());
+        if(actual===expected)return;
+        await new Promise(resolve=>setTimeout(resolve,100));
+      }while(Date.now()<deadline);
+      assert.equal(actual,expected,'Window title must follow the selected language');
+    };
     const openWindow = async app => {
       const page = await app.firstWindow();
       await page.waitForFunction(() => Boolean(window.prism), null, { timeout: 30000 });
@@ -73,7 +83,38 @@ async function main() {
     assert.equal(info.version, expectedVersion, 'Packaged app version must match package.json');
 
     const initial = await page.evaluate(() => window.prism.init());
+    const initialData=await application.evaluate(({app})=>app.getPath('userData'));
+    await page.locator('.language-toggle').selectOption('en');
+    await waitForTitle('Prism');
+    assert.equal(await application.evaluate(({app})=>app.getName()),'Prism');
     await page.locator('.language-toggle').selectOption('zh');
+    await waitForTitle('棱镜');
+    assert.equal(await application.evaluate(({app})=>app.getPath('userData')),initialData,'Changing the app name must preserve the data directory');
+    if(process.platform==='win32'){
+      const shortcuts=await application.evaluate(({app,shell},directory)=>{
+        const requireModule=process.getBuiltinModule('module').createRequire(app.getAppPath()+'/package.json');
+        const fs=requireModule('node:fs'),path=requireModule('node:path');
+        const locations={exe:app.getPath('exe'),appData:path.join(directory,'roaming'),desktop:path.join(directory,'desktop'),userData:path.join(directory,'user-data')};
+        const menu=path.join(locations.appData,'Microsoft','Windows','Start Menu','Programs');
+        for(const folder of [menu,locations.desktop]){
+          fs.mkdirSync(folder,{recursive:true});
+          if(!shell.writeShortcutLink(path.join(folder,'Prism Desk.lnk'),'create',{target:locations.exe,description:'Previous installation'}))throw Error('Could not create isolated shortcut fixture');
+        }
+        const testApp={isPackaged:true,getPath:key=>locations[key],setAsDefaultProtocolClient:()=>true};
+        const register=requireModule('./electron/desktop-identity.cjs').register;
+        const snapshots=[];
+        for(const [language,name] of [['zh','棱镜'],['en','Prism']]){
+          register(testApp,shell,directory,language,()=>{});
+          snapshots.push([menu,locations.desktop].map(folder=>({files:fs.readdirSync(folder),link:shell.readShortcutLink(path.join(folder,name+'.lnk'))})));
+        }
+        return {target:locations.exe,snapshots};
+      },path.join(root,'native-shortcut-check'));
+      for(const [index,name] of ['棱镜','Prism'].entries())for(const shortcut of shortcuts.snapshots[index]){
+        assert.deepEqual(shortcut.files,[name+'.lnk']);
+        assert.equal(shortcut.link.target.toLowerCase(),shortcuts.target.toLowerCase());
+        assert.equal(shortcut.link.appUserModelId,'org.prismdesk.desktop');
+      }
+    }
     assert.equal(initial.capabilities?.taichu?.exists, false, 'Smoke data must not load a configured assistant');
     assert.equal(initial.capabilities?.taichu?.path, '', 'Smoke data must not expose a private assistant path');
     assert.ok(initial.profiles.every(profile => !('home' in profile) && !('executable' in profile)), 'Init must not expose account directories or executable paths');
@@ -133,10 +174,16 @@ async function main() {
     assert.equal(savedTemplates.length,1);
     assert.equal(savedTemplates[0].body,'Review the current changes.\nKeep the approved layout.');
 
+    await page.locator('.language-toggle').selectOption('en');
+    await waitForTitle('Prism');
     await application.close();
     application = await launch();
     page = await openWindow(application);
     const restored = await page.evaluate(async () => window.prism.init());
+    assert.equal(restored.settings.language,'en','Manual language must survive restart');
+    assert.equal(await application.evaluate(({app})=>app.getPath('userData')),initialData,'Restart after a name change must preserve the data directory');
+    await waitForTitle('Prism');
+    await page.locator('.language-toggle').selectOption('zh');
     assert.ok(restored.tasks.some(task => task.id === created.id), 'Created task must persist across app restart');
     assert.ok(restored.profiles.some(profile=>profile.id===account.id),'Saved account settings must persist across app restart');
     assert.equal(restored.drafts[created.id]?.text, draftText, 'UI draft must persist across app restart');
