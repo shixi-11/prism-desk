@@ -110,5 +110,6 @@ test('discovers the prior source shortcut without scanning unrelated folders',t=
  fs.writeFileSync(path.join(f.sharedRoot,'package.json'),JSON.stringify({name:'prism-desk'}));
  const old={cwd:f.sharedRoot,target:path.join(f.sharedRoot,'runtime','desktop','Prism.exe'),args:`"${f.sharedRoot}" --user-data-dir="${f.sourceData}"`};
  assert.deepEqual(discoverSource({shortcuts:[shortcut],readShortcut:()=>old}),{configFile:f.configFile,sourceData:f.sourceData});
+ assert.deepEqual(discoverSource({shortcuts:[shortcut],readShortcut:()=>({...old,target:path.join(f.sharedRoot,'runtime','PrismLauncher.exe')})}),{configFile:f.configFile,sourceData:f.sourceData});
  assert.equal(discoverSource({shortcuts:[shortcut],readShortcut:()=>({...old,target:path.join(f.root,'other.exe')})}),null);
 });

@@ -50,3 +50,29 @@ test('an alternate path to the same installed executable still owns its existing
  register(f.app,f.shell,f.root,'zh',()=>{});
  for(const folder of [f.menu,f.directories.desktop])assert.deepEqual(fs.readdirSync(folder),['棱镜.lnk']);
 });
+
+test('source launcher repairs parameterless legacy shortcuts without adopting another checkout',t=>{
+ const f=fixture(t,false),launcher=path.join(f.root,'runtime','PrismLauncher.exe');fs.writeFileSync(launcher,'fixture');
+ f.link(f.directories.desktop,'棱镜',f.target,'');
+ register(f.app,f.shell,f.root,'zh');
+ for(const folder of [f.menu,f.directories.desktop]){
+  const shortcut=f.shell.readShortcutLink(path.join(folder,'棱镜.lnk'));
+  assert.equal(shortcut.target,launcher);
+  assert.equal(shortcut.args,`--user-data-dir="${f.directories.userData}"`);
+ }
+ f.link(f.directories.desktop,'棱镜',launcher,'');register(f.app,f.shell,f.root,'zh');
+ assert.equal(f.shell.readShortcutLink(path.join(f.directories.desktop,'棱镜.lnk')).target,launcher);
+ const other=f.link(f.directories.desktop,'棱镜',f.target,`"${f.root}-other"`),before=fs.readFileSync(other,'utf8');
+ register(f.app,f.shell,f.root,'en');assert.equal(fs.readFileSync(other,'utf8'),before);
+});
+
+test('renamed Electron runtime must not clear source shortcut arguments when isPackaged is true',t=>{
+ const f=fixture(t,false);f.app.isPackaged=true;
+ f.link(f.directories.desktop,'棱镜',f.target,'');
+ register(f.app,f.shell,f.root,'zh');
+ assert.equal(f.shell.readShortcutLink(path.join(f.directories.desktop,'棱镜.lnk')).args,`"${f.root}" --user-data-dir="${f.directories.userData}"`);
+ const launcher=path.join(f.root,'runtime','PrismLauncher.exe');fs.writeFileSync(launcher,'fixture');
+ register(f.app,f.shell,f.root,'zh');register(f.app,f.shell,f.root,'zh');
+ const shortcut=f.shell.readShortcutLink(path.join(f.directories.desktop,'棱镜.lnk'));
+ assert.equal(shortcut.target,launcher);assert.equal(shortcut.args,`--user-data-dir="${f.directories.userData}"`);
+});

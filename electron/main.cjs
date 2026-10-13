@@ -95,12 +95,20 @@ function settings() {
   }
   return require('./branding.cjs').settings(saved,{locale:app.getLocale(),installDirectory:app.isPackaged?path.dirname(process.execPath):undefined});
 }
+function desktopRoot(){
+ const source=updateBootstrap.installation(path.resolve(__dirname,'..'));
+ try{if(fs.realpathSync.native(process.execPath).toLowerCase()===fs.realpathSync.native(path.join(source,'runtime','desktop','Prism.exe')).toLowerCase())return source;}catch{}
+ return updater.root;
+}
 function brandWindow(win,language){
  const name=require('./branding.cjs').name(language);
  win.setTitle(`${name} v${app.getVersion()}`);
  if(process.platform==='win32'){
-  const executable=app.isPackaged?process.execPath:path.join(updater.root,'runtime','desktop','Prism.exe');
-  win.setAppDetails({appId,appIconPath:executable,appIconIndex:0,relaunchDisplayName:name,relaunchCommand:app.isPackaged?`"${executable}"`:`"${executable}" "${updater.root}" --user-data-dir="${app.getPath('userData')}"`});
+  const root=desktopRoot(),launcher=path.join(root,'runtime','PrismLauncher.exe');
+  const sourceRuntime=!app.isPackaged||path.resolve(process.execPath).toLowerCase()===path.join(root,'runtime','desktop','Prism.exe').toLowerCase();
+  const useLauncher=sourceRuntime&&fs.existsSync(launcher);
+  const executable=useLauncher?launcher:process.execPath;
+  win.setAppDetails({appId,appIconPath:executable,appIconIndex:0,relaunchDisplayName:name,relaunchCommand:useLauncher?`"${executable}" --user-data-dir="${app.getPath('userData')}"`:sourceRuntime?`"${executable}" "${root}" --user-data-dir="${app.getPath('userData')}"`:`"${executable}"`});
  }
 }
 function handle(method, fn) {
@@ -375,7 +383,7 @@ app.whenReady().then(() => {
    app.setName(require('./branding.cjs').name(language));
    for(const win of windows)brandWindow(win,language);
    if(tray)tray.setToolTip(require('./branding.cjs').name(language));
-   if(process.platform==='win32'&&!process.env.PRISM_TEST_DATA){try{desktopIdentity.register(app,shell,updater.root,language);}catch(error){console.warn(error.message);emit('error',error.message);}}
+   if(process.platform==='win32'&&!process.env.PRISM_TEST_DATA){try{desktopIdentity.register(app,shell,desktopRoot(),language);}catch(error){console.warn(error.message);emit('error',error.message);}}
   });
   handle('defaultMode',mode=>{if(!require('./task-settings.cjs').MODES.includes(mode))throw Error('Invalid permission mode');atomic(path.join(dataPath(),'settings.json'),{...settings(),defaultMode:mode});return mode;});
   handle("scan", () => require('./diagnostics.cjs').verifyCapabilities());
@@ -554,7 +562,7 @@ app.whenReady().then(() => {
   windows.add(window);
   // Focus must not synchronously rescan hundreds of skill files.
   // Scheduled refresh and explicit Check & sync still discover changes.
-  if(process.platform==='win32'&&!process.env.PRISM_TEST_DATA){try{desktopIdentity.register(app,shell,updater.root,settings().language);}catch(error){console.warn(error.message);}}
+  if(process.platform==='win32'&&!process.env.PRISM_TEST_DATA){try{desktopIdentity.register(app,shell,desktopRoot(),settings().language);}catch(error){console.warn(error.message);}}
   window.draftKey=restore?.key||(taskId?require('node:crypto').randomUUID():'primary');
   if(restore?.bounds&&[restore.bounds.x,restore.bounds.y,restore.bounds.width,restore.bounds.height].every(Number.isFinite))window.setBounds(restore.bounds);
   window.on('page-title-updated',event=>event.preventDefault());

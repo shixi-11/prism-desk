@@ -52,7 +52,7 @@ function discoverSource({ shortcuts, readShortcut }) {
     const root = shortcut.cwd;
     if (!root || !path.isAbsolute(root)) continue;
     const executable = path.join(root, 'runtime', 'desktop', 'Prism.exe');
-    if (!shortcut.target || !same(shortcut.target, executable)) continue;
+    if (!shortcut.target || ![executable,path.join(root,'runtime','PrismLauncher.exe')].some(target=>same(shortcut.target,target))) continue;
     const configFile = path.join(root, '.local', 'config.json');
     if (!fs.existsSync(configFile)) continue;
     try { if (readJson(path.join(root, 'package.json')).name !== 'prism-desk') continue; } catch { continue; }
