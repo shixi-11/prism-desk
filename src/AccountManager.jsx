@@ -11,7 +11,7 @@ function LoginStatus({state}){
  const labels={starting:'正在获取登录链接…',waiting:'登录链接已准备好',verifying:'正在检查账号…',connected:'账号已连接',cancelled:'已取消登录',error:'登录未完成'};
  return <div className={`connection-status ${state.phase}`} role="status">{state.phase==='connected'?<Check size={17}/>:active(state)?<RefreshCw size={17} className="spinning"/>:null}<span>{tr(state.phase==='waiting'&&state.codeSubmitted?'授权码已提交，正在等待登录结果…':labels[state.phase])}{state.message&&<small>{tr(state.message)}</small>}</span></div>;
 }
-function AccountEmail({email}){const [visible,setVisible]=useState(false);useEffect(()=>setVisible(false),[email]);return <small className="account-email"><span dir="ltr">{email?(visible?email:'••••••@••••••'):tr('邮箱暂未返回')}</span><button type="button" disabled={!email} aria-label={tr(visible?'隐藏邮箱':'显示邮箱')} aria-pressed={visible} onClick={()=>setVisible(v=>!v)}>{visible?<EyeOff size={15}/>:<Eye size={15}/>}</button></small>;}
+function AccountEmail({email}){const [visible,setVisible]=useState(true);useEffect(()=>setVisible(true),[email]);return <small className="account-email"><span dir="ltr">{email?(visible?email:'••••••@••••••'):tr('邮箱暂未返回')}</span><button type="button" disabled={!email} aria-label={tr(visible?'隐藏邮箱':'显示邮箱')} aria-pressed={visible} onClick={()=>setVisible(v=>!v)}>{visible?<EyeOff size={15}/>:<Eye size={15}/>}</button></small>;}
 function AccountName({profile,onSaved}){
  const [editing,setEditing]=useState(false),[name,setName]=useState(profile.name),[busy,setBusy]=useState(false),[error,setError]=useState('');
  useEffect(()=>{if(!editing)setName(profile.name);},[profile.name,editing]);
