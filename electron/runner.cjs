@@ -61,6 +61,8 @@ class Runner extends EventEmitter {
     require('./task-settings.cjs').validateMode(task.mode,nextProfile);
     if (task.profile === profile) return this.store.save(task);
     const previous = task.profile;
+    const previousProfile=PROFILES.find(p=>p.id===previous);
+    const previousName=previousProfile?`${previousProfile.provider} / ${previousProfile.name}`:'已移除账号';
     const progress = require('./handoff.cjs').snapshot(task, this.store.events(id));
     task.profile = profile;
     // A provider that returns after another writer must load the complete delta,
@@ -68,7 +70,7 @@ class Runner extends EventEmitter {
     delete task.sessions[profile];
     this.event(id, "handoff", {
       progress,
-      text: `执行账号从 ${profileFor(previous).provider} / ${profileFor(previous).name} 切换到 ${nextProfile.provider} / ${nextProfile.name}。任务与工作目录保持不变；下一条指令将读取持久工作记录。`,
+      text: `执行账号从 ${previousName} 切换到 ${nextProfile.provider} / ${nextProfile.name}。任务与工作目录保持不变；下一条指令将读取持久工作记录。`,
     });
     this.store.context(task);
     return this.store.save(task);

@@ -65,6 +65,26 @@ test("switching while execution or crash state is unresolved is rejected", (t) =
   assert.equal(store.get(task.id).state, "unknown");
   assert.throws(() => runner.switch(task.id, "codex-test-3"));
 });
+
+test('a task can leave a removed account without losing history or other accounts',async t=>{
+ const {store,task}=setup(t),removed=PROFILES.find(p=>p.id==='codex-test-2'),index=PROFILES.indexOf(removed);
+ task.profile=removed.id;task.sessions={'codex-test-1':'old-session'};store.save(task);
+ store.append(task.id,'user',{text:'Keep this task and its workspace'});
+ PROFILES.splice(index,1);
+ try{
+  const otherIds=PROFILES.map(p=>p.id),runner=new Runner(store);
+  const changed=runner.switch(task.id,'codex-test-1');
+  assert.equal(changed.profile,'codex-test-1');assert.equal(changed.cwd,task.cwd);
+  assert.equal(changed.sessions['codex-test-1'],undefined);
+  assert.deepEqual(PROFILES.map(p=>p.id),otherIds);
+  assert.ok(store.events(task.id).some(e=>e.type==='user'&&e.text==='Keep this task and its workspace'));
+  assert.match(store.events(task.id).findLast(e=>e.type==='handoff').text,/已移除账号/);
+  const {accountTarget}=await import('../src/account-selection.js');
+  assert.equal(accountTarget(PROFILES,removed.id),'codex-test-1');
+  assert.equal(accountTarget(PROFILES,'codex-test-3'),'codex-test-3');
+  assert.equal(accountTarget([],removed.id),'');
+ }finally{PROFILES.splice(index,0,removed);}
+});
 test("an idle task can switch accounts while another task runs without changing the active task", async (t) => {
   const { store, task } = setup(t);
   const other = store.create({title:'Other task',cwd:task.cwd});

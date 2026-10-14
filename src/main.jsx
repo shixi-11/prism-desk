@@ -1,4 +1,5 @@
 import {quotaBlocked,quotaStateLabel} from './quota-state.js';
+import {accountTarget} from './account-selection.js';
 import React, { useEffect, useRef, useState, useMemo, useCallback } from "react";
 import { createRoot } from "react-dom/client";
 import Markdown from "react-markdown";
@@ -277,7 +278,8 @@ function Inspector({
   storage,
   disabled,
 }) {
-  const [target, setTarget] = useState(task?.profile || profiles.find(p=>!p.disabled)?.id);
+  const [requestedTarget, setTarget] = useState(task?.profile || profiles.find(p=>!p.disabled)?.id);
+  const target=accountTarget(profiles,requestedTarget);
   const [resetBusy,setResetBusy]=useState(false),[resetMessage,setResetMessage]=useState('');
   const [loginBusy,setLoginBusy]=useState(false),[loginMessage,setLoginMessage]=useState('');
   useEffect(()=>setResetMessage(''),[target]);
@@ -285,7 +287,7 @@ function Inspector({
     setTarget(task?.profile || profiles.find(p=>!p.disabled)?.id);
   }, [task?.id, task?.profile]);
   const selected = profiles.find((p) => p.id === target);
-  useEffect(()=>{if(!task&&(!profiles.some(p=>p.id===target&&!p.disabled))){const next=profiles.find(p=>!p.disabled)?.id;setTarget(next);onDraftAccount?.(next||'');}},[profiles,task?.id]);
+  useEffect(()=>{if(!profiles.some(p=>p.id===requestedTarget&&(!p.disabled||task))){const next=profiles.find(p=>!p.disabled)?.id||'';setTarget(next);if(!task)onDraftAccount?.(next);}},[profiles,task?.id,requestedTarget]);
   const quota = quotas[target];
   const selectedConfig=task?.modelSettings?.[target];
   const activeConfig=task?.execution||task?.lastExecution;
@@ -334,8 +336,7 @@ function Inspector({
         </button>
         <p className="relay-note">{!task?tr("先新建任务，再切换执行账号。"):task.state==='unknown'?tr("先核对上次执行进度，再切换账号。"):disabled?tr("请等待当前执行结束。"):target===task.profile&&!changedModel?tr("已是当前账号；选择其他账号后可切换。"):tr("切换后，在同一任务中发送指令继续。")}</p>
         {task && (
-          <p className="relay-note">{tr("当前：")}{profiles.find((p) => p.id === task.profile)?.provider} /{" "}
-            {tr(profiles.find((p) => p.id === task.profile)?.name||'账号已移除，请切换账号')}
+          <p className="relay-note">{tr("当前：")}{profiles.find((p) => p.id === task.profile)?`${profiles.find(p=>p.id===task.profile).provider} / ${tr(profiles.find(p=>p.id===task.profile).name)}`:tr('账号已移除，请切换账号')}
           </p>
         )}
 
