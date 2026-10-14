@@ -13,7 +13,13 @@ function command(file,args,cwd,timeout=120000,extraEnv={}){return new Promise((r
  child.on('error',error=>finish(error));child.on('close',code=>finish(null,code));
 });}
 class Updater extends EventEmitter{
- constructor(appRoot,{run=command,fetchRelease=latestRelease,platform=process.platform,root=installation(appRoot)}={}){super();this.appRoot=appRoot;this.root=root;this.run=run;this.fetchRelease=fetchRelease;this.platform=platform;this.file=path.join(this.root,'.local','updates','status.json');this.activeFile=path.join(this.root,'.local','updates','active.json');const saved=read(this.file);this.state={automatic:saved.automatic!==false,status:saved.release&&saved.latest&&saved.latest!==saved.current?(validVersion(this.root,saved.latest)?'ready':'available'):'idle',current:saved.current||'',latest:saved.release?saved.latest||'':saved.current||'',release:saved.release||null,checkedAt:saved.checkedAt||null,error:read(this.activeFile).error||'',repository:REPOSITORY};this.busy=false;}
+ constructor(appRoot,{run=command,fetchRelease=latestRelease,platform=process.platform,root=installation(appRoot)}={}){
+  super();this.appRoot=appRoot;this.root=root;this.run=run;this.fetchRelease=fetchRelease;this.platform=platform;this.file=path.join(this.root,'.local','updates','status.json');this.activeFile=path.join(this.root,'.local','updates','active.json');
+  const saved=read(this.file),version=read(path.join(appRoot,'package.json')).version;let comparison=null;
+  try{if(saved.release)comparison=compareVersions(saved.release.version,version);}catch{}
+  const newer=comparison>0&&SHA.test(saved.latest)&&saved.latest!==saved.current;
+  this.state={automatic:saved.automatic!==false,status:newer?(validVersion(this.root,saved.latest)?'ready':'available'):comparison!==null?'current':'idle',current:saved.current||'',latest:newer?saved.latest:saved.current||'',release:comparison!==null&&comparison>=0?saved.release:null,checkedAt:saved.checkedAt||null,error:read(this.activeFile).error||'',repository:REPOSITORY};this.busy=false;
+ }
  set(value){Object.assign(this.state,value);write(this.file,this.state);this.emit('change',this.snapshot());return this.snapshot();}
  snapshot(){return {...this.state,version:read(path.join(this.appRoot,'package.json')).version||null};}
  automatic(value){if(typeof value!=='boolean')throw Error('Invalid update preference');return this.set({automatic:value});}

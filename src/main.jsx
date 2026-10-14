@@ -1,5 +1,6 @@
 import {quotaBlocked,quotaStateLabel} from './quota-state.js';
 import {accountTarget} from './account-selection.js';
+import {hasNewRelease} from './update-state.js';
 import React, { useEffect, useRef, useState, useMemo, useCallback } from "react";
 import { createRoot } from "react-dom/client";
 import Markdown from "react-markdown";
@@ -564,7 +565,7 @@ const ExecutionLog=React.memo(function ExecutionLog({ events }) {
 function App() {
   const [init, setInit] = useState(null);
   const [appUpdate,setAppUpdate]=useState(null);
-  const hasAppUpdate=appUpdate?.latest&&appUpdate.latest!==appUpdate.current;
+  const hasAppUpdate=hasNewRelease(appUpdate);
   const [task, setTask] = useState(null);
   const [events, setEvents] = useState([]);
   const [modal, setModal] = useState("");

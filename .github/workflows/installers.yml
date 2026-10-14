@@ -25,7 +25,7 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      - run: node --test tests/core.test.cjs tests/install-migration.test.cjs tests/quota-display.test.cjs tests/source-launcher.test.cjs
+      - run: node --test tests/core.test.cjs tests/install-migration.test.cjs tests/quota-display.test.cjs tests/source-launcher.test.cjs tests/updater.test.cjs tests/installer-updater.test.cjs tests/release.test.cjs
       - run: npm run build:installer
       - run: npm install --no-save --ignore-scripts playwright
       - run: node scripts/smoke-windows-installer.cjs

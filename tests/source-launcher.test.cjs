@@ -1,6 +1,6 @@
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),os=require('node:os'),path=require('node:path'),cp=require('node:child_process');
 test('native source launcher opens the app without shortcut arguments and preserves explicit paths and task links',{skip:process.platform!=='win32'},async t=>{
- const root=fs.mkdtempSync(path.join(os.tmpdir(),'Prism 中文 launcher '));
+ const root=fs.realpathSync.native(fs.mkdtempSync(path.join(os.tmpdir(),'Prism 中文 launcher ')));
  t.after(()=>fs.rmSync(root,{recursive:true,force:true}));
  const runtime=path.join(root,'runtime'),desktop=path.join(runtime,'desktop');fs.mkdirSync(desktop,{recursive:true});
  fs.mkdirSync(path.join(root,'electron'));fs.writeFileSync(path.join(root,'electron','main.cjs'),'// fixture');

@@ -1,6 +1,17 @@
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),os=require('node:os'),path=require('node:path');
 const {compareVersions,releaseInfo}=require('../electron/release.cjs');
 const {checkRelease,releaseBody,findReleaseByTag}=require('../scripts/release.cjs');
+test('update indicators compare release versions for source and installer states',async()=>{
+ const {hasNewRelease}=await import('../src/update-state.js');
+ for(const current of ['0.1.48','a'.repeat(40)]){
+  for(const status of ['current','available','ready','error']){
+   assert.equal(hasNewRelease({version:'0.1.48',current,latest:'0.1.47',release:{version:'0.1.47'},status}),false);
+   assert.equal(hasNewRelease({version:'0.1.48',current,latest:current,release:{version:'0.1.48'},status}),false);
+  }
+  assert.equal(hasNewRelease({version:'0.1.48',current,latest:'b'.repeat(40),release:{version:'0.1.49'}}),true);
+ }
+ assert.equal(hasNewRelease(null),false);assert.equal(hasNewRelease({version:'0.1.48',release:{version:'invalid'}}),false);
+});
 test('only stable, documented numeric releases are accepted',()=>{
  assert.equal(compareVersions('0.10.0','0.9.9'),1);assert.equal(compareVersions('0.2.0','0.2.0'),0);assert.equal(compareVersions('0.1.9','0.2.0'),-1);
  for(const tag_name of ['main','v0.2.0-beta','v01.2.0','v../../file'])assert.throws(()=>releaseInfo({tag_name,body:'notes'}));

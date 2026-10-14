@@ -11,13 +11,15 @@
       "Account removal stays effective after restart. Migrated source launches use the same account configuration instead of loading an older copy.",
       "Tasks can switch from a removed account to an available account while preserving their workspace and conversation history. The account selector now matches its actual selection.",
       "Account email addresses are visible by default, with a button to hide them. Deactivated Codex workspaces no longer display old allowance percentages.",
-      "Windows source installations use a native launcher to prevent recurring Electron welcome screens caused by missing shortcut arguments."
+      "Windows source installations use a native launcher to prevent recurring Electron welcome screens caused by missing shortcut arguments.",
+      "Update indicators and download actions appear only for a newer version. Older GitHub releases no longer appear as new updates."
     ],
     "zh": [
       "移除账号后重启仍保持移除状态。已迁移的源码入口统一读取同一份账号配置，不再加载旧配置恢复账号。",
       "任务可以从已移除的账号切换到其他可用账号，保留工作目录和对话记录；账号下拉框显示与实际选择保持一致。",
       "账号邮箱默认完整显示，可点击按钮隐藏；Codex 工作区被官方停用时，不再显示旧额度百分比。",
-      "Windows 源码版增加独立启动器，修复桌面快捷方式参数丢失后反复打开 Electron 欢迎页的问题。"
+      "Windows 源码版增加独立启动器，修复桌面快捷方式参数丢失后反复打开 Electron 欢迎页的问题。",
+      "仅在确有更新版本时显示蓝点和下载操作，不再把较旧的 GitHub 发布版标成新版本。"
     ]
   }
 }

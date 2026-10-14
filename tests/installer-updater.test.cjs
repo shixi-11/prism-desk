@@ -1,6 +1,12 @@
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),os=require('node:os'),path=require('node:path'),crypto=require('node:crypto');
 const {InstallerUpdater}=require('../electron/installer-updater.cjs'),{releaseInfo}=require('../electron/release.cjs');
 const data=Buffer.from('verified installer fixture'),sha256=crypto.createHash('sha256').update(data).digest('hex');
+test('an older public installer never becomes a new update',async t=>{
+ const {u,downloads}=fixture(t);u.version='0.1.48';u.state.current=u.version;
+ u.fetchRelease=async()=>({version:'0.1.47'});
+ const state=await u.check();assert.equal(state.status,'current');assert.equal(state.latest,u.version);
+ await u.prepare();assert.equal(downloads(),0);
+});
 function fixture(t,platform='win32',arch='x64',downloadData=data){
  const root=fs.mkdtempSync(path.join(os.tmpdir(),'prism-installer-test-'));t.after(()=>fs.rmSync(root,{recursive:true,force:true}));
  let downloads=0;const key=platform==='darwin'?`mac-${arch}`:'windows-x64';
