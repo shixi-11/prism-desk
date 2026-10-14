@@ -3,7 +3,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
-const { registerSource, migrate, migrateFrom, discoverSource } = require('../electron/install-migration.cjs');
+const { registerSource, migrate, migrateFrom, discoverSource, sourceConfig } = require('../electron/install-migration.cjs');
 
 function fixture() {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'prism-install-migration-'));
@@ -20,6 +20,22 @@ function fixture() {
   return { root, sharedRoot, sourceData, userData, configFile, config };
 }
 function clean(f) { fs.rmSync(f.root, { recursive: true, force: true }); }
+
+test('relaunching a migrated source uses the edited installed accounts instead of resurrecting removed source accounts',t=>{
+ const f=fixture();t.after(()=>clean(f));
+ registerSource({sharedRoot:f.userData,configFile:f.configFile,userData:f.sourceData});
+ assert.equal(sourceConfig({sourceRoot:f.sharedRoot,sharedRoot:f.userData}),null);
+ migrate({sharedRoot:f.userData,userData:f.userData});
+ const installed=path.join(f.userData,'config.json'),edited={...f.config,profiles:[]};
+ fs.writeFileSync(installed,JSON.stringify(edited));
+ for(let restart=0;restart<3;restart++){
+  const selected=sourceConfig({sourceRoot:f.sharedRoot,sharedRoot:f.userData});
+  assert.equal(selected,installed);assert.deepEqual(JSON.parse(fs.readFileSync(selected)).profiles,[]);
+  assert.equal(migrate({sharedRoot:f.userData,userData:f.userData}).reason,'installed-config-exists');
+ }
+ assert.equal(JSON.parse(fs.readFileSync(f.configFile,'utf8').replace(/^\uFEFF/,'' )).profiles.length,1);
+ assert.equal(sourceConfig({sourceRoot:path.join(f.root,'other-source'),sharedRoot:f.userData}),null);
+});
 
 test('imports approved config and state, merges destination draft values, and is safe to retry', t => {
   const f = fixture(); t.after(() => clean(f));

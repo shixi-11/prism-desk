@@ -1,6 +1,12 @@
 const { app, BrowserWindow, ipcMain, dialog, shell, Menu, clipboard, Tray } = require("electron");
 if(app.isPackaged&&!process.env.PRISM_TEST_DATA)app.setPath('userData',require('node:path').join(app.getPath('appData'),'Prism'));
 const updateBootstrap=require('./update-bootstrap.cjs');
+if(!process.env.PRISM_CONFIG&&!process.env.PRISM_TEST_DATA&&process.defaultApp){
+ const source=updateBootstrap.installation(require('node:path').resolve(__dirname,'..'));
+ const sharedRoot=require('node:path').join(app.getPath('appData'),'Prism');
+ const migrated=require('./install-migration.cjs').sourceConfig({sourceRoot:source,sharedRoot});
+ if(migrated)process.env.PRISM_CONFIG=migrated;
+}
 // Source and installer editions share only a pointer to existing local data.
 // Import before loading config/core so the first window keeps account identity.
 if(!process.env.PRISM_CONFIG){

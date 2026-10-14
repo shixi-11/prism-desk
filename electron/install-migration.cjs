@@ -39,6 +39,17 @@ function registerSource({ sharedRoot, configFile, userData }) {
   atomic(pointer, { configFile: config, sourceData });
   return pointer;
 }
+function sourceConfig({sourceRoot,sharedRoot}) {
+  const source=path.join(absolute(sourceRoot,'sourceRoot'),'.local','config.json');
+  const shared=absolute(sharedRoot,'sharedRoot'),pointer=path.join(shared,POINTER),installed=path.join(shared,'config.json');
+  if(!fs.existsSync(pointer)||!fs.existsSync(installed))return null;
+  assertNotLink(pointer);assertNotLink(installed);
+  const marker=readJson(pointer);
+  if(!marker||typeof marker.configFile!=='string'||!path.isAbsolute(marker.configFile))throw Error('Invalid source installation marker.');
+  // Once this source installation migrated, its account edits have one authority.
+  // A different checkout must never adopt another installation's accounts.
+  return same(marker.configFile,source)?installed:null;
+}
 function assertNotLink(file) {
   try { if (fs.lstatSync(file).isSymbolicLink()) throw Error(`Refusing symbolic link: ${file}`); }
   catch (e) { if (e.code !== 'ENOENT') throw e; }
@@ -147,4 +158,4 @@ function migrate({ sharedRoot, userData }) {
   if (same(configFile, path.join(target, 'config.json')) || same(sourceData, target)) throw Error('Source and installed data paths must differ.');
   return migrateFrom({ configFile, sourceData, userData: target });
 }
-module.exports = { registerSource, migrate, migrateFrom, discoverSource };
+module.exports = { registerSource, migrate, migrateFrom, discoverSource, sourceConfig };

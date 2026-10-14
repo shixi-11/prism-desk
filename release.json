@@ -1,6 +1,6 @@
 {
-  "version": "0.1.47",
-  "date": "2026-10-10",
+  "version": "0.1.48",
+  "date": "2026-10-14",
   "distribution": [
     "windows-x64",
     "mac-arm64",
@@ -8,14 +8,16 @@
   ],
   "notes": {
     "en": [
-      "Use Prism as the English application name and 棱镜 in Chinese. One Windows installer offers English, Simplified Chinese and Traditional Chinese, with matching shortcut and uninstall names. Existing installation identity and data directories are retained.",
-      "First launch follows the installer language or system language. A manually selected app language remains saved across restarts and upgrades; changing it also updates existing Windows shortcuts for this installation. Deleted desktop shortcuts are not recreated.",
-      "macOS application names are localized for English and Chinese using the system language. Apple silicon and Intel installers include the same changes."
+      "Account removal stays effective after restart. Migrated source launches use the same account configuration instead of loading an older copy.",
+      "Tasks can switch from a removed account to an available account while preserving their workspace and conversation history. The account selector now matches its actual selection.",
+      "Account email addresses are visible by default, with a button to hide them. Deactivated Codex workspaces no longer display old allowance percentages.",
+      "Windows source installations use a native launcher to prevent recurring Electron welcome screens caused by missing shortcut arguments."
     ],
     "zh": [
-      "英文应用名称统一为 Prism，中文保持棱镜。Windows 共用一个安装包，可选择英文、简体中文或繁体中文，快捷方式与卸载名称随安装语言显示，沿用原安装身份和数据目录。",
-      "首次启动采用安装语言或系统语言；手动选择的应用语言会在重启和升级后保留，并更新此安装位置已有的 Windows 快捷方式名称。已主动删除的桌面快捷方式不会重建。",
-      "macOS 应用名称随系统语言显示为 Prism 或棱镜，Apple 芯片与 Intel 安装包同步提供。"
+      "移除账号后重启仍保持移除状态。已迁移的源码入口统一读取同一份账号配置，不再加载旧配置恢复账号。",
+      "任务可以从已移除的账号切换到其他可用账号，保留工作目录和对话记录；账号下拉框显示与实际选择保持一致。",
+      "账号邮箱默认完整显示，可点击按钮隐藏；Codex 工作区被官方停用时，不再显示旧额度百分比。",
+      "Windows 源码版增加独立启动器，修复桌面快捷方式参数丢失后反复打开 Electron 欢迎页的问题。"
     ]
   }
 }
