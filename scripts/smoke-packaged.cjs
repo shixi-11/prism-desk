@@ -232,18 +232,20 @@ async function main() {
     assert.equal(migrationRestart.drafts[created.id]?.text,draftText);
 
     // Removing an imported account must survive subsequent migration checks.
-    const orphan=await page.evaluate(profile=>window.prism.create({title:'Removed account recovery',profile,mode:'read-only'}),account.id);
+    const removedId=migrated.profiles.find(profile=>!profile.disabled).id;
+    const orphan=await page.evaluate(profile=>window.prism.create({title:'Removed account recovery',profile,mode:'read-only'}),removedId);
     const accountList=await page.evaluate(()=>window.prism.accounts());
-    await page.evaluate(profile=>window.prism.removeAccount(profile.id,profile.revision),accountList.profiles.find(profile=>profile.id===account.id));
-    const retainedIds=accountList.profiles.filter(profile=>profile.id!==account.id).map(profile=>profile.id);
+    await page.evaluate(profile=>window.prism.removeAccount(profile.id,profile.revision),accountList.profiles.find(profile=>profile.id===removedId));
+    const retainedIds=accountList.profiles.filter(profile=>profile.id!==removedId).map(profile=>profile.id);
+    const destination=accountList.profiles.find(profile=>profile.id!==removedId&&!profile.disabled).id;
     await application.close();application=await launch();page=await openWindow(application);
     const afterRemoval=await page.evaluate(()=>window.prism.init());
     assert.deepEqual(afterRemoval.profiles.map(profile=>profile.id),retainedIds,'Restart must retain the removal and all other accounts');
     assert.ok(afterRemoval.tasks.some(task=>task.id===orphan.id),'Removing an account must keep its task');
-    const recovered=await page.evaluate(({id,profile})=>window.prism.switch(id,profile),{id:orphan.id,profile:retainedIds[0]});
-    assert.equal(recovered.profile,retainedIds[0],'A task must switch away from its removed account');
+    const recovered=await page.evaluate(({id,profile})=>window.prism.switch(id,profile),{id:orphan.id,profile:destination});
+    assert.equal(recovered.profile,destination,'A task must switch away from its removed account');
     await application.close();application=await launch();page=await openWindow(application);
-    assert.ok(!(await page.evaluate(()=>window.prism.init())).profiles.some(profile=>profile.id===account.id),'A second restart must not restore the removed source account');
+    assert.ok(!(await page.evaluate(()=>window.prism.init())).profiles.some(profile=>profile.id===removedId),'A second restart must not restore the removed source account');
 
     const commit = process.env.GITHUB_SHA || execFileSync('git', ['rev-parse', 'HEAD'], { cwd: path.resolve(__dirname, '..'), encoding: 'utf8' }).trim();
     const metadata = { version: info.version, commit, arch: info.arch };
