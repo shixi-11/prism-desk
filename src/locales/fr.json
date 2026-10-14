@@ -766,5 +766,7 @@
   "删除模板失败": "Impossible de supprimer le modèle",
   "保存并插入": "Enregistrer et insérer",
   "仅保存文字，不包含附件": "Texte uniquement ; les pièces jointes ne sont pas incluses",
-  "删除": "Supprimer"
+  "删除": "Supprimer",
+  "工作区已停用": "Espace de travail désactivé",
+  "工作区已停用，请联系工作区管理员或切换其他账号。": "Cet espace de travail est désactivé. Contactez son administrateur ou changez de compte."
 }

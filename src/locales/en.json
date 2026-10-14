@@ -766,5 +766,7 @@
   "删除模板失败": "Could not delete template",
   "保存并插入": "Save and insert",
   "仅保存文字，不包含附件": "Text only; attachments are not included",
-  "删除": "Delete"
+  "删除": "Delete",
+  "工作区已停用": "Workspace deactivated",
+  "工作区已停用，请联系工作区管理员或切换其他账号。": "This workspace is deactivated. Contact its administrator or switch accounts."
 }

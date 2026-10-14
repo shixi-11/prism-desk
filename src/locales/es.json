@@ -766,5 +766,7 @@
   "删除模板失败": "No se pudo eliminar la plantilla",
   "保存并插入": "Guardar e insertar",
   "仅保存文字，不包含附件": "Solo se guarda el texto, sin archivos adjuntos",
-  "删除": "Eliminar"
+  "删除": "Eliminar",
+  "工作区已停用": "Espacio de trabajo desactivado",
+  "工作区已停用，请联系工作区管理员或切换其他账号。": "Este espacio de trabajo está desactivado. Contacta con su administrador o cambia de cuenta."
 }

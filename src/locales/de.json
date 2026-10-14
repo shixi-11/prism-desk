@@ -766,5 +766,7 @@
   "删除模板失败": "Vorlage konnte nicht gelöscht werden",
   "保存并插入": "Speichern und einfügen",
   "仅保存文字，不包含附件": "Nur Text wird gespeichert, keine Anhänge",
-  "删除": "Löschen"
+  "删除": "Löschen",
+  "工作区已停用": "Arbeitsbereich deaktiviert",
+  "工作区已停用，请联系工作区管理员或切换其他账号。": "Dieser Arbeitsbereich ist deaktiviert. Wenden Sie sich an die Administration oder wechseln Sie das Konto."
 }
