@@ -4,7 +4,7 @@
 .compose-actions .composer-primary:hover:not(:disabled){filter:brightness(.88)}
 .compose-actions .composer-primary:disabled{opacity:.4}
 .compose-actions .composer-primary:focus-visible{outline:2px solid var(--text);outline-offset:4px}
-.compose-actions .composer-steer{font-size:13px;padding:8px 10px}
+.compose-actions .composer-stop{width:40px;height:40px;min-width:40px;padding:0;display:inline-flex;align-items:center;justify-content:center;flex:none}
 .composer-stopping{animation:composer-spin 1s linear infinite}
 @keyframes composer-spin{to{transform:rotate(360deg)}}
 @media(prefers-reduced-motion:reduce){.composer-stopping{animation:none}}

@@ -87,7 +87,7 @@ class Runner extends EventEmitter {
     if(!active||active.task.id!==id||active.cancelRequested)return false;
     if(active.profile.provider!=='Codex'){if(!active.sendGuidance||!await active.sendGuidance(text,images))return false;}
     else {if(!active.rpc||!active.turnId||active.rpc.closed)return false;
-    await active.rpc.call('turn/steer',{threadId:active.task.sessions[active.profile.id],expectedTurnId:active.turnId,input:require('./attachments.cjs').codexInput(text,images)});}
+    await active.rpc.call('turn/steer',{threadId:active.task.sessions[active.profile.id],expectedTurnId:active.turnId,input:require('./attachments.cjs').codexInput(require('./task-continuity.cjs').guidance(text),images)});}
     this.event(id,'user',{text,images,profile:active.profile.id,steered:true});
     active.images=[...(active.images||[]),...images].slice(-5);
     this.store.context(active.task);return true;

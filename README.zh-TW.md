@@ -54,7 +54,7 @@
 
 ### 安裝
 
-下載 **v0.1.48 Windows 64 位元安裝程式**，按兩下 `Prism-Setup.exe` 即可安裝。安裝 Prism 不需要 Git、Node.js 或 npm。由於安裝程式尚未簽署，Windows 可能顯示「未知的發行者」警告。
+下載 **v0.1.49 Windows 64 位元安裝程式**，按兩下 `Prism-Setup.exe` 即可安裝。安裝 Prism 不需要 Git、Node.js 或 npm。由於安裝程式尚未簽署，Windows 可能顯示「未知的發行者」警告。
 
 Windows 使用同一個安裝程式，可選擇 English、简体中文或繁體中文；中文介面名稱為「棱镜」，其他語言顯示為「Prism」。只有在尚未儲存介面語言時，初次介面語言才會採用安裝時的選擇；升級後仍保留已儲存的介面語言。Mac 的 Finder App 名稱會隨系統語言顯示。
 
@@ -71,7 +71,7 @@ Windows 應用程式資料：`%APPDATA%\Prism`；獨立帳號：`%LOCALAPPDATA%\
 以下 PowerShell 指令僅適用於 Windows。
 
 ```powershell
-git clone --branch v0.1.48 https://github.com/shixi-11/prism-desk.git
+git clone --branch v0.1.49 https://github.com/shixi-11/prism-desk.git
 cd prism-desk
 npm install
 npm run build
