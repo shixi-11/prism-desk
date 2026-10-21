@@ -768,5 +768,6 @@
   "仅保存文字，不包含附件": "Texte uniquement ; les pièces jointes ne sont pas incluses",
   "删除": "Supprimer",
   "工作区已停用": "Espace de travail désactivé",
-  "工作区已停用，请联系工作区管理员或切换其他账号。": "Cet espace de travail est désactivé. Contactez son administrateur ou changez de compte."
+  "工作区已停用，请联系工作区管理员或切换其他账号。": "Cet espace de travail est désactivé. Contactez son administrateur ou changez de compte.",
+  "更新下载已停止响应，请检查网络后重试。": "Le téléchargement de la mise à jour ne répond plus. Vérifiez votre connexion et réessayez."
 }

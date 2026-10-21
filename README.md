@@ -52,7 +52,7 @@ Created by [Shixi Lin](https://shixilin.com/). If Prism helps you keep creating,
 
 ### Install
 
-Download the **Windows x64 installer for v0.1.49** and double-click `Prism-Setup.exe`. No Git, Node.js or npm is needed. Windows may show an “Unknown publisher” warning because the installer is unsigned.
+Download the **Windows x64 installer for v0.1.50** and double-click `Prism-Setup.exe`. No Git, Node.js or npm is needed. Windows may show an “Unknown publisher” warning because the installer is unsigned.
 
 The single Windows installer lets you choose English, Simplified Chinese (棱镜), or Traditional Chinese (棱镜). The app initially uses that choice only when no language has been saved; your saved UI language is retained across upgrades. On Mac, the Finder app name follows the system language.
 
@@ -71,7 +71,7 @@ For Windows source builds, use the PowerShell commands below. This option requir
 The following PowerShell commands are for Windows only.
 
 ```powershell
-git clone --branch v0.1.49 https://github.com/shixi-11/prism-desk.git
+git clone --branch v0.1.50 https://github.com/shixi-11/prism-desk.git
 cd prism-desk
 npm install
 npm run build

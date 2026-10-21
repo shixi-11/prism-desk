@@ -768,5 +768,6 @@
   "仅保存文字，不包含附件": "Nur Text wird gespeichert, keine Anhänge",
   "删除": "Löschen",
   "工作区已停用": "Arbeitsbereich deaktiviert",
-  "工作区已停用，请联系工作区管理员或切换其他账号。": "Dieser Arbeitsbereich ist deaktiviert. Wenden Sie sich an die Administration oder wechseln Sie das Konto."
+  "工作区已停用，请联系工作区管理员或切换其他账号。": "Dieser Arbeitsbereich ist deaktiviert. Wenden Sie sich an die Administration oder wechseln Sie das Konto.",
+  "更新下载已停止响应，请检查网络后重试。": "Der Update-Download reagiert nicht mehr. Prüfen Sie die Verbindung und versuchen Sie es erneut."
 }

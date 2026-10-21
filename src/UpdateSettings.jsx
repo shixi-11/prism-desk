@@ -10,11 +10,13 @@ export default function UpdateSettings({checkOnOpen=false,standalone=false,onLat
  const action=async method=>{setBusy(true);setError('');try{setState(await window.prism[method]()||state);}catch(e){setError(e.message.replace(/^Error invoking remote method '[^']+': Error: /,''));}finally{setBusy(false);}};
  const changeAutomatic=async value=>{const before=state;setBusy(true);setState({...state,automatic:value});try{setState(await window.prism.automaticUpdates(value));}catch(e){setState(before);setError(e.message);}finally{setBusy(false);}};
  const hasNew=hasNewRelease(state);
+ const progress=state.status==='preparing'&&state.downloadProgress;
  return <section className={`update-settings${standalone?' standalone':''}`} aria-label={tr('软件更新')}>
  {!standalone&&<strong>{tr('软件更新')}</strong>}
  <label><span>{tr('自动检查更新')}</span><input type="checkbox" checked={state.automatic!==false} disabled={busy} onChange={e=>changeAutomatic(e.target.checked)}/></label>
  <p>{tr('发现新版时亮起蓝点，确认后下载并更新。')}</p>
  <p className="update-status" role="status">{tr(labels[state.status]||labels.idle)}{state.detail?` · ${tr(state.detail)}`:''}</p>
+ {progress&&<div className="update-download-progress"><progress aria-label={tr('正在准备新版')} value={progress.received} max={progress.total}/><span>{Math.floor(progress.received/progress.total*100)}% · {(progress.received/1048576).toFixed(1)} / {(progress.total/1048576).toFixed(1)} MB</span></div>}
  <div className="update-metadata"><span className="update-version">{tr('当前版本')} · {state.version?`v${state.version}`:tr('暂未返回')}</span>{hasNew&&state.release&&<span className="update-version">{tr('新版本')} · v{state.release.version}</span>}{state.checkedAt&&<span>{tr('上次检查')} · {new Date(state.checkedAt).toLocaleString()}</span>}</div>
  {state.release?.body&&(hasNew||state.release.version===state.version)&&<div className="update-release"><strong>{tr('更新内容')} · v{state.release.version}</strong>{state.release.publishedAt&&<time>{new Date(state.release.publishedAt).toLocaleDateString()}</time>}<Markdown skipHtml disallowedElements={['img']}>{releaseNotes(state.release.body,document.documentElement.lang)}</Markdown></div>}
  <div className="update-actions"><button disabled={busy||['checking','preparing','restarting'].includes(state.status)} onClick={()=>action('checkUpdates')}>{tr('检查更新')}</button>{hasNew&&['available','error'].includes(state.status)&&<button disabled={busy} onClick={()=>action('prepareUpdate')}>{tr('下载并准备')}</button>}{hasNew&&state.status==='ready'&&<button disabled={busy} onClick={()=>action('installUpdate')}>{tr(state.distribution==='mac-dmg'?'打开安装包':'更新并重启')}</button>}{onLater&&hasNew&&<button onClick={onLater}>{tr('稍后')}</button>}</div>

@@ -21,6 +21,23 @@ test('checking never downloads; explicit preparation verifies bytes and activati
 test('bad digest and oversized downloads cannot become installable',async t=>{
  for(const bytes of [Buffer.alloc(data.length),Buffer.alloc(data.length+1)]){const {u}=fixture(t,'win32','x64',bytes);await u.check();assert.equal((await u.prepare()).status,'error');assert.equal(fs.existsSync(u.installerFile()),false);assert.equal(fs.existsSync(u.installerFile()+'.partial'),false);await assert.rejects(u.activate());}
 });
+test('checking again and restarting preserve a verified ready installer without downloading again',async t=>{
+ const {u,downloads}=fixture(t);await u.check();await u.prepare();
+ assert.equal((await u.check()).status,'ready');assert.equal(downloads(),1);
+ const restored=new InstallerUpdater({root:u.root,version:u.version,platform:u.platform,arch:u.arch,fetchRelease:u.fetchRelease,download:async()=>{throw Error('Must reuse the verified installer');}});
+ assert.equal((await restored.check()).status,'ready');assert.equal(await restored.activate(),u.installerFile());
+ fs.writeFileSync(u.installerFile(),'tampered');assert.equal((await u.check()).status,'available');
+});
+test('download reports byte progress and a stalled stream becomes retryable without a partial installer',async t=>{
+ const {u}=fixture(t),states=[];u.on('change',state=>states.push(state));await u.check();await u.prepare();
+ assert.ok(states.some(s=>s.status==='preparing'&&s.downloadProgress?.received===data.length));
+ assert.equal(u.state.status,'ready');assert.equal(u.state.downloadProgress,null);
+ fs.unlinkSync(u.installerFile());u.stallTimeoutMs=20;u.download=async()=>new Response(new ReadableStream({start(controller){controller.enqueue(data.subarray(0,2));}}));
+ // Keep the event loop alive so the deliberately unref'ed idle timer can fire.
+ const keepAlive=setTimeout(()=>{},1000);try{assert.equal((await u.prepare()).status,'error');}finally{clearTimeout(keepAlive);}
+ assert.match(u.state.error,/停止响应/);assert.equal(u.busy,false);assert.equal(fs.existsSync(u.installerFile()+'.partial'),false);
+ u.download=async()=>new Response(data);assert.equal((await u.prepare()).status,'ready');
+});
 test('a simultaneous update check cannot replace the installer during activation verification',async t=>{
  const {u}=fixture(t);await u.check();await u.prepare();const file=u.installerFile();
  let fetched=false;u.fetchRelease=async()=>{fetched=true;return {version:'0.1.2',installers:u.state.release.installers};};

@@ -1,6 +1,6 @@
 {
-  "version": "0.1.49",
-  "date": "2026-10-21",
+  "version": "0.1.50",
+  "date": "2026-10-22",
   "distribution": [
     "windows-x64",
     "mac-arm64",
@@ -8,12 +8,12 @@
   ],
   "notes": {
     "en": [
-      "While a task is running, typing a follow-up makes the main composer button send guidance or queue the message. A separate stop button remains available.",
-      "Follow-up instructions retain the original objective and unfinished requirements. Codex guidance stays in the active turn, and later messages resume the same native thread."
+      "Update checks reuse a verified downloaded installer and retain the ready-to-install action, including after restarting Prism.",
+      "Installer downloads display byte progress and stop with a retryable error if the connection stalls. Update indicators clear when the installed version is current."
     ],
     "zh": [
-      "任务运行中输入补充内容后，输入框主按钮改为发送引导或排队，停止按钮单独保留，避免把发送补充误操作为停止。",
-      "追加要求沿用原目标和未完成事项；Codex实时引导在当前轮次中接收，后续消息继续使用原生会话。"
+      "检查更新会复用已下载并通过校验的安装包，保留安装入口；重启棱镜后再次检查也无需重复下载。",
+      "下载更新显示百分比和已下载大小；连接长时间无响应时明确报错并允许重试，真正更新完成后清除更新提示。"
     ]
   }
 }

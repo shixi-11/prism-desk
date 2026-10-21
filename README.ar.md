@@ -54,7 +54,7 @@
 
 ### التثبيت
 
-نزّل مثبّت **v0.1.49 لنظام Windows x64**، ثم انقر نقرًا مزدوجًا على `Prism-Setup.exe`. لا تحتاج إلى Git أو Node.js أو npm. لأن المثبّت غير موقّع، قد يعرض Windows تحذير «ناشر غير معروف».
+نزّل مثبّت **v0.1.50 لنظام Windows x64**، ثم انقر نقرًا مزدوجًا على `Prism-Setup.exe`. لا تحتاج إلى Git أو Node.js أو npm. لأن المثبّت غير موقّع، قد يعرض Windows تحذير «ناشر غير معروف».
 
 يتيح مثبّت Windows الموحّد اختيار English أو 简体中文 أو 繁體中文. يظهر اسم التطبيق بالصينية «棱镜» وباللغات الأخرى «Prism». لا يحدد اختيار المثبّت لغة الواجهة الأولى إلا إذا لم تكن هناك لغة محفوظة؛ وتظل اللغة المحفوظة كما هي بعد الترقية. على Mac، يتبع اسم التطبيق في Finder لغة النظام.
 
@@ -71,7 +71,7 @@
 أوامر PowerShell التالية خاصة بنظام Windows فقط.
 
 ```powershell
-git clone --branch v0.1.49 https://github.com/shixi-11/prism-desk.git
+git clone --branch v0.1.50 https://github.com/shixi-11/prism-desk.git
 cd prism-desk
 npm install
 npm run build
