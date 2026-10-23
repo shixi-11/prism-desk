@@ -54,7 +54,7 @@
 
 ### 설치
 
-**v0.1.50 Windows x64 설치 프로그램**을 다운로드하고 `Prism-Setup.exe`를 더블클릭하세요. Git, Node.js, npm은 필요하지 않습니다. 설치 프로그램은 서명되지 않았으므로 Windows에서 “알 수 없는 게시자” 경고가 표시될 수 있습니다.
+**v0.1.51 Windows x64 설치 프로그램**을 다운로드하고 `Prism-Setup.exe`를 더블클릭하세요. Git, Node.js, npm은 필요하지 않습니다. 설치 프로그램은 서명되지 않았으므로 Windows에서 “알 수 없는 게시자” 경고가 표시될 수 있습니다.
 
 Windows에서는 하나의 설치 프로그램에서 English, 简体中文, 繁體中文을 선택할 수 있습니다. 중국어에서는 “棱镜”, 그 밖의 언어에서는 “Prism”으로 표시됩니다. 저장된 UI 언어가 없을 때만 설치 선택이 최초 UI 언어로 적용되며, 업그레이드 후에도 저장된 언어가 유지됩니다. Mac의 Finder 앱 이름은 시스템 언어를 따릅니다.
 
@@ -71,7 +71,7 @@ Windows 데이터: `%APPDATA%\Prism`, 독립 계정: `%LOCALAPPDATA%\Prism\accou
 아래 PowerShell 명령은 Windows 전용입니다.
 
 ```powershell
-git clone --branch v0.1.50 https://github.com/shixi-11/prism-desk.git
+git clone --branch v0.1.51 https://github.com/shixi-11/prism-desk.git
 cd prism-desk
 npm install
 npm run build

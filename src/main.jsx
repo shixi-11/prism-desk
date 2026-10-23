@@ -240,9 +240,9 @@ function NewTask({ onClose, onCreate, initialCwd="", projects=[], projectNames={
 function ModelControls({task,profile,disabled,onSave}) {
   const [catalog,setCatalog]=useState(null),[error,setError]=useState(''),[busy,setBusy]=useState(false);
   useEffect(()=>{let live=true;setCatalog(null);setError('');api.models(profile.id).then(v=>{if(live)setCatalog(v);}).catch(e=>{if(live)setError(e.message);});return()=>{live=false;};},[profile.id]);
-  const saved=task.modelSettings?.[profile.id];const current=saved?.model||profile.model;
+  const saved=task.modelSettings?.[profile.id],defaults=task.modelDefaults?.[profile.provider];const current=saved?.model||defaults?.model||profile.model;
   const model=catalog?.models.find(m=>m.id===current);
-  const effort=saved?.effort||(profile.effort||(profile.provider==='Gemini'?'auto':'high'));
+  const effort=saved?.effort||defaults?.effort||(profile.effort||(profile.provider==='Gemini'?'auto':'high'));
   const labels={auto:tr("模型自动管理"),low:tr("低"),medium:tr("中"),high:tr("高"),xhigh:tr("更高"),max:tr("最高"),ultra:tr("极高"),minimal:tr("最少"),none:tr("无")};
   const serviceTier=saved?.serviceTier||'default';
   async function save(model,effort,tier=serviceTier){setBusy(true);setError('');try{await onSave({model,effort,...(profile.provider==='Codex'?{serviceTier:tier}:{})});}catch(e){setError(e.message);}finally{setBusy(false);}}
@@ -647,7 +647,7 @@ function App() {
       if(type==='capabilities'){setInit(old=>old?{...old,capabilities:value}:old);return;}
       if(type==='projects'){setInit(old=>old?{...old,settings:{...old.settings,...value}}:old);return;}
       if(type==='app-update'){setAppUpdate(value);return;}
-      if(type==='accounts'){setInit(old=>old?{...old,profiles:value}:old);setDraftSettings(old=>Object.fromEntries(Object.entries(old).map(([id,saved])=>{const p=value.find(p=>p.id===id);return [id,p?.provider==='Codex'?{...saved,model:p.model,effort:p.effort}:saved];})));if(!current.current)setDraftAccount(old=>value.some(p=>p.id===old&&!p.disabled)?old:value.find(p=>!p.disabled)?.id||'');return;}
+      if(type==='accounts'){setInit(old=>old?{...old,profiles:value}:old);if(!current.current)setDraftAccount(old=>value.some(p=>p.id===old&&!p.disabled)?old:value.find(p=>!p.disabled)?.id||'');return;}
       if(type==='account-login'){setAccountLogins(old=>({...old,[value.id]:value}));return;}
       if(type==='tasks-purged'){for(const id of value)delete drafts.current[id];return;}
       if(type==='task-list'){setInit(old=>old?{...old,...value}:old);const selected=value.tasks.find(t=>t.id===current.current);if(selected)setTask(selected);else if(current.current){++loadSequence.current;current.current=null;setTask(null);setEvents([]);setText('');setImages([]);setPastedTexts([]);setOpenedPaste(null);setStreaming('');setThinking('');setActivity('');}return;}
@@ -771,6 +771,7 @@ function App() {
   }catch(error){fail(error);}};
   const create = async (values) => {
     const made = await api.create({...values,profile:draftAccount,executionOptions:draftSettings[draftAccount]});
+    setDraftSettings({});
     if(!task)drafts.current[made.id]={text,images:[],pastedTexts};
     setInit((old) => ({ ...old, tasks: [made, ...old.tasks.filter(t=>t.id!==made.id)] }));
     setModal("");
@@ -820,7 +821,7 @@ function App() {
   const refresh = async (id,model) => {
     setChecking(old=>[...old,id]);
     try {
-      const result = await api.quota(id,model||task?.modelSettings?.[id]?.model||draftSettings[id]?.model);
+      const result = await api.quota(id,model||task?.modelSettings?.[id]?.model||task?.modelDefaults?.[init.profiles.find(p=>p.id===id)?.provider]?.model||draftSettings[id]?.model);
       setQuotas((old) => ({ ...old, [id]: result }));
     } catch (e) {
       setQuotas((old) => ({

@@ -1,6 +1,6 @@
 {
-  "version": "0.1.50",
-  "date": "2026-10-22",
+  "version": "0.1.51",
+  "date": "2026-10-24",
   "distribution": [
     "windows-x64",
     "mac-arm64",
@@ -8,12 +8,12 @@
   ],
   "notes": {
     "en": [
-      "Update checks reuse a verified downloaded installer and retain the ready-to-install action, including after restarting Prism.",
-      "Installer downloads display byte progress and stop with a retryable error if the connection stalls. Update indicators clear when the installed version is current."
+      "Model and reasoning choices are isolated per conversation. Changing one conversation no longer changes other existing conversations or their next execution.",
+      "New conversations inherit the last manually chosen Codex model and reasoning level. Existing conversations retain explicit choices and recover their last recorded execution settings where available; Fast controls use the current conversation’s selection."
     ],
     "zh": [
-      "检查更新会复用已下载并通过校验的安装包，保留安装入口；重启棱镜后再次检查也无需重复下载。",
-      "下载更新显示百分比和已下载大小；连接长时间无响应时明确报错并允许重试，真正更新完成后清除更新提示。"
+      "模型与思考等级按会话独立保存，修改一个会话不再带动其他已有会话的显示或下一次执行。",
+      "新会话沿用最近手动选择的Codex模型与思考等级；旧会话保留明确设置，并在有记录时保留上次实际执行选择。Fast开关使用本会话的模型配置。"
     ]
   }
 }

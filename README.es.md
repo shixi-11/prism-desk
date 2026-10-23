@@ -54,7 +54,7 @@ Creado por [Shixi Lin](https://shixilin.com/). Si Prism te ayuda a seguir creand
 
 ### Instalación
 
-Descarga el instalador **v0.1.50 para Windows x64** y haz doble clic en `Prism-Setup.exe`. No necesitas Git, Node.js ni npm. Como no está firmado, Windows puede mostrar una advertencia de «Editor desconocido».
+Descarga el instalador **v0.1.51 para Windows x64** y haz doble clic en `Prism-Setup.exe`. No necesitas Git, Node.js ni npm. Como no está firmado, Windows puede mostrar una advertencia de «Editor desconocido».
 
 El instalador único de Windows permite elegir English, 简体中文 o 繁體中文. En chino, la aplicación se llama «棱镜»; en los demás idiomas, «Prism». La elección del instalador solo determina el idioma inicial si aún no hay uno guardado; el idioma guardado se conserva al actualizar. En Mac, el nombre de la app en Finder sigue el idioma del sistema.
 
@@ -71,7 +71,7 @@ Para compilar desde el código fuente, sigue los comandos para desarrolladores. 
 Los siguientes comandos de PowerShell son solo para Windows.
 
 ```powershell
-git clone --branch v0.1.50 https://github.com/shixi-11/prism-desk.git
+git clone --branch v0.1.51 https://github.com/shixi-11/prism-desk.git
 cd prism-desk
 npm install
 npm run build

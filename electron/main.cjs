@@ -137,6 +137,7 @@ app.whenReady().then(() => {
   store = new TaskStore(require('./storage.cjs').taskRoot(app.getAppPath(),dataPath()));
   store.recover();
   require('./model-preference-request.cjs').apply(store,PROFILES,path.join(dataPath(),'model-preference-request.json'));
+  store.pinModelDefaults();
   quotaDisplay=new (require('./quota-display.cjs').QuotaDisplay)(dataPath());
   const draftFile=win=>path.join(dataPath(),'drafts',win.draftKey+'.json');
   const draftWriter=new (require('./draft-writer.cjs').DraftWriter)();
@@ -458,7 +459,7 @@ app.whenReady().then(() => {
   });
   handle('models',id=>{if(accountOperation)throw Error('请等待账号操作结束。');return require('./models.cjs').modelOptions(id,app.getAppPath());});
   handle('modelSettings',async(id,input,profileId)=>{if(accountOperation)throw Error('请等待账号操作结束。');const task=await require('./models.cjs').updateSelectionForRunner(store,runner.forTask(id),id,input,profileId);broadcastAccounts();return task;});
-  handle('rememberModel',async(id,input)=>{if(accountOperation)throw Error('请等待账号操作结束。');const value=await require('./models.cjs').rememberSelection(id,app.getAppPath(),input);broadcastAccounts();return value;});
+  handle('rememberModel',async(id,input)=>{if(accountOperation)throw Error('请等待账号操作结束。');const value=await require('./models.cjs').rememberSelection(id,app.getAppPath(),input,store);broadcastAccounts();return value;});
   handle("run", async (id, text, imageIds=[], choiceEventId) => {
     if(accountOperation)throw Error('请先完成或取消账号登录。');
     if(validatingApps)throw Error('请等待本机应用验证结束');

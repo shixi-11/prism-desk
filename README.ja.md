@@ -54,7 +54,7 @@
 
 ### インストール
 
-**v0.1.50 Windows x64版**をダウンロードし、`Prism-Setup.exe` をダブルクリックします。Windows は未署名インストーラーについて警告する場合があります。
+**v0.1.51 Windows x64版**をダウンロードし、`Prism-Setup.exe` をダブルクリックします。Windows は未署名インストーラーについて警告する場合があります。
 
 Windows では共通のインストーラーで English、简体中文、繁體中文を選択できます。中国語では「棱镜」、その他の言語では「Prism」と表示されます。保存済みの表示言語がない場合に限り、初回の画面言語にインストーラーの選択が使われ、アップグレード後も保存済みの言語が引き継がれます。Mac の Finder 上のアプリ名はシステム言語に従います。
 
@@ -65,7 +65,7 @@ Windowsでソースからビルドする場合は、以下のPowerShellコマン
 以下のPowerShellコマンドはWindows専用です。
 
 ```powershell
-git clone --branch v0.1.50 https://github.com/shixi-11/prism-desk.git
+git clone --branch v0.1.51 https://github.com/shixi-11/prism-desk.git
 cd prism-desk
 npm install
 npm run build

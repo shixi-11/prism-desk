@@ -321,6 +321,15 @@ class TaskStore {
     atomic(path.join(this.dir(task.id), "task.json"), task);
     return task;
   }
+  pinModelDefaults(){
+    let changed=0;
+    for(const view of ['active','archived','deleted'])for(const task of this.list(view)){
+      if(require('./task-model-settings.cjs').pin(task)){
+        atomic(path.join(this.dir(task.id),'task.json'),task);changed++;
+      }
+    }
+    return changed;
+  }
   create({ title, cwd, profile = PROFILES.find(p=>!p.disabled)?.id, mode = "read-only" }) {
     if (typeof title !== "string" || !title.trim() || title.length > 100)
       throw Error("请填写 1–100 字的任务名。");
@@ -334,7 +343,7 @@ class TaskStore {
       throw Error("工作模式无效。");
     const id=crypto.randomUUID();
     if(managed){cwd=path.join(this.dir(id),'workspace');fs.mkdirSync(cwd,{recursive:true});}
-    return this.save({
+    const task={
       id,
       title: title.trim(),
       cwd: fs.realpathSync.native(cwd),
@@ -346,7 +355,9 @@ class TaskStore {
       checkpoint: "",
       autoSwitch: true,
       updated: new Date().toISOString(),
-    });
+    };
+    require('./task-model-settings.cjs').pin(task);
+    return this.save(task);
   }
   append(id, type, data) {
     const event = {
