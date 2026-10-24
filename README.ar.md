@@ -48,6 +48,8 @@
 
 يوفّر هذا الإصدار مثبّتات Windows x64 وMac. راجع [التثبيت](#install) للتعليمات الخاصة بكل منصة وتفاصيل التوقيع.
 
+انضم إلى مجتمع [Discord](https://discord.gg/FZwtjm3sxh).
+
 من إنشاء [Shixi Lin](https://shixilin.com/). إذا ساعدك Prism على مواصلة الإبداع، يمكنك [دعم تطويره](https://shixilin.com/support?lang=ar).
 
 <a id="install"></a>

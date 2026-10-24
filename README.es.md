@@ -48,6 +48,8 @@ Haz clic derecho en un proyecto para fijarlo, editar su nombre, elegir una secci
 
 Esta versión incluye instaladores para Windows x64 y Mac. Consulta [Instalación](#install) para ver las instrucciones y los detalles de firma.
 
+Únete a la comunidad en [Discord](https://discord.gg/FZwtjm3sxh).
+
 Creado por [Shixi Lin](https://shixilin.com/). Si Prism te ayuda a seguir creando, [apoya su desarrollo](https://shixilin.com/support?lang=es).
 
 <a id="install"></a>

@@ -48,6 +48,8 @@
 
 このリリースではWindows x64版とMac版のインストーラーを提供します。各プラットフォームの導入方法と署名の詳細は[インストール](#install)をご覧ください。
 
+[Discordコミュニティに参加](https://discord.gg/FZwtjm3sxh)。
+
 作者：[Shixi Lin](https://shixilin.com/)。 Prism が制作に役立ったら、[今後の開発をご支援ください](https://shixilin.com/support?lang=ja)。
 
 <a id="install"></a>

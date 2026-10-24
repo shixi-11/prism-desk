@@ -48,6 +48,8 @@ Un clic droit sur un projet permet de l’épingler, modifier son nom, choisir u
 
 Cette version fournit des installateurs pour Windows x64 et Mac. Consultez [Installation](#install) pour les instructions et les détails de signature.
 
+Rejoignez la communauté sur [Discord](https://discord.gg/FZwtjm3sxh).
+
 Créé par [Shixi Lin](https://shixilin.com/). Si Prism vous aide à créer, [soutenez son développement](https://shixilin.com/support?lang=fr).
 
 <a id="install"></a>

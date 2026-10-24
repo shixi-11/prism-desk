@@ -48,6 +48,8 @@
 
 本次发布提供 Windows 64 位与 Mac 安装包。平台安装方式和签名说明见[安装](#安装)。
 
+欢迎加入 [Discord 社区](https://discord.gg/FZwtjm3sxh)。
+
 由[光之十一](https://shixilin.com/)创作。 如果棱镜让你更顺畅地投入创作，欢迎[支持后续开发](https://shixilin.com/support?lang=zh)。
 
 <a id="install"></a>

@@ -48,6 +48,8 @@ Per Rechtsklick können Sie ein Projekt anheften, umbenennen, einem Bereich zuor
 
 Diese Version enthält Installer für Windows x64 und Mac. Plattformhinweise und Signaturdetails finden Sie unter [Installation](#install).
 
+Treten Sie der Community auf [Discord](https://discord.gg/FZwtjm3sxh) bei.
+
 Entwickelt von [Shixi Lin](https://shixilin.com/). Wenn Prism Ihre Arbeit erleichtert, [unterstützen Sie die Weiterentwicklung](https://shixilin.com/support?lang=de).
 
 <a id="install"></a>

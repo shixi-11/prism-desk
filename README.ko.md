@@ -48,6 +48,8 @@
 
 이번 릴리스는 Windows x64 및 Mac 설치 프로그램을 제공합니다. 플랫폼별 설치와 서명 안내는 [설치](#install)를 참조하세요.
 
+[Discord 커뮤니티에 참여하세요](https://discord.gg/FZwtjm3sxh).
+
 제작: [Shixi Lin](https://shixilin.com/). Prism이 창작에 도움이 된다면 [지속적인 개발을 후원해 주세요](https://shixilin.com/support?lang=ko).
 
 <a id="install"></a>

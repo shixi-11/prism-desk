@@ -48,6 +48,8 @@
 
 本次發布提供 Windows 64 位元與 Mac 安裝程式。平台安裝方式與簽章說明請見[安裝](#安裝)。
 
+歡迎加入 [Discord 社群](https://discord.gg/FZwtjm3sxh)。
+
 由[光之十一](https://shixilin.com/)創作。 如果 Prism 讓創作更順暢，歡迎[支持後續開發](https://shixilin.com/support?lang=zh-TW)。
 
 <a id="install"></a>

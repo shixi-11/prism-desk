@@ -48,6 +48,8 @@ Right-click a project to pin it, edit its name, choose a section, create a perma
 
 This release provides Windows x64 and Mac installers. See [Install](#install) for platform-specific instructions and signing details.
 
+Join the community on [Discord](https://discord.gg/FZwtjm3sxh).
+
 Created by [Shixi Lin](https://shixilin.com/). If Prism helps you keep creating, [support its continued development](https://shixilin.com/support?lang=en).
 
 ### Install
