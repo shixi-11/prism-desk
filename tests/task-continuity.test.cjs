@@ -28,6 +28,9 @@ test('successive guidance stays in the same active turn and a later message resu
   for(let n=0;!runner.active.turnId&&n<100;n++)await new Promise(r=>setImmediate(r));
   assert.equal(runner.active.turnId,'same-active-turn');
   if(!turn){
+   rpc.emit('message',{method:'turn/started',params:{threadId:'subagent-thread',turn:{id:'subagent-turn'}}});
+   rpc.emit('message',{method:'turn/completed',params:{threadId:'subagent-thread',turn:{id:'subagent-turn',status:'completed'}}});
+   assert.equal(runner.active.turnId,'same-active-turn');
    for(const text of ['Keep the full names.','Clarify the opening scene.'])assert.equal(await runner.steer(task.id,text),true);
    assert.equal(ended,0);assert.equal(task.sessions[profile.id],'same-native-thread');
    const guidance=calls.filter(c=>c.method==='turn/steer');assert.equal(guidance.length,2);

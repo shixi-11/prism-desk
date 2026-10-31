@@ -259,12 +259,14 @@ class Runner extends EventEmitter {
         this.event(task.id, "plan", { data: p });
       if (message.method === "turn/diff/updated")
         this.event(task.id, "diff", { text: p.diff });
-      if (message.method === "turn/completed") {
+      // Subagent threads share this connection; their turns must not replace the task's turn.
+      const otherThread = p.threadId && task.sessions[profile.id] && p.threadId !== task.sessions[profile.id];
+      if (message.method === "turn/completed" && !otherThread) {
         terminal = p.turn;
         this.active.turnId = null;
         resolveTurn();
       }
-      if (message.method === "turn/started") {
+      if (message.method === "turn/started" && !otherThread) {
         this.active.turnId = p.turn.id;
         this.emit('steer-ready', {taskId:task.id});
         this.active.started = true;
