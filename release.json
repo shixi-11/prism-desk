@@ -1,6 +1,6 @@
 {
-  "version": "0.1.51",
-  "date": "2026-10-24",
+  "version": "0.1.52",
+  "date": "2026-11-01",
   "distribution": [
     "windows-x64",
     "mac-arm64",
@@ -8,12 +8,12 @@
   ],
   "notes": {
     "en": [
-      "Model and reasoning choices are isolated per conversation. Changing one conversation no longer changes other existing conversations or their next execution.",
-      "New conversations inherit the last manually chosen Codex model and reasoning level. Existing conversations retain explicit choices and recover their last recorded execution settings where available; Fast controls use the current conversation’s selection."
+      "Messages sent while a Codex task is running reach the ongoing turn again when Codex uses subagents. They no longer fail with “expected active turn id … but found …”.",
+      "A subagent finishing its own work no longer ends the main Codex task early."
     ],
     "zh": [
-      "模型与思考等级按会话独立保存，修改一个会话不再带动其他已有会话的显示或下一次执行。",
-      "新会话沿用最近手动选择的Codex模型与思考等级；旧会话保留明确设置，并在有记录时保留上次实际执行选择。Fast开关使用本会话的模型配置。"
+      "Codex 执行中调用子代理时，执行途中补充的消息可以正常送达当前轮次，不再报错“expected active turn id … but found …”。",
+      "子代理完成自己的工作后，不再让主任务提前结束。"
     ]
   }
 }
