@@ -28,6 +28,8 @@ jobs:
       - run: node --test --test-concurrency=1 tests/task-continuity.test.cjs tests/model-isolation.test.cjs tests/message-queue.test.cjs tests/live-guidance.test.cjs tests/core.test.cjs tests/install-migration.test.cjs tests/quota-display.test.cjs tests/source-launcher.test.cjs tests/updater.test.cjs tests/installer-updater.test.cjs tests/release.test.cjs
       - run: npm run build:installer
       - run: npm install --no-save --ignore-scripts playwright
+      - run: node --test tests/preview.test.cjs tests/preview-theme.test.cjs
+      - run: node scripts/preview-theme-ui-check.cjs
       - run: node scripts/smoke-windows-installer.cjs
       - uses: actions/upload-artifact@v4
         with:
@@ -82,6 +84,8 @@ jobs:
           codesign --verify --deep --strict "$app"
           node scripts/verify-mac-localization.cjs "$app"
           npm install --no-save --ignore-scripts playwright
+          node --test tests/preview.test.cjs tests/preview-theme.test.cjs
+          node scripts/preview-theme-ui-check.cjs
           node scripts/smoke-packaged.cjs "$app" --metadata "$artifacts/metadata.json"
           node -e 'const m=require(process.argv[1]); if(m.arch!==process.argv[2]) throw Error(`Expected ${process.argv[2]} but smoke app reported ${m.arch}`)' "$artifacts/metadata.json" "$ARCH"
           cp "$dmg" "$artifacts/Prism-${ARCH}.dmg"

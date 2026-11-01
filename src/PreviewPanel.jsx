@@ -3,6 +3,7 @@ import Markdown from 'react-markdown';
 import {X,RefreshCw,FolderOpen,Maximize2,Save} from 'lucide-react';
 import {localPathText} from './local-path.js';
 import {tr,locale} from './i18n.js';
+import {previewTheme,htmlPreviewDocument} from './preview-theme.js';
 const pathLink=(children)=>{const value=Array.isArray(children)?children.every(c=>typeof c==='string')?children.join(''):null:children;return localPathText(value);};
 const keepUrl=url=>url;
 // Stable component types let React update streamed Markdown in place instead of
@@ -13,6 +14,13 @@ const MemoMarkdown=React.memo(function MemoMarkdown({children,onPreview}){
  return <Markdown urlTransform={keepUrl} components={components}>{children}</Markdown>;
 });
 export function LinkedMarkdown(props){return <MemoMarkdown {...props} language={locale()}/>;}
+function HtmlPreview({name,text}){
+ const frame=useRef(null);
+ const source=useMemo(()=>htmlPreviewDocument(text,previewTheme()),[text]);
+ const syncTheme=useCallback(()=>frame.current?.contentWindow?.postMessage({type:'prism:preview-theme',theme:previewTheme()},'*'),[]);
+ useEffect(()=>{const observer=new MutationObserver(syncTheme);observer.observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});return()=>observer.disconnect();},[syncTheme]);
+ return <iframe ref={frame} className="preview-html" title={name} sandbox="allow-scripts" srcDoc={source} onLoad={syncTheme}/>;
+}
 function PreviewPanel({task,request,onClose}){
  const [item,setItem]=useState(null),[text,setText]=useState(''),[edit,setEdit]=useState(false),[error,setError]=useState(''),[busy,setBusy]=useState(false),[wide,setWide]=useState(false),[address,setAddress]=useState(''),[frame,setFrame]=useState(0);
  const linkHandler=useRef(null);linkHandler.current=(target)=>open(target,item?.path);
@@ -30,7 +38,7 @@ function PreviewPanel({task,request,onClose}){
  <div className="preview-tools">{item?.path&&<><button onClick={()=>openNative(item.nativeAction||'open')}><FolderOpen size={15}/>{tr(nativeLabel)}</button>{item.kind!=='directory'&&item.nativeAction!=='reveal'&&<button onClick={()=>openNative('reveal')}>{tr('在文件夹中显示')}</button>}</>}<button disabled={busy||!item} onClick={()=>open(item.path||item.url)}><RefreshCw size={15}/>{tr('刷新')}</button>{item?.text!==undefined&&<><button aria-pressed={edit} onClick={()=>setEdit(!edit)}>{tr(edit?'预览':'编辑')}</button><button disabled={busy||!dirty} onClick={save}><Save size={15}/>{tr('保存')}</button></>}</div>
  {item?.plainText&&<p className="muted">{tr('文件较大，已切换为纯文本预览。')}</p>}
  {error&&<p className="preview-error" role="alert">{tr(error)}</p>}
- <div className="preview-content">{busy&&<p>{tr('正在加载…')}</p>}{!busy&&item&&(edit?<textarea aria-label={tr('文件内容')} spellCheck={false} value={text} onChange={e=>setText(e.target.value)}/>:['directory','external'].includes(item.kind)?<div className="preview-native"><p>{item.name}</p><p>{tr(item.kind==='directory'?'可在资源管理器中打开此文件夹。':item.nativeAction==='reveal'?'在文件夹中显示':'此文件可用本机应用打开，或在文件夹中显示。')}</p><button onClick={()=>openNative(item.nativeAction||'open')}>{tr(nativeLabel)}</button></div>:item.kind==='image'?<img alt={item.name} src={item.data}/>:item.kind==='markdown'?<article className="prose"><LinkedMarkdown onPreview={followLink}>{text}</LinkedMarkdown></article>:item.kind==='text'?<pre>{text}</pre>:item.kind==='html'?<iframe title={item.name} sandbox="allow-scripts" srcDoc={`<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; font-src data:">${text}`}/>:item.kind==='web'?<iframe key={frame} title={item.name} sandbox="allow-scripts allow-same-origin allow-forms" src={item.url}/>:<iframe title={item.name} src={item.data}/>)}</div>
+ <div className="preview-content">{busy&&<p>{tr('正在加载…')}</p>}{!busy&&item&&(edit?<textarea aria-label={tr('文件内容')} spellCheck={false} value={text} onChange={e=>setText(e.target.value)}/>:['directory','external'].includes(item.kind)?<div className="preview-native"><p>{item.name}</p><p>{tr(item.kind==='directory'?'可在资源管理器中打开此文件夹。':item.nativeAction==='reveal'?'在文件夹中显示':'此文件可用本机应用打开，或在文件夹中显示。')}</p><button onClick={()=>openNative(item.nativeAction||'open')}>{tr(nativeLabel)}</button></div>:item.kind==='image'?<img alt={item.name} src={item.data}/>:item.kind==='markdown'?<article className="prose"><LinkedMarkdown onPreview={followLink}>{text}</LinkedMarkdown></article>:item.kind==='text'?<pre>{text}</pre>:item.kind==='html'?<HtmlPreview name={item.name} text={text}/>:item.kind==='web'?<iframe key={frame} title={item.name} sandbox="allow-scripts allow-same-origin allow-forms" src={item.url}/>:<iframe title={item.name} src={item.data}/>)}</div>
  {item?.kind==='html'&&<footer>{tr('交互项目请启动本地服务，再输入预览网址。')}</footer>}
  {item?.kind==='web'&&<footer>{tr('网址需已启动服务；部分网站不允许嵌入预览。')}</footer>}
  </aside>;

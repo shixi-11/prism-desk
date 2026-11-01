@@ -17,3 +17,4 @@ config.local.json
 **/credentials.json
 *.db
 *.sqlite*
+/output/playwright/
