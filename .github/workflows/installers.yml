@@ -84,6 +84,8 @@ jobs:
           codesign --verify --deep --strict "$app"
           node scripts/verify-mac-localization.cjs "$app"
           npm install --no-save --ignore-scripts playwright
+          # Preview paths are canonical; macOS exposes its temp folder via /var.
+          export TMPDIR="$(cd "$TMPDIR" && pwd -P)/"
           node --test tests/preview.test.cjs tests/preview-theme.test.cjs
           node scripts/preview-theme-ui-check.cjs
           node scripts/smoke-packaged.cjs "$app" --metadata "$artifacts/metadata.json"
