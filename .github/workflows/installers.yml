@@ -29,6 +29,9 @@ jobs:
       - run: npm run build:installer
       - run: npm install --no-save --ignore-scripts playwright
       - run: node --test tests/preview.test.cjs tests/preview-theme.test.cjs
+        env:
+          TEMP: ${{ runner.temp }}
+          TMP: ${{ runner.temp }}
       - run: node scripts/preview-theme-ui-check.cjs
       - run: node scripts/smoke-windows-installer.cjs
       - uses: actions/upload-artifact@v4
