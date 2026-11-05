@@ -1,11 +1,19 @@
 import React,{useEffect,useState} from 'react';
-import {Plus,RefreshCw,ExternalLink,FolderOpen,Check,Settings2,Copy,Eye,EyeOff,Pencil,X,Trash2} from 'lucide-react';
+import {Plus,RefreshCw,ExternalLink,FolderOpen,Check,Settings2,Copy,Eye,EyeOff,Pencil,X,Trash2,ArrowUp,ArrowDown,ListOrdered} from 'lucide-react';
 import {AccountQuota} from './TaskControls.jsx';
+import {accountLabel} from './account-selection.js';
 import {tr} from './i18n.js';
 const api=window.prism;
 const focusWithoutScroll=button=>button?.focus({preventScroll:true});
 const errorText=error=>(error.message||String(error)).replace(/^Error invoking remote method '[^']+': Error: /,'');
 const active=state=>['starting','waiting','verifying'].includes(state?.phase);
+const orderKey='prism-account-display-order';
+function readOrder(){
+ try{
+  const order=JSON.parse(localStorage.getItem(orderKey));
+  return Array.isArray(order)?order:[];
+ }catch{return [];}
+}
 function LoginStatus({state}){
  if(!state)return null;
  const labels={starting:'正在获取登录链接…',waiting:'登录链接已准备好',verifying:'正在检查账号…',connected:'账号已连接',cancelled:'已取消登录',error:'登录未完成'};
@@ -23,6 +31,17 @@ export default function AccountManager({profiles,quotas,checking,bulk,onRefresh,
  const [copied,setCopied]=useState(false);
  const [removing,setRemoving]=useState(null);
  const [authorizationCode,setAuthorizationCode]=useState('');
+ const [sorting,setSorting]=useState(false),[order,setOrder]=useState(readOrder);
+ const accounts=data?.profiles||profiles;
+ const ranks=new Map(order.map((id,index)=>[id,index]));
+ const orderedAccounts=[...accounts].sort((a,b)=>(ranks.get(a.id)??order.length)-(ranks.get(b.id)??order.length));
+ function moveAccount(index,offset){
+  const next=orderedAccounts.map(account=>account.id);
+  const target=index+offset;
+  [next[index],next[target]]=[next[target],next[index]];
+  try{localStorage.setItem(orderKey,JSON.stringify(next));setOrder(next);setError('');}
+  catch{setError('无法保存账号顺序，请重试。');}
+ }
  const reload=async()=>{const result=await api.accounts();setData(result);return result;};
  useEffect(()=>{reload().catch(e=>setError(errorText(e)));},[profiles]);
  const locked=busy||working||!!bulk||checking.length>0||Object.values(loginStates).some(active);
@@ -67,10 +86,24 @@ export default function AccountManager({profiles,quotas,checking,bulk,onRefresh,
     <p className="muted">{tr('凭据由官方 CLI 保存在本机，棱镜不接收你的密码。')}</p>
     <div className="dialog-actions"><button disabled={active(state)} onClick={()=>{setEditor({...current});setStep('form');}}>{tr('修改设置')}</button><button className="primary" onClick={()=>setEditor(null)}>{tr('返回账号列表')}</button></div>
    </div>}
+  </section>:sorting?<section>
+   <button onClick={()=>{setSorting(false);setError('');}}>{tr('返回账号列表')}</button>
+   <ol className="relay-order" aria-label={tr('手动排序')}>
+    {orderedAccounts.map((p,index)=>{
+     const label=accountLabel(p.provider,tr(p.name));
+     return <li className="account-sort-row" key={p.id}>
+      <span aria-hidden="true">{index+1}</span><strong>{label}</strong>
+      <div className="relay-row-actions">
+       <button disabled={index===0} title={tr('上移')} aria-label={`${tr('上移')} ${label}`} onClick={()=>moveAccount(index,-1)}><ArrowUp size={17}/></button>
+       <button disabled={index===orderedAccounts.length-1} title={tr('下移')} aria-label={`${tr('下移')} ${label}`} onClick={()=>moveAccount(index,1)}><ArrowDown size={17}/></button>
+      </div>
+     </li>;
+    })}
+   </ol>
   </section>:<>
    <p className="muted">{tr('在这里接入和管理订阅账号，登录成功后即可选择执行。')}</p>
-   <div className="account-query-toolbar"><button className="primary" disabled={!data||locked} onClick={()=>begin(null)}><Plus size={17}/>{tr('接入账号')}</button><button disabled={!!bulk||checking.length>0||locked} onClick={onRefreshAll}><RefreshCw size={16} className={bulk?'spinning':''}/>{tr('一键查询全部')}</button><span role="status">{bulk?`${tr('查询中…')} ${bulk.done} / ${bulk.total}`:''}</span></div>
-   <div className="connection-list">{(data?.profiles||profiles).map(p=><article className={`connection-card ${p.disabled?'disabled-account':''}`} key={p.id}><div className="connection-identity"><strong>{p.provider}</strong><AccountName profile={p} onSaved={reload}/>{p.disabled&&<small>{tr((p.connectionState==='pending'||p.loginRequired)?'待登录':'已停用')}</small>}<AccountEmail email={quotas[p.id]?.email||p.email}/></div><AccountQuota profile={p} quota={quotas[p.id]}/><LoginStatus state={loginStates[p.id]}/><div className="connection-card-actions"><button disabled={locked||checking.includes(p.id)} onClick={()=>onRefresh(p.id)}>{tr(checking.includes(p.id)?'查询中…':'查询')}</button><button disabled={locked&&!active(loginStates[p.id])} onClick={()=>{setEditor({...p});setStep('connect');setError('');}}>{tr(active(loginStates[p.id])?'继续登录':'登录账号')}</button><button disabled={locked} aria-label={`${tr('账号设置')} ${p.name}`} onClick={()=>begin(p)}><Settings2 size={15}/>{tr('设置')}</button><button disabled={locked||p.connectionState==='pending'||p.loginRequired} onClick={()=>action(()=>api.enableAccount(p.id,!!p.disabled))}>{tr(p.disabled?'启用':'停用')}</button><button disabled={locked} aria-label={tr('移除账号')+' '+p.name} onClick={()=>{setRemoving(p);setError('');}}><Trash2 size={15}/>{tr('移除')}</button>{active(loginStates[p.id])&&<button onClick={()=>action(()=>api.cancelAccountLogin(p.id))}>{tr('取消登录')}</button>}</div>{removing?.id===p.id&&<section className="account-remove-confirm" role="alertdialog" aria-labelledby="remove-account-title" aria-describedby="remove-account-detail"><h3 id="remove-account-title">{tr('移除账号')} · {removing.name}</h3><p id="remove-account-detail">{tr('仅从棱镜移除账号，保留任务记录和本机登录目录。关联任务需切换账号后继续。')}</p><div className="dialog-actions"><button ref={focusWithoutScroll} disabled={working} onClick={()=>setRemoving(null)}>{tr('取消')}</button><button disabled={locked} onClick={()=>action(async()=>{await api.removeAccount(removing.id,removing.revision);setRemoving(null);})}>{tr('确认移除')}</button></div></section>}</article>)}</div>
+   <div className="account-query-toolbar"><button className="primary" disabled={!data||locked} onClick={()=>begin(null)}><Plus size={17}/>{tr('接入账号')}</button><button disabled={!!bulk||checking.length>0||locked} onClick={onRefreshAll}><RefreshCw size={16} className={bulk?'spinning':''}/>{tr('一键查询全部')}</button><button disabled={orderedAccounts.length<2} onClick={()=>{setSorting(true);setError('');}}><ListOrdered size={16}/>{tr('手动排序')}</button><span role="status">{bulk?`${tr('查询中…')} ${bulk.done} / ${bulk.total}`:''}</span></div>
+   <div className="connection-list">{orderedAccounts.map(p=><article className={`connection-card ${p.disabled?'disabled-account':''}`} key={p.id}><div className="connection-identity"><strong>{p.provider}</strong><AccountName profile={p} onSaved={reload}/>{p.disabled&&<small>{tr((p.connectionState==='pending'||p.loginRequired)?'待登录':'已停用')}</small>}<AccountEmail email={quotas[p.id]?.email||p.email}/></div><AccountQuota profile={p} quota={quotas[p.id]}/><LoginStatus state={loginStates[p.id]}/><div className="connection-card-actions"><button disabled={locked||checking.includes(p.id)} onClick={()=>onRefresh(p.id)}>{tr(checking.includes(p.id)?'查询中…':'查询')}</button><button disabled={locked&&!active(loginStates[p.id])} onClick={()=>{setEditor({...p});setStep('connect');setError('');}}>{tr(active(loginStates[p.id])?'继续登录':'登录账号')}</button><button disabled={locked} aria-label={`${tr('账号设置')} ${p.name}`} onClick={()=>begin(p)}><Settings2 size={15}/>{tr('设置')}</button><button disabled={locked||p.connectionState==='pending'||p.loginRequired} onClick={()=>action(()=>api.enableAccount(p.id,!!p.disabled))}>{tr(p.disabled?'启用':'停用')}</button><button disabled={locked} aria-label={tr('移除账号')+' '+p.name} onClick={()=>{setRemoving(p);setError('');}}><Trash2 size={15}/>{tr('移除')}</button>{active(loginStates[p.id])&&<button onClick={()=>action(()=>api.cancelAccountLogin(p.id))}>{tr('取消登录')}</button>}</div>{removing?.id===p.id&&<section className="account-remove-confirm" role="alertdialog" aria-labelledby="remove-account-title" aria-describedby="remove-account-detail"><h3 id="remove-account-title">{tr('移除账号')} · {removing.name}</h3><p id="remove-account-detail">{tr('仅从棱镜移除账号，保留任务记录和本机登录目录。关联任务需切换账号后继续。')}</p><div className="dialog-actions"><button ref={focusWithoutScroll} disabled={working} onClick={()=>setRemoving(null)}>{tr('取消')}</button><button disabled={locked} onClick={()=>action(async()=>{await api.removeAccount(removing.id,removing.revision);setRemoving(null);})}>{tr('确认移除')}</button></div></section>}</article>)}</div>
   </>}
  </div>;
 }

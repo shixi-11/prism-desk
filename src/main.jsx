@@ -1,5 +1,5 @@
 import {quotaBlocked,quotaStateLabel} from './quota-state.js';
-import {accountTarget} from './account-selection.js';
+import {accountLabel,accountTarget} from './account-selection.js';
 import {hasNewRelease} from './update-state.js';
 import React, { useEffect, useRef, useState, useMemo, useCallback } from "react";
 import { createRoot } from "react-dom/client";
@@ -295,7 +295,8 @@ function Inspector({
   const changedModel=!!selectedConfig&&(!activeConfig||activeConfig.model!==selectedConfig?.model||activeConfig.effort!==selectedConfig?.effort||(activeConfig.serviceTier||'default')!==(selectedConfig.serviceTier||'default'));
 
   const running = task?.state === "running";
-  const canStop = running && ["Codex","Claude","Grok"].includes(profiles.find(p=>p.id===task.profile)?.provider);
+  const currentProfile = profiles.find(p=>p.id===task?.profile);
+  const canStop = running && ["Codex","Claude","Grok"].includes(currentProfile?.provider);
   const [clock,setClock]=useState(Date.now());
   useEffect(()=>{const timer=setInterval(()=>setClock(Date.now()),30000);return()=>clearInterval(timer);},[]);
   const stale = quota?.cached ||
@@ -318,7 +319,7 @@ function Inspector({
             {!selected&&<option value="" disabled>{tr("待登录")}</option>}
             {profiles.map((p) => (
               <option value={p.id} key={p.id} disabled={p.disabled}>
-                {p.provider} / {tr(p.name)}
+                {accountLabel(p.provider,tr(p.name))}
               </option>
             ))}
           </select>
@@ -337,7 +338,7 @@ function Inspector({
         </button>
         <p className="relay-note">{!task?tr("先新建任务，再切换执行账号。"):task.state==='unknown'?tr("先核对上次执行进度，再切换账号。"):disabled?tr("请等待当前执行结束。"):target===task.profile&&!changedModel?tr("已是当前账号；选择其他账号后可切换。"):tr("切换后，在同一任务中发送指令继续。")}</p>
         {task && (
-          <p className="relay-note">{tr("当前：")}{profiles.find((p) => p.id === task.profile)?`${profiles.find(p=>p.id===task.profile).provider} / ${tr(profiles.find(p=>p.id===task.profile).name)}`:tr('账号已移除，请切换账号')}
+          <p className="relay-note">{tr("当前：")}{currentProfile?accountLabel(currentProfile.provider,tr(currentProfile.name)):tr('账号已移除，请切换账号')}
           </p>
         )}
 
@@ -455,7 +456,7 @@ function Conversation({ task, events, streaming, thinking, activity, awaitingApp
         e.type==='progress'?<details key={e.id} className="assistant-progress" open={task.state==='running'}><summary>{tr('执行进度')} · {e.parts.length}</summary><div className="prose">{e.parts.map(part=><div key={part.id}><LinkedMarkdown onPreview={preview}>{part.text}</LinkedMarkdown></div>)}</div></details>:["handoff","notice"].includes(e.type) ? (
           <div key={e.id} className="handoff">
             <ArrowRightLeft size={14} />
-            <div><p>{e.executionStatus?`${tr(e.executionStatus)} · ${e.provider} / ${tr(e.accountName)} · ${e.execution.reportedModel||e.execution.model} · ${e.execution.effort}${e.execution.serviceTier&&e.execution.serviceTier!=='default'?' · Fast':''}`:tr(e.text)}</p>{e.progress&&<details className="handoff-progress"><summary>{tr("交接进度")}</summary>
+            <div><p>{e.executionStatus?`${tr(e.executionStatus)} · ${accountLabel(e.provider,tr(e.accountName))} · ${e.execution.reportedModel||e.execution.model} · ${e.execution.effort}${e.execution.serviceTier&&e.execution.serviceTier!=='default'?' · Fast':''}`:tr(e.text)}</p>{e.progress&&<details className="handoff-progress"><summary>{tr("交接进度")}</summary>
             <strong>{tr("任务要求")}</strong><p>{e.progress.request||tr("尚无记录")}</p>
             <strong>{tr("进度备注")}</strong><p>{e.progress.checkpoint||tr("尚无记录")}</p>
             <strong>{tr("上轮报告（需结合文件核对）")}</strong><div className="prose"><Markdown>{e.progress.report||tr("尚无报告")}</Markdown></div>

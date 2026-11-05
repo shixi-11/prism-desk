@@ -555,6 +555,10 @@ html:not([lang^="zh"]) .empty h1 { font-size:clamp(26px,3vw,44px); }
 .view-options { display:grid; gap:18px; padding:18px 0; }
 .view-options label { display:flex; align-items:center; gap:10px; }
 .account-query-toolbar { display:flex; gap:16px; align-items:center; margin:18px 0; }
+.account-manager .account-query-toolbar { flex-wrap:wrap; }
+.account-sort-row { display:grid; grid-template-columns:auto minmax(0,1fr) auto; align-items:center; gap:12px; padding:10px 12px; border:1px solid var(--line); border-radius:8px; }
+.account-sort-row > span { color:var(--muted); }
+.account-sort-row > strong { font-weight:500; overflow-wrap:anywhere; }
 .account-quota { display:grid; gap:8px; grid-column:2; }
 .account-list .account-quota strong,.account-list .account-quota span,.account-list .account-quota small { grid-column:auto; grid-row:auto; }
 .account-quota>div { display:grid; gap:4px; }
