@@ -14,7 +14,7 @@ async function readModelOptions(id,cwd){
  else if(p.provider==='Gemini')models=[{id:'auto',name:'Gemini Auto',efforts:['auto'],defaultEffort:'auto'}];
  else {const output=await new Promise((resolve,reject)=>{const proc=spawnCLI(p,['models'],cwd);let text='';const timer=setTimeout(()=>{proc.kill();reject(Error('模型列表查询超时'));},15000);proc.stdout.on('data',d=>{text+=d;if(text.length>64000)proc.kill();});proc.stderr.on('data',()=>{});proc.on('error',reject);proc.on('close',code=>{clearTimeout(timer);code===0?resolve(text):reject(Error('无法读取 Grok 模型列表'));});proc.stdin.end();});models=[...output.matchAll(/^\s*[-*]\s+(grok-[\w.-]+)/gm)].map(m=>({id:m[1],name:m[1],efforts:['high'],defaultEffort:'high'}));}
  if(!models.length)throw Error('CLI 未返回可选择的模型');
- const value={models,note:p.provider==='Gemini'?'由 Gemini CLI 自动选模；暂不提供独立思考等级':p.provider==='Claude'?'官方模型别名；实际可用性由订阅与组织权限决定':p.provider==='Grok'?'来自当前 CLI；思考等级暂提供已验证的 high':'来自当前 CLI 模型目录；实际调用仍受账号权限限制'};return value;
+ const value={models,note:p.provider==='Gemini'?'Gemini Auto':p.provider==='Claude'?'官方模型别名；实际可用性由订阅与组织权限决定':p.provider==='Grok'?'来自当前 CLI；思考等级暂提供已验证的 high':'来自当前 CLI 模型目录；实际调用仍受账号权限限制'};return value;
 }
 function selection(task,profile){const saved=task.modelSettings?.[profile.id],preferred=task.modelDefaults?.[profile.provider]||require('./model-preferences.cjs').defaults(profile.provider);return {...profile,model:saved?.model||preferred?.model||profile.model,effort:saved?.effort||preferred?.effort||(profile.provider==='Gemini'?'auto':'high'),...(profile.provider==='Codex'?{serviceTier:saved?.serviceTier||'default'}:{})};}
 async function validateSelection(profileId,cwd,input){

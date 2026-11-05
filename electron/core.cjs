@@ -46,9 +46,13 @@ function childEnv(profile, envSource = process.env, platform = process.platform)
   if (profile.provider === "Claude") {env.CLAUDE_CONFIG_DIR = profile.home;env.CLAUDE_CODE_DISABLE_FAST_MODE='1';}
   if (profile.provider === "Grok") {env.GROK_AUTH_PATH = path.join(profile.home, "auth.json");if(profile.isolatedHome)env.GROK_HOME=profile.home;}
   if (profile.provider === 'Gemini') {
-    env.GEMINI_CLI_HOME=profile.home;
-    env.NO_BROWSER='true';
-    env.GEMINI_CLI_SYSTEM_SETTINGS_PATH=require('./gemini.cjs').prepareGemini(profile).settings;
+    const gemini=require('./gemini.cjs');
+    if(gemini.isAntigravity(profile))Object.assign(env,gemini.antigravityEnvironment(profile,platform));
+    else {
+      env.GEMINI_CLI_HOME=profile.home;
+      env.NO_BROWSER='true';
+      env.GEMINI_CLI_SYSTEM_SETTINGS_PATH=gemini.prepareGemini(profile).settings;
+    }
   }
   env.PRISM_PROVIDER = profile.provider;
   env.PRISM_ACCOUNT = profile.id;
@@ -61,7 +65,7 @@ function childEnv(profile, envSource = process.env, platform = process.platform)
 }
 function executable(profile, platform = process.platform) { return require("./discovery.cjs").resolveExecutable(profile, process.env, platform); }
 function spawnCLI(profile, args, cwd, platform = process.platform) {
-  if (profile.provider === 'Gemini') {
+  if (profile.provider === 'Gemini'&&!require('./gemini.cjs').isAntigravity(profile)) {
     if (!CONFIG.geminiEntry || !fs.existsSync(CONFIG.geminiEntry)) throw Error('Configure the installed Gemini CLI entry path before execution.');
     args = [CONFIG.geminiEntry, ...args];
   }
@@ -126,6 +130,7 @@ class Rpc extends EventEmitter {
       }
     });
     this.proc.stderr.on("data", () => {});
+    this.proc.stdin.on("error", error => this.fail(error));
     this.proc.on("error", (error) => this.fail(error));
     this.done = new Promise((resolve) =>
       this.proc.on("close", (code) => {

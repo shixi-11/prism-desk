@@ -129,7 +129,7 @@ class Runner extends EventEmitter {
           const withGoals=instructions+'\n'+require('./task-plan.cjs').goalInstructions;
           if(profile.provider==='Codex')await this.codex(task,profile,instruction,withGoals);
           else if(profile.provider==='Claude')await this.claude(task,profile,instruction,withGoals);
-          else if(profile.provider==='Gemini')await this.gemini(task,profile,instruction,withGoals);
+          else if(profile.provider==='Gemini')await require('./gemini.cjs').runGemini(this,task,profile,instruction,withGoals,record);
           else await this.grok(task,profile,instruction,withGoals);
         } catch(e) {
           this.event(id,'notice',{text:e.message});
@@ -139,7 +139,7 @@ class Runner extends EventEmitter {
         if(options.maintenance || task.autoSwitch===false || this.active.cancelRequested || !this.active.quotaExhausted || task.state!=='failed')break;
         require('./task-settings.cjs').applyPendingMode(task);
         const ordered=[...(task.relayOrder||[]).map(id=>PROFILES.find(p=>p.id===id)).filter(Boolean),...PROFILES.filter(p=>!(task.relayOrder||[]).includes(p.id))];
-        const next=ordered.find(p=>!p.disabled&&!task.relayPaused?.includes(p.id)&&!attempted.has(p.id) && (!task.linkedProjects?.length||task.execution.mode==='full-access'||['Codex','Claude'].includes(p.provider)) && (!this.active.images.some(image=>image.kind!=='file')||['Codex','Claude','Grok'].includes(p.provider)) && (task.execution.mode==='read-only'||p.write&&['Codex','Claude','Grok'].includes(p.provider)));
+        const next=ordered.find(p=>p.provider!=='Gemini'&&!p.disabled&&!task.relayPaused?.includes(p.id)&&!attempted.has(p.id) && (!task.linkedProjects?.length||task.execution.mode==='full-access'||['Codex','Claude'].includes(p.provider)) && (!this.active.images.some(image=>image.kind!=='file')||['Codex','Claude','Grok'].includes(p.provider)) && (task.execution.mode==='read-only'||p.write&&['Codex','Claude','Grok'].includes(p.provider)));
         if(!next){this.event(id,'notice',{text:'已尝试所有符合当前权限的入口；没有自动重复调用。'});break;}
         this.active.pending.clear();
         this.emit('approval-reset',{taskId:task.id});
@@ -569,6 +569,5 @@ class Runner extends EventEmitter {
     // Extra usage and top-up settings are managed on the provider's platform.
     return require('./grok.cjs').runGrok(this,task,profile,text,instructions);
   }
-  async gemini(task,profile,text,instructions) {return require('./gemini.cjs').runGemini(this,task,profile,require('./attachments.cjs').attachmentText(text,this.active.images),instructions);}
 }
 module.exports = { Runner };

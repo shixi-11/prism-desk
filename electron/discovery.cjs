@@ -9,6 +9,10 @@ function resolveExecutable(profile,env=process.env,platform=process.platform){
   const suffix=platform==='win32'?'.exe':'';
   const native=profile.provider==='Claude'?path.join(home,'.local','bin',`claude${suffix}`):profile.provider==='Grok'?path.join(home,'.grok','bin',`grok${suffix}`):null;
   if(native&&isFile(native))return native;
+  if(platform==='win32'&&profile.provider==='Gemini'&&/^agy(?:\.exe)?$/i.test(profile.executable)&&env.LOCALAPPDATA&&path.isAbsolute(env.LOCALAPPDATA)){
+    const agy=path.join(env.LOCALAPPDATA,'agy','bin','agy.exe');
+    if(isFile(agy))return agy;
+  }
   if(platform==='win32'&&profile.provider==='Codex' && env.LOCALAPPDATA && path.isAbsolute(env.LOCALAPPDATA)){
     const root=path.join(env.LOCALAPPDATA||'', 'OpenAI','Codex','bin');
     const candidates=[path.join(root,'codex.exe'),...dirs(root).map(dir=>path.join(dir,'codex.exe'))].filter(isFile);

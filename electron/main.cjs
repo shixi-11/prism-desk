@@ -226,7 +226,7 @@ app.whenReady().then(() => {
     }catch{}finally{autoUpdating=false;}
   }
   if(!process.env.PRISM_TEST_DATA){setTimeout(autoUpdate,60000).unref();setInterval(autoUpdate,30000).unref();}
-  const publicProfiles=()=>PROFILES.map(({home,executable,...p})=>({...p,...require('./model-preferences.cjs').defaults(p.provider)}));
+  const publicProfiles=()=>PROFILES.map(({home,executable,...p})=>({...p,...require('./model-preferences.cjs').defaults(p.provider),...(p.provider==='Gemini'?{legacyGemini:!require('./gemini.cjs').isAntigravity({...p,executable})}:{})}));
   const broadcastAccounts=()=>emit('accounts',publicProfiles());
   const assertAccountIdle=()=>{if(runner.active||accountOperation||accountQueries||resetInProgress||store.list().some(t=>['running','stopping','unknown'].includes(t.state)))throw Error('请等待当前执行或账号操作结束。');};
   const loginState=(id,state)=>{const value={id,...state};accountLoginStates.set(id,value);emit('account-login',value);};
@@ -271,6 +271,7 @@ app.whenReady().then(() => {
   handle('pickAccountFile',async kind=>{if(!['directory','executable'].includes(kind))throw Error('Invalid selection');const selected=await dialog.showOpenDialog(owner(),kind==='directory'?{properties:['openDirectory']}:{properties:['openFile'],...(process.platform==='win32'?{filters:[{name:'CLI',extensions:['exe']}]}:{})});return selected.canceled?null:selected.filePaths[0];});
   handle('startAccountLogin',id=>{
     assertAccountIdle();const profile=PROFILES.find(p=>p.id===id);if(!profile)throw Error('账号不存在。');
+    if(profile.provider==='Gemini'&&!require('./gemini.cjs').isAntigravity(profile))throw Error('请重新接入 Gemini 账号以使用 Antigravity CLI。');
     require('./account-providers.cjs').providerFor(profile.provider);
     accountOperation=true;messageQueue.paused=true;
     try{
@@ -439,7 +440,8 @@ app.whenReady().then(() => {
   });
   handle('loginGemini',async()=>{
     if(geminiLogin)throw Error('Google 登录窗口已打开，请完成当前授权');
-    const profile=PROFILES.find(p=>p.provider==='Gemini');
+    const profile=PROFILES.find(p=>p.provider==='Gemini'&&!require('./gemini.cjs').isAntigravity(p));
+    if(!profile)throw Error('请从订阅账号设置登录 Gemini。');
     if(runner.activeRuns().some(a=>a.profile.provider==='Gemini'))throw Error('请等待 Gemini 当前执行结束');
     const proc=require('node:child_process').spawn(profile.executable,[path.join(app.getAppPath(),'scripts','gemini-login.cjs')],{cwd:app.getAppPath(),windowsHide:true,stdio:['ignore','pipe','pipe']});
     geminiLogin=proc;

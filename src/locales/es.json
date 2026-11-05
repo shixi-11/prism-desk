@@ -769,5 +769,11 @@
   "删除": "Eliminar",
   "工作区已停用": "Espacio de trabajo desactivado",
   "工作区已停用，请联系工作区管理员或切换其他账号。": "Este espacio de trabajo está desactivado. Contacta con su administrador o cambia de cuenta.",
-  "更新下载已停止响应，请检查网络后重试。": "La descarga de la actualización dejó de responder. Comprueba la conexión y vuelve a intentarlo."
+  "更新下载已停止响应，请检查网络后重试。": "La descarga de la actualización dejó de responder. Comprueba la conexión y vuelve a intentarlo.",
+  "Gemini 支持只读对话、文本附件和任务接续。": "Gemini admite conversaciones de solo lectura, archivos de texto adjuntos y traspasos de tareas.",
+  "Gemini 目前只支持一个 Google 账号。": "Gemini admite una sola cuenta de Google por ahora.",
+  "Gemini 需要由棱镜创建独立账号目录。": "Prism debe crear una carpeta de cuenta exclusiva para Gemini.",
+  "Google 登录已确认，额度暂不可查询": "Inicio de sesión de Google confirmado. Cuota no disponible.",
+  "Gemini 仅支持不超过 64 KB 的 UTF-8 文本附件。": "Gemini admite archivos de texto UTF-8 de hasta 64 KB.",
+  "Gemini 交接记录超过 256 KB，请先整理任务记录。": "El traspaso a Gemini supera los 256 KB. Resume primero el historial de la tarea."
 }

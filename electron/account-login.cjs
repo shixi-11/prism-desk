@@ -2,7 +2,7 @@ const {spawn}=require('node:child_process');
 const {providerFor,officialLoginUrl}=require('./account-providers.cjs');
 function startAccountLogin(profile,cwd,onUrl=()=>{},dependencies={}){
  const core=require('./core.cjs'),adapter=providerFor(profile.provider);
- const proc=(dependencies.spawn||spawn)((dependencies.executable||core.executable)(profile),adapter.loginArgs(profile),{cwd,env:(dependencies.childEnv||core.childEnv)(profile),windowsHide:true,stdio:['pipe','pipe','pipe']});
+ const proc=(dependencies.spawn||spawn)((dependencies.executable||core.executable)(profile),adapter.loginArgs(profile),{cwd:profile.provider==='Gemini'?profile.home:cwd,env:(dependencies.childEnv||core.childEnv)(profile),windowsHide:true,stdio:['pipe','pipe','pipe']});
  let buffer='',url=null,cancelled=false,timedOut=false,closed=false,submitted=false,timer;
  const receive=data=>{buffer=(buffer+data.toString().replace(/\x1b\[[0-?]*[ -/]*[@-~]/g,'')).slice(-32768);let end;while((end=buffer.indexOf('\n'))>=0){const line=buffer.slice(0,end);buffer=buffer.slice(end+1);for(const raw of line.match(/https:\/\/[^\s<>"\x1b]+/g)||[]){const found=officialLoginUrl(profile.provider,raw.replace(/[).,;]+$/,''));if(found&&found!==url){url=found;onUrl(found);}}}};
  proc.stdout.on('data',receive);proc.stderr.on('data',receive);

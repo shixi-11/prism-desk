@@ -403,7 +403,8 @@ function Inspector({
             />{tr("刷新")}</button>
         </div>
         {quota?.status && <p className="account-status">{tr(quota.status)}</p>}
-        {selected?.provider==='Gemini'&&<><p className="account-status">{tr("Gemini 当前提供只读接续；登录后仍需执行验证。")}</p><button className="outline" disabled={loginBusy||disabled} onClick={async()=>{setLoginBusy(true);setLoginMessage(tr("请在当前浏览器完成 Google 授权"));try{const result=await api.loginGemini();setLoginMessage(tr(result.ok?"Google 授权已完成；尚未验证模型执行":"登录未完成，请核对浏览器提示后重试"));await onRefresh(target);}catch(e){setLoginMessage(e.message);}finally{setLoginBusy(false);}}}>{tr(loginBusy?"等待浏览器授权…":"登录 Google")}</button><p className="account-status" role="status">{loginMessage}</p></>}
+        {selected?.provider==='Gemini'&&!selected.legacyGemini&&<p className="account-status">{tr('Gemini 支持只读对话、文本附件和任务接续。')}</p>}
+        {selected?.legacyGemini&&<><p className="account-status">{tr("Gemini 当前提供只读接续；登录后仍需执行验证。")}</p><button className="outline" disabled={loginBusy||disabled} onClick={async()=>{setLoginBusy(true);setLoginMessage(tr("请在当前浏览器完成 Google 授权"));try{const result=await api.loginGemini();setLoginMessage(tr(result.ok?"Google 授权已完成；尚未验证模型执行":"登录未完成，请核对浏览器提示后重试"));await onRefresh(target);}catch(e){setLoginMessage(e.message);}finally{setLoginBusy(false);}}}>{tr(loginBusy?"等待浏览器授权…":"登录 Google")}</button><p className="account-status" role="status">{loginMessage}</p></>}
         {quotaBlocked(quota,selected?.provider)&&!stale&&<p className="quota-notice" role="status">{tr(quotaStateLabel(quota,selected?.provider)||'已用完')}{quota?.rateLimitUpsell?.reset_at?` · ${tr('恢复：')}${new Date(quota.rateLimitUpsell.reset_at*1000).toLocaleString(locale())}`:''}</p>}
       </section>
       {task&&<RelayPreferences key={task.id} task={task} profiles={profiles} onSaveOrder={onRelayPreferences} onPauseAccount={onPauseRelayAccount} onModelSettings={onModelSettings} Modal={Modal} ModelControls={ModelControls}/>}

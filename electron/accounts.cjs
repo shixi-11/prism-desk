@@ -26,13 +26,16 @@ function saveAccount(input,accountRoot){
  if(input.id&&!existing)throw Error('账号不存在。');
  if(existing&&input.revision!==revision(existing))throw Error('账号已在其他窗口更新，请重新打开设置。');
  const adapter=providerFor(existing?.provider||input.provider);
+ if(!existing&&adapter.provider==='Gemini'&&CONFIG.profiles.some(p=>p.provider==='Gemini'))throw Error('Gemini 目前只支持一个 Google 账号。');
  if(existing&&((input.provider&&input.provider!==existing.provider)||(input.home&&canonical(input.home)!==canonical(existing.home))))throw Error('已有账号的平台和登录目录不可更换，请接入新账号。');
  const name=typeof input.name==='string'?input.name.trim():'';if(!name||name.length>60)throw Error('请填写 1–60 字的账号名称。');
  const executable=(typeof input.executable==='string'?input.executable.trim():'')||adapter.executable;
  if(executable!==existing?.executable&&path.basename(executable).toLowerCase()!==adapter.executable)throw Error('请选择对应平台的官方 CLI 程序。');
+ if(existing?.provider==='Gemini'&&executable!==existing.executable&&!require('./gemini.cjs').isAntigravity(existing))throw Error('已有账号的平台和登录目录不可更换，请接入新账号。');
  if(executable!==adapter.executable&&(!path.isAbsolute(executable)||!fs.existsSync(executable)||!fs.statSync(executable).isFile()||(process.platform==='win32'&&path.extname(executable).toLowerCase()!=='.exe')))throw Error('请选择有效的 CLI 可执行程序。');
  const id=existing?.id||adapter.provider.toLowerCase()+'-'+crypto.randomUUID();
  const supplied=typeof input.home==='string'&&input.home.trim();
+ if(!existing&&adapter.provider==='Gemini'&&supplied)throw Error('Gemini 需要由棱镜创建独立账号目录。');
  if(!existing&&supplied&&!fs.existsSync(supplied))throw Error('选择的已有账号目录不存在。');
  const home=existing?.home||validateHome(supplied||path.join(accountRoot,id),id);
  const profile=existing?{...existing,name,executable}:{id,provider:adapter.provider,name,home,executable,model:adapter.model,write:adapter.write,isolatedHome:true,disabled:true,connectionState:'pending'};
@@ -56,6 +59,7 @@ function setEnabled(id,enabled){
 function prepareLogin(id){const profile=CONFIG.profiles.find(p=>p.id===id);if(!profile)throw Error('账号不存在。');const next={...profile,disabled:true,loginRequired:true,enableAfterLogin:!profile.disabled||profile.enableAfterLogin||profile.connectionState==='pending'};saveProfiles(CONFIG.profiles.map(p=>p.id===id?next:p));return next;}
 function recordVerified(id,status){
  const profile=CONFIG.profiles.find(p=>p.id===id);if(!profile)throw Error('账号不存在。');
+ if(profile.provider==='Gemini'&&status.authenticated!==true)throw Error('Gemini 尚未完成 Google 登录');
  if(profile.email&&status.email&&profile.email.toLowerCase()!==status.email.toLowerCase())throw Error('登录账号与已有账号身份不一致，请使用原账号登录。');
  const next={...profile,connectionState:'connected',lastVerifiedAt:new Date().toISOString(),...(profile.connectionState==='pending'||profile.enableAfterLogin?{disabled:false}:{}),...(status.email?{email:status.email}:{}),...(status.subscriptionType?{subscriptionType:status.subscriptionType}:{})};delete next.loginRequired;delete next.enableAfterLogin;
  saveProfiles(CONFIG.profiles.map(p=>p.id===id?next:p));require('./models.cjs').invalidate(id);return next;
