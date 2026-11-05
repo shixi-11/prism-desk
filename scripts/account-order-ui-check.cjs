@@ -17,7 +17,7 @@ async function main(){
  const original=JSON.stringify({profiles});
  fs.writeFileSync(config,original);
  const launch=()=>_electron.launch({
-  executablePath:process.env.PRISM_TEST_ELECTRON||path.join(root,'runtime','desktop',process.platform==='win32'?'Prism.exe':'Prism'),
+  executablePath:process.env.PRISM_TEST_ELECTRON||require('electron'),
   args:[root],
   env:{...process.env,PRISM_TEST_HIDE:'1',PRISM_TEST_DATA:data,PRISM_CONFIG:config},
  });
@@ -25,6 +25,7 @@ async function main(){
  try{
   app=await launch();
   let page=await app.firstWindow();
+  await page.getByLabel('Switch language').selectOption('zh');
   const openAccounts=()=>page.getByRole('button',{name:'账号',exact:true}).click();
   const cardOrder=()=>page.locator('.connection-identity > strong').allTextContents();
   const executionOrder=()=>page.getByLabel('执行账号',{exact:true}).locator('option').allTextContents();
