@@ -48,17 +48,20 @@ export default function AccountManager({profiles,quotas,checking,bulk,onRefresh,
     <p className="muted">{tr(editor.provider==='Gemini'?'Gemini 支持只读对话、文本附件和任务接续。':'使用官方订阅登录，每个账号保存在独立目录。')}</p>
     {!provider?.installed&&!editor.executable&&<div className="connection-install"><span>{tr('本机尚未找到此平台的 CLI。')}</span><button type="button" onClick={install}><ExternalLink size={15}/>{tr('官方安装说明')}</button></div>}
     <details className="connection-advanced"><summary>{tr('高级设置')}</summary><label>{tr('CLI 程序路径')}<div className="connection-path"><input dir="ltr" placeholder={provider?.executable||''} value={editor.executable} onChange={e=>setEditor({...editor,executable:e.target.value})} disabled={locked}/><button type="button" aria-label={tr('选择 CLI 程序')} onClick={()=>picker('executable')} disabled={locked}><FolderOpen size={17}/></button></div></label>{(editor.provider!=='Gemini'||editor.id)&&<label>{tr('独立账号目录')}<div className="connection-path"><input dir="ltr" placeholder={tr('留空自动创建，也可选择已有独立目录')} value={editor.home} onChange={e=>setEditor({...editor,home:e.target.value})} readOnly={!!editor.id} disabled={locked}/>{!editor.id&&<button type="button" aria-label={tr('选择账号目录')} onClick={()=>picker('directory')} disabled={locked}><FolderOpen size={17}/></button>}</div></label>}<p className="muted">{tr(editor.id?'已有账号的平台与登录目录保持固定；接入其他账号请新建。':'已有目录直接使用原登录；不会复制其他账号的凭据。')}</p></details>
-    <div className="dialog-actions"><button type="submit" className="primary" disabled={locked||!editor.name.trim()}>{working?tr('保存中…'):tr('保存并继续')}</button></div>
+    <div className="dialog-actions"><button type="submit" className="primary" disabled={locked||!editor.name.trim()}>{working?tr('保存中…'):tr('保存并前往登录')}</button></div>
    </form>:<div className="connection-connect">
-    <p>{tr(provider?.manualCode?'复制登录链接到浏览器，授权后将网页给出的授权码粘贴到下方。':'获取登录链接，复制到浏览器完成授权后返回这里。')}</p>
+    {!state?.hasUrl&&<p>{tr('获取登录链接后，可直接打开登录页，也可复制链接。')}</p>}
     <LoginStatus state={state}/>
     {!current?.cliAvailable&&<div className="connection-install"><span>{tr('本机尚未找到此平台的 CLI。')}</span><button onClick={install}><ExternalLink size={15}/>{tr('官方安装说明')}</button><button onClick={()=>action(reload)}>{tr('重新检测')}</button></div>}
     <div className="connection-buttons">
-      {state?.hasUrl?<button className="primary" disabled={working} onClick={()=>action(async()=>{await api.copyAccountLogin(current.id);setCopied(true);})}>{copied?<Check size={17}/>:<Copy size={17}/>}<span>{tr(copied?'登录链接已复制':'复制登录链接')}</span></button>:<button className="primary" disabled={locked||!current?.cliAvailable} onClick={()=>login(current.id)}><ExternalLink size={17}/>{tr('获取登录链接')}</button>}
+      {state?.hasUrl?<>
+        <button className="primary" disabled={working} onClick={()=>action(()=>api.openAccountLogin(current.id))}><ExternalLink size={17}/>{tr('打开登录页')}</button>
+        <button disabled={working} onClick={()=>action(async()=>{await api.copyAccountLogin(current.id);setCopied(true);})}>{copied?<Check size={17}/>:<Copy size={17}/>}<span>{tr(copied?'登录链接已复制':'复制登录链接')}</span></button>
+      </>:<button className="primary" disabled={locked||!current?.cliAvailable} onClick={()=>login(current.id)}><ExternalLink size={17}/>{tr('获取登录链接')}</button>}
       <button disabled={locked||!current?.cliAvailable} onClick={()=>action(()=>api.verifyAccount(current.id))}><RefreshCw size={17}/>{tr('检查已有登录')}</button>
       {active(state)&&state.phase!=='verifying'&&<button onClick={()=>action(()=>api.cancelAccountLogin(current.id))}>{tr('取消登录')}</button>}
     </div>
-    {state?.hasUrl&&<p className="muted" role={copied?'status':undefined}>{tr('粘贴到已打开的浏览器地址栏，完成授权后返回这里。')}</p>}
+    {state?.hasUrl&&<p className="muted">{tr('在浏览器完成授权后返回这里。')}</p>}
     {state?.hasUrl&&provider?.manualCode&&<form className="authorization-code-form" autoComplete="off" onSubmit={e=>{e.preventDefault();const code=authorizationCode;setAuthorizationCode('');action(()=>api.submitAccountLoginCode(current.id,code));}}><label htmlFor="authorization-code">{tr('授权码')}</label><p className="muted">{tr('浏览器显示授权码时，将完整内容粘贴到这里。')}</p><div className="authorization-code-row"><input id="authorization-code" name="authorization-code" type="password" dir="ltr" autoComplete="off" spellCheck={false} required maxLength={4096} placeholder={tr('粘贴浏览器给出的授权码')} value={authorizationCode} onChange={e=>setAuthorizationCode(e.target.value)} disabled={working||state.codeSubmitted}/><button type="submit" className="primary" disabled={working||state.codeSubmitted||!authorizationCode.trim()}>{tr(state.codeSubmitted?'已提交':'提交授权码')}</button></div></form>}
     {current?.connectionState==='connected'&&!active(state)&&<p className="connection-ready"><Check size={17}/>{tr(current.disabled?'登录已确认，账号当前已停用。':'此账号已加入执行账号列表。')}{current.email&&<AccountEmail email={current.email}/>}</p>}
     <p className="muted">{tr('凭据由官方 CLI 保存在本机，棱镜不接收你的密码。')}</p>

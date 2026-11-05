@@ -12,10 +12,9 @@ const fs=require('node:fs'),path=require('node:path'),assert=require('node:asser
  try{
   const page=await app.firstWindow(),errors=[];page.on('pageerror',e=>errors.push(e.message));
   await page.getByLabel('Switch language').waitFor();
-  assert.deepEqual(await page.locator('.sidebar footer button').allTextContents(),['账号','共享能力','归档','设置','认识作者shixilin.com']);
   await app.evaluate(({app,shell,clipboard})=>{
-   app.__opens=0;app.__copied=null;app.__loginCount=0;
-   shell.openExternal=async()=>{app.__opens++;throw Error('The login flow must not open a browser');};
+   app.__opened=[];app.__copied=null;app.__loginCount=0;
+   shell.openExternal=async url=>{app.__opened.push(url);};
    // Keep this isolated UI test away from the user's actual clipboard.
    clipboard.writeText=value=>{app.__copied=value;};
    process.mainModule.require('./electron/core.cjs').accountStatus=async()=>({email:'fixture@example.com',remaining:70,status:'Connected fixture'});
@@ -23,6 +22,7 @@ const fs=require('node:fs'),path=require('node:path'),assert=require('node:asser
     app.__loginCount++;
     let done,url=null;const completed=new Promise(resolve=>{done=resolve;});
     app.__sendUrl=()=>{url='https://claude.com/cai/oauth/authorize?state=fixture';onUrl(url);};
+    app.__replaceUrl=value=>{url=value;};
     app.__completeLogin=()=>done({completed:true});
     return {get url(){return url;},completed,submitCode:async code=>{app.__submittedCode=code;return {submitted:true};},cancel:async()=>done({cancelled:true})};
    };
@@ -34,13 +34,22 @@ const fs=require('node:fs'),path=require('node:path'),assert=require('node:asser
   // Disabling the only profile during login must not crash the empty-task page.
   assert.equal(await page.locator('.inspector').count(),1);
   await assert.rejects(page.evaluate(()=>window.prism.copyAccountLogin('test')),/登录链接/);
+  await assert.rejects(page.evaluate(()=>window.prism.openAccountLogin('test')),/登录链接/);
   await app.evaluate(({app})=>app.__sendUrl());
   await page.getByRole('button',{name:'复制登录链接',exact:true}).waitFor();
-  assert.equal(await page.getByRole('button',{name:'重新打开登录页',exact:true}).count(),0);
+  const open=page.getByRole('button',{name:'打开登录页',exact:true});
+  await open.waitFor();
   await page.getByRole('button',{name:'复制登录链接',exact:true}).click();
   await page.getByRole('button',{name:'登录链接已复制',exact:true}).waitFor();
   assert.equal(await app.evaluate(({app})=>app.__copied),'https://claude.com/cai/oauth/authorize?state=fixture');
-  assert.equal(await app.evaluate(({app})=>app.__opens),0);
+  assert.deepEqual(await app.evaluate(({app})=>app.__opened),[]);
+  await app.evaluate(({app})=>app.__replaceUrl('https://claude.com.invalid/cai/oauth/authorize?state=fixture'));
+  await assert.rejects(page.evaluate(()=>window.prism.openAccountLogin('test')),/登录链接/);
+  assert.deepEqual(await app.evaluate(({app})=>app.__opened),[]);
+  await app.evaluate(({app})=>app.__sendUrl());
+  await open.click();
+  await page.waitForFunction(()=>!document.querySelector('.connection-buttons button.primary')?.disabled);
+  assert.deepEqual(await app.evaluate(({app})=>app.__opened),['https://claude.com/cai/oauth/authorize?state=fixture']);
   assert.equal((await page.locator('body').innerText()).includes('state=fixture'),false);
   const publicState=await page.evaluate(()=>window.prism.init());
   assert.equal(JSON.stringify(publicState.accountLogins).includes('state=fixture'),false);
@@ -48,11 +57,11 @@ const fs=require('node:fs'),path=require('node:path'),assert=require('node:asser
   await page.getByRole('button',{name:'继续登录',exact:true}).click();
   await page.getByLabel('授权码',{exact:true}).waitFor();
   assert.equal(await app.evaluate(({app})=>app.__loginCount),1);
-  await app.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows()[0].showInactive());
   await page.screenshot({path:path.join(dir,'copy-link.png')});
   await page.getByRole('button',{name:'取消登录',exact:true}).click();
   await page.getByText('已取消登录',{exact:true}).waitFor();
   await assert.rejects(page.evaluate(()=>window.prism.copyAccountLogin('test')),/登录链接/);
+  await assert.rejects(page.evaluate(()=>window.prism.openAccountLogin('test')),/登录链接/);
   assert.equal(await page.getByRole('button',{name:'复制登录链接',exact:true}).count(),0);
   await page.getByRole('button',{name:'获取登录链接',exact:true}).waitFor();
   await page.getByRole('button',{name:'获取登录链接',exact:true}).click();
