@@ -33,6 +33,7 @@ jobs:
           TEMP: ${{ runner.temp }}
           TMP: ${{ runner.temp }}
       - run: node scripts/preview-theme-ui-check.cjs
+      - run: node scripts/account-order-ui-check.cjs
       - run: node scripts/smoke-windows-installer.cjs
       - uses: actions/upload-artifact@v4
         with:
@@ -91,6 +92,7 @@ jobs:
           export TMPDIR="$(cd "$TMPDIR" && pwd -P)/"
           node --test tests/preview.test.cjs tests/preview-theme.test.cjs
           node scripts/preview-theme-ui-check.cjs
+          node scripts/account-order-ui-check.cjs
           node scripts/smoke-packaged.cjs "$app" --metadata "$artifacts/metadata.json"
           node -e 'const m=require(process.argv[1]); if(m.arch!==process.argv[2]) throw Error(`Expected ${process.argv[2]} but smoke app reported ${m.arch}`)' "$artifacts/metadata.json" "$ARCH"
           cp "$dmg" "$artifacts/Prism-${ARCH}.dmg"

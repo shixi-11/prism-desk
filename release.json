@@ -1,6 +1,6 @@
 {
-  "version": "0.1.52",
-  "date": "2026-11-01",
+  "version": "0.1.53",
+  "date": "2026-11-06",
   "distribution": [
     "windows-x64",
     "mac-arm64",
@@ -8,14 +8,12 @@
   ],
   "notes": {
     "en": [
-      "Local HTML document previews now use Prism’s current background, text, link and scrollbar colors. Switching between day and night themes preserves the reading position and document state without changing the original file or typography.",
-      "Messages sent while a Codex task is running reach the ongoing turn again when Codex uses subagents. They no longer fail with “expected active turn id … but found …”.",
-      "A subagent finishing its own work no longer ends the main Codex task early."
+      "Drag account rows in Subscription Accounts to set their order, or use the up and down buttons. Prism saves the order on this device and immediately shows it in the Execution Account menu. Each task keeps its own automatic handoff order.",
+      "Account labels show the provider once when a nickname already begins with its name."
     ],
     "zh": [
-      "本地 HTML 文档预览跟随棱镜当前的底色、文字、链接与滚动条配色；切换白天、黑夜主题时保留阅读位置和文档状态，不修改原文件、字号或行距。",
-      "Codex 执行中调用子代理时，执行途中补充的消息可以正常送达当前轮次，不再报错“expected active turn id … but found …”。",
-      "子代理完成自己的工作后，不再让主任务提前结束。"
+      "在「订阅账号」里拖动账号行，或用上下箭头调整顺序。棱镜会在本机记住顺序，并立即同步到「执行账号」下拉。每条任务仍有独立的自动接续顺序。",
+      "账号备注以平台名开头时，选择账号的界面只显示一次平台名。"
     ]
   }
 }
