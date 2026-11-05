@@ -2,6 +2,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const {atomic} = require('./atomic-file.cjs');
 const antigravityArgs = ['acp','--sandbox','--disable-telemetry','--include-default-customizations=false'];
+const licenseDenial = /^⚠\s*You do not have a valid license of this product\.[\s\S]*\(#3501\)\s*$/;
 function isAntigravity(profile) {
   return profile.provider==='Gemini' && /^agy(?:\.exe)?$/i.test(path.basename(profile.executable||''));
 }
@@ -119,7 +120,7 @@ async function runGemini(runner,task,profile,text,instructions,record) {
   const rpc = new Rpc(profile,cwd,args);
   Object.assign(runner.active,{rpc,grok:true,...(antigravity?{proc:rpc.proc,gemini:true}:{})});
   task.activePid=rpc.proc.pid;runner.store.save(task);
-  let answer='', terminal, prompting=false;
+  let answer='', terminal, prompting=false, denied=false;
   rpc.on('message',message=>{
     if (message.id!==undefined && message.method) {
       rpc.write(message.method==='session/request_permission'
@@ -165,9 +166,14 @@ async function runGemini(runner,task,profile,text,instructions,record) {
     throw error;
   } finally {
     await closeGemini(rpc);
-    if(answer)runner.event(task.id,'assistant',{text:answer,profile:profile.id});
+    denied=antigravity&&licenseDenial.test(answer.trim());
+    if(answer&&!denied)runner.event(task.id,'assistant',{text:answer,profile:profile.id});
   }
-  if(terminal?.stopReason==='end_turn')runner.state(task,'idle');
+  if(denied){
+    runner.event(task.id,'notice',{text:'Google 拒绝了 Antigravity 调用（#3501）。请检查账号的使用资格。'});
+    runner.state(task,'failed');
+  }
+  else if(terminal?.stopReason==='end_turn')runner.state(task,'idle');
   else if(terminal?.stopReason==='cancelled'||runner.active.cancelRequested)runner.state(task,'paused');
   else {runner.event(task.id,'notice',{text:`Gemini 本轮结束：${terminal?.stopReason||'未知原因'}；未标记任务完成。`});runner.state(task,'failed');}
 }

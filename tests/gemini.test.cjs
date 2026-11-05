@@ -41,7 +41,7 @@ test('Antigravity transfers the task record once, resumes by native ID and ignor
   const record={path:path.join(home,'record.md')};
   fs.writeFileSync(record.path,'Evidence from the previous provider');
   const calls=[],events=[];
-  let lostSession=false;
+  let lostSession=false, denyLicense=false;
   class Agent extends EventEmitter {
     constructor(_profile,cwd,args){super();assert.equal(cwd,home);assert.equal(args[0],'acp');this.proc={pid:1};}
     async call(method,params){
@@ -52,7 +52,13 @@ test('Antigravity transfers the task record once, resumes by native ID and ignor
         if(lostSession)throw Object.assign(Error('Session not found: native-id'),{detail:{code:-32000}});
         this.update('Replay');return {};
       }
-      if(method==='session/prompt'){this.update('Fresh reply');return {stopReason:'end_turn'};}
+      if(method==='session/prompt'){
+        if(denyLicense){
+          this.update('⚠ You do not have a valid license of this product. ');
+          this.update('Please contact your administrator to request a license. (#3501)');
+        }else this.update('Fresh reply');
+        return {stopReason:'end_turn'};
+      }
       throw Error('Unexpected RPC '+method);
     }
     update(text){this.emit('message',{method:'session/update',params:{sessionId:'native-id',update:{sessionUpdate:'agent_message_chunk',content:{type:'text',text}}}});}
@@ -77,4 +83,10 @@ test('Antigravity transfers the task record once, resumes by native ID and ignor
   task.mode='workspace-write';
   await assert.rejects(runGemini(runner,task,profile,'Write','',record),/只读/);
   assert.equal(calls.length,10);
+  lostSession=false;denyLicense=true;task.mode='read-only';
+  const beforeDenial=events.length;
+  await runGemini(runner,task,profile,'Try licensed model','',record);
+  assert.equal(task.state,'failed');
+  assert.equal(events.slice(beforeDenial).some(e=>e.type==='assistant'),false);
+  assert.match(events.at(-1).text,/#3501/);
 });

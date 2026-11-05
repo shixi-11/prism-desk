@@ -775,6 +775,7 @@
   "Gemini 支持只读对话、文本附件和任务接续。": "Gemini unterstützt schreibgeschützte Chats, Textanhänge und Aufgabenübergaben.",
   "Gemini 目前只支持一个 Google 账号。": "Gemini unterstützt derzeit ein Google-Konto.",
   "Gemini 需要由棱镜创建独立账号目录。": "Prism muss einen eigenen Kontoordner für Gemini erstellen.",
+  "Google 拒绝了 Antigravity 调用（#3501）。请检查账号的使用资格。": "Google hat die Antigravity-Anfrage abgelehnt (#3501). Prüfen Sie, ob dieses Konto berechtigt ist.",
   "Google 登录已确认，额度暂不可查询": "Google-Anmeldung bestätigt. Kontingent nicht verfügbar.",
   "Gemini 仅支持不超过 64 KB 的 UTF-8 文本附件。": "Gemini unterstützt UTF-8-Textanhänge bis 64 KB.",
   "Gemini 交接记录超过 256 KB，请先整理任务记录。": "Die Übergabe an Gemini überschreitet 256 KB. Kürze zuerst den Aufgabenverlauf."
