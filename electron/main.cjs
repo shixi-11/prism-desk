@@ -230,7 +230,12 @@ app.whenReady().then(() => {
   const broadcastAccounts=()=>emit('accounts',publicProfiles());
   const assertAccountIdle=()=>{if(runner.active||accountOperation||accountQueries||resetInProgress||store.list().some(t=>['running','stopping','unknown'].includes(t.state)))throw Error('请等待当前执行或账号操作结束。');};
   const loginState=(id,state)=>{const value={id,...state};accountLoginStates.set(id,value);emit('account-login',value);};
-  const verifyAccount=async id=>{const status=await require('./core.cjs').accountStatus(id,app.getAppPath());require('./accounts.cjs').recordVerified(id,status);broadcastAccounts();emit('quota',{id,...status});return status;};
+  const verifyAccount=async(id,fromLogin=false)=>{
+    const profile=PROFILES.find(p=>p.id===id);
+    if(profile?.provider==='Gemini'&&profile.connectionState!=='connected'&&!fromLogin)throw Error('Gemini 尚未完成 Google 登录');
+    const status=await require('./core.cjs').accountStatus(id,app.getAppPath());
+    require('./accounts.cjs').recordVerified(id,status);broadcastAccounts();emit('quota',{id,...status});return status;
+  };
   handle('accounts',()=>require('./accounts.cjs').accountList());
   handle('removeAccount',(id,revision)=>{
     assertAccountIdle();
@@ -272,6 +277,7 @@ app.whenReady().then(() => {
   handle('startAccountLogin',id=>{
     assertAccountIdle();const profile=PROFILES.find(p=>p.id===id);if(!profile)throw Error('账号不存在。');
     if(profile.provider==='Gemini'&&!require('./gemini.cjs').isAntigravity(profile))throw Error('请重新接入 Gemini 账号以使用 Antigravity CLI。');
+    if(profile.provider==='Gemini'&&profile.connectionState==='connected')throw Error('请先移除此 Gemini 入口，再接入 Google 账号。');
     require('./account-providers.cjs').providerFor(profile.provider);
     accountOperation=true;messageQueue.paused=true;
     try{
@@ -283,7 +289,7 @@ app.whenReady().then(() => {
         loginState(id,{phase:'waiting',hasUrl:true});
       });
       accountLogins.set(id,login);
-      login.completed.then(async result=>{if(result.cancelled){loginState(id,{phase:'cancelled',hasUrl:false});return;}loginState(id,{phase:'verifying',hasUrl:false});await verifyAccount(id);loginState(id,{phase:'connected',hasUrl:false});}).catch(error=>loginState(id,{phase:'error',hasUrl:false,message:error.message})).finally(()=>{accountLogins.delete(id);accountOperation=false;messageQueue.paused=false;messageQueue.pump();});
+      login.completed.then(async result=>{if(result.cancelled){loginState(id,{phase:'cancelled',hasUrl:false});return;}loginState(id,{phase:'verifying',hasUrl:false});await verifyAccount(id,true);loginState(id,{phase:'connected',hasUrl:false});}).catch(error=>loginState(id,{phase:'error',hasUrl:false,message:error.message})).finally(()=>{accountLogins.delete(id);accountOperation=false;messageQueue.paused=false;messageQueue.pump();});
       return {id};
     }catch(error){accountOperation=false;messageQueue.paused=false;loginState(id,{phase:'error',hasUrl:false,message:error.message});messageQueue.pump();throw error;}
   });

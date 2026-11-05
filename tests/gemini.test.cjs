@@ -41,13 +41,17 @@ test('Antigravity transfers the task record once, resumes by native ID and ignor
   const record={path:path.join(home,'record.md')};
   fs.writeFileSync(record.path,'Evidence from the previous provider');
   const calls=[],events=[];
+  let lostSession=false;
   class Agent extends EventEmitter {
     constructor(_profile,cwd,args){super();assert.equal(cwd,home);assert.equal(args[0],'acp');this.proc={pid:1};}
     async call(method,params){
       calls.push({method,params});
       if(method==='initialize')return {protocolVersion:1,agentInfo:{name:'Antigravity ACP Server'},agentCapabilities:{loadSession:true},authMethods:[{id:'oauth-personal'}]};
       if(method==='session/new')return {sessionId:'native-id'};
-      if(method==='session/load'){this.update('Replay');return {};}
+      if(method==='session/load'){
+        if(lostSession)throw Object.assign(Error('Session not found: native-id'),{detail:{code:-32000}});
+        this.update('Replay');return {};
+      }
       if(method==='session/prompt'){this.update('Fresh reply');return {stopReason:'end_turn'};}
       throw Error('Unexpected RPC '+method);
     }
@@ -66,7 +70,11 @@ test('Antigravity transfers the task record once, resumes by native ID and ignor
   assert.match(JSON.stringify(calls[2].params.prompt),/Evidence from the previous provider/);
   assert.doesNotMatch(JSON.stringify(calls[5].params.prompt),/Evidence from the previous provider/);
   assert.deepEqual(events.filter(e=>e.type==='assistant').map(e=>e.text),['Fresh reply','Fresh reply']);
+  lostSession=true;
+  await runGemini(runner,task,profile,'After eviction','',record);
+  assert.deepEqual(calls.slice(6).map(c=>c.method),['initialize','session/load','session/new','session/prompt']);
+  assert.match(JSON.stringify(calls[9].params.prompt),/Evidence from the previous provider/);
   task.mode='workspace-write';
   await assert.rejects(runGemini(runner,task,profile,'Write','',record),/只读/);
-  assert.equal(calls.length,6);
+  assert.equal(calls.length,10);
 });

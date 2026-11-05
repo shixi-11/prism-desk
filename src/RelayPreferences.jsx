@@ -2,7 +2,7 @@ import React,{useEffect,useState} from 'react';
 import {GripVertical,ArrowUp,ArrowDown,Settings2,Pause,Play} from 'lucide-react';
 import {tr} from './i18n.js';
 export default function RelayPreferences({task,profiles,onSaveOrder,onPauseAccount,onModelSettings,Modal,ModelControls}){
- profiles=profiles.filter(profile=>profile.provider!=='Gemini');
+ profiles=profiles.filter(profile=>profile.provider!=='Gemini'||profile.legacyGemini);
  const ids=[...(task.relayOrder||[]).filter(id=>profiles.some(p=>p.id===id)),...profiles.filter(p=>!(task.relayOrder||[]).includes(p.id)).map(p=>p.id)];
  const [open,setOpen]=useState(false),[order,setOrder]=useState(ids),[dragging,setDragging]=useState(null),[over,setOver]=useState(null),[editing,setEditing]=useState(null),[saving,setSaving]=useState(false),[notice,setNotice]=useState(''),[error,setError]=useState('');
  useEffect(()=>setOrder(ids),[ids.join('|')]);

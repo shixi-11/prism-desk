@@ -12,6 +12,7 @@ const {
   quotaView,
 } = require("./core.cjs");
 const {recordClaude,codexExhausted}=require('./quota.cjs');
+const {isAntigravity,runGemini}=require('./gemini.cjs');
 
 class Runner extends EventEmitter {
   constructor(store) {
@@ -120,7 +121,7 @@ class Runner extends EventEmitter {
       while(true) {
         if(task.pendingModelRefresh?.[profile.id]){delete task.sessions[profile.id];delete task.pendingModelRefresh[profile.id];this.store.save(task);}
         attempted.add(profile.id);
-        Object.assign(this.active,{profile,questions:new Map(),confirmed:false,started:false,quotaExhausted:false,quotaByWindow:{},codexQuota:null,rpc:null,proc:null,turnId:null,grok:false,sessionId:null,sendGuidance:null});
+        Object.assign(this.active,{profile,questions:new Map(),confirmed:false,started:false,quotaExhausted:false,quotaByWindow:{},codexQuota:null,rpc:null,proc:null,turnId:null,grok:false,gemini:false,sessionId:null,sendGuidance:null});
         task.execution = {profile:profile.id, model:profile.model, effort:profile.effort, ...(profile.provider==='Codex'?{serviceTier:profile.serviceTier||'default'}:{}), mode:options.planning||options.maintenance?'read-only':task.mode};
         const record=this.store.context(task);
         const instructions=environmentPrompt({...task,mode:task.execution.mode},capabilities(),record)+(options.planning?'\n本轮只制订计划，禁止实施。读取必要材料后给出可核对的步骤与验收条件，等待用户确认。最后用 JSON 代码块返回 {"steps":[{"text":"步骤及验收条件"}]}，供界面展示待确认步骤。':'');
@@ -129,7 +130,7 @@ class Runner extends EventEmitter {
           const withGoals=instructions+'\n'+require('./task-plan.cjs').goalInstructions;
           if(profile.provider==='Codex')await this.codex(task,profile,instruction,withGoals);
           else if(profile.provider==='Claude')await this.claude(task,profile,instruction,withGoals);
-          else if(profile.provider==='Gemini')await require('./gemini.cjs').runGemini(this,task,profile,instruction,withGoals,record);
+          else if(profile.provider==='Gemini')await this.gemini(task,profile,instruction,withGoals,record);
           else await this.grok(task,profile,instruction,withGoals);
         } catch(e) {
           this.event(id,'notice',{text:e.message});
@@ -139,7 +140,7 @@ class Runner extends EventEmitter {
         if(options.maintenance || task.autoSwitch===false || this.active.cancelRequested || !this.active.quotaExhausted || task.state!=='failed')break;
         require('./task-settings.cjs').applyPendingMode(task);
         const ordered=[...(task.relayOrder||[]).map(id=>PROFILES.find(p=>p.id===id)).filter(Boolean),...PROFILES.filter(p=>!(task.relayOrder||[]).includes(p.id))];
-        const next=ordered.find(p=>p.provider!=='Gemini'&&!p.disabled&&!task.relayPaused?.includes(p.id)&&!attempted.has(p.id) && (!task.linkedProjects?.length||task.execution.mode==='full-access'||['Codex','Claude'].includes(p.provider)) && (!this.active.images.some(image=>image.kind!=='file')||['Codex','Claude','Grok'].includes(p.provider)) && (task.execution.mode==='read-only'||p.write&&['Codex','Claude','Grok'].includes(p.provider)));
+        const next=ordered.find(p=>!isAntigravity(p)&&!p.disabled&&!task.relayPaused?.includes(p.id)&&!attempted.has(p.id) && (!task.linkedProjects?.length||task.execution.mode==='full-access'||['Codex','Claude'].includes(p.provider)) && (!this.active.images.some(image=>image.kind!=='file')||['Codex','Claude','Grok'].includes(p.provider)) && (task.execution.mode==='read-only'||p.write&&['Codex','Claude','Grok'].includes(p.provider)));
         if(!next){this.event(id,'notice',{text:'已尝试所有符合当前权限的入口；没有自动重复调用。'});break;}
         this.active.pending.clear();
         this.emit('approval-reset',{taskId:task.id});
@@ -519,7 +520,7 @@ class Runner extends EventEmitter {
     if(run.started && !run.proc?.requestStop && !(run.grok && run.sessionId) && !(run.rpc && run.turnId))
       throw Error('该执行暂不支持可靠的中途停止。请等待结束后切换，避免重复修改文件。');
     run.cancelRequested=true;
-    if(!run.started){this.state(run.task,'stopping');return;}
+    if(!run.started&&!(run.gemini&&run.proc?.requestStop)){this.state(run.task,'stopping');return;}
     if(run.proc?.requestStop){
       this.state(run.task,'stopping');
       run.stopSignal=run.proc.requestStop().then(()=>{run.stopAcknowledged=true;});
@@ -568,6 +569,9 @@ class Runner extends EventEmitter {
     const usage=await require('./provider-quota.cjs').grokQuota(profile,task.cwd);this.emit('quota',usage);
     // Extra usage and top-up settings are managed on the provider's platform.
     return require('./grok.cjs').runGrok(this,task,profile,text,instructions);
+  }
+  async gemini(task,profile,text,instructions,record) {
+    return runGemini(this,task,profile,text,instructions,record);
   }
 }
 module.exports = { Runner };

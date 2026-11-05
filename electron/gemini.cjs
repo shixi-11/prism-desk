@@ -1,13 +1,13 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const {atomic} = require('./atomic-file.cjs');
-const antigravityArgs = ['acp','--disable-telemetry','--include-default-customizations=false'];
+const antigravityArgs = ['acp','--sandbox','--disable-telemetry','--include-default-customizations=false'];
 function isAntigravity(profile) {
   return profile.provider==='Gemini' && /^agy(?:\.exe)?$/i.test(path.basename(profile.executable||''));
 }
 function antigravityEnvironment(profile,platform) {
   const settings=path.join(profile.home,'.gemini','antigravity-cli','settings.json');
-  // Run outside the project so its hooks and MCP configuration are never loaded.
+  // Use a Prism-owned home and do not pass the user's project to ACP.
   const policy={agentMode:'plan',toolPermission:'request-review',permissions:{deny:[
     'read_file(*)','write_file(*)','command(*)','unsandboxed(*)','mcp(*)','read_url(*)','execute_url(*)',
   ]}};
@@ -112,13 +112,12 @@ async function runGemini(runner,task,profile,text,instructions,record) {
   if ((task.execution?.mode||task.mode) !== 'read-only') throw Error('Gemini 当前仅支持只读任务。');
   const antigravity=isAntigravity(profile);
   if (!antigravity&&geminiStatus(profile).loginRequired) throw Error('Gemini 尚未完成 Google 登录，请先运行登录入口。');
-  const existing=task.sessions[profile.id];
-  const prompt=antigravity?antigravityPrompt(task,text,runner.active.images,record,existing):[{type:'text',text:instructions},{type:'text',text:require('./attachments.cjs').attachmentText(text,runner.active.images)}];
+  let existing=task.sessions[profile.id];
   const cwd=antigravity?profile.home:task.cwd;
   const {Rpc} = require('./core.cjs');
   const args=antigravity?antigravityArgs:['--acp','--approval-mode','plan','--admin-policy',prepareGemini(profile).policy,'--model',profile.model];
   const rpc = new Rpc(profile,cwd,args);
-  Object.assign(runner.active,{rpc,grok:true,gemini:true});
+  Object.assign(runner.active,{rpc,grok:true,...(antigravity?{proc:rpc.proc,gemini:true}:{})});
   task.activePid=rpc.proc.pid;runner.store.save(task);
   let answer='', terminal, prompting=false;
   rpc.on('message',message=>{
@@ -139,7 +138,19 @@ async function runGemini(runner,task,profile,text,instructions,record) {
   try {
     await initializeGemini(rpc,antigravity);
     if(runner.active.cancelRequested){runner.state(task,'paused');return;}
-    const session=await rpc.call(existing?'session/load':'session/new',{...(existing?{sessionId:existing}:{}),cwd,mcpServers:[]});
+    let session;
+    if(existing){
+      try{session=await rpc.call('session/load',{sessionId:existing,cwd,mcpServers:[]},20000);}
+      catch(error){
+        if(!antigravity||!error.detail||!/^(?:session|conversation) not found(?:$|:)/i.test(error.message))throw error;
+        delete task.sessions[profile.id];runner.store.save(task);
+        existing=null;
+        runner.event(task.id,'notice',{text:'Gemini 原生会话已失效，将从棱镜保存的任务记录接续。'});
+      }
+    }
+    if(runner.active.cancelRequested){runner.state(task,'paused');return;}
+    const prompt=antigravity?antigravityPrompt(task,text,runner.active.images,record,existing):[{type:'text',text:instructions},{type:'text',text:require('./attachments.cjs').attachmentText(text,runner.active.images)}];
+    if(!existing)session=await rpc.call('session/new',{cwd,mcpServers:[]},20000);
     const sessionId=existing||session.sessionId;
     if(!sessionId)throw Error('Gemini 未返回会话编号。');
     task.sessions[profile.id]=sessionId;runner.active.sessionId=sessionId;runner.store.save(task);

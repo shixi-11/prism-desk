@@ -1,8 +1,9 @@
 const fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto'),os=require('node:os');
 const {CONFIG,saveProfiles}=require('./config.cjs');
 const {providerFor,providerCatalog}=require('./account-providers.cjs');
+const {isAntigravity}=require('./gemini.cjs');
 const revision=p=>crypto.createHash('sha256').update(JSON.stringify(p)).digest('hex');
-function accountList(){return {providers:providerCatalog(),profiles:CONFIG.profiles.map(p=>{let cliAvailable=false;try{require('./discovery.cjs').resolveExecutable(p);cliAvailable=true;}catch{}return {...p,revision:revision(p),cliAvailable};})};}
+function accountList(){return {providers:providerCatalog(),profiles:CONFIG.profiles.map(p=>{let cliAvailable=false;try{require('./discovery.cjs').resolveExecutable(p);cliAvailable=true;}catch{}return {...p,revision:revision(p),cliAvailable,...(p.provider==='Gemini'?{legacyGemini:!isAntigravity(p)}:{})};})};}
 function renameAccount(id,name){
  const profile=CONFIG.profiles.find(p=>p.id===id);if(!profile)throw Error('账号不存在。');
  if(typeof name!=='string'||!name.trim()||name.trim().length>60)throw Error('请填写 1–60 字的账号名称。');
@@ -26,12 +27,12 @@ function saveAccount(input,accountRoot){
  if(input.id&&!existing)throw Error('账号不存在。');
  if(existing&&input.revision!==revision(existing))throw Error('账号已在其他窗口更新，请重新打开设置。');
  const adapter=providerFor(existing?.provider||input.provider);
- if(!existing&&adapter.provider==='Gemini'&&CONFIG.profiles.some(p=>p.provider==='Gemini'))throw Error('Gemini 目前只支持一个 Google 账号。');
+ if(!existing&&adapter.provider==='Gemini'&&CONFIG.profiles.some(isAntigravity))throw Error('Gemini 目前只支持一个 Google 账号。');
  if(existing&&((input.provider&&input.provider!==existing.provider)||(input.home&&canonical(input.home)!==canonical(existing.home))))throw Error('已有账号的平台和登录目录不可更换，请接入新账号。');
  const name=typeof input.name==='string'?input.name.trim():'';if(!name||name.length>60)throw Error('请填写 1–60 字的账号名称。');
  const executable=(typeof input.executable==='string'?input.executable.trim():'')||adapter.executable;
  if(executable!==existing?.executable&&path.basename(executable).toLowerCase()!==adapter.executable)throw Error('请选择对应平台的官方 CLI 程序。');
- if(existing?.provider==='Gemini'&&executable!==existing.executable&&!require('./gemini.cjs').isAntigravity(existing))throw Error('已有账号的平台和登录目录不可更换，请接入新账号。');
+ if(existing?.provider==='Gemini'&&executable!==existing.executable&&!isAntigravity(existing))throw Error('已有账号的平台和登录目录不可更换，请接入新账号。');
  if(executable!==adapter.executable&&(!path.isAbsolute(executable)||!fs.existsSync(executable)||!fs.statSync(executable).isFile()||(process.platform==='win32'&&path.extname(executable).toLowerCase()!=='.exe')))throw Error('请选择有效的 CLI 可执行程序。');
  const id=existing?.id||adapter.provider.toLowerCase()+'-'+crypto.randomUUID();
  const supplied=typeof input.home==='string'&&input.home.trim();
