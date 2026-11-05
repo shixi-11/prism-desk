@@ -441,6 +441,8 @@
   "先制订或添加计划步骤，再确认执行。": "Vor dem Bestätigen der Ausführung Planschritte erstellen oder hinzufügen.",
   "调整接续顺序": "Übergabereihenfolge ändern",
   "调整顺序与模型": "Reihenfolge und Modelle ändern",
+  "手动排序": "Konten neu anordnen",
+  "无法保存账号顺序，请重试。": "Die Kontoreihenfolge konnte nicht gespeichert werden. Versuchen Sie es erneut.",
   "顺序已保存": "Reihenfolge gespeichert",
   "接续顺序": "Übergabereihenfolge",
   "上移": "Nach oben",

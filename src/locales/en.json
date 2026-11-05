@@ -441,6 +441,8 @@
   "先制订或添加计划步骤，再确认执行。": "Create or add plan steps before confirming execution.",
   "调整接续顺序": "Adjust handoff order",
   "调整顺序与模型": "Adjust order and models",
+  "手动排序": "Reorder accounts",
+  "无法保存账号顺序，请重试。": "Could not save the account order. Try again.",
   "顺序已保存": "Order saved",
   "接续顺序": "Handoff order",
   "上移": "Move up",

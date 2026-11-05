@@ -441,6 +441,8 @@
   "先制订或添加计划步骤，再确认执行。": "Créez ou ajoutez des étapes avant de confirmer l’exécution.",
   "调整接续顺序": "Modifier l’ordre de relais",
   "调整顺序与模型": "Modifier l’ordre et les modèles",
+  "手动排序": "Réorganiser les comptes",
+  "无法保存账号顺序，请重试。": "Impossible d’enregistrer l’ordre des comptes. Réessayez.",
   "顺序已保存": "Ordre enregistré",
   "接续顺序": "Ordre de relais",
   "上移": "Monter",
