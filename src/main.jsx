@@ -1,5 +1,5 @@
 import {quotaBlocked,quotaStateLabel} from './quota-state.js';
-import {accountLabel,accountTarget} from './account-selection.js';
+import {accountLabel,accountOrderKey,accountTarget,orderedProfiles} from './account-selection.js';
 import {hasNewRelease} from './update-state.js';
 import React, { useEffect, useRef, useState, useMemo, useCallback } from "react";
 import { createRoot } from "react-dom/client";
@@ -261,6 +261,7 @@ function ModelControls({task,profile,disabled,onSave}) {
 function Inspector({
   task,
   profiles,
+  displayOrder,
   cap,
   quotas,
   checking,
@@ -317,7 +318,7 @@ function Inspector({
             disabled={disabled && !canStop}
           >
             {!selected&&<option value="" disabled>{tr("待登录")}</option>}
-            {profiles.map((p) => (
+            {orderedProfiles(profiles,displayOrder).map((p) => (
               <option value={p.id} key={p.id} disabled={p.disabled}>
                 {accountLabel(p.provider,tr(p.name))}
               </option>
@@ -565,6 +566,14 @@ const ExecutionLog=React.memo(function ExecutionLog({ events }) {
   );
 });
 function App() {
+  const [accountOrder,setAccountOrder]=useState(()=>{
+    try{const order=JSON.parse(localStorage.getItem(accountOrderKey));return Array.isArray(order)?order:[];}
+    catch{return [];}
+  });
+  function saveAccountOrder(order){
+    localStorage.setItem(accountOrderKey,JSON.stringify(order));
+    setAccountOrder(order);
+  }
   const [init, setInit] = useState(null);
   const [appUpdate,setAppUpdate]=useState(null);
   const hasAppUpdate=hasNewRelease(appUpdate);
@@ -997,6 +1006,7 @@ function App() {
       {view.inspector&&<Inspector
         task={task}
         profiles={init.profiles}
+        displayOrder={accountOrder}
         cap={init.capabilities}
         quotas={quotas}
         checking={checking}
@@ -1048,7 +1058,7 @@ function App() {
       )}
       {modal === "accounts" && (
         <Modal title={tr("订阅账号")} wide onClose={() => setModal("")}>
-          <AccountManager profiles={init.profiles} quotas={quotas} checking={checking} bulk={bulk} onRefresh={refresh} onRefreshAll={refreshAll} loginStates={accountLogins} busy={anyBusy}/>
+          <AccountManager profiles={init.profiles} displayOrder={accountOrder} onDisplayOrder={saveAccountOrder} quotas={quotas} checking={checking} bulk={bulk} onRefresh={refresh} onRefreshAll={refreshAll} loginStates={accountLogins} busy={anyBusy}/>
         </Modal>
       )}
       {modal === "checkpoint" && (

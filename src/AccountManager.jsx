@@ -1,19 +1,12 @@
 import React,{useEffect,useState} from 'react';
-import {Plus,RefreshCw,ExternalLink,FolderOpen,Check,Settings2,Copy,Eye,EyeOff,Pencil,X,Trash2,ArrowUp,ArrowDown,ListOrdered} from 'lucide-react';
+import {Plus,RefreshCw,ExternalLink,FolderOpen,Check,Settings2,Copy,Eye,EyeOff,Pencil,X,Trash2,ArrowUp,ArrowDown,ListOrdered,GripVertical} from 'lucide-react';
 import {AccountQuota} from './TaskControls.jsx';
-import {accountLabel} from './account-selection.js';
+import {accountLabel,orderedProfiles} from './account-selection.js';
 import {tr} from './i18n.js';
 const api=window.prism;
 const focusWithoutScroll=button=>button?.focus({preventScroll:true});
 const errorText=error=>(error.message||String(error)).replace(/^Error invoking remote method '[^']+': Error: /,'');
 const active=state=>['starting','waiting','verifying'].includes(state?.phase);
-const orderKey='prism-account-display-order';
-function readOrder(){
- try{
-  const order=JSON.parse(localStorage.getItem(orderKey));
-  return Array.isArray(order)?order:[];
- }catch{return [];}
-}
 function LoginStatus({state}){
  if(!state)return null;
  const labels={starting:'正在获取登录链接…',waiting:'登录链接已准备好',verifying:'正在检查账号…',connected:'账号已连接',cancelled:'已取消登录',error:'登录未完成'};
@@ -26,22 +19,24 @@ function AccountName({profile,onSaved}){
  async function save(e){e.preventDefault();setBusy(true);setError('');try{await api.renameAccount(profile.id,name);setEditing(false);await onSaved();}catch(e){setError(errorText(e));}finally{setBusy(false);}}
  return <div className="account-name">{editing?<form onSubmit={save}><label>{tr('备注名：')}<input autoFocus aria-label={tr('备注名')} value={name} maxLength={60} disabled={busy} onChange={e=>setName(e.target.value)} onKeyDown={e=>{if(e.key==='Escape'&&!busy){e.preventDefault();setEditing(false);}}}/></label><button disabled={busy||!name.trim()} aria-label={tr('保存备注名')} title={tr('保存备注名')}><Check size={16}/></button><button type="button" disabled={busy} onClick={()=>setEditing(false)} aria-label={tr('取消')}><X size={16}/></button></form>:<><span>{tr('备注名：')}{tr(profile.name)}</span><button aria-label={tr('修改备注名')+' '+profile.name} title={tr('修改备注名')} onClick={()=>{setName(profile.name);setError('');setEditing(true);}}><Pencil size={15}/></button></>}{error&&<small role="alert">{error}</small>}</div>;
 }
-export default function AccountManager({profiles,quotas,checking,bulk,onRefresh,onRefreshAll,loginStates,busy}){
+export default function AccountManager({profiles,displayOrder,onDisplayOrder,quotas,checking,bulk,onRefresh,onRefreshAll,loginStates,busy}){
  const [data,setData]=useState(null),[editor,setEditor]=useState(null),[step,setStep]=useState('form'),[working,setWorking]=useState(false),[error,setError]=useState('');
  const [copied,setCopied]=useState(false);
  const [removing,setRemoving]=useState(null);
  const [authorizationCode,setAuthorizationCode]=useState('');
- const [sorting,setSorting]=useState(false),[order,setOrder]=useState(readOrder);
- const accounts=data?.profiles||profiles;
- const ranks=new Map(order.map((id,index)=>[id,index]));
- const orderedAccounts=[...accounts].sort((a,b)=>(ranks.get(a.id)??order.length)-(ranks.get(b.id)??order.length));
- function moveAccount(index,offset){
-  const next=orderedAccounts.map(account=>account.id);
-  const target=index+offset;
-  [next[index],next[target]]=[next[target],next[index]];
-  try{localStorage.setItem(orderKey,JSON.stringify(next));setOrder(next);setError('');}
+ const [sorting,setSorting]=useState(false);
+ const [dragging,setDragging]=useState(null),[dropTarget,setDropTarget]=useState(null);
+ const orderedAccounts=orderedProfiles(data?.profiles||profiles,displayOrder);
+ function moveAccount(id,target){
+  const order=orderedAccounts.map(account=>account.id);
+  const index=order.indexOf(id);
+  if(index<0||target<0||target>=order.length||target===index)return;
+  order.splice(index,1);
+  order.splice(target,0,id);
+  try{onDisplayOrder(order);setError('');}
   catch{setError('无法保存账号顺序，请重试。');}
  }
+ const endDrag=()=>{setDragging(null);setDropTarget(null);};
  const reload=async()=>{const result=await api.accounts();setData(result);return result;};
  useEffect(()=>{reload().catch(e=>setError(errorText(e)));},[profiles]);
  const locked=busy||working||!!bulk||checking.length>0||Object.values(loginStates).some(active);
@@ -91,11 +86,16 @@ export default function AccountManager({profiles,quotas,checking,bulk,onRefresh,
    <ol className="relay-order" aria-label={tr('手动排序')}>
     {orderedAccounts.map((p,index)=>{
      const label=accountLabel(p.provider,tr(p.name));
-     return <li className="account-sort-row" key={p.id}>
-      <span aria-hidden="true">{index+1}</span><strong>{label}</strong>
+     return <li className={`account-sort-row${dragging===p.id?' dragging':''}${dropTarget===p.id?' drag-over':''}`} key={p.id} draggable
+      onDragStart={e=>{e.dataTransfer.setData('text/plain',p.id);e.dataTransfer.effectAllowed='move';setDragging(p.id);}}
+      onDragOver={e=>{if(dragging&&dragging!==p.id){e.preventDefault();e.dataTransfer.dropEffect='move';setDropTarget(p.id);}}}
+      onDragLeave={e=>{if(!e.currentTarget.contains(e.relatedTarget))setDropTarget(old=>old===p.id?null:old);}}
+      onDrop={e=>{if(!dragging)return;e.preventDefault();moveAccount(dragging,index);endDrag();}}
+      onDragEnd={endDrag}>
+      <span className="account-sort-grip" aria-hidden="true"><GripVertical size={17}/>{index+1}</span><strong>{label}</strong>
       <div className="relay-row-actions">
-       <button disabled={index===0} title={tr('上移')} aria-label={`${tr('上移')} ${label}`} onClick={()=>moveAccount(index,-1)}><ArrowUp size={17}/></button>
-       <button disabled={index===orderedAccounts.length-1} title={tr('下移')} aria-label={`${tr('下移')} ${label}`} onClick={()=>moveAccount(index,1)}><ArrowDown size={17}/></button>
+       <button disabled={index===0} title={tr('上移')} aria-label={`${tr('上移')} ${label}`} onClick={()=>moveAccount(p.id,index-1)}><ArrowUp size={17}/></button>
+       <button disabled={index===orderedAccounts.length-1} title={tr('下移')} aria-label={`${tr('下移')} ${label}`} onClick={()=>moveAccount(p.id,index+1)}><ArrowDown size={17}/></button>
       </div>
      </li>;
     })}
